@@ -7,7 +7,7 @@ import TheGreatCommission from "./components/TheGreatCommision";
 
 export default function Home() {
   return (
-    <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
+    <div className="min-h-screen overflow-hidden bg-[#F7EDFE] px-6">
       <Hero />
       <TheGreatCommission />
       <GrowInGrace />

@@ -1,22 +1,22 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white pt-16">
-      <div className="container mx-auto px-4">
+    <footer className="bg-gradient-to-b from-[#A967F1] from-0% to-[#5B26B1] to-100% text-white pt-16">
+      <div className="container mx-auto px-6">
         {/* Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          {/* Brand */}
-          <div className="md:col-span-1">
-            <img src="/logo.png" alt="Breed" className="h-8 mb-4" />
-            <p className="text-purple-100 text-sm leading-relaxed">
+        <div className="w-full flex flex-col xl:flex-row gap-[32px] xl:gap-0">
+         <div className="w-full xl:w-[50%]">
+
+            <p className="text-white text-sm xl:text-[20px] leading-relaxed w-full xl:w-1/2">
               Your spiritual companion app built to help you stay consistent in
               your walk with God
             </p>
           </div>
-
-          {/* Product */}
+        <div className="w-full xl:w-[50%] grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr] gap-8 mb-12">
           <div>
-            <h3 className="font-bold mb-4 text-sm">Product</h3>
-            <ul className="space-y-2 text-purple-100 text-sm">
+            <h3 className="font-bold mb-4 text-sm xl:text-[20px]">Product</h3>
+            <ul className="space-y-2 text-purple-100 text-sm xl:text-[20px]">
               <li>
                 <a href="#" className="hover:text-white transition-colors">
                   For Believers
@@ -37,8 +37,8 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="font-bold mb-4 text-sm">Resources</h3>
-            <ul className="space-y-2 text-purple-100 text-sm">
+            <h3 className="font-bold mb-4 text-sm xl:text-[20px]">Resources</h3>
+            <ul className="space-y-2 text-purple-100 text-sm xl:text-[20px]">
               <li>
                 <a href="#" className="hover:text-white transition-colors">
                   Lorem Ipsum
@@ -59,8 +59,8 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="font-bold mb-4 text-sm">Company</h3>
-            <ul className="space-y-2 text-purple-100 text-sm">
+            <h3 className="font-bold mb-4 text-sm xl:text-[20px]">Company</h3>
+            <ul className="space-y-2 text-purple-100 text-sm xl:text-[20px]">
               <li>
                 <a href="#" className="hover:text-white transition-colors">
                   About Us
@@ -74,20 +74,21 @@ export default function Footer() {
             </ul>
           </div>
         </div>
+        </div>
 
         {/* Divider */}
         <div className="border-t border-purple-500 my-8"></div>
 
         {/* Bottom Footer */}
-        <div className="flex flex-col md:flex-row justify-between items-center text-purple-100 text-sm">
+        <div className="flex flex-row justify-between items-center text-white text-sm">
           <p>© 2025 Breed.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-white transition-colors">
+          <div className="flex gap-6 items-center">
+            <Link href="/terms" className=" transition-colors">
               Terms of Service
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
+            </Link>
+            <Link href="/privacy" className=" transition-colors">
               Privacy Policy
-            </a>
+            </Link>
           </div>
         </div>
         <img src="./Logo2.png" alt="logo" className="pt-16" />

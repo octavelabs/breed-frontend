@@ -54,7 +54,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] flex w-full lg:w-[70%] h-[80px] box-border mx-auto items-center justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white lg:bg-[#FBF6FF] lg:rounded-full border-[5px] border-white">
+      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] flex w-full xl:w-[70%] h-[80px] box-border mx-auto items-center justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white xl:bg-[#FBF6FF] xl:rounded-full border-[5px] border-white">
         <Link href="/">
           <img src="/Logo.png" alt="logo" className="h-[30px] w-auto" />
         </Link>
@@ -113,13 +113,14 @@ const Navbar = () => {
           isMobileMenuOpen ? "translate-y-0 top-[80px]" : "-translate-y-full"
         }`}
       >
-        <div className="flex flex-col py-6 px-6 max-h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="flex flex-col py-6 px-6 h-[calc(100vh-80px)] overflow-y-auto">
+          <div className="flex flex-col flex-grow">
           {mobileNavLinks.map((link, index) => (
             <Link
               key={index}
               href={link.path as string}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex py-4 items-center border-b border-gray-100 ${
+              className={`flex py-4 items-center ${
                 pathname.includes(link.path as string)
                   ? "text-[#330750] font-medium"
                   : "text-[#4E5255]"
@@ -128,14 +129,8 @@ const Navbar = () => {
               <p className="text-lg">{link.title}</p>
             </Link>
           ))}
+          </div>
           <div className="flex flex-col gap-3 mt-6">
-            <a
-              href="https://chat.whatsapp.com/GZznvmedujS2E5CbdxtFYG?mode=wwt"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-medium text-center hover:shadow-lg transition-all"
-            >
-              Join Our Community
-            </a>
             <Link
               href="/grant"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -143,6 +138,13 @@ const Navbar = () => {
             >
               Partner With Us
             </Link>
+             <a
+              href="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="w-full px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-medium text-center hover:shadow-lg transition-all"
+            >
+              Join Us Today
+            </a>
           </div>
         </div>
       </div>
