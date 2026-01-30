@@ -218,7 +218,7 @@ const TabContentOne = () => {
 
       {/* Right Preview Cards */}
       <div
-        className="bg-[#F1DFFF]  rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
+        className="bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
         <div className="space-y-[10px]">

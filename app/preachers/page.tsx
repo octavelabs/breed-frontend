@@ -1,8 +1,12 @@
 import { ArrowRight } from "lucide-react";
-import GetBreedApp from "../components/GetBreedApp";
+import GetBreedApp from "../components/landingPage/GetBreedApp";
+import Navbar from "../components/landingPage/Navbar";
+import Footer from "../components/landingPage/Footer";
 
 export default function PreachersPage() {
   return (
+    <>
+    <Navbar />
     <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
       <div className="container mx-auto px-4 pt-[150px] md:pt-[230px]">
         <div className="relative max-w-5xl mx-auto">
@@ -131,5 +135,7 @@ export default function PreachersPage() {
       </div>
       <GetBreedApp />
     </div>
+    <Footer />
+    </>
   );
 }
