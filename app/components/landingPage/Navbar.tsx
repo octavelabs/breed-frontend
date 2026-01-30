@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import NavbarDropdown from "./NavbarDropdown";
+
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import NavbarDropdown from "./NavbarDropdown";
 
 export const navLinks = [
   {

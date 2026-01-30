@@ -228,15 +228,15 @@ export default function TheGreatCommission() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const updateScrollDirection = useCallback(() => {
-    const currentScrollY = window.scrollY;
-    if (currentScrollY > lastScrollY.current) {
-      setScrollDirection("down");
-    } else if (currentScrollY < lastScrollY.current) {
-      setScrollDirection("up");
-    }
-    lastScrollY.current = currentScrollY;
-  }, []);
+  // const updateScrollDirection = useCallback(() => {
+  //   const currentScrollY = window.scrollY;
+  //   if (currentScrollY > lastScrollY.current) {
+  //     setScrollDirection("down");
+  //   } else if (currentScrollY < lastScrollY.current) {
+  //     setScrollDirection("up");
+  //   }
+  //   lastScrollY.current = currentScrollY;
+  // }, []);
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current || isMobile) return;
@@ -248,7 +248,7 @@ export default function TheGreatCommission() {
     animationFrameId.current = requestAnimationFrame(() => {
       if (!containerRef.current) return;
 
-      updateScrollDirection();
+      // updateScrollDirection();
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
@@ -271,7 +271,7 @@ export default function TheGreatCommission() {
       setScrollProgress(progress);
       setAnimationComplete(isComplete);
     });
-  }, [updateScrollDirection, isMobile]);
+  }, [isMobile]);
 
   useEffect(() => {
     if (isMobile) return;

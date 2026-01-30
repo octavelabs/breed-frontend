@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from "react";
+import Footer from "../components/landingPage/Footer";
+import Navbar from "../components/landingPage/Navbar";
 
 const sections = [
   {
@@ -74,8 +76,10 @@ export default function PrivacyPolicyPage() {
   const activeSection = sections.find(s => s.id === activeId);
 
   return (
-    <div className="min-h-screen bg-[#F7EFFF] px-4 md:px-12 py-10">
-      <div className="max-w-6xl mx-auto">
+    <>
+    <Navbar />
+    <div className="min-h-screen bg-[#F7EFFF] px-4 py-10">
+      <div className=" mx-auto  pt-[100px] md:pt-[230px]">
         <h1 className="text-3xl font-semibold text-purple-800">Privacy Policy</h1>
         <p className="text-sm text-purple-700 mt-2">Last Updated: 6th of August, 2025</p>
 
@@ -113,7 +117,7 @@ export default function PrivacyPolicyPage() {
               <div key={section.id} className="border-b border-purple-300 pb-2">
                 <button
                   onClick={() =>
-                    handleSectionChange(isOpen ? null : section.id)
+                    setOpenMobile(isOpen ? '' : section.id)
                   }
                   className="w-full flex items-center justify-between text-left text-purple-800 font-medium"
                 >
@@ -134,5 +138,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

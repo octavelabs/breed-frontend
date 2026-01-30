@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Calligraffitti } from 'next/font/google';
 import "./globals.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "./components/landingPage/Navbar";
+import Footer from "./components/landingPage/Footer";
 import localFont from 'next/font/local'
 
 
@@ -51,9 +51,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable}  ${aeonikFont.variable} ${calligraffitti.variable} antialiased`}
       >
-        <Navbar />
         {children}
-        <Footer />
       </body>
     </html>
   );

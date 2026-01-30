@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Hero() {
   return (
     <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px]">
@@ -75,9 +77,11 @@ export default function Hero() {
               </div>
             </button>
 
+            <Link href='/signup'>
             <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold">
               Join Us Today
             </button>
+            </Link>
           </div>
         </div>
       </div>
