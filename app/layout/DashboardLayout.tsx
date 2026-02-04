@@ -28,7 +28,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       <aside className="h-screen max-h-screen w-64 bg-white border-r border-gray-200 flex flex-col">
         {/* Logo */}
         <div className="px-[26px] pt-[44px] pb-[32px]">
-                    <img src="/Logo.png" alt="logo" className="h-[44px] w-auto" />
+                    <img src="/logo3.png" alt="logo" className="h-[44px] w-auto" />
 
         </div>
 
@@ -40,7 +40,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               href={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 isActive(item.path)
-                  ? 'bg-purple-50 text-purple-600'
+                  ? 'bg-[#FBF6FF] text-[#870BD6]'
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
