@@ -1,7 +1,12 @@
 "use client"
 
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
 
 const QuizCompletion = () => {
+  const {id} = useParams()
+
       return (
         <div className="min-h-screen bg-[#330750] flex items-center justify-center p-6">
           <div className="flex flex-col items-center">
@@ -20,13 +25,15 @@ const QuizCompletion = () => {
           <span className="inline-block bg-white text-green-600 text-xs font-semibold px-3 py-1 rounded-full mb-3">
             Score
           </span>
-          <h2 className="text-white text-4xl font-bold">100%</h2>
+          <h2 className="text-white text-[26px] font-semibold">100%</h2>
         </div>
             </div>
 
-           <button className="w-full bg-white rounded-full py-5 font-semibold text-base">
+{/* <Link href={`/dashboard/learn/materials/${Number(id) + 1}`}> */}
+           <button className="w-full bg-white rounded-full py-5 font-semibold text-base mt-8">
           Proceed to Chapter 2
         </button>
+        {/* </Link> */}
           </div>
         </div>
       );

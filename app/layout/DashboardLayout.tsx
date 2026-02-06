@@ -7,9 +7,10 @@ import { Home, BookOpen, Flame, Users, Menu, LogOut } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  custom?: boolean
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom }) => {
   const pathname = usePathname();
   const router = useRouter();
   
@@ -18,6 +19,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     { path: '/dashboard/learn', label: 'Learn', icon: BookOpen },
     { path: '/dashboard/buildup', label: 'Buildup', icon: Flame },
     { path: '/dashboard/community', label: 'Community', icon: Users },
+      { path: '/dashboard/more', label: 'More', icon: Menu },
   ];
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
@@ -48,11 +50,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               <span className="font-medium">{item.label}</span>
             </Link>
           ))}
-
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 w-full transition-colors">
-            <Menu className="w-5 h-5" />
-            <span className="font-medium">More</span>
-          </button>
         </nav>
 
         {/* User Profile */}
@@ -76,7 +73,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto p-[70px] pt-[79px]">
+      <main className={`flex-1 overflow-auto ${custom ? "" : "p-[70px] pt-[79px]"}`}>
         {children}
       </main>
     </div>
