@@ -6,21 +6,22 @@ import { ChevronRight, Clock, Clock1, RollerCoaster, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BookingModal } from "../components/BookingModal";
 
 
 
 const  MentorProfilePage = () => {
      const router = useRouter()
       const [activeTab, setActiveTab] = useState("overview")
+      const [isModalOpen, setModalOpen] = useState(false)
 
      const mentor = {
         id: 1,
-         name: "John Doe",
+         name: "Bisola Badejo",
          role: "Senior Software Engineer",
          image: "/courseImage1.png",
-         bio: "John has over 10 years of experience in software development and has worked with top tech companies. He specializes in full-stack development and has a passion for mentoring junior developers.",
-         expertise: ["Full-Stack Development", "React", "Node.js", "JavaScript", "TypeScript"],
-         availability: "Monday to Friday, 9 AM - 5 PM",
+         about: "General Mentorship",
+         duration: '1 hour',
          contact: "john.doe@example.com",
         completedSessions: 10,
         totalTime: 720,
@@ -28,6 +29,10 @@ const  MentorProfilePage = () => {
       
 
     return (
+      <>
+      {
+        isModalOpen && <BookingModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} mentorInfo={mentor} />
+      }
         <DashboardLayout>
     <div className="border-l border-[#D2D9DF]">
       {/* Header Banner */}
@@ -53,7 +58,7 @@ const  MentorProfilePage = () => {
           </div>
         </div>
 
-        <button className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold">
+        <button className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer" onClick={() => setModalOpen(true)}>
           Book a Session
         </button>
       </div>
@@ -131,6 +136,7 @@ const  MentorProfilePage = () => {
       </div>
     </div>
  </DashboardLayout>
+ </>
     )
 }
 

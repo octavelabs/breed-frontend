@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import AuthLayout from "../layout/AuthLayout";
 import Input from "../components/Input";
-import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
-import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const ForgotPassword: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);

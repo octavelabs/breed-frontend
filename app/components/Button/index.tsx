@@ -46,13 +46,13 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
       ref={ref}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${
+      className={`${buttonStyleClass} ${
         loading && !disabled
           ? "!cursor-not-allowed opacity-[0.5]"
           : !loading && disabled
             ? "!cursor-not-allowed !bg-[rgba(217,217,217,0.48)]"
             : ""
-      } flex gap-1 relative justify-center items-center rounded-full text-base h-10 w-auto  text-sm font-semibold ${buttonStyleClass} ${customClasses}`}
+      } flex gap-1 relative justify-center items-center rounded-full text-base h-10 w-auto  text-sm font-semibold  ${customClasses}`}
     >
       {loading ? <Loader  /> : children}
     </button>

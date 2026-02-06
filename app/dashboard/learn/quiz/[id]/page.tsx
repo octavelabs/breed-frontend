@@ -53,13 +53,13 @@ const Quiz: React.FC = () => {
         setSelectedAnswer(answerId);
         
         // Auto-advance after a short delay
-        setTimeout(() => {
-          if (currentQuestion < questions.length - 1) {
-            setSelectedAnswer(null);
-          } else {
-            alert('Quiz completed! 🎉');
-          }
-        }, 800);
+        // setTimeout(() => {
+        //   if (currentQuestion < questions.length - 1) {
+        //     setSelectedAnswer(null);
+        //   } else {
+        //     alert('Quiz completed! 🎉');
+        //   }
+        // }, 800);
       };
 
   const steps = questions.map((el) => (
@@ -93,6 +93,7 @@ if(quizCompleted){
       steps={steps}
       onComplete={() => setQuizCompleted(true)}
       completeButtonText="Submit"
+      handleNextClick={() => setCurrentQuestion((prev) => prev + 1)}
     />
     
     </div>
