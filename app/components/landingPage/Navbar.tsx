@@ -89,7 +89,7 @@ const Navbar = () => {
             <Link href="/grant">Partner With Us</Link>
           </button>
           <button className="px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
-            <a href="https://chat.whatsapp.com/GZznvmedujS2E5CbdxtFYG?mode=wwt">
+            <a href="">
               Join Us Today
             </a>
           </button>

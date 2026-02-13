@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface StepProgressProps {
@@ -30,6 +31,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = steps.length;
   const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
+  const router = useRouter();
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
@@ -61,7 +63,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
             {/* Close button */}
             <button 
               className="text-gray-400 hover:text-gray-600 transition-colors"
-              onClick={() => setCurrentStep(0)}
+              onClick={() => router.back()}
               aria-label="Close"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -120,7 +122,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
                 isFirstStep 
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                   : 'bg-gray-400 text-white hover:bg-gray-500'
-              }`}
+              } ${currentStep > 0 ? 'visible' : 'invisible'}`}
             >
               {previousButtonText}
             </button>

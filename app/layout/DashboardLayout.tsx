@@ -4,6 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, BookOpen, Flame, Users, Menu, LogOut } from 'lucide-react';
+import HomeIcon from '../assets/icons/homeIcon';
+import LearnIcon from '../assets/icons/learnIcon';
+import BuildupIcon from '../assets/icons/buildupIcon';
+import CommunityIcon from '../assets/icons/communityIcon';
+import MoreIcon from '../assets/icons/MoreIcon';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,11 +20,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom }) =
   const router = useRouter();
   
   const navItems = [
-    { path: '/dashboard/home', label: 'Home', icon: Home },
-    { path: '/dashboard/learn', label: 'Learn', icon: BookOpen },
-    { path: '/dashboard/buildup', label: 'Buildup', icon: Flame },
-    { path: '/dashboard/community', label: 'Community', icon: Users },
-      { path: '/dashboard/more', label: 'More', icon: Menu },
+    { path: '/dashboard/home', label: 'Home', icon: HomeIcon },
+    { path: '/dashboard/learn', label: 'Learn', icon: LearnIcon },
+    { path: '/dashboard/buildup', label: 'Buildup', icon: BuildupIcon },
+    { path: '/dashboard/community', label: 'Community', icon: CommunityIcon },
+      { path: '/dashboard/more', label: 'More', icon: MoreIcon },
   ];
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
@@ -46,7 +51,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom }) =
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon color={isActive(item.path) ? "#870BD6" : "#60666B"} />
               <span className="font-medium">{item.label}</span>
             </Link>
           ))}

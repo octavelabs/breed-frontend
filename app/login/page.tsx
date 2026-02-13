@@ -19,8 +19,26 @@ const Login: React.FC = () => {
 
   return (
     <AuthLayout>
-      <div className="">
-        <h2 className="text-[32px] font-bold leading-none text-center mb-8">Login to Account</h2>
+      <div className="bg-white p-8 rounded-[24px]">
+        <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-4 flex justify-center items-center mx-auto">
+          <img
+            src="./heroImage2.svg"
+            alt="bird"
+            className="w-[36px] h-[36px]"
+          />
+        </div>
+        <h2 className="text-[32px] font-bold leading-none text-center mb-2">
+          Welcome Back
+        </h2>
+        <p className="text-center text-sm text-gray-600 mb-8">
+          Don't have an account?{" "}
+          <Link
+            href="/signup"
+            className="text-purple-600 hover:underline font-medium"
+          >
+            Signup
+          </Link>
+        </p>
 
         <form className="flex flex-col gap-4">
           <div>
@@ -79,15 +97,6 @@ const Login: React.FC = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mb-2">
-          Don't have an account?{" "}
-          <Link
-            href="/signup"
-            className="text-purple-600 hover:underline font-medium"
-          >
-            Signup
-          </Link>
-        </p>
         <p className="text-center text-sm text-gray-600">
           Forgot your password?{" "}
           <Link

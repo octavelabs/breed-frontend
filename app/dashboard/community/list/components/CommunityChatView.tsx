@@ -1,4 +1,4 @@
-import { ChartAreaIcon } from "lucide-react";
+import { ChartAreaIcon, MoreHorizontalIcon, MoreVerticalIcon, Search } from "lucide-react";
 import { useState } from "react";
 import { EventCard } from "./EventCard";
 import { MessageBubble } from "./MessageBubble";
@@ -77,9 +77,13 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({ community 
   ];
 
   return (
-    <div className="h-screen">
+    <div className=" h-[calc(100vh-150px)]">
+      <div className='h-[56px] px-5 py-3 border-b border-[#D2D9DF] flex items-center justify-between'>
+        <p>{community.name}</p>
+        <div className="flex gap-2 "><Search /><MoreVerticalIcon /></div>
+      </div>
       
-      <div className="flex-1 max-h-[calc(100vh-100px)] overflow-y-auto px-8 pt-[70px] w-[50%] hide-scrollbar">
+      <div className="h-full max-h-[78%] overflow-auto px-8 pt-[70px]  hide-scrollbar w-full overflow-auto">
         <EventCard />
         <DateDivider date="Saturday 5th July, 2025" />
         {messages.map((message) => (

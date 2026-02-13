@@ -53,6 +53,7 @@ const HomePage = () => {
         {/* Suggested Course */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Suggested Course</h3>
+          <Link href='/dashboard/learn'>
           <div 
             className="bg-white rounded-2xl px-[28px] py-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
             
@@ -75,12 +76,14 @@ const HomePage = () => {
               />
             </div>
           </div>
+          </Link>
 
         </div>
 
         {/* Say a Prayer Today */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Say a Prayer Today</h3>
+          <Link href='/dashboard/buildup'>
           <div className="bg-white rounded-2xl px-[28px] py-4 shadow-sm">
             <div className="flex gap-10 items-center">
               <div className="flex-1">
@@ -100,6 +103,7 @@ const HomePage = () => {
               />
             </div>
           </div>
+          </Link>
         </div>
       </div>
 

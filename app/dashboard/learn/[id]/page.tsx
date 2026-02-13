@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
@@ -88,9 +88,13 @@ const { id } = useParams();
             <div className="p-4">
               <h3 className="font-semibold text-[20px] mb-[5.78px]">{course.title}</h3>
               <p className="text-[18px] leading-tight text-[#60666B] mb-3">{course.description}</p>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className='flex mb-3 items-center gap-2 text-[#60666B]'>
+                <User className="w-4 h-4" />
+                <p className='text-sm'>Chibuike Amadi</p>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-[#60666B]">
                 <Clock className="w-4 h-4" />
-                <span className='text-[18px] leading-none text-[#60666B]'>{course.duration} . {course.chapters}</span>
+                <span className='leading-none text-[#60666B]'>{course.duration} . {course.chapters}</span>
               </div>
             </div>
           </div>

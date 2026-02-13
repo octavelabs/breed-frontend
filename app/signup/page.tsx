@@ -7,21 +7,42 @@ import Input from "../components/Input";
 import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
 import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
+import StepProgress from "./components/StepProgress";
 
 const CreateAccount: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const steps = [
-    <StepOne setCurrentStep={setCurrentStep} currentStep={currentStep} />,
-    <StepTwo />,
-  ];
+  const [currentStep, setCurrentStep] = useState<number>(1);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
     // navigate('/create-password');
   };
+    const exampleSteps = [
+    {
+      content: (
+      <StepOne setCurrentStep={setCurrentStep} currentStep={currentStep} />
+      )
+    },
+     {
+      content: (
+      <StepTwo setCurrentStep={setCurrentStep} currentStep={currentStep}/>
+      )
+    },
+    {
+      content: (
+      <StepThree />
+      )
+    }
+  ]
 
-  return <AuthLayout>{steps[currentStep]}</AuthLayout>;
+  return <AuthLayout custom={true}>
+     <StepProgress
+      steps={exampleSteps}
+      currentStep={currentStep}
+      setCurrentStep={setCurrentStep}
+    />
+  </AuthLayout>;
 };
 
 const StepOne = ({
@@ -31,10 +52,66 @@ const StepOne = ({
   currentStep: number;
   setCurrentStep: (step: number) => void;
 }) => {
-  return (
-    <div className="">
-      <h2 className="text-[32px] font-bold leading-none text-center mb-8">Create an Account</h2>
 
+  return (
+    <div className="bg-white p-8 rounded-[24px]">
+      <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-4 flex justify-center items-center mx-auto">
+       <img
+              src="./heroImage2.svg"
+              alt="bird"
+              className="w-[36px]  h-[36px]  "
+            />
+            </div>
+      <h2 className="text-[24px] font-semibold leading-none text-center mb-2">Create an Account</h2>
+         <p className="text-center text-sm text-gray-600 mb-8">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="text-purple-600 hover:underline font-medium"
+        >
+          Login
+        </Link>
+      </p>
+
+      <form className="flex flex-col gap-4">
+      
+        <div>
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-medium  mb-2"
+                    >
+                      Email address
+                    </label>
+                    <div className="relative">
+                      <Input
+                        variant="outlined"
+                        type="text"
+                        id="firstName"
+                        onChange={() => console.log("firstname")}
+                        placeholder="Enter email address"
+                      />
+                    </div>
+                  </div>
+
+        {/* Submit button */}
+        <Button customClass="!w-full !h-[58px] mt-4 !text-white" onClick={() => setCurrentStep(currentStep + 1)} type='button'>
+          Proceed
+        </Button>
+      </form>
+    </div>
+  );
+};
+
+const StepTwo = ({
+  setCurrentStep,
+  currentStep,
+}: {
+  currentStep: number;
+  setCurrentStep: (step: number) => void;
+}) => {
+  return (
+    <div className="bg-white p-8 rounded-[24px]">
+ <h2 className="text-[24px] font-semibold leading-none text-center mb-8">Provide Personal Information</h2>
       <form className="flex flex-col gap-4">
         {/* First name */}
         <div>
@@ -71,23 +148,7 @@ const StepOne = ({
           </div>
         </div>
 
-         <div>
-                    <label
-                      htmlFor="firstName"
-                      className="block text-sm font-medium  mb-2"
-                    >
-                      Email address
-                    </label>
-                    <div className="relative">
-                      <Input
-                        variant="outlined"
-                        type="text"
-                        id="firstName"
-                        onChange={() => console.log("firstname")}
-                        placeholder="Enter email address"
-                      />
-                    </div>
-                  </div>
+        
 
         {/* Phone number */}
         <div>
@@ -133,24 +194,16 @@ const StepOne = ({
       </form>
 
       {/* Login link */}
-      <p className="text-center text-sm text-gray-600">
-        Already have an account?{" "}
-        <Link
-          href="/login"
-          className="text-purple-600 hover:underline font-medium"
-        >
-          Login
-        </Link>
-      </p>
+   
     </div>
   );
 };
 
-const StepTwo = () => {
+const StepThree = () => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <div className="">
-      <h2 className="text-[32px] font-bold leading-none text-center mb-8">Create Password</h2>
+    <div className="rounded-[24px] bg-white p-8">
+      <h2 className="text-[24px] font-semibold leading-none text-center mb-8">Set Password</h2>
 
       <form className="flex flex-col gap-4">
         <div>

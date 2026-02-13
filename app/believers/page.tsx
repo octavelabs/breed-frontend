@@ -39,7 +39,7 @@ export default function BelieversPage() {
               <button className="w-[90%] md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
                 Download app
                 <div className="flex items-center gap-1">
-                  <img src="/apple.svg" className="w-5 h-5" />
+                  <img src="/apple-play.svg" className="w-5 h-5" />
                   <img
                     src="/google-play.svg"
                     className="w-5 h-5 fill-current"
@@ -181,7 +181,7 @@ export default function BelieversPage() {
                 </h2>
 
                 <div className="w-full xl:w-[80%] bg-[#E7C8FF] rounded-[14px] xl:rounded-[28px]  border-[2.5px] border-[#FFFFFF8A] shadow-[0px_1.2px_29.92px_0px_#452A7C1A]">
-                  <img src="./Frame2.png" />
+                  <img src="./frame2.png" />
                 </div>
               </div>
 

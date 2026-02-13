@@ -29,7 +29,7 @@ export default function PreachersPage() {
             <button className="w-[90%] md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
               Download app
               <div className="flex items-center gap-1">
-                <img src="/apple.svg" className="w-5 h-5" />
+                <img src="/apple-play.svg" className="w-5 h-5" />
                 <img src="/google-play.svg" className="w-5 h-5 fill-current" />
               </div>
             </button>

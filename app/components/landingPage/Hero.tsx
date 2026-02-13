@@ -72,13 +72,13 @@ export default function Hero() {
             <button className="w-[90%] md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
               Download app
               <div className="flex items-center gap-1">
-                <img src="/apple.svg" className="w-5 h-5" />
+                <img src="/apple-play.svg" className="w-5 h-5" />
                 <img src="/google-play.svg" className="w-5 h-5 fill-current" />
               </div>
             </button>
 
             <Link href='/signup'>
-            <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold">
+            <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
               Join Us Today
             </button>
             </Link>
