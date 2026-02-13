@@ -18,17 +18,17 @@ export default function Footer() {
             <h3 className="font-bold mb-4 text-sm xl:text-[20px]">Product</h3>
             <ul className="space-y-2 text-purple-100 text-sm xl:text-[20px]">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/believers" className="cursor-pointer">
                   For Believers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/preachers" className="cursor-pointer">
                   For Preachers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="#" className="cursor-pointer">
                   For Churches(coming soon)
                 </a>
               </li>
@@ -91,7 +91,7 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        <img src="./Logo2.png" alt="logo" className="pt-16" />
+        <img src="/Logo2.png" alt="logo" className="pt-16 w-full" />
       </div>
     </footer>
   );

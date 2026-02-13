@@ -35,7 +35,7 @@ const Tabs: React.FC<TabsProps> = ({
   return (
     <div>
       {/* Tab Buttons */}
-      <div className={`flex gap-3 px-12 ${className}`}>
+      <div className={`flex gap-3 ${className}`}>
         {tabs.map((tab) => (
           <button
             key={tab.value}

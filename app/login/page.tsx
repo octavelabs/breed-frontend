@@ -19,7 +19,7 @@ const Login: React.FC = () => {
 
   return (
     <AuthLayout>
-      <div className="bg-white p-8 rounded-[24px]">
+      <div className="bg-white p-8 rounded-[24px] max-w-[700px] mx-auto">
         <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-4 flex justify-center items-center mx-auto">
           <img
             src="./heroImage2.svg"

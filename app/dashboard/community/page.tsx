@@ -49,7 +49,7 @@ const CommunityPage = () => {
         </Button>
       </div>
       <div className=" bg-white pt-5">
-        <Tabs tabs={tabs} defaultTab="communities" />
+        <Tabs tabs={tabs} defaultTab="communities" className="px-12" />
       </div>
     </DashboardLayout>
   );

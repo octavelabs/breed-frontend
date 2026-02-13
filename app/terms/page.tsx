@@ -27,7 +27,7 @@ const sections = [
   },
 ];
 
-export default function PrivacyPolicyPage() {
+export default function TermsPage() {
   const [activeId, setActiveId] = useState(sections[0].id);
   const [openMobile, setOpenMobile] = useState(sections[0].id);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -80,7 +80,7 @@ export default function PrivacyPolicyPage() {
     <Navbar />
     <div className="min-h-screen bg-[#F7EFFF] px-4 py-10 ">
       <div className="container mx-auto  pt-[100px] md:pt-[200px]">
-        <h1 className="text-[64px] leading-[72px] font-medium text-[#4E0A7C]">Privacy Policy</h1>
+        <h1 className="text-[64px] leading-[72px] font-medium text-[#4E0A7C]">Terms Of Service</h1>
         <p className="text-[18px] font-medium text-[#180426] mt-[40px] mb-5">Last Updated: 6th of August, 2025</p>
         <p className="text-[#4E5255] text-[18px] border-b border-[#D2D9DF] pb-10">
           At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat

@@ -40,7 +40,7 @@ export default function GrowInGrace() {
             </span>
           </div>
 
-          <h1 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-aeonik font-bold mb-2">
+          <h1 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-aeonik font-bold mb-2 text-white">
             Grow in Grace
           </h1>
 

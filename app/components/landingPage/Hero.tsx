@@ -77,7 +77,7 @@ export default function Hero() {
               </div>
             </button>
 
-            <Link href='/signup'>
+            <Link href='/welcome'>
             <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
               Join Us Today
             </button>
@@ -91,7 +91,7 @@ export default function Hero() {
           <div className="relative lg:aspect-[3/4] bg-gradient-to-b from-[#A967F1] to-[#5B26B1]">
             <div className="absolute inset-0 ">
               <img
-                src="./hero1.png"
+                src="/hero1.png"
                 alt="Woman praying"
                 className="w-full h-full object-cover mix-blend-overlay"
               />
@@ -101,7 +101,7 @@ export default function Hero() {
           <div className="relative lg:aspect-[3/4] bg-blue-600">
             <div className="absolute inset-0">
               <img
-                src="./hero2.png"
+                src="/hero2.png"
                 alt="Man reading bible"
                 className="w-full h-full object-cover mix-blend-overlay"
               />
@@ -111,7 +111,7 @@ export default function Hero() {
           <div className="relative lg:aspect-[3/4] bg-gradient-to-b from-pink-500/70 to-pink-600/70">
             <div className="absolute inset-0">
               <img
-                src="./hero4.png"
+                src="/hero4.png"
                 alt="Happy family"
                 className="w-full h-full object-cover mix-blend-luminosity"
               />
@@ -121,7 +121,7 @@ export default function Hero() {
           <div className="relative lg:aspect-[3/4] bg-[#1A8454]">
             <div className="absolute inset-0 ">
               <img
-                src="./hero3.png"
+                src="/hero3.png"
                 alt="Hands with plant"
                 className="w-full h-full object-cover mix-blend-luminosity"
               />
