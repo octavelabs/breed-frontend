@@ -4,7 +4,7 @@ import Loader from "../Loader";
 
 type Props = {
     children: React.ReactNode;
-    buttonType?: "primary" | "bordered";
+    buttonType?: "primary" | "bordered" | "custom";
     customClass?: string;
     loading?: boolean;
     onClick?: (e?: any) => void;
@@ -52,7 +52,7 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
           : !loading && disabled
             ? "!cursor-not-allowed !bg-[rgba(217,217,217,0.48)]"
             : ""
-      } flex gap-1 relative justify-center items-center rounded-full text-base h-10 w-auto  text-sm font-semibold  ${customClasses}`}
+      } flex gap-1 relative justify-center cursor-pointer items-center rounded-full text-base h-10 w-auto  text-sm font-semibold  ${customClasses}`}
     >
       {loading ? <Loader  /> : children}
     </button>

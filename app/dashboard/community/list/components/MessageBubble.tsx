@@ -13,7 +13,7 @@ type BubbleMessageProps = {
 }
 
 export const MessageBubble: React.FC<BubbleMessageProps> = ({ message, isOwnMessage }) => (
-  <div className={`flex gap-3 mb-8 `}>
+  <div className={`flex gap-3 mb-8 w-[60%] ${!isOwnMessage ? "mr-auto" : "ml-auto"}`}>
     {!isOwnMessage && (
       <img 
         src={message.avatar}
@@ -21,7 +21,7 @@ export const MessageBubble: React.FC<BubbleMessageProps> = ({ message, isOwnMess
         className="w-8 h-8 rounded-full object-cover flex-shrink-0 self-end"
       />
     )}
-    <div className="flex-1 w-auto bg-white rounded-[15px] py-2 px-[13px]">
+    <div className={`flex-1  ${!isOwnMessage ? "bg-[#F6F8FA]" : "bg-[#EAE1F2]"} rounded-[15px] py-2 px-[13px]`}>
       <div className="text-[10px] font-semibold mb-2">
         {message.author}
       </div>

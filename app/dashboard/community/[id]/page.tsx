@@ -1,12 +1,15 @@
 "use client"
 import DashboardLayout from "@/app/layout/DashboardLayout"
+import { ArrowLeft, Globe, Users } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { JoinCommunityModal } from "../list/components/JoinCommunityModal"
 
   
   const SingleCommunityPage = () => {
         const [activeTab, setActiveTab] = useState("description")
         const router = useRouter()
+        const [openModal, setOpenModal] = useState(false)
 
         const community = {
          id: 1,
@@ -20,12 +23,28 @@ import { useState } from "react"
         totalTime: 720,
      }
 
+       const guidelines = [
+    'Be respectful and kind to all members',
+    'No spam or self-promotion without permission',
+    'Keep discussions relevant to the community topic',
+    'Report inappropriate behavior to moderators',
+    'Follow all applicable laws and regulations',
+    'Respect intellectual property and privacy rights'
+  ];
+
     return (
-  <DashboardLayout>
+  <DashboardLayout custom={true}>
+    {openModal && <JoinCommunityModal isOpen={openModal} onClose={() => setOpenModal(false)} communityName={community.title} guidelines={guidelines}/>}
     <div className="border-l border-[#D2D9DF]">
       {/* Header Banner */}
       <div className="bg-[#870BD6] h-48 relative" style={{backgroundImage: "url('/dashboard-header.png')"}}>
         {/* Pattern overlay */}
+         <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
+      >
+        <ArrowLeft className="w-5 h-5 text-white" />
+      </button>
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.15)_1px,_transparent_1px)] [background-size:20px_20px]" />
       </div>
 
@@ -73,7 +92,7 @@ import { useState } from "react"
           </div>
         </div>
 
-        <button className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer" onClick={() => router.push(`/dashboard/community/list`)}>
+        <button className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer" onClick={() => setOpenModal(true)}>
           Join Community
         </button>
       </div>
@@ -107,6 +126,17 @@ import { useState } from "react"
                 They also share spiritual resources like prayer reels and weekly playlists 
 (“BTH Global Weekly Faves”), blending community moments with worship and devotion
               </p>
+              <div className="space-y-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-[#4E5255]">
+              <Globe stroke='#870BD6' className="w-3 h-3" />
+              <p>This is an open community. Anyone can join this community.</p>
+            </div>
+            
+            <div className="flex items-center gap-2 text-sm text-[#4E5255]">
+              <Users stroke='#870BD6'className="w-3 h-3" />
+              <p>Everyone can interact in this community</p>
+            </div>
+          </div>
             </div>
           </>
         )}

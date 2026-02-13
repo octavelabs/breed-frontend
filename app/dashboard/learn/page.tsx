@@ -1,3 +1,4 @@
+import Tabs from '@/app/components/Tabs';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import Link from 'next/link';
 import React from 'react';
@@ -6,7 +7,41 @@ import React from 'react';
 const Learn: React.FC = () => {
 
 
-  const categories = [
+
+
+   const tabs = [
+    { 
+      label: 'Discover', 
+      value: 'discover',
+      content: <DiscoverCourses />
+    },
+    { 
+      label: 'In progress', 
+      value: 'inProgress',
+      content: <DiscoverCourses />
+    },
+    { 
+      label: 'Completed', 
+      value: 'completed',
+      content: <DiscoverCourses />
+    },
+  ];
+
+  return (
+    <DashboardLayout>
+    <div className="">
+      <h1 className="text-[32px] leading-none font-bold mb-5">Learn</h1>
+      <Tabs
+        tabs={tabs} 
+        defaultTab="discover"
+      />
+    </div>
+    </DashboardLayout>
+  );
+};
+
+const DiscoverCourses = () => {
+    const categories = [
     {
       id: 1,
       title: 'Knowing Jesus',
@@ -30,11 +65,7 @@ const Learn: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout>
-    <div className="">
-      <h1 className="text-[32px] leading-none font-bold mb-8">Learn</h1>
-
-      <div className="grid grid-cols-3 gap-6 xl:gap-8">
+     <div className="grid grid-cols-3 gap-6 xl:gap-8">
         {categories.map((category, index) => (
             <Link href={`/dashboard/learn/${category.id}`} key={index}>
           <div
@@ -53,9 +84,7 @@ const Learn: React.FC = () => {
           </Link>
         ))}
       </div>
-    </div>
-    </DashboardLayout>
-  );
-};
+  )
+}
 
 export default Learn;

@@ -25,15 +25,15 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({ communities,
   );
 
   return (
-    <div className="w-[40%] bg-[#F8F9FC] h-screen max-h-screen border-r border-gray-200 flex flex-col ">
+    <div className="w-[40%] overflow-hidden h-[calc(100vh-150px)] border-r border-gray-200 flex flex-col ">
       {/* Header */}
-      <div className="px-[44px] pt-[64px] pb-6">
-        <h1 className="text-[32px] font-bold text-black mb-3 leading-none">
+      <div className="px-[44px] pt-6 pb-4">
+        <p className="text-sm font-medium text-[#60666B] mb-3 leading-none">
           Community
-        </h1>
+        </p>
 
         {/* Search */}
-        <div className="relative">
+        {/* <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
             <SearchIcon />
           </div>
@@ -44,7 +44,7 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({ communities,
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2.5 text-sm font-normal text-black bg-white border border-gray-200 rounded-lg outline-none focus:border-purple-400 transition-colors"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Communities List */}

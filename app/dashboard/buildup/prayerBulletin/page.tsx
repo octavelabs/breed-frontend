@@ -46,7 +46,7 @@ const router = useRouter();
 
       <div className="grid grid-cols-3 gap-6 xl:gap-8">
         {categories.map((category, index) => (
-            <Link href={`/dashboard/learn/${category.id}`} key={index}>
+            <Link href={`/dashboard/buildup/prayerBulletin/${category.id}`} key={index}>
           <div
             className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group"
           >

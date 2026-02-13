@@ -2,11 +2,12 @@
 
 import FlameIcon from "@/app/assets/icons/flame";
 import DashboardLayout from "@/app/layout/DashboardLayout"
-import { ChevronRight, Clock } from "lucide-react";
+import { ChevronRight, Clock, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import MentorCard from "./components/MentorCard";
 import { useRouter } from "next/navigation";
+import Input from "@/app/components/Input";
 
  const mentorsData = [
       {
@@ -91,36 +92,32 @@ const  MentorShipPage = () => {
         <DashboardLayout>
             <div className="mx-auto">
       <h1 className="text-[32px] leading-none font-bold mb-2">Mentorship Hub</h1>
-<p className="text-base leading-none mb-8">
+<p className="text-base leading-tight mb-8">
                 Step into a space designed to help you grow with guidance, structure, and support. The Mentorship Hub connects you with a trusted mentor who walks alongside you in your spiritual journey. Stay accountable, share your challenges, and grow stronger in community as your mentor helps you walk in truth and purpose.
               </p>
  <div className="mb-10 animate-fade-in-up stagger-1">
-              <div className="relative max-w-2xl">
-                <svg 
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" 
-                  width="20" 
-                  height="20" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 rounded-[10px] border-2 border-gray-200 focus:border-purple-400 focus:outline-none transition-all bg-white "
-                  style={{ fontSize: '16px' }}
-                />
-              </div>
+
             </div>
 
   <div>
-              <h2 className="text-2xl font-bold mb-6 clash-display animate-fade-in-up stagger-2">
+    <div className="flex gap-2 items-center mb-6">
+              <h2 className="text-base font-semibold  whitespace-nowrap ">
                 Select a Mentor
               </h2>
+             
+               <Input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search name"
+                                    variant="outlined"
+                                    icon={<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2  w-5 h-5 opacity-50"/>}
+                                    className="!bg-white !border-[#F2F2F7] !w-[50%] !max-w-[800px]"
+                                  />
+                               
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {filteredMentors.map((mentor, index) => (
                   <div key={mentor.id} className={`stagger-${Math.min(index + 3, 5)}`}>

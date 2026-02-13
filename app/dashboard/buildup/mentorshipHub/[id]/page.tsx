@@ -33,7 +33,7 @@ const  MentorProfilePage = () => {
       {
         isModalOpen && <BookingModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} mentorInfo={mentor} />
       }
-        <DashboardLayout>
+        <DashboardLayout custom={true}>
     <div className="border-l border-[#D2D9DF]">
       {/* Header Banner */}
       <div className="bg-[#870BD6] h-48 relative" style={{backgroundImage: "url('/dashboard-header.png')"}}>
@@ -110,7 +110,7 @@ const  MentorProfilePage = () => {
             </div>
 
             {/* Stats */}
-            <div className="bg-white rounded-2xl p-4 shadow-[0px_4.29px_4.29px_0px_#60666B0D] flex w-[40%] flex-shrink-0">
+            <div className="bg-white rounded-2xl p-4 shadow-[0px_4.29px_4.29px_0px_#60666B0D] flex w-[40%] flex-shrink-0 gap-2">
               <Stat
                 label="Completed Sessions"
                 value="10"
