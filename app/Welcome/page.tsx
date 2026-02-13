@@ -1,8 +1,13 @@
+'use client'
+
 import Link from "next/link"
 import Button from "../components/Button"
+import { useRouter } from "next/navigation"
 
 
 const WelcomePage = () => {
+    const router = useRouter()
+
     return (
         <div className="flex items-center justify-center h-screen bg-[#180426]">
            <div className="rounded-[24px] p-12 bg-[#100319] flex flex-col items-center gap-[40px] w-[540px]">
@@ -10,11 +15,11 @@ const WelcomePage = () => {
                 <img src='logo3.svg' alt='logo' />
                 <p className="text-sm text-white">Select an option</p>
             </div>
-             <div>
-                 <Button customClass="!w-full !h-[58px]  !text-white" onClick={() => console.log('done')} type='button'>
+             <div className="w-full">
+                 <Button customClass="!w-full !h-[52px] !text-white" onClick={() => router.push('/signup')} type='button'>
                           Continue with Email
                         </Button>
-                         <Button customClass="!w-full !h-[58px] mt-3 !text-white !bg-[#330750]" onClick={() => console.log('done')} type='button'>
+                         <Button buttonType='custom' customClass="!w-full !h-[52px] mt-3 !text-white !bg-[#330750]" onClick={() => console.log('done')} type='button'>
                                   Continue with Google
                                 </Button>
              </div>

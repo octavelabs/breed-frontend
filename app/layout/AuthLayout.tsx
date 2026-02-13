@@ -12,6 +12,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, custom = false }) => 
         <div className="relative w-full h-full flex flex-col items-center justify-center px-15 bg-cover bg-no-repeat bg-center"
         style={{backgroundImage: `url('/authLayout.webp')` }}>
           <div className="relative z-10 text-white mt-[70%]  w-full rounded-[12px] p-6 bg-[#F8F9FC1A]">
+            <img src='/frame.svg' className='mb-4' />
             <p className="text-[20px] leading-[24px] mb-4">
               At <span className='font-[800]'>breed</span>, we believe growth
               in God shouldn't be left to
