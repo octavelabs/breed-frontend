@@ -35,6 +35,11 @@ body {
  animation: backAndForth 2s ease 0s infinite;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
+
 @keyframes backAndForth {
   0%{
     transform: translateY(0px);

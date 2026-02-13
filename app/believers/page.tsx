@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import GetBreedApp from "../components/landingPage/GetBreedApp";
 import Navbar from "../components/landingPage/Navbar";
 import Footer from "../components/landingPage/Footer";
+import Link from "next/link";
 
  const days = [
     { day: 'M'},
@@ -46,10 +47,11 @@ export default function BelieversPage() {
                   />
                 </div>
               </button>
-
+          <Link href='/welcome'>
               <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold">
                 Join Us Today
               </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -78,14 +80,14 @@ export default function BelieversPage() {
                     <p className="text-xs text-gray-500">🕐 &nbsp; 4 · 5mins</p>
                   </div>
                   <div className="w-[96px] rounded-[11px] flex items-center justify-center flex-shrink-0">
-                    <img src="./DailyEdification2.png" />
+                    <img src="/DailyEdification2.png" />
                   </div>
                 </div>
               </div>
 
               <div className="relative min-h-80 md:min-h-auto p-2">
                 <img
-                  src="./hero1.png"
+                  src="/hero1.png"
                   alt="Woman praying"
                   className="w-full h-full object-cover rounded-[32px]"
                 />
@@ -107,7 +109,7 @@ export default function BelieversPage() {
                 <div className="w-full xl:w-[80%] bg-[#FFFFFFB2] rounded-[14px] xl:rounded-[28px] p-4 xl:p-6 flex  items-center gap-4 border-[2.5px] border-[#FFFFFF8A]">
                   <div className="w-[32px] h-[32px] md:w-[64px] md:h-[64px] rounded-[8px] overflow-hidden">
                     <img
-                      src="./believers.png"
+                      src="/believers.png"
                       alt="Believers group"
                       className="w-full h-full object-cover mix-blend-luminosity"
                     />
@@ -124,21 +126,21 @@ export default function BelieversPage() {
                       <div className="flex items-center -space-x-3">
                         <div className="w-12 h-12 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
                           <img
-                            src="./believers1.jpg"
+                            src="/believers1.jpg"
                             alt="Member 1"
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="w-12 h-12 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
                           <img
-                            src="./believers2.jpg"
+                            src="/believers2.jpg"
                             alt="Member 2"
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="w-12 h-12 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
                           <img
-                            src="./believers3.jpg"
+                            src="/believers3.jpg"
                             alt="Member 3"
                             className="w-full h-full object-cover"
                           />
@@ -154,14 +156,14 @@ export default function BelieversPage() {
 
                   {/* Right: Calendar icon */}
                   <div className="w-[52px] h-[52px]">
-                    <img src="./beach.svg" className="w-full h-full" />
+                    <img src="/beach.svg" className="w-full h-full" />
                   </div>
                 </div>
               </div>
 
               <div className="relative min-h-80 md:min-h-auto order-1 md:order-2 p-2">
                 <img
-                  src="./hero2.png"
+                  src="/hero2.png"
                   alt="Man reading bible"
                   className="w-full h-full object-cover rounded-3xl"
                 />
@@ -181,13 +183,13 @@ export default function BelieversPage() {
                 </h2>
 
                 <div className="w-full xl:w-[80%] bg-[#E7C8FF] rounded-[14px] xl:rounded-[28px]  border-[2.5px] border-[#FFFFFF8A] shadow-[0px_1.2px_29.92px_0px_#452A7C1A]">
-                  <img src="./frame2.png" />
+                  <img src="/frame2.png" />
                 </div>
               </div>
 
               <div className="relative min-h-80 md:min-h-auto p-2">
                 <img
-                  src="./believer.png"
+                  src="/believer.png"
                   alt="Hands praying together"
                   className="w-full h-full object-cover rounded-3xl"
                 />
@@ -220,7 +222,7 @@ export default function BelieversPage() {
                 <div key={index} className="flex flex-col items-center gap-2">
                   {/* Flame icon */}
                   <div>
-                    <img src='./flame.svg' className="w-6 h-6" />
+                    <img src='/flame.svg' className="w-6 h-6" />
                   </div>
                   {/* Day label */}
                   <span className="text-base font-semibold text-[#0F422E]">
@@ -233,7 +235,7 @@ export default function BelieversPage() {
             {/* Streak Counter */}
 
               <div className="bg-[#B4F6D5] border-[1.2px] border-[#65E9A8] rounded-full px-4 xl:px-6 py-3 flex items-center gap-[2px]">
-                <img src='./flame.svg' className="w-6 h-6" />
+                <img src='/flame.svg' className="w-6 h-6" />
                 <span className="text-2xl xl:text-4xl font-semibold text-[#0F0F20]">
                   7
                 </span>
@@ -246,7 +248,7 @@ export default function BelieversPage() {
 
               <div className="relative min-h-80 md:min-h-auto order-1 md:order-2 p-2">
                 <img
-                  src="./believer2.png"
+                  src="/believer2.png"
                   alt="Growth tracking"
                   className="w-full h-full object-cover rounded-3xl"
                 />

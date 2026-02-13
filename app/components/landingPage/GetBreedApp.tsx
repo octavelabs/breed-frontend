@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Testimonials from "./Testimonial";
+import Link from "next/link";
 
 
 export default function GetBreedApp() {
@@ -38,7 +39,7 @@ export default function GetBreedApp() {
               <button className="group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
                 Download app
                 <div className="flex items-center gap-1">
-                  <img src="/apple.svg" className="w-5 h-5" />
+                  <img src="/apple-play.svg" className="w-5 h-5" />
                   <img
                     src="/google-play.svg"
                     className="w-5 h-5 fill-current"
@@ -67,18 +68,18 @@ export default function GetBreedApp() {
                 <h2 className="text-[24px] xl:text-[36px] font-black text-white mb-4 leading-tight font-aeonik">
                   Rooted in Christ, Growing Together
                 </h2>
-
-                <p className=" mb-8 text-sm xl:text-base leading-relaxed">
+                <p className=" mb-8 text-sm xl:text-base leading-relaxed text-white">
                   Whether you're just beginning or leading others, Breed is your
                   space to grow in Christ, stay accountable, and walk in
                   purpose. Join here and take the next step in your faith
                   journey.
                 </p>
-
+                <Link href='/welcome'>
                 <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold transition-all w-fit">
                   Join Us Today
                   <ArrowRight className="w-4 h-4" />
                 </button>
+                </Link>
               </div>
             </div>
           </div>

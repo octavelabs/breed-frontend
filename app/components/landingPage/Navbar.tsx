@@ -89,9 +89,9 @@ const Navbar = () => {
             <Link href="/grant">Partner With Us</Link>
           </button>
           <button className="px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
-            <a href="">
+            <Link href="/welcome">
               Join Us Today
-            </a>
+            </Link>
           </button>
         </div>
 
@@ -133,19 +133,19 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col gap-3 mt-6">
             <Link
-              href="/grant"
+              href="/"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full px-6 py-3 text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full font-medium text-center hover:shadow-lg transition-all"
             >
               Partner With Us
             </Link>
-             <a
-              href="/"
+             <Link
+              href="/welcome"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-medium text-center hover:shadow-lg transition-all"
             >
               Join Us Today
-            </a>
+            </Link>
           </div>
         </div>
       </div>

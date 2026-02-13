@@ -114,14 +114,14 @@ export default function Community() {
   const bottomStyle = animationComplete ? 0 : "auto";
 
   const floatingImages = [
-    { id: 1, top: "5%", left: "5%", size: 120, photo: "./community1.png" },
-    { id: 2, top: "8%", left: "40%", size: 150, photo: "./community2.png" },
-    { id: 3, top: "5%", right: "8%", size: 100, photo: "./community3.png" },
-    { id: 4, top: "35%", left: "0%", size: 130, photo: "./community4.png" },
-    { id: 5, top: "30%", right: "0%", size: 110, photo: "./community5.png" },
-    { id: 6, top: "65%", left: "8%", size: 140, photo: "./community6.png" },
-    { id: 7, top: "80%", left: "50%", size: 100, photo: "./community7.png" },
-    { id: 8, top: "72%", right: "12%", size: 120, photo: "./community8.png" },
+    { id: 1, top: "5%", left: "5%", size: 120, photo: "/community1.png" },
+    { id: 2, top: "8%", left: "40%", size: 150, photo: "/community2.png" },
+    { id: 3, top: "5%", right: "8%", size: 100, photo: "/community3.png" },
+    { id: 4, top: "35%", left: "0%", size: 130, photo: "/community4.png" },
+    { id: 5, top: "30%", right: "0%", size: 110, photo: "/community5.png" },
+    { id: 6, top: "65%", left: "8%", size: 140, photo: "/community6.png" },
+    { id: 7, top: "80%", left: "50%", size: 100, photo: "/community7.png" },
+    { id: 8, top: "72%", right: "12%", size: 120, photo: "/community8.png" },
   ];
 
   return (
@@ -205,7 +205,7 @@ export default function Community() {
                 >
                   <div className="relative w-full h-full">
                     <img
-                      src="./heaven.png"
+                      src="/Heaven.png"
                       alt="Community"
                       className="w-full h-full object-cover"
                     />
@@ -220,7 +220,7 @@ export default function Community() {
                 <div
                   className="absolute inset-0 hidden md:flex items-center justify-start px-8"
                   style={{ 
-                    backgroundImage: `url('/heaven.png')`,
+                    backgroundImage: "url('/Heaven.png')",
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -246,7 +246,7 @@ export default function Community() {
                 <div
                   className="absolute inset-0 flex md:hidden flex-col justify-center px-6 py-8"
                   style={{ 
-                    backgroundImage: `url('/heaven.png')`,
+                    backgroundImage: `url('/Heaven.png')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
