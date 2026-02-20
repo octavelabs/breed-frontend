@@ -58,7 +58,7 @@ export default function Footer() {
           </div>
 
           {/* Company */}
-          <div>
+          <div className="text-end">
             <h3 className="font-bold mb-4 text-sm xl:text-[20px]">Company</h3>
             <ul className="space-y-2 text-purple-100 text-sm xl:text-[20px]">
               <li>
