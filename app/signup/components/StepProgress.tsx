@@ -31,7 +31,7 @@ const StepProgress: React.FC<StepProgressProps> = ({
     <div className="overflow-hidden">
       {/* Header with Progress Bar */}
       <div className="">
-        <div className="bg-[#F8F9FC] flex h-[100px] px-8 items-center">
+        <div className="bg-[#F8F9FC] flex h-[70px] lg:h-[100px] px-4 lg:px-8 items-center">
           <button
             onClick={() =>
               currentStep > 0 ? setCurrentStep(currentStep - 1) : router.back()
@@ -58,7 +58,7 @@ const StepProgress: React.FC<StepProgressProps> = ({
       </div>
 
       {/* Content Area */}
-      <div className="px-[200px] py-12 pt-30 max-h-[calc(100vh-102px)] overflow-auto">
+      <div className="px-4 lg:px-[100px] xl:px-[200px] py-12 pt-30 max-h-[calc(100vh-102px)] overflow-auto">
         {currentStepData.content}
       </div>
     </div>

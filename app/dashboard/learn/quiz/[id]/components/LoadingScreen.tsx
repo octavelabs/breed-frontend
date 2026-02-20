@@ -24,12 +24,12 @@ const LoadingScreen:React.FC<LoadingScreenProps> = ({ onLoadComplete }) => {
 
             {/* Loading Text */}
             <div className="text-white space-y-4 text-center">
-              <h2 className="text-[24px] leading-tight font-semibold">Loading...</h2>
-              <p className="text-[24px] leading-tight font-medium mx-auto">
+              <h2 className="text-[20px] lg:text-[24px] leading-tight font-semibold">Loading...</h2>
+              <p className="text-[20px] lg:text-[24px] leading-tight font-medium mx-auto">
                 Hey there! Don't worry, spiritual<br />
                 growth doesn't happen by accident.
               </p>
-              <p className="text-[24px] leading-tight font-medium mx-auto">
+              <p className="text-[20px] lg:text-[24px] leading-tight font-medium mx-auto">
                 Let's walk through this together and<br />
                 grow deeper in the Word step by step!
               </p>

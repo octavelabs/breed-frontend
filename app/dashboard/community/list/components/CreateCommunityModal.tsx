@@ -289,9 +289,21 @@ export const CreateCommunityModal = ({
               </div>
 
               {/* Guidelines */}
-              <div className="pt-2">
+              <div className=" bg-[#F6F8FA] rounded-[16px] p-5">
                 <div className="flex items-start gap-3">
-                  <input
+                 
+                  <div className='flex-1'>
+                    <label
+                      htmlFor="guidelines"
+                      className="text-sm font-medium text-gray-900 cursor-pointer"
+                    >
+                      Accept Breed's community guidelines
+                    </label>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      The following will serve as rules for your community
+                    </p>
+                  </div>
+                   <input
                     type="checkbox"
                     id="guidelines"
                     checked={formData.guidelinesAccepted}
@@ -303,17 +315,6 @@ export const CreateCommunityModal = ({
                     }
                     className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500 cursor-pointer mt-0.5"
                   />
-                  <div>
-                    <label
-                      htmlFor="guidelines"
-                      className="text-sm font-medium text-gray-900 cursor-pointer"
-                    >
-                      Accept Breed's community guidelines
-                    </label>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      The following will serve as rules for your community
-                    </p>
-                  </div>
                 </div>
 
                 <ul className="mt-3 ml-7 space-y-1.5">

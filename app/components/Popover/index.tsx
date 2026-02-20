@@ -2,8 +2,8 @@ import React, { RefObject, useEffect, useRef } from 'react';
 
 
 interface CustomPopoverProp {
-  parentRef: RefObject<HTMLDivElement>
-  buttonRef: RefObject<HTMLButtonElement>;
+  parentRef: RefObject<HTMLDivElement | null>
+  buttonRef: RefObject<HTMLButtonElement | null>;
   content: {item: string, icon?: React.ReactNode, onClick: () => void}[];
   handleClose: () => void;
   hasIcon?: boolean;
@@ -48,7 +48,7 @@ const CustomPopover: React.FC<CustomPopoverProp> = ({ buttonRef, content, handle
     >
       {content.map((el: any, idx: number) => (
         <React.Fragment key={idx}>
-          <div className="flex border-b px-4 py-2 gap-x-3 items-center cursor-pointer " onClick={() => {
+          <div className="flex  px-4 py-2 gap-x-3 items-center cursor-pointer " onClick={() => {
             el.onClick()
             handleClose()
             }}>

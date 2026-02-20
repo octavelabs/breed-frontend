@@ -3,23 +3,33 @@
 import FlameIcon from "@/app/assets/icons/flame";
 import Tabs from "@/app/components/Tabs";
 import DashboardLayout from "@/app/layout/DashboardLayout";
-import { ChevronRight, Clock, Plus } from "lucide-react";
+import { ChevronRight, Clock, Plus, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { CommunitySidebar } from "./list/components/CommunitySidebar";
 import { CommunityChatView } from "./list/components/CommunityChatView";
 import { EmptyState } from "./list/components/EmptyState";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/app/components/Button";
 import { CreateCommunityModal } from "./list/components/CreateCommunityModal";
 
 const CommunityPage = () => {
   const [openModal, setOpenModal] = useState(false);
+   const [isMobile, setIsMobile] = useState(false)
+  
+    useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(window.matchMedia("(max-width: 767px)").matches)
+      }
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
+      return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
   const tabs = [
     {
       label: "Your Communities",
       value: "communities",
-      content: <Communities setOpenModal={setOpenModal} />,
+      content: <Communities setOpenModal={setOpenModal} isMobile={isMobile} />,
     },
     {
       label: "Explore",
@@ -36,10 +46,10 @@ const CommunityPage = () => {
           onClose={() => setOpenModal(false)}
         />
       )}
-      <div className="flex justify-between items-center pb-8 px-12 mt-[64px] border-b border-[#D2D9DF]">
-        <h1 className="text-[32px] leading-none font-bold ">Community</h1>
+      <div className="flex justify-between items-center pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold ">Community</h1>
         <Button
-          customClass="!w-fit px-6 !h-[48px] !text-white"
+          customClass="!w-fit px-6 !h-[48px] !text-white hidden"
           type="button"
           onClick={() => setOpenModal(true)}
         >
@@ -47,10 +57,20 @@ const CommunityPage = () => {
             <Plus stroke="white" /> Create a community
           </p>
         </Button>
+        <SearchIcon className="block lg:hidden" /> 
       </div>
       <div className=" bg-white pt-5">
-        <Tabs tabs={tabs} defaultTab="communities" className="px-12" />
+        <Tabs tabs={tabs} defaultTab="communities" className="px-4 lg:px-12" />
       </div>
+      {/* <Button
+                    customClass="!w-full px-6 !h-[48px] !text-white absolute mt-4 lg:hidden"
+                    type="button"
+                    onClick={() => setOpenModal(true)}
+                  >
+                    <p className="flex items-center gap-[6px]">
+                      Join community
+                    </p>
+                  </Button> */}
     </DashboardLayout>
   );
 };
@@ -74,7 +94,7 @@ const Explore = () => {
     },
   ];
   return (
-    <div className="grid grid-cols-3 gap-4 px-[44px] bg-[#fafafa] pt-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-[32px] lg:gap-4 px-4 lg:px-[44px] bg-[#fafafa] pt-6 border-t border-[#D2D9DF]">
       {content.map((item, index) => (
         <Link href={`/dashboard/community/${item.id}`} key={index}>
           <div className="bg-white rounded-[10px] py-3 px-4 flex  items-center gap-4">
@@ -93,21 +113,21 @@ const Explore = () => {
               {/* Avatar group with count */}
               <div className="flex items-center gap-3">
                 <div className="flex items-center -space-x-3">
-                  <div className="w-12 h-12 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
                     <img
                       src="/believers1.jpg"
                       alt="Member 1"
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="w-12 h-12 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
                     <img
                       src="/believers2.jpg"
                       alt="Member 2"
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="w-12 h-12 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
                     <img
                       src="/believers3.jpg"
                       alt="Member 3"
@@ -126,8 +146,10 @@ const Explore = () => {
 
 const Communities = ({
   setOpenModal,
+  isMobile,
 }: {
   setOpenModal: (val: boolean) => void;
+  isMobile: boolean;
 }) => {
   const [selectedCommunity, setSelectedCommunity] = useState(null);
 
@@ -146,7 +168,7 @@ const Communities = ({
     },
   ];
   return (
-    <div className="flex  h-[calc(100vh-150px)] border-t border-[#D2D9DF]">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] pt-6">
       {communities.length < 1 ? (
         <div className="bg-white h-full w-full flex justify-center items-center">
           <div className="flex flex-col gap-4 w-[400px] items-center">
@@ -173,10 +195,16 @@ const Communities = ({
             selectedCommunity={selectedCommunity}
             onSelectCommunity={setSelectedCommunity}
           />
-          {selectedCommunity ? (
-            <CommunityChatView community={selectedCommunity} />
+          {isMobile ? (
+            selectedCommunity ? (
+              <CommunityChatView community={selectedCommunity} setSelectedCommunity={setSelectedCommunity} />
+            ) : null
           ) : (
-            <EmptyState />
+            selectedCommunity ? (
+              <CommunityChatView community={selectedCommunity} setSelectedCommunity={setSelectedCommunity}/>
+            ) : (
+              <EmptyState />
+            )
           )}
         </>
       )}

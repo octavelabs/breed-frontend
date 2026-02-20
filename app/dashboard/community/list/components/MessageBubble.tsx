@@ -1,4 +1,4 @@
-import { User2 } from "lucide-react";
+import { CircleUserRound} from "lucide-react";
 
 
 type BubbleMessageProps = {
@@ -34,7 +34,7 @@ export const MessageBubble: React.FC<BubbleMessageProps> = ({ message, isOwnMess
     </div>
     {isOwnMessage && (
       <button className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center self-end justify-center cursor-pointer flex-shrink-0 hover:bg-gray-50 transition-colors">
-        <User2 />
+        <CircleUserRound />
       </button>
     )}
   </div>

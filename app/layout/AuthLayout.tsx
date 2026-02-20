@@ -28,7 +28,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, custom = false }) => 
         </div>
       </div>
       <div className="w-full lg:w-[60%] flex items-start  bg-[#F8F9FC] overflow-auto">
-        <div className={`w-full ${custom ? "" : "px-[200px] py-12 pt-32"}`}>
+        <div className={`w-full ${custom ? "" : "px-4 lg:px-[100px] xl:px-[200px] py-12 pt-32"}`}>
           {children}
         </div>
       </div>

@@ -48,11 +48,11 @@ const router = useRouter();
       >
         <ArrowLeft className="w-5 h-5" />
       </button>
-      <h1 className="text-[32px] leading-none font-bold mb-8">Greatness Is Key</h1>
+      <h1 className="text-[24px] lg:text-[32px] leading-none font-bold mb-4 lg:mb-8">Greatness Is Key</h1>
 
       {/* Course Header */}
-      <div className="flex gap-12 mb-10">
-        <div className="flex-1 text-[#60666B] text-base w-1/2">
+      <div className="flex flex-col lg:flex-row gap-12 mb-10">
+        <div className="w-full lg:w-1/2 text-[#60666B] text-base w-1/2">
           <p className="mb-2 leading-relaxed">
             Greatness isn't just about success it's about rising to purpose. It's the quiet discipling, the faithful obedience, 
             and the courage to serve when no one's watching.
@@ -63,7 +63,7 @@ const router = useRouter();
             spotlight that defines it, but the Spirit that fuels it.
           </p>
           
-          <p className="mb-6 leading-relaxed">
+          <p className="mb-4 lg:mb-6 leading-relaxed">
             Greatness is key not to fame, but to fulfilling the call.
           </p>
 
@@ -74,7 +74,7 @@ const router = useRouter();
         </div>
 
         {/* Course Image */}
-        <div className="w-1/2 h-full max-h-[300px] rounded-2xl overflow-hidden">
+        <div className="w-full lg:w-1/2 h-full max-h-[300px] rounded-2xl overflow-hidden">
           <img
             src="/courseImage.jpg"
             alt="Course"
@@ -87,7 +87,7 @@ const router = useRouter();
       <div>
         <h2 className="text-[20px] font-bold mb-6 border-b border-[#D2D9DF]">Chapters</h2>
         
-        <div className="flex flex-col gap-8">
+        <div className="hidden lg:flex flex-col gap-8">
           {chapters.map((chapter) => (
             <div key={chapter.id} className="px-4">
               <div className="flex gap-4">
@@ -117,6 +117,20 @@ const router = useRouter();
             </div>
           ))}
         </div>
+        <div className='flex flex-col gap-4 lg:hidden'>
+   {
+    chapters.map((chapter, idx) => (
+       <Link href={`/dashboard/learn/materials/${chapter.id}`} key={chapter.id}>
+      <div className={`flex flex-col items-center w-1/2 ${(idx + 1) % 2 === 0 ? 'ml-auto' : ""}`}>
+        <div className={`w-[80px] h-[80px] rounded-full mb-2 ${!chapter.hasButton ? "bg-[#D2D9DF] text-[#60666B]" : "text-[#5B26B1] bg-[#FBF6FF] border-2 border-[#5B26B1]"} flex justify-center items-center text-[45px] font-bold `}>
+          {idx + 1}
+          </div>
+          <p className={`text-base ${!chapter.hasButton ? "text-[#D2D9DF]" : "text-black"}`}>{chapter.title}</p>
+        </div>
+        </Link>
+    ))
+   }
+          </div>
       </div>
     </div>
     </DashboardLayout>

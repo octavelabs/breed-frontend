@@ -17,11 +17,11 @@ const CourseMaterials: React.FC = () => {
       subtitle: 'Chapter 1',
       title: 'The Fall That Made Grace Necessary',
       content: (
-        <div className="flex gap-6 min-h-[calc(100vh-400px)]">
+        <div className="flex flex-col l:flex-row gap-6 min-h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>
@@ -41,35 +41,24 @@ It becomes a quiet, powerful resistance to fear and frustration reminding us tha
       subtitle: 'Chapter 1',
       title: 'The Fall That Made Grace Necessary',
       content: (
-          <div>
-              <div className="relative bg-gray-900 rounded-[20px] overflow-hidden mb-4 aspect-video">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button className="w-20 h-20 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all shadow-lg">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-1">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                  </button>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="text-6xl mb-4">📖</div>
-                    <p className="text-lg">Video Content</p>
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm text-center">Click play to begin the chapter</p>
-            </div>
+           <video
+      className="rounded-[16px] h-[600px]"
+      src='/test.mp4'
+      width="100%"
+      controls
+      controlsList="nodownload"
+    />
       )
     },
          {
        subtitle: 'Chapter 1',
       title: 'The Fall That Made Grace Necessary',
       content: (
-        <div className="flex gap-6 min-h-[calc(100vh-400px)]">
+        <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>
@@ -87,11 +76,11 @@ Mark 1:35 (NIV)
            subtitle: 'Chapter 1',
       title: 'The Fall That Made Grace Necessary',
       content: (
-        <div className="flex gap-6 h-[calc(100vh-400px)]">
+        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>

@@ -118,7 +118,7 @@ const  MentorShipPage = () => {
                                   />
                                
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {filteredMentors.map((mentor, index) => (
                   <div key={mentor.id} className={`stagger-${Math.min(index + 3, 5)}`}>
                     <MentorCard mentor={mentor} onClick={() => router.push(`/dashboard/buildup/mentorshipHub/${mentor.id}`)} />

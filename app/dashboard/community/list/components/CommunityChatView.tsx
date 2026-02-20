@@ -1,7 +1,9 @@
-import { ChartAreaIcon, MoreHorizontalIcon, MoreVerticalIcon, Search } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, BellOff, ChartAreaIcon, LogOut, MoreVerticalIcon, Search, Settings, Trash } from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { EventCard } from "./EventCard";
 import { MessageBubble } from "./MessageBubble";
+import Button from "@/app/components/Button";
+import CustomPopover from "@/app/components/Popover";
 
 type CommunityChatViewProps = {
   community: {
@@ -20,9 +22,15 @@ type CommunityChatViewProps = {
       image: string;
     }>;
   };
-};      
+  setSelectedCommunity: (community: any) => void
+};  
 
-export const CommunityChatView: React.FC<CommunityChatViewProps> = ({ community }) => {
+ type PopoverState = {
+  visible: boolean;
+  rowData: null | any;
+}
+
+export const CommunityChatView: React.FC<CommunityChatViewProps> = ({ community, setSelectedCommunity }) => {
   const [messageText, setMessageText] = useState('');
 
   const messages = [
@@ -76,11 +84,72 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({ community 
     }
   ];
 
+    const parentRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLButtonElement | null>(null);
+    const [popover, setPopover] = useState<PopoverState>({
+    visible: false,
+    rowData: null,
+  });
+
+    const handleClose = useCallback(() => {
+    setPopover((prevState) => ({
+      ...prevState,
+      visible: false,
+      rowData: null,
+    }));
+  }, [setPopover]);
+
+    const popoverContent = useMemo(() => {
+    // if (!popover.rowData) return [];
+
+    return [
+      {
+        item: "Settings",
+        icon: <Settings className="w-[14px] h-[14px]" />,
+        onClick: () => {
+        
+        },
+      },
+      {
+        item: "Leave",
+        icon: <LogOut className="w-[14px] h-[14px] rotate-180" />,
+        onClick: () => {
+         
+        },
+      },
+         {
+        item: "Mute",
+        icon: <BellOff className="w-[14px] h-[14px]" />,
+        onClick: () => {
+        
+        },
+      },
+         {
+        item: "Delete",
+        icon: <Trash className="w-[14px] h-[14px]" stroke='red' />,
+        onClick: () => {
+          
+        },
+      },
+    ];
+  }, [popover.rowData]);
+
   return (
-    <div className=" h-[calc(100vh-150px)]">
-      <div className='h-[56px] px-5 py-3 border-b border-[#D2D9DF] flex items-center justify-between'>
-        <p>{community.name}</p>
-        <div className="flex gap-2 "><Search /><MoreVerticalIcon /></div>
+    <div className=" h-[calc(100vh-150px)] relative" ref={parentRef}>
+      <div className='h-[56px] px-5 py-3 border-b border-[#D2D9DF] flex items-center justify-between relative'>
+        <div className="flex gap-2 items-center"><ArrowLeft className="block lg:hidden" onClick={() => setSelectedCommunity(null)} /><p>{community.name}</p></div>
+        <div className="flex gap-2 items-center"><Search />
+        <Button
+                      customClass="!bg-transparent"
+                      buttonType="custom"
+                      onClick={() => {
+                        setPopover((prev) => ({
+                          ...prev,
+                          visible: !prev.visible,
+                        }));
+                      }}
+                      ref={anchorRef}
+                    ><MoreVerticalIcon /></Button></div>
       </div>
       
       <div className="h-full max-h-[78%] overflow-auto px-8 pt-[70px]  hide-scrollbar w-full overflow-auto">
@@ -108,6 +177,16 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({ community 
           />
         </div>
       </div>
+      {popover.visible && (
+              <CustomPopover
+                parentRef={parentRef}
+                buttonRef={anchorRef}
+                content={popoverContent}
+                handleClose={handleClose}
+                hasIcon={true}
+                leftOffset={80}
+              />
+            )}
     </div>
   );
 };

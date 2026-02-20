@@ -1,5 +1,5 @@
 import { SearchIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CommunityItem from "./CommunityItem";
 
 
@@ -19,15 +19,25 @@ type CommunitySidebarProps = {
 
 export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({ communities, selectedCommunity, onSelectCommunity }) => {
   const [searchQuery, setSearchQuery] = useState('');
+    const [isMobile, setIsMobile] = useState(false)
+  
+    useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(window.matchMedia("(max-width: 767px)").matches)
+      }
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
+      return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
   const filteredCommunities = communities.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="w-[40%] overflow-hidden h-[calc(100vh-150px)] border-r border-gray-200 flex flex-col ">
+    <div className={` ${isMobile && !selectedCommunity ? "block" : "hidden"}w-full lg:w-[40%] overflow-hidden h-[calc(100vh-150px)] border-r border-gray-200 flex flex-col `}>
       {/* Header */}
-      <div className="px-[44px] pt-6 pb-4">
+      <div className="px-4 lg:px-[44px] pt-6 pb-4">
         <p className="text-sm font-medium text-[#60666B] mb-3 leading-none">
           Community
         </p>
