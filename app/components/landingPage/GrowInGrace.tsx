@@ -29,7 +29,7 @@ export default function GrowInGrace() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4">
+    <div className="max-w-7xl mx-auto space-y-4 px-6">
       {/* Top Grid - 2 Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Blue Card - Grow in Grace */}

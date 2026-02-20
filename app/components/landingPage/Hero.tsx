@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px]">
+    <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-6">
       <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full" />
 
       <div className="relative max-w-5xl mx-auto">
