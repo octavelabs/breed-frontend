@@ -96,14 +96,14 @@ const StepProgress:React.FC<StepProgressProps> = ({
         <div className=" pb-6">
           {/* Subtitle (if exists) */}
           {currentStepData?.subtitle && (
-            <p className="text-[20px] mb- text-[#60666B]">
+            <p className="text-base lg:text-[20px] mb- text-[#60666B]">
               {currentStepData?.subtitle}
             </p>
           )}
 
           {/* Title */}
           {currentStepData.title && (
-            <h1 className="text-[32px] font-bold  mb-7">
+            <h1 className="text-[24px] lg:text-[32px] font-bold  mb-7">
               {currentStepData.title}
             </h1>
           )}

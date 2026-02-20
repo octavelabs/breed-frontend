@@ -28,12 +28,15 @@ const Learn: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout>
-    <div className="">
-      <h1 className="text-[32px] leading-none font-bold mb-5">Learn</h1>
+    <DashboardLayout custom={true}>
+      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold ">Learn</h1>
+      </div>
+    <div className="bg-white pt-5">
       <Tabs
         tabs={tabs} 
         defaultTab="discover"
+        className="px-4 lg:px-12" 
       />
     </div>
     </DashboardLayout>
@@ -65,7 +68,7 @@ const DiscoverCourses = () => {
   ];
 
   return (
-     <div className="grid grid-cols-3 gap-6 xl:gap-8">
+     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 border-t border-[#D2D9DF] p-4 lg:px-12 bg-[#F8F9FC] pt-6">
         {categories.map((category, index) => (
             <Link href={`/dashboard/learn/${category.id}`} key={index}>
           <div

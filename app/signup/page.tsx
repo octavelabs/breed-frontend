@@ -10,7 +10,7 @@ import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
 import StepProgress from "./components/StepProgress";
 
 const CreateAccount: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ const StepOne = ({
   setCurrentStep: (step: number) => void;
 }) => {
   return (
-    <div className="bg-white p-8 rounded-[24px] max-w-[700px] mx-auto">
+    <div className="bg-white p-4 lg:p-8 rounded-[24px] max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-4 flex justify-center items-center mx-auto">
         <img
           src="./heroImage2.svg"
@@ -113,7 +113,7 @@ const StepTwo = ({
   setCurrentStep: (step: number) => void;
 }) => {
   return (
-    <div className="bg-white p-8 rounded-[24px] max-w-[700px] mx-auto">
+    <div className="bg-white p-4 lg:p-8 rounded-[24px] max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <h2 className="text-[24px] font-semibold leading-none text-center mb-8">
         Provide Personal Information
       </h2>
@@ -204,7 +204,7 @@ const StepTwo = ({
 const StepThree = () => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <div className="rounded-[24px] bg-white p-8 max-w-[700px] mx-auto">
+    <div className="rounded-[24px] bg-white p-4 lg:p-8 max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <h2 className="text-[24px] font-semibold leading-none text-center mb-8">
         Set Password
       </h2>

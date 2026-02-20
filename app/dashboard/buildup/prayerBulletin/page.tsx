@@ -42,9 +42,9 @@ const router = useRouter();
       >
         <ArrowLeft className="w-5 h-5 text-[#60666B]" />
       </button>
-      <h1 className="text-[32px] leading-none font-bold mb-8">Prayer Bulletin</h1>
+      <h1 className="text-[24px] lg:text-[32px] leading-none font-bold mb-8">Prayer Bulletin</h1>
 
-      <div className="grid grid-cols-3 gap-6 xl:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
         {categories.map((category, index) => (
             <Link href={`/dashboard/buildup/prayerBulletin/${category.id}`} key={index}>
           <div

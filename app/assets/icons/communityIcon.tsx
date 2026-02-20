@@ -1,6 +1,6 @@
-const CommunityIcon = ({ color, size = 26 }: {color: string, size?: number}) => {
+const CommunityIcon = ({ color, size = 26, fill='none' }: {color: string, size?: number, fill?: string}) => {
   return (
-<svg width={size} height={size} viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width={size} height={size} viewBox="0 0 27 27" fill={fill} xmlns="http://www.w3.org/2000/svg">
 <path d="M18.791 6.83594C21.0069 8.37599 22.5359 10.8246 22.8461 13.6499" stroke={color} strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M3.86719 13.7055C4.15526 10.8913 5.66207 8.44274 7.85582 6.8916" stroke={color} strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M9.07422 23.2002C10.3594 23.8539 11.8219 24.2195 13.362 24.2195C14.8467 24.2195 16.2427 23.8871 17.4947 23.2778" stroke={color} strokeLinecap="round" strokeLinejoin="round"/>

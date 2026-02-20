@@ -18,8 +18,8 @@ const Login: React.FC = () => {
   };
 
   return (
-    <AuthLayout>
-      <div className="bg-white p-8 rounded-[24px] max-w-[700px] mx-auto">
+    <AuthLayout custom={false}>
+      <div className="bg-white p-4 lg:p-8 rounded-[24px] max-w-[500px] mx-auto">
         <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-4 flex justify-center items-center mx-auto">
           <img
             src="./heroImage2.svg"
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
             className="w-[36px] h-[36px]"
           />
         </div>
-        <h2 className="text-[32px] font-bold leading-none text-center mb-2">
+        <h2 className="text-[24px] lg:text-[32px] font-bold leading-none text-center mb-2">
           Welcome Back
         </h2>
         <p className="text-center text-sm text-gray-600 mb-8">

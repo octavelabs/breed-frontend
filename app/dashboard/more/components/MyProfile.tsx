@@ -1,9 +1,10 @@
 import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 
-const MyProfile = () => {
+const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => void}) => {
       const [formData, setFormData] = useState({
     firstName: "Amber",
     lastName: "James",
@@ -28,9 +29,10 @@ const MyProfile = () => {
   };
     return (
         <>
+         <ArrowLeft className="lg:hidden mb-4" stroke='#60666B' onClick={() => setShowSelectedTab(false) } />
             <h2 className="text-[24px] font-bold mb-8">Profile</h2>
             
-           <div className="w-[40%]">
+           <div className="w-full lg:w-[40%]">
             <div className="flex flex-col items-center mb-8">
               <div className="w-24 h-24 rounded-full border border-gray-300 flex items-center justify-center mb-2">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">

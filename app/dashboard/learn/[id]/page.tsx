@@ -71,10 +71,10 @@ const { id } = useParams();
         <ArrowLeft className="w-5 h-5" />
       </button>
 
-      <h1 className="text-[32px] leading-none font-bold mb-8">Knowing Jesus</h1>
+      <h1 className="text-[18px] md:text-[24px] lg:text-[32px] leading-none font-bold mb-8">Knowing Jesus</h1>
 
       {/* Courses Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course, index) => (
             <Link href={`/dashboard/learn/${id}/chapters/${course.id}`} key={index}>
           <div
@@ -86,9 +86,9 @@ const { id } = useParams();
               className="w-full h-40 object-cover"
             />
             <div className="p-4">
-              <h3 className="font-semibold text-[20px] mb-[5.78px]">{course.title}</h3>
-              <p className="text-[18px] leading-tight text-[#60666B] mb-3">{course.description}</p>
-              <div className='flex mb-3 items-center gap-2 text-[#60666B]'>
+              <h3 className="font-semibold text-sm lg:text-[20px] mb-[5.78px]">{course.title}</h3>
+              <p className="text-[12px] lg:text-[18px] leading-tight text-[#60666B] mb-2 lg:mb-3">{course.description}</p>
+              <div className='flex mb-2 lg:mb-3 items-center gap-2 text-[#60666B]'>
                 <User className="w-4 h-4" />
                 <p className='text-sm'>Chibuike Amadi</p>
               </div>

@@ -22,7 +22,7 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <AuthLayout>
-      <div className="bg-white p-8 rounded-[24px] max-w-[700px] mx-auto">{steps[currentStep]}</div>
+      <div className="bg-white p-4 p-8 rounded-[24px] max-w-[500px] mx-auto">{steps[currentStep]}</div>
     </AuthLayout>
   );
 };

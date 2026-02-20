@@ -8,40 +8,16 @@ import React from 'react';
 
 const CourseMaterials: React.FC = () => {
 
-
-  const categories = [
-    {
-      id: 1,
-      title: 'Knowing Jesus',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500',
-    },
-    {
-      id: 2,
-      title: 'Salvation',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500',
-    },
-    {
-      id: 3,
-      title: 'Understand the Bible',
-      image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=500',
-    },
-    {
-      id: 4,
-      title: 'Preaching the Word',
-      image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=500',
-    },
-  ];
-
   const exampleSteps = [
     {
       subtitle: 'Prayer Bulletin',
       title: 'Personal Devotion',
       content: (
-        <div className="flex gap-6 h-[calc(100vh-400px)]">
+        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>
@@ -64,11 +40,11 @@ Over time, personal devotion becomes more than a practice it becomes a lifeline,
       subtitle: 'Prayer Bulletin',
       title: 'Prayer for a Consistent Devotional Life',
       content: (
-        <div className="flex gap-6 h-[calc(100vh-400px)]">
+        <div className="flex flex-col lg:flex-row  gap-6 h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>
@@ -86,11 +62,11 @@ Mark 1:35 (NIV)
       subtitle: 'Prayer Bulletin',
       title: 'Prayer for God’s Prescence in Daily Life',
       content: (
-        <div className="flex gap-6 h-[calc(100vh-400px)]">
+        <div className="flex flex-col lg:flex-row  gap-6 h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>
@@ -108,11 +84,11 @@ Mark 1:35 (NIV)
       subtitle: 'Prayer Bulletin',
       title: 'Thanksgiving',
       content: (
-        <div className="flex gap-6 h-[calc(100vh-400px)]">
+        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-400px)]">
           <img 
             src="/dashboard-gratitude.png" 
             alt="Devotional" 
-            className="w-72 h-48 object-cover rounded-lg"
+            className="w-full lg:w-72 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 text-gray-700 space-y-4">
             <p>
@@ -128,7 +104,6 @@ Mark 1:35 (NIV)
   return (
     <DashboardLayout>
     <div className="">
- 
      <StepProgress
       steps={exampleSteps}
       onComplete={() => alert('Completed all steps!')}

@@ -24,7 +24,7 @@ const CommunityItem: React.FC<CommunityItemProps> = ({ community, isSelected, on
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`flex items-center gap-5 px-[44px] py-3 cursor-pointer transition-colors ${getBackgroundClass()}`}
+      className={`flex items-center gap-5 px-4 lg:px-[44px] py-3 cursor-pointer transition-colors ${getBackgroundClass()}`}
     >
       <img 
         src={community.avatar}

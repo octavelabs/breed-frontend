@@ -4,6 +4,7 @@ import { DateSelectStep } from './DateSelectStep';
 import { TimeSelectStep } from './TimeSelectStep';
 import { ConfirmBookingStep, formatDate } from './ConfirmBookingStep';
 import { Modal } from '@/app/components/Modal';
+import Button from '@/app/components/Button';
 ;
 
 interface MentorInfo {
@@ -81,11 +82,11 @@ export function BookingModal({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={handleClose} customClass='!w-[60%]' title='Mentorship' name={mentorInfo?.name} role={mentorInfo?.role} showHeader={true}>
+      <Modal isOpen={isOpen} onClose={handleClose} customClass='!w-[60%]' title='Mentorship' name={mentorInfo?.name} role={mentorInfo?.role} showHeader={isSuccessModalOpen ? false : true}>
         {isSuccessModalOpen ?
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center animate-scale-in">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center animate-scale-in mx-auto">
           <button 
-            onClick={handleSuccessModalClose}
+            onClick={handleClose}
             className="ml-auto block text-gray-400 hover:text-gray-600 mb-4"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,12 +130,12 @@ export function BookingModal({
             </div>
           </div>
 
-          <button
+          <Button
             onClick={handleSuccessModalClose}
-            className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-purple-700 btn-hover-lift"
+            customClass="!w-full !text-white"
           >
             Manage Booking
-          </button>
+          </Button>
         </div> :
       <div className="flex">
           <div className="flex flex-col gap-4 w-1/2">

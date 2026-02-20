@@ -40,7 +40,7 @@ const Input: React.ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
   } 
 
   ${variant === "primary" && "bg-[#d9d9d93d] text-gray-900"}
-  ${variant === "outlined" && "border border-[#60666B]"}
+  ${variant === "outlined" && "border border-[#B9C2CA]"}
   ${className} 
   ${
     isError && errorCondition

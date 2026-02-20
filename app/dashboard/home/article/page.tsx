@@ -19,14 +19,14 @@ const router = useRouter();
         <ArrowLeft className="w-5 h-5 text-[#60666B]" />
       </button>
       <div className="mb-8">
-        <h1 className="text-[32px] font-bold mb-4">Gratitude</h1>
+        <h1 className="tet-[20px] lg:text-[32px] font-bold mb-3">Gratitude</h1>
         <div className="flex items-center justify-between">
-          <div className="bg-[#F7EDFF] px-12 py-[10px] rounded-full">
-          <span className="text-[#870BD6] font-medium text-[20px] leading-none">Salvation</span>
+          <div className="bg-[#F7EDFF] px-2 lg:px-12 py-1 lg:py-[10px] rounded-[5px] lg:rounded-full">
+          <span className="text-[#870BD6] font-medium text-xs lg:text-[20px] leading-none">Salvation</span>
           </div>
           <div className="flex items-center gap-2 text-gray-500">
             <Clock className="w-4 h-4" />
-            <span>4min read</span>
+            <span className="text-sm lg:text-[20px]">4min read</span>
           </div>
         </div>
       </div>

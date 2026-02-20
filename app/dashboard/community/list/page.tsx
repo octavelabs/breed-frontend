@@ -32,7 +32,7 @@ const CommunityListPage = () => {
         onSelectCommunity={setSelectedCommunity}
       />
       {selectedCommunity ? (
-        <CommunityChatView community={selectedCommunity} />
+        <CommunityChatView community={selectedCommunity} setSelectedCommunity={setSelectedCommunity} />
       ) : (
         <EmptyState />
       )}

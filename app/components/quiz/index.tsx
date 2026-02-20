@@ -27,14 +27,14 @@ const QuizQuestion:React.FC<QuizQuestionProps>  = ({
 
   return (
     <div className="flex gap-6 h-[calc(100vh-400px)]">
-          <div className="flex gap-[48px]">
+          <div className="flex flex-col lg:flex-row gap-[32px] lg:gap-[48px]">
         {/* Question */}
-        <h2 className="text-[32px] mb-8 leading-snug w-1/2">
+        <h2 className="text-[26px] lg:text-[32px]leading-snug w-full lg:w-1/2">
           {question}
         </h2>
 
         {/* Options */}
-        <div className="space-y-3 w-1/2">
+        <div className="space-y-3 w-full lg:w-1/2">
           {options.map((option) => {
             const isSelected = selectedAnswer === option.id;
             
@@ -49,7 +49,7 @@ const QuizQuestion:React.FC<QuizQuestionProps>  = ({
                 }`}
                 style={isSelected ? { backgroundColor: `rgb(147 51 234)` } : {}}
               >
-                <span className="flex-1 pr-4 text-[20px] leading-[30px] font-semibold">{option.text}</span>
+                <span className="flex-1 pr-4 text-base lg:text-[20px] leading-[24px] lg:leading-[30px] font-semibold">{option.text}</span>
                 
                 {/* Radio Button */}
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
