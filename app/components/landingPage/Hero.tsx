@@ -1,8 +1,19 @@
+"use client"
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import Button from "../Button";
 
 export default function Hero() {
+   const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+
+
   return (
-    <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-6">
+    <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-[31px]">
       <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full" />
 
       <div className="relative max-w-5xl mx-auto">
@@ -14,7 +25,7 @@ export default function Hero() {
             & Accountability
           </span>
         </div>
-        <div className="flex flex-col text-[#3C3E40] absolute bottom-[140px] xl:bottom-15 -rotate-[5deg] left-0 xl:left-40 text-[8.85px] xl:text-[18px]">
+        <div className="flex flex-col text-[#3C3E40] absolute bottom-[150px] xl:bottom-15 -rotate-[5deg] -left-5 xl:left-40 text-[8.85px] xl:text-[18px]">
           <span className="pl-3 pr-2 py-1 bg-[#C8DBFF] rounded-[8px] w-fit">
             Scripture
           </span>
@@ -31,7 +42,7 @@ export default function Hero() {
           </span>
         </div>
 
-        <div className="flex flex-col text-[#3C3E40] absolute bottom-[130px] xl:bottom-15 rotate-[10deg] right-0 xl:-right-10 text-[8.85px] xl:text-[18px]">
+        <div className="flex flex-col text-[#3C3E40] absolute bottom-[150px] xl:bottom-15 rotate-[10deg] -right-6 xl:-right-10 text-[8.85px] xl:text-[18px]">
           <span className="pl-3 pr-2 py-1 bg-[#B4F6D5] rounded-[8px] w-fit">
             Community
           </span>
@@ -49,7 +60,13 @@ export default function Hero() {
             </div>
           </div>
 
-          <h1 className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik relative">
+          <motion.h1
+          variants={fadeIn}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+          className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik relative">
             Grow in FAITH <br /> WALK in Purpose
             <img
               src="./heroImage2.svg"
@@ -61,15 +78,15 @@ export default function Hero() {
               alt="pathway"
               className="absolute bottom-[-70px] xl:bottom-[20px] right-[40px] xl:right-[120px] w-6 h-6 xl:w-[56px] xl:h-[56px]"
             />
-          </h1>
+          </motion.h1>
 
-          <p className="text-base lg:text-[24px] text-[#4E5255] mb-10 max-w-2xl mx-auto font-medium">
+          <p className="text-base lg:text-[24px] text-[#4E5255] mb-12 max-w-2xl mx-auto font-medium">
             A spiritual companion app built to help you stay consistent in your
             walk with God
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="w-[90%] md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
+            <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
               Download app
               <div className="flex items-center gap-1">
                 <img src="/apple-play.svg" className="w-5 h-5" />
@@ -77,16 +94,21 @@ export default function Hero() {
               </div>
             </button>
 
-            <Link href='/welcome'>
-            <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
-              Join Us Today
-            </button>
+            <Link href='/welcome' className="w-full md:w-[200px]">
+            <Button customClass="!w-full md:!w-[200px] h-[64px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
+              Join Us For Free
+            </Button>
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="mt-10 md:mt-20 max-w-7xl mx-auto h-[224px] lg:h-auto">
+      <motion.div 
+       initial={{ opacity: 0, scale: 0.8 }}
+         whileInView={{ opacity: 1, scale: 1 }}
+viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.8 }}
+      className="mt-10 md:mt-20 max-w-7xl mx-auto h-[224px] lg:h-auto">
         <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-2xl h-full xl:h-auto">
           <div className="relative lg:aspect-[3/4] bg-gradient-to-b from-[#A967F1] to-[#5B26B1]">
             <div className="absolute inset-0 ">
@@ -128,7 +150,7 @@ export default function Hero() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

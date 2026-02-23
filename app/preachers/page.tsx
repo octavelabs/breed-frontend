@@ -1,3 +1,6 @@
+'use client'
+
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import GetBreedApp from "../components/landingPage/GetBreedApp";
 import Navbar from "../components/landingPage/Navbar";
@@ -5,6 +8,21 @@ import Footer from "../components/landingPage/Footer";
 import Link from "next/link";
 
 export default function PreachersPage() {
+   const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+      const slideInRight = {
+    hidden: { x: -60, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
+
+  const slideInLeft = {
+    hidden: { x: 100, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
+
   return (
     <>
     <Navbar />
@@ -19,9 +37,15 @@ export default function PreachersPage() {
                 </span>
               </div>
             </div>
-            <h1 className="text-[32px] lg:text-[80px] font-[900] font-aeonik text-[#180426] leading-tight mb-6">
+              <motion.h1 
+            variants={fadeIn}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+            className="text-[32px] lg:text-[80px] font-[900] font-aeonik text-[#180426] leading-tight mb-6">
               Lead With Purpose
-            </h1>
+            </motion.h1>
             <p className="text-base xl:text-[20px] text-[#4E5255] mb-10  mx-auto">
               For pastors, preachers, and leaders called to teach, disciple, and
               equip the body of Christ.
@@ -44,7 +68,13 @@ export default function PreachersPage() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8 md:py-12">
+        <motion.div 
+          variants={slideInRight}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+        className="container mx-auto px-4 py-8 md:py-12">
           <div className="bg-purple-600 rounded-[32px] overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 ">
               <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white">
@@ -82,10 +112,16 @@ export default function PreachersPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature Card 2 - Dark Blue */}
-        <div className="container mx-auto px-4 py-8 md:py-12">
+        <motion.div 
+        variants={slideInLeft}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+        className="container mx-auto px-4 py-8 md:py-12">
           <div className="bg-[#34399C] rounded-3xl overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white order-2 md:order-1">
@@ -107,10 +143,16 @@ export default function PreachersPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature Card 3 - Pink */}
-        <div className="container mx-auto px-4 py-8 md:py-12">
+         <motion.div 
+          variants={slideInRight}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+        className="container mx-auto px-4 py-8 md:py-12">
           <div className="bg-[#C83785] rounded-3xl overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               <div className="px-5 xl:px-12 py-10 xl:py-20  flex flex-col justify-between text-white">
@@ -134,7 +176,7 @@ export default function PreachersPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
       <GetBreedApp />
     </div>
