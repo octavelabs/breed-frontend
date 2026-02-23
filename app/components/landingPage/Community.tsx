@@ -175,7 +175,7 @@ export default function Community() {
                       color: "#9333ea",
                     }}
                   >
-                    Lorem ipsum
+                    Breed is free to use
                   </div>
 
                   <h1 className="text-[24px] leading-[32px] md:text-[20px] md:leading-[40px] xl:text-[58px] xl:leading-[72px] font-bold text-[#101828] font-aeonik text-center mb-4 md:mb-8">

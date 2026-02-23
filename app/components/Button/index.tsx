@@ -42,7 +42,6 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
   return (
     <button
       title={title}
-    
       ref={ref}
       onClick={onClick}
       disabled={disabled || loading}

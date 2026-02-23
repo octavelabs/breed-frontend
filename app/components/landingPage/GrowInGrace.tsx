@@ -1,10 +1,21 @@
 "use client";
 
-import { ArrowRight, ChevronRight, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function GrowInGrace() {
   const [activeTab, setActiveTab] = useState(0);
+
+   const slideInRight = {
+    hidden: { x: -60, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
+
+  const slideInLeft = {
+    hidden: { x: 100, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
 
   const tabs = [
     "Daily Edification",
@@ -29,11 +40,17 @@ export default function GrowInGrace() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 px-6">
+    <div className="max-w-7xl mx-auto space-y-4 px-4">
       {/* Top Grid - 2 Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Blue Card - Grow in Grace */}
-        <div className="bg-[#34399C] rounded-[24px] xl:rounded-[40px] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px]">
+        <motion.div 
+        variants={slideInRight}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+        className="bg-[#34399C] rounded-[24px] xl:rounded-[40px] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px]">
           <div className="inline-block mb-6">
             <span className="px-4 py-1.5 text-xs xl:text-base text-white border border-white/50 rounded-full font-medium">
               For All Believers
@@ -67,43 +84,61 @@ export default function GrowInGrace() {
           </div>
 
           <div className="flex gap-3">
-            <button className="group  flex items-center gap-3 px-4 xl:px-8 py-4 bg-white/16 rounded-full font-semibold text-xs xl:text-sm text-white transition-all font-bold">
+            <button className="group w-[50%] lg:w-auto flex items-center gap-3 px-4 xl:px-8 py-4 bg-white/16 rounded-full font-semibold text-xs xl:text-sm text-white transition-all font-bold">
               Download app
               <div className="flex items-center gap-2.5">
                 <img src="/apple-white.svg" className="w-4 xl:w-5 h-4 xl:h-5" />
                 <img src="/google-white.svg" className="w-4 xl:w-5 h-4 xl:h-5" />
               </div>
             </button>
-            <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[200px] bg-white text-black rounded-full text-sm font-bold">
+            <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[50%] lg:w-[200px] bg-white text-black rounded-full text-sm font-bold">
               Learn more
               <ArrowRight size={16} />
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Image Card - Prayer */}
-        <div className="bg-gradient-to-br from-amber-200 to-amber-100 rounded-[24px] xl:rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center">
+        <motion.div
+         variants={slideInRight}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+         className="bg-gradient-to-br from-amber-200 to-amber-100 rounded-[24px] xl:rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center">
           <img
             className="h-full w-full object-cover"
             src="./growInGrace1.png"
             alt="Woman praying"
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* Bottom Grid - 2 Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Image Card - Pastor */}
-        <div className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-[24px] rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center">
+        <motion.div 
+          variants={slideInLeft}
+            initial="hidden"
+  whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+        className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-[24px] rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center">
           <img
             className="h-full w-full object-cover"
             src="./Rectangle.png"
             alt="pastor preaching"
           />
-        </div>
+        </motion.div>
 
         {/* Pink Card - Lead with Purpose */}
-        <div className="bg-[#C83785] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px] rounded-[24px] xl:rounded-[40px] text-white">
+        <motion.div 
+         variants={slideInLeft}
+            initial="hidden"
+whileInView="visible"
+viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+        className="bg-[#C83785] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px] rounded-[24px] xl:rounded-[40px] text-white">
           <div className="inline-block mb-6">
             <span className="px-4 py-1.5 text-xs xl:text-base text-white border border-white/50 rounded-full font-medium">
               For Preachers
@@ -151,7 +186,7 @@ export default function GrowInGrace() {
               <ArrowRight size={16} />
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Daily Edification Section */}
@@ -218,7 +253,7 @@ const TabContentOne = () => {
 
       {/* Right Preview Cards */}
       <div
-        className="bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
+        className="flex flex-col gap-[35px] items-center bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
         <div className="space-y-[10px]">
@@ -254,6 +289,9 @@ const TabContentOne = () => {
             </div>
           </div>
         </div>
+        <button className="w-fit px-[10px] py-2 bg-[#E7C8FF] text-[#4E0A7C] rounded-full text-sm font-medium transition">
+          Consistency builds intimacy with God 💜
+        </button>
       </div>
     </div>
   );

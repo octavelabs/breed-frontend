@@ -1,6 +1,9 @@
+"use client"
+
 import { ArrowRight } from "lucide-react";
 import Testimonials from "./Testimonial";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 
 export default function GetBreedApp() {
@@ -10,7 +13,12 @@ export default function GetBreedApp() {
       <div className="min-h-screen">
         {/* Hero Section */}
         <div className="bg-[#F7EDFE] pt-12 pb-5 md:py-20">
-          <div className="container mx-auto text-center">
+          <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.8 }}
+          className="container mx-auto text-center">
             {/* Badge */}
             <div className="inline-block mb-8">
               <div className="border border-purple-400 text-purple-700 px-4 py-1.5 rounded-full text-xs font-semibold">
@@ -47,7 +55,7 @@ export default function GetBreedApp() {
                 </div>
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* CTA Section - Dark Navy with Image */}

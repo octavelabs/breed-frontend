@@ -29,7 +29,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <div className="mt-[104px] flex gap-6 w-full max-w-[90%] xl:max-w-full  overflow-auto events-slider">
+    <div className="mt-[104px] px-4 flex gap-6 w-full max-w-[90%] xl:max-w-full  overflow-auto events-slider">
       {testimonials.map((t, index) => (
         <div
           key={index}
