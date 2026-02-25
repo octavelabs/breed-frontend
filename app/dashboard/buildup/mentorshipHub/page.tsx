@@ -100,8 +100,8 @@ const  MentorShipPage = () => {
             </div>
 
   <div>
-    <div className="flex gap-2 items-center mb-6">
-              <h2 className="text-base font-semibold  whitespace-nowrap ">
+
+              <h2 className="text-base font-semibold  whitespace-nowrap mb-2">
                 Select a Mentor
               </h2>
              
@@ -114,10 +114,10 @@ const  MentorShipPage = () => {
                                     placeholder="Search name"
                                     variant="outlined"
                                     icon={<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2  w-5 h-5 opacity-50"/>}
-                                    className="!bg-white !border-[#F2F2F7] !w-[50%] !max-w-[800px]"
+                                    className="!bg-white !border-[#F2F2F7] !w-full !mb-6"
                                   />
                                
-              </div>
+            
               <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {filteredMentors.map((mentor, index) => (
                   <div key={mentor.id} className={`stagger-${Math.min(index + 3, 5)}`}>

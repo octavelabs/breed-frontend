@@ -85,8 +85,8 @@ const Navbar = () => {
               );
             }
           })}
-          <button className="px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full  hover:shadow-lg hover:scale-105 transition-all duration-300">
-            <Link href="/grant">Partner With Us</Link>
+          <button className={`px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 ${pathname === '/partner' || pathname.startsWith('/partner') ? 'shadow-[2.5px_2.5px_0px_0px_#D49CFD,-2.5px_-2.5px_0px_0px_#D49CFD,2.5px_-2.5px_0px_0px_#D49CFD,-2.5px_2.5px_0px_0px_#D49CFD]' : ''}`}>
+            <Link href="/partner">Partner With Us</Link>
           </button>
           <button className="px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
             <Link href="/welcome">
