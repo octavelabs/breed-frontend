@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Calligraffitti } from 'next/font/google';
 import "./globals.css";
 import localFont from 'next/font/local'
+import { Analytics } from "@vercel/analytics/next";
 
 
 const inter = Inter({
@@ -50,6 +51,7 @@ export default function RootLayout({
         className={`${inter.variable}  ${aeonikFont.variable} ${calligraffitti.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
