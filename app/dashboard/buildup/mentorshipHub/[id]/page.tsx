@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookingModal } from "../components/BookingModal";
+import Button from "@/app/components/Button";
 
 
 
@@ -163,7 +164,7 @@ const Stat = ({ value, label, icon, backgroundColor }: {
 const StepOne = () => {
   const router = useRouter()
   return (
-    <div>
+    <div className="relative">
     <div className=" h-[250px] flex flex-col justify-between" style={{backgroundImage: "url('/dashboard-header.png')"}}>
         <button
         onClick={() => router.back()}
@@ -174,8 +175,24 @@ const StepOne = () => {
       <p className="text-[20px] font-bold text-white">Mentorship Hub</p>
       </div>
       <div className="bg-white p-[18px]">
-         <p className="font-bold text-sm">Description</p>
+         <p className="font-bold text-sm mb-2">Description</p>
+         <div className="space-y-2">
+         <p> Step into a space designed to help you grow with guidance, structure, and support. </p>
+         <p>The Mentorship Hub connects you with a trusted mentor who walks alongside you in your spiritual journey. </p>
+        <p>Stay accountable, share your challenges, and grow stronger in community as your mentor helps you walk in truth and purpose.</p>
+<p>Everything you need to grow deeper one check-in, one prayer, one step at a time.
+</p>
+</div>
+
+
+
       </div>
+        <Button
+                    onClick={() => console.log('fe')}
+                    customClass="!w-full !text-white"
+                  >
+                    Get Started
+                  </Button>
     </div>
   )
 }

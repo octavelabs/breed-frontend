@@ -500,7 +500,9 @@ Your continued use of our services after any changes means you accept the update
       </h2>
       <p>For questions about these Terms, please contact:</p>
       <p className="mt-2">
-        Email: <a href="mailto:legal@zuricircle.com">legal@zuricircle.com</a>
+        Email: <a href="mailto:support@joinbreed.com
+">support@joinbreed.com
+</a>
       </p>
     </main>
     </div>
