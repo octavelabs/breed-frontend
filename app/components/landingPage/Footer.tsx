@@ -16,7 +16,7 @@ export default function Footer() {
         <div className="w-full xl:w-[50%] grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr] gap-8 mb-12">
           <div>
             <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Product</h3>
-            <ul className="space-y-5 text-purple-100 text-sm xl:text-[18px]">
+            <ul className="space-y-5 text-white text-sm xl:text-[18px]">
               <li>
                 <Link href="/believers" className="cursor-pointer">
                   For Believers
@@ -38,7 +38,7 @@ export default function Footer() {
     
           <div>
             <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Company</h3>
-            <ul className="space-y-5 text-purple-100 text-sm xl:text-[18px]">
+            <ul className="space-y-5 text-white text-sm xl:text-[18px]">
               <li>
                 <a href="#" className="hover:text-white transition-colors">
                   About Us
@@ -64,8 +64,8 @@ export default function Footer() {
 
           {/* Company */}
           <div className="text-end">
-            <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Socials</h3>
-            <ul className="space-y-5 text-purple-100 text-sm xl:text-[18px]">
+            <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Social</h3>
+            <ul className="space-y-5 text-white text-sm xl:text-[18px]">
               <li>
                 <a href="#" className="hover:text-white transition-colors">
                   Instagram

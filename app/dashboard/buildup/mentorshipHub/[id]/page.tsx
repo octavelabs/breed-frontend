@@ -2,7 +2,7 @@
 
 import FlameIcon from "@/app/assets/icons/flame";
 import DashboardLayout from "@/app/layout/DashboardLayout"
-import { ChevronRight, Clock, Clock1, RollerCoaster, Zap } from "lucide-react";
+import { ArrowLeft, ChevronRight, Clock, Clock1, RollerCoaster, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -64,7 +64,7 @@ const  MentorProfilePage = () => {
       </div>
 
       {/* Tabs */}
-      <div className="px-6 md:px-12 pt-6">
+      <div className="px-4 md:px-12 pt-6">
         <div className="flex gap-8 border-b border-[#D2D9DF]">
           <button
             onClick={() => setActiveTab("overview")}
@@ -91,11 +91,11 @@ const  MentorProfilePage = () => {
       </div>
 
       {/* Content */}
-      <div className="px-12 py-5 flex gap-8 items-start">
+      <div className="px-4 lg:px-12 py-5 flex flex-col lg:flex-row gap-8 items-start">
         {activeTab === "overview" && (
           <>
             {/* Description */}
-            <div className="w-[60%] space-y-4 leading-relaxed">
+            <div className="w-full lg:w-[60%] space-y-4 leading-relaxed">
               <p>
                 Bisola Badejo, a pastor at Celebration Church, is passionate
                 about transforming lives through faith-centered
@@ -110,7 +110,7 @@ const  MentorProfilePage = () => {
             </div>
 
             {/* Stats */}
-            <div className="bg-white rounded-2xl p-4 shadow-[0px_4.29px_4.29px_0px_#60666B0D] flex w-[40%] flex-shrink-0 gap-2">
+            <div className="bg-white rounded-2xl p-4 shadow-[0px_4.29px_4.29px_0px_#60666B0D] flex w-full  lg:w-[40%] flex-shrink-0 gap-2">
               <Stat
                 label="Completed Sessions"
                 value="10"
@@ -155,6 +155,26 @@ const Stat = ({ value, label, icon, backgroundColor }: {
       <div>
         <p className="font-bold text-[17px] leading-none mb-[2px]">{value}</p>
         <p className="text-[15px] text-[#60666B] leading-tight">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+const StepOne = () => {
+  const router = useRouter()
+  return (
+    <div>
+    <div className=" h-[250px] flex flex-col justify-between" style={{backgroundImage: "url('/dashboard-header.png')"}}>
+        <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
+      >
+        <ArrowLeft className="w-5 h-5 text-white" />
+      </button>
+      <p className="text-[20px] font-bold text-white">Mentorship Hub</p>
+      </div>
+      <div className="bg-white p-[18px]">
+         <p className="font-bold text-sm">Description</p>
       </div>
     </div>
   )

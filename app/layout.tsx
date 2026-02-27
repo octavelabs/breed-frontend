@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Calligraffitti } from 'next/font/google';
+import { Inter, Calligraffitti, Courgette } from 'next/font/google';
 import "./globals.css";
 import localFont from 'next/font/local'
 import { Analytics } from "@vercel/analytics/next";
@@ -13,6 +13,12 @@ const inter = Inter({
 const calligraffitti = Calligraffitti({
   weight: '400',
   variable: "--font-calligraffitti",
+  subsets: ["latin"],
+});
+
+const courgette = Courgette({
+  weight: '400',
+  variable: "--font-courgette",
   subsets: ["latin"],
 });
 
@@ -48,7 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable}  ${aeonikFont.variable} ${calligraffitti.variable} antialiased`}
+        className={`${inter.variable}  ${aeonikFont.variable} ${calligraffitti.variable} ${courgette.variable} antialiased`}
       >
         {children}
         <Analytics />

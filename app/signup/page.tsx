@@ -8,9 +8,11 @@ import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
 import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
 import StepProgress from "./components/StepProgress";
+import { useRouter } from "next/navigation";
 
 const CreateAccount: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -271,9 +273,11 @@ const StepThree = () => {
         </div>
 
         {/* Submit button */}
+        <Link href='/onboard'>
         <Button customClass="!w-full !h-[58px] mt-4 !text-white">
           Create Account
         </Button>
+        </Link>
       </form>
     </div>
   );

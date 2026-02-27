@@ -13,9 +13,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom }) =
 
 
   return (
-    <div className="block lg:flex h-screen bg-[#F8F9FC]">
+    <div className="block lg:flex min-h-screen bg-[#F8F9FC]">
       <SideBar />
-      <main className={`min-h-screen w-screen lg:flex-1 pb-[68px] lg:mb-0 overflow-auto ${custom ? "" : "p-4 pt-6 lg:p-[35px] xl:p-[70px] lg:pt-[40px] xl:pt-[79px] relative"}`}>
+      <main className={`h-screen w-screen lg:flex-1 pb-[68px] lg:pb-0 overflow-auto ${custom ? "" : "p-4 pt-6 lg:p-[35px] xl:p-[70px] lg:pt-[40px] xl:pt-[79px] relative"}`}>
         {children}
       </main>
       

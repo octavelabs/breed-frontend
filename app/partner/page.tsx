@@ -9,51 +9,7 @@ import Link from "next/link";
 import Button from "../components/Button";
 import ScrollStorySection from "./components/StoryTelling";
 
-export default function PartnerWithUsPage() {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const slideInRight = {
-    hidden: { x: -60, opacity: 0 },
-    visible: { x: 0, opacity: 1 },
-  };
-
-  const slideInLeft = {
-    hidden: { x: 100, opacity: 0 },
-    visible: { x: 0, opacity: 1 },
-  };
-
-  const whatToAchieve = [
-    {
-      title: "Stay Free",
-      description:
-        "The app remains free so every church and believer can participate without financial pressure.",
-    },
-    {
-      title: "Product excellence",
-      description:
-        "Every update strengthens the tools that support ministry, kingdom collaboration, and growth.",
-    },
-    {
-      title: "Wider reach",
-      description:
-        "We bring more churches and believers onboard, strengthening connections and increasing collective impact.",
-    },
-    {
-      title: "Sustainable growth",
-      description:
-        "We make careful decisions that protect trust, maintain quality, and ensure the platform serves communities well into the ",
-    },
-    {
-      title: "Shared Stewarship",
-      description:
-        "Together, we manage resources wisely and make decisions that protect trust and ensure long term sustainability.",
-    },
-  ];
-
-  const partnershipCards = [
+  export const partnershipCards = [
     {
       title: "Advocacy",
       description: "Share Breed with believers who would benefit from it.",
@@ -104,6 +60,52 @@ export default function PartnerWithUsPage() {
     },
   ];
 
+export default function PartnerWithUsPage() {
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const slideInRight = {
+    hidden: { x: -60, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
+
+  const slideInLeft = {
+    hidden: { x: 100, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+  };
+
+  const whatToAchieve = [
+    {
+      title: "Stay Free",
+      description:
+        "The app remains free so every church and believer can participate without financial pressure.",
+    },
+    {
+      title: "Product excellence",
+      description:
+        "Every update strengthens the tools that support ministry, kingdom collaboration, and growth.",
+    },
+    {
+      title: "Wider reach",
+      description:
+        "We bring more churches and believers onboard, strengthening connections and increasing collective impact.",
+    },
+    {
+      title: "Sustainable growth",
+      description:
+        "We make careful decisions that protect trust, maintain quality, and ensure the platform serves communities well into the ",
+    },
+    {
+      title: "Shared Stewarship",
+      description:
+        "Together, we manage resources wisely and make decisions that protect trust and ensure long term sustainability.",
+    },
+  ];
+
+
+
   return (
     <>
       <Navbar />
@@ -137,7 +139,6 @@ export default function PartnerWithUsPage() {
           </div>
           <ScrollStorySection />
           <section className="bg-white py-[104px] relative">
-            <div className="absolute inset-0 bg-[#180426B2]" />
             <div className="container  mx-auto px-4 relative z-10">
               <div className="bg-[#330750] rounded-[40px] py-[64px] px-20 shadow-2xl relative">
                 <div
@@ -269,7 +270,7 @@ export default function PartnerWithUsPage() {
             />
             <div className="bg-[#330750] flex relative z-10 rounded-[20px] h-[420px]">
               <div className="w-1/2">
-                <img src='/grapes.png' className="w-full h-full object-cover mix-blend-burn"/>
+                <img src='/grapes.png' className="w-full h-full object-cover mix-blend-luminosity"/>
               </div>
               <div className="w-1/2 py-[78px] pr-[73px] text-white">
                 <p className="font-aeonik font-bold text-[40px] mb-4">

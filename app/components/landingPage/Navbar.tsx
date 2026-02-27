@@ -21,12 +21,8 @@ export const navLinks = [
     path: "/about",
   },
   {
-    title: "Resources",
-    dropdown: true,
-    options: [
-      { title: "For Believers", path: "/dashboard/orders" },
-      { title: "For Preachers", path: "/dashboard/prescriptions" },
-    ],
+    title: "Contact Us",
+    path: "/contact",
   },
 ];
 
@@ -44,8 +40,8 @@ export const mobileNavLinks = [
     path: "/about",
   },
   {
-    title: "Resources",
-    path: "/resources",
+    title: "Contact Us",
+    path: "/contact",
   },
 ];
 
@@ -60,7 +56,7 @@ const Navbar = () => {
           <img src="/Logo.png" alt="logo" className="h-[30px] w-auto" />
         </Link>
 
-        <div className="hidden lg:flex items-center space-x-4">
+        <div className="hidden lg:flex items-center space-x-[28px]">
           {navLinks.map((link, index) => {
             if (link.dropdown) {
               const selected = link.options.some((option) =>
@@ -77,7 +73,7 @@ const Navbar = () => {
                   key={index}
                   href={link.path as string}
                   className={`flex h-12 items-center justify-center gap-2 rounded-full  ${[
-                    selected ? "text-[#330750] font-medium" : "text-[#4E5255]",
+                    selected ? "text-[#330750] font-bold" : "text-[#4E5255]",
                   ].join(" ")} `}
                 >
                   <p>{link.title}</p>

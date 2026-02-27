@@ -10,7 +10,7 @@ const WelcomePage = () => {
 
     return (
         <div className="flex items-center justify-center h-screen bg-[#180426]">
-           <div className="rounded-[24px] p-12 bg-[#100319] flex flex-col items-center gap-[40px] w-[540px]">
+           <div className="rounded-[24px] p-12 bg-[#100319] flex flex-col items-center gap-[40px] w-[90%] lg:w-[540px]">
             <div className="flex justify-center items-center flex-col gap-4">
                 <img src='logo3.svg' alt='logo' />
                 <p className="text-sm text-white ">Select an option below</p>

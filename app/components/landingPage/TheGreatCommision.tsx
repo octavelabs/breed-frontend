@@ -3,6 +3,7 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 
 export default function TheGreatCommission() {
@@ -138,13 +139,14 @@ export default function TheGreatCommission() {
               Breed helps you stay rooted, consistent, and purpose-driven in
               your walk with Christ.
             </p>
-
+             <Link href='/about'>
             <button className="flex items-center font-[800] justify-between gap-2 px-6 py-4 w-[70%] md:w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
               Read our story
               <div className="w-5 h-5 bg-gradient-to-r from-[#A967F1] to-[#5B26B1] rounded-full flex items-center justify-center">
                 <ChevronRight size={12} stroke="#FFFFFF" />
               </div>
             </button>
+            </Link>
 
             <div className="mt-6 text-[40px] text-[#180426] italic font-mono">
               Matthew 28:16-20
