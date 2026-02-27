@@ -39,6 +39,12 @@ const  MentorProfilePage = () => {
       {/* Header Banner */}
       <div className="bg-[#870BD6] h-48 relative" style={{backgroundImage: "url('/dashboard-header.png')"}}>
         {/* Pattern overlay */}
+          <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
+      >
+        <ArrowLeft className="w-5 h-5 text-white" />
+      </button>
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.15)_1px,_transparent_1px)] [background-size:20px_20px]" />
       </div>
 
