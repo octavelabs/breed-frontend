@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
 import { ArrowRight } from "lucide-react";
 import Testimonials from "./Testimonial";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
 
 export default function GetBreedApp() {
   return (
@@ -13,16 +12,17 @@ export default function GetBreedApp() {
       <div className="min-h-screen">
         {/* Hero Section */}
         <div className="bg-[#F7EDFE] pt-12 pb-5 md:py-20">
-          <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.8 }}
-          className="container mx-auto text-center">
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+            className="container mx-auto text-center"
+          >
             {/* Badge */}
             <div className="inline-block mb-8">
-              <div className="border border-purple-400 text-purple-700 px-4 py-1.5 rounded-full text-xs font-semibold">
-                Lorem Ipsum
+              <div className="border border-[#161717] bg-[#E7C8FF] text-[#161717] px-4 py-1.5 rounded-full text-xs font-semibold">
+                Download the app
               </div>
             </div>
 
@@ -32,14 +32,18 @@ export default function GetBreedApp() {
             </h1>
 
             {/* Description */}
-            <p className="text-[#4E5255] text-sm xl:text-[18px] mb-12  mx-auto font-medium px-4">
+            <p className="text-[#344054] text-sm xl:text-[18px] mb-12  mx-auto px-4 lg:w-2/5">
               Start your journey towards experiencing progress and joy in the
-              faith every single day by downloading the Breed App
+              faith every single day by downloading the Breed App.
             </p>
 
             {/* Phone Mockup */}
             <div className="flex w-full lg:w-[70%] xl:w-[768px] h-[768px] mx-auto justify-center xl:mb-12 relative -top-[55px]">
-              <img src="./breedApp.png" alt="Breed App on phone" className="w-full h-full object-cover scale-[0.8]" />
+              <img
+                src="./breedApp.png"
+                alt="Breed App on phone"
+                className="w-full h-full object-cover scale-[0.8]"
+              />
             </div>
 
             {/* Download Button */}
@@ -82,11 +86,11 @@ export default function GetBreedApp() {
                   purpose. Join here and take the next step in your faith
                   journey.
                 </p>
-                <Link href='/welcome'>
-                <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold transition-all w-fit">
-                  Join Us Today
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                <Link href="/welcome">
+                  <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold transition-all w-fit">
+                    Join Us Today
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </Link>
               </div>
             </div>
