@@ -82,7 +82,7 @@ export function BookingModal({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={handleClose} customClass='!w-[60%]' title='Mentorship' name={mentorInfo?.name} role={mentorInfo?.role} showHeader={isSuccessModalOpen ? false : true}>
+      <Modal isOpen={isOpen} onClose={handleClose} customClass='!w-[90%] lg:!w-[60%]' title='Mentorship' name={mentorInfo?.name} role={mentorInfo?.role} showHeader={isSuccessModalOpen ? false : true}>
         {isSuccessModalOpen ?
         <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center animate-scale-in mx-auto">
           <button 
@@ -137,27 +137,26 @@ export function BookingModal({
             Manage Booking
           </Button>
         </div> :
-      <div className="flex">
-          <div className="flex flex-col gap-4 w-1/2">
+      <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col gap-4 w-full lg:w-1/2">
             <div>
-              <p className="text-base text-[#60666B] mb-1">Price</p>
-              <p className="font-semibold text-[20px]">Free</p>
+              <p className="text-sm lg:text-base text-[#60666B] mb-1">Price</p>
+              <p className="font-semibold text-[18px] lg:text-[20px]">Free</p>
+            </div>
+            <div>
+              <p className="text-sm lg:text-base text-[#60666B] mb-1">Session Duration</p>
+              <p className="font-semibold text-[18px] lg:text-[20px]">{mentorInfo.duration}</p>
             </div>
 
             <div>
-              <p className="text-base text-[#60666B] mb-1">Session Duration</p>
-              <p className="font-semibold text-[20px]">{mentorInfo.duration}</p>
-            </div>
-
-            <div>
-              <p className="text-base text-[#60666B] mb-1">About</p>
-              <p className="font-semibold text-[20px]">{mentorInfo.about}</p>
+              <p className="text-sm lg:text-base text-[#60666B] mb-1">About</p>
+              <p className="font-semibold text-[18px] lg:text-[20px]">{mentorInfo.about}</p>
             </div>
           </div>
       
 
-        <div className="w-1/2">
-          <div className="mb-4">
+        <div className="w-full lg:w-1/2 order-[-1] lg:order-0">
+          <div className="mb-8 lg:mb-4">
             <p className="text-base text-[#60666B] mb-1">Step {currentStep} of 3</p>
             <h3 className="text-[20px] leading-none font-bold">
               {currentStep === 1 && 'Select date'}
@@ -165,7 +164,6 @@ export function BookingModal({
               {currentStep === 3 && 'Confirm your Booking'}
             </h3>
           </div>
-
           <div className="mb-4">
             {currentStep === 1 && (
               <DateSelectStep

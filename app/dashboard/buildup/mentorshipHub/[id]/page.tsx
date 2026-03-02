@@ -41,7 +41,7 @@ const  MentorProfilePage = () => {
         {/* Pattern overlay */}
           <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
+        className="flex items-center gap-2 cursor-pointer px-4 md:px-12 pt-16 relative z-20"
       >
         <ArrowLeft className="w-5 h-5 text-white" />
       </button>
@@ -49,20 +49,26 @@ const  MentorProfilePage = () => {
       </div>
 
       {/* Profile Header */}
-      <div className=" px-6 md:px-12 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className=" px-4 md:px-12 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 lg:gap-6">
         <div className="flex items-center gap-5">
           <img
             src="/bisola.jpg"
             alt="mentor"
-            className="w-[180px] h-[180px] rounded-full border-[3px] border-white object-cover -mt-20 relative z-20"
+            className="w-[120px] lg:w-[180px] h-[120px] lg:h-[180px] rounded-full border-[3px] border-white object-cover -mt-20 relative z-20"
           />
 
-          <div>
-            <h2 className="text-2xl font-bold">Bisola Badejo</h2>
-            <p className="text-gray-600">
+          <div className="hidden lg:block">
+            <h2 className="text-[24px] font-bold">Bisola Badejo</h2>
+            <p className="">
               Pastor @ Celebration Church
             </p>
           </div>
+        </div>
+        <div className="lg:hidden">
+<h2 className="text-[24px] font-bold">Bisola Badejo</h2>
+            <p className="">
+              Pastor @ Celebration Church
+            </p>
         </div>
 
         <button className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer" onClick={() => setModalOpen(true)}>
@@ -102,7 +108,7 @@ const  MentorProfilePage = () => {
         {activeTab === "overview" && (
           <>
             {/* Description */}
-            <div className="w-full lg:w-[60%] space-y-4 leading-relaxed">
+            <div className="w-full lg:w-[60%] space-y-4 leading-relaxed ">
               <p>
                 Bisola Badejo, a pastor at Celebration Church, is passionate
                 about transforming lives through faith-centered
@@ -117,7 +123,7 @@ const  MentorProfilePage = () => {
             </div>
 
             {/* Stats */}
-            <div className="bg-white rounded-2xl p-4 shadow-[0px_4.29px_4.29px_0px_#60666B0D] flex w-full  lg:w-[40%] flex-shrink-0 gap-2">
+            <div className="bg-white rounded-2xl p-4 shadow-[0px_4.29px_4.29px_0px_#60666B0D] flex w-full  lg:w-[40%] flex-shrink-0 gap-2 order-[-1] lg:order-0">
               <Stat
                 label="Completed Sessions"
                 value="10"
@@ -167,40 +173,6 @@ const Stat = ({ value, label, icon, backgroundColor }: {
   )
 }
 
-const StepOne = () => {
-  const router = useRouter()
-  return (
-    <div className="relative">
-    <div className=" h-[250px] flex flex-col justify-between" style={{backgroundImage: "url('/dashboard-header.png')"}}>
-        <button
-        onClick={() => router.back()}
-        className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
-      >
-        <ArrowLeft className="w-5 h-5 text-white" />
-      </button>
-      <p className="text-[20px] font-bold text-white">Mentorship Hub</p>
-      </div>
-      <div className="bg-white p-[18px]">
-         <p className="font-bold text-sm mb-2">Description</p>
-         <div className="space-y-2">
-         <p> Step into a space designed to help you grow with guidance, structure, and support. </p>
-         <p>The Mentorship Hub connects you with a trusted mentor who walks alongside you in your spiritual journey. </p>
-        <p>Stay accountable, share your challenges, and grow stronger in community as your mentor helps you walk in truth and purpose.</p>
-<p>Everything you need to grow deeper one check-in, one prayer, one step at a time.
-</p>
-</div>
 
-
-
-      </div>
-        <Button
-                    onClick={() => console.log('fe')}
-                    customClass="!w-full !text-white"
-                  >
-                    Get Started
-                  </Button>
-    </div>
-  )
-}
 
 export default MentorProfilePage
