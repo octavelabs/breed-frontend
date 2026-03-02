@@ -7,7 +7,7 @@ export default function Community() {
   const [isFixed, setIsFixed] = useState<boolean>(false);
   const [animationComplete, setAnimationComplete] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameId = useRef<number | null>(null);
 
@@ -17,8 +17,8 @@ export default function Community() {
       setIsMobile(window.innerWidth < 1024);
     };
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Define animation stages
@@ -100,7 +100,18 @@ export default function Community() {
     ),
   );
 
-  const titleWords = ["AND", "THE", "GOAL", "TO", "MAKE", "HEAVEN"];
+  const titleWords = [
+    "AND",
+    "THE",
+    "GOAL",
+    "TO",
+    "SEE",
+    "JESUS",
+    "AND",
+    "HEAR",
+    "WELL",
+    "DONE!",
+  ];
   const visibleWordCount = Math.floor(textProgress * titleWords.length);
 
   const showInitialContent = activeProgress < 0.1;
@@ -155,7 +166,9 @@ export default function Community() {
                       left: img.left,
                       right: img.right,
                       width: isMobile ? `${img.size * 0.6}px` : `${img.size}px`,
-                      height: isMobile ? `${img.size * 0.6}px` : `${img.size}px`,
+                      height: isMobile
+                        ? `${img.size * 0.6}px`
+                        : `${img.size}px`,
                     }}
                   >
                     <img
@@ -219,13 +232,13 @@ export default function Community() {
                 {/* Desktop: Text on left side */}
                 <div
                   className="absolute inset-0 hidden md:flex items-center justify-start px-8"
-                  style={{ 
+                  style={{
                     backgroundImage: "url('/Heaven.png')",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                   }}
                 >
-                  <h1 className="text-[36px] xl:text-[50px] font-bold text-white">
+                  <h1 className="text-[36px] xl:text-[50px] font-bold text-white w-1/2">
                     {titleWords
                       .slice(0, visibleWordCount)
                       .map((word, index) => (
@@ -245,10 +258,10 @@ export default function Community() {
                 {/* Mobile: Text stacked vertically */}
                 <div
                   className="absolute inset-0 flex md:hidden flex-col justify-center px-6 py-8"
-                  style={{ 
+                  style={{
                     backgroundImage: `url('/Heaven.png')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                   }}
                 >
                   <h1 className="text-[28px] leading-[36px] font-bold text-white mb-6 font-aeonik">
@@ -290,9 +303,9 @@ export default function Community() {
                         style={{ opacity: Math.min(1, rightTextProgress * 3) }}
                       >
                         AND I HEARD A GREAT VOICE OUT OF HEAVEN SAYING, BEHOLD,
-                        THE TABERNACLE OF GOD IS WITH MEN, AND HE WILL DWELL WITH
-                        THEM, AND THEY SHALL BE HIS PEOPLE, AND GOD HIMSELF SHALL
-                        BE WITH THEM, AND BE THEIR GOD.
+                        THE TABERNACLE OF GOD IS WITH MEN, AND HE WILL DWELL
+                        WITH THEM, AND THEY SHALL BE HIS PEOPLE, AND GOD HIMSELF
+                        SHALL BE WITH THEM, AND BE THEIR GOD.
                       </span>
                     </p>
 
@@ -302,10 +315,10 @@ export default function Community() {
                         opacity: Math.max(0, (rightTextProgress - 0.3) * 2),
                       }}
                     >
-                      AND GOD SHALL WIPE AWAY ALL TEARS FROM THEIR EYES; AND THERE
-                      SHALL BE NO MORE DEATH, NEITHER SORROW, NOR CRYING, NEITHER
-                      SHALL THERE BE ANY MORE PAIN; FOR THE FORMER THINGS ARE
-                      PASSED AWAY.
+                      AND GOD SHALL WIPE AWAY ALL TEARS FROM THEIR EYES; AND
+                      THERE SHALL BE NO MORE DEATH, NEITHER SORROW, NOR CRYING,
+                      NEITHER SHALL THERE BE ANY MORE PAIN; FOR THE FORMER
+                      THINGS ARE PASSED AWAY.
                     </p>
                   </div>
                 </div>
@@ -335,10 +348,10 @@ export default function Community() {
                         opacity: Math.max(0, (rightTextProgress - 0.3) * 2),
                       }}
                     >
-                      AND GOD SHALL WIPE AWAY ALL TEARS FROM THEIR EYES; AND THERE
-                      SHALL BE NO MORE DEATH, NEITHER SORROW, NOR CRYING, NEITHER
-                      SHALL THERE BE ANY MORE PAIN; FOR THE FORMER THINGS ARE
-                      PASSED AWAY.
+                      AND GOD SHALL WIPE AWAY ALL TEARS FROM THEIR EYES; AND
+                      THERE SHALL BE NO MORE DEATH, NEITHER SORROW, NOR CRYING,
+                      NEITHER SHALL THERE BE ANY MORE PAIN; FOR THE FORMER
+                      THINGS ARE PASSED AWAY.
                     </p>
                   </div>
                 </div>
