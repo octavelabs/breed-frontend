@@ -51,7 +51,7 @@ export default function GetBreedApp() {
               <button className="group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
                 Download app
                 <div className="flex items-center gap-1">
-                  <img src="/apple-play.svg" className="w-5 h-5 fill-current" />
+                  <img src="/Apple-play.svg" className="w-5 h-5 fill-current" />
                   <img
                     src="/google-play.svg"
                     className="w-5 h-5 fill-current"
@@ -86,7 +86,11 @@ export default function GetBreedApp() {
                   purpose. Join here and take the next step in your faith
                   journey.
                 </p>
-                <a href="https://form.typeform.com/to/EMh4jnRi" target="_blank" rel="noreferrer">
+                <a
+                  href="https://form.typeform.com/to/EMh4jnRi"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold transition-all w-fit">
                     Join The Waitlist
                     <ArrowRight className="w-4 h-4" />
