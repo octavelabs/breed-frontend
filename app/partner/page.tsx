@@ -9,56 +9,56 @@ import Link from "next/link";
 import Button from "../components/Button";
 import ScrollStorySection from "./components/StoryTelling";
 
-  export const partnershipCards = [
-    {
-      title: "Advocacy",
-      description: "Share Breed with believers who would benefit from it.",
-      span: "col-span-3",
-      bgColor: "#2D307B",
-      image: "/partner1.svg",
-      hasButton: false,
-      height: "248px",
-    },
-    {
-      title: "Church Partnerships",
-      description: "Introduce Breed to your church community or ministry.",
-      span: "col-span-3",
-      bgColor: "#4E5255",
-      image: "/partner2.svg",
-      hasButton: false,
-      height: "248px",
-    },
-    {
-      title: "Intercessory Prayers",
-      description:
-        "Commit to praying for the mission and the people being discipled.",
-      span: "col-span-2",
-      bgColor: "#A22F6E",
-      image: "/partner5.svg",
-      hasButton: false,
-      height: "424px",
-    },
-    {
-      title: "Skill & Advisory",
-      description:
-        "Contribute expertise in tech, design, theology, operations, or strategy.",
-      span: "col-span-2",
-      bgColor: "#6A0BA9",
-      image: "/partner4.svg",
-      hasButton: false,
-      height: "424px",
-    },
-    {
-      title: "Financial Support",
-      description:
-        "Help sustain and scale the platform through recurring or one-time giving.",
-      span: "col-span-2",
-      bgColor: "#180426",
-      image: "/partner3.svg",
-      hasButton: true,
-      height: "424px",
-    },
-  ];
+export const partnershipCards = [
+  {
+    title: "Advocacy",
+    description: "Share Breed with believers who would benefit from it.",
+    span: "col-span-3",
+    bgColor: "#2D307B",
+    image: "/partner1.svg",
+    hasButton: false,
+    height: "248px",
+  },
+  {
+    title: "Church Partnerships",
+    description: "Introduce Breed to your church community or ministry.",
+    span: "col-span-3",
+    bgColor: "#4E5255",
+    image: "/partner2.svg",
+    hasButton: false,
+    height: "248px",
+  },
+  {
+    title: "Intercessory Prayers",
+    description:
+      "Commit to praying for the mission and the people being discipled.",
+    span: "col-span-2",
+    bgColor: "#A22F6E",
+    image: "/partner5.svg",
+    hasButton: false,
+    height: "424px",
+  },
+  {
+    title: "Skill & Advisory",
+    description:
+      "Contribute expertise in tech, design, theology, operations, or strategy.",
+    span: "col-span-2",
+    bgColor: "#6A0BA9",
+    image: "/partner4.svg",
+    hasButton: false,
+    height: "424px",
+  },
+  {
+    title: "Financial Support",
+    description:
+      "Help sustain and scale the platform through recurring or one-time giving.",
+    span: "col-span-2",
+    bgColor: "#180426",
+    image: "/partner3.svg",
+    hasButton: true,
+    height: "424px",
+  },
+];
 
 export default function PartnerWithUsPage() {
   const fadeIn = {
@@ -104,15 +104,13 @@ export default function PartnerWithUsPage() {
     },
   ];
 
-
-
   return (
     <>
       <Navbar />
       <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
         <div className="">
           <div
-            className="relative flex justify-center bg-cover bg-center px-4 pt-[150px] md:pt-[230px] h-screen"
+            className="relative flex justify-center items-center bg-cover bg-center px-4 h-screen"
             style={{
               backgroundImage: `url('/partnerWithUs.jpg')`,
             }}
@@ -133,7 +131,7 @@ export default function PartnerWithUsPage() {
                 transition={{ duration: 0.5 }}
                 className="text-[42px] lg:text-[80px] text-center text-white font-[900] text-[#180426] leading-tight mt-4 font-aeonik"
               >
-                More than an app <br /> A MOVEMENT
+                More than an app <br /> A MOVEMENT.
               </motion.h1>
             </div>
           </div>
@@ -197,7 +195,8 @@ export default function PartnerWithUsPage() {
                         type="button"
                       >
                         <p className="flex items-center gap-[10px]">
-                          Start a conversation <ArrowRight className="w-5 h-4" stroke="white" />
+                          Start a conversation{" "}
+                          <ArrowRight className="w-5 h-4" stroke="white" />
                         </p>
                       </Button>
                     </div>
@@ -270,7 +269,10 @@ export default function PartnerWithUsPage() {
             />
             <div className="bg-[#330750] flex relative z-10 rounded-[20px] h-[420px]">
               <div className="w-1/2">
-                <img src='/grapes.png' className="w-full h-full object-cover mix-blend-luminosity"/>
+                <img
+                  src="/grapes.png"
+                  className="w-full h-full object-cover mix-blend-luminosity"
+                />
               </div>
               <div className="w-1/2 py-[78px] pr-[73px] text-white">
                 <p className="font-aeonik font-bold text-[40px] mb-4">
@@ -288,7 +290,8 @@ export default function PartnerWithUsPage() {
                     type="button"
                   >
                     <p className="flex items-center gap-[10px]">
-                      Start a conversation <ArrowRight className="w-5 h-4" stroke="white" />
+                      Start a conversation{" "}
+                      <ArrowRight className="w-5 h-4" stroke="white" />
                     </p>
                   </Button>
                   <Button
