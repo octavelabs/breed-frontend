@@ -5,43 +5,15 @@ import Footer from "../components/landingPage/Footer";
 import Input from "../components/Input";
 import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
+import { contactInfo } from "@/utils/commonHelpers";
 
-const days = [
-  { day: "M" },
-  { day: "T" },
-  { day: "W" },
-  { day: "T" },
-  { day: "F" },
-  { day: "S" },
-  { day: "S" },
-];
-
-export default function BelieversPage() {
-  const contactInfo = [
-    {
-      title: "For support",
-      email: "support@joinbreed.com",
-    },
-    {
-      title: "To partner with us",
-      email: "partners@joinbreed.com",
-    },
-    {
-      title: "To volunteer",
-      email: "volunteers@joinbreed.com",
-    },
-    {
-      title: "To create courses, devotionals or prayer bulletins on Breed",
-      email: "creators@joinbreed.com",
-    },
-  ];
-
+export default function ContactPage() {
   return (
     <>
       <Navbar />
       <div className="min-h-screen overflow-hidden bg-[#FBF6FF]">
-        <div className="container mx-auto px-4 pt-[150px] md:pt-[230px] mb-[118px]">
-          <p className="text-[#330750] text-4xl md:text-[56px] leading-[64px] mb-18 text-center">
+        <div className="container mx-auto px-4 xl:px-[70px] pt-[150px] md:pt-[230px] mb-[118px]">
+          <p className="text-[#330750] text-[56px] leading-[64px] mb-[72px] text-center text-aeonik font-bold">
             Connect With Us
           </p>
           <div className="flex flex-col lg:flex-row gap-10 w-full">
@@ -54,7 +26,7 @@ export default function BelieversPage() {
                   Leave us a message and we’ll reach out to you swiftly
                 </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
                   <label
                     htmlFor="firstName"
@@ -72,7 +44,7 @@ export default function BelieversPage() {
                     />
                   </div>
                 </div>
-                <div className="col-span-2 md:col-span-1">
+                <div>
                   <label
                     htmlFor="firstName"
                     className="block text-sm font-medium  mb-2"
@@ -89,7 +61,7 @@ export default function BelieversPage() {
                     />
                   </div>
                 </div>
-                <div className="col-span-2 md:col-span-1">
+                <div>
                   <label
                     htmlFor="firstName"
                     className="block text-sm font-medium  mb-2"

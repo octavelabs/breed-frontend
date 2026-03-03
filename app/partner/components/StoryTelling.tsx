@@ -354,7 +354,7 @@ export default function ScrollStorySection() {
             <div
               className="absolute inset-0 opacity-10"
               style={{
-                backgroundImage: "url('/partnerCardBackground.png')",
+                backgroundImage: "url('/aboutBackground.png')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -368,7 +368,7 @@ export default function ScrollStorySection() {
           >
             <div
               className="absolute inset-0 bg-cover bg-center opacity-10"
-              style={{ backgroundImage: "url('/partnerCardBackground.png')" }}
+              style={{ backgroundImage: "url('/aboutBackground.png')" }}
             />
             <div className="container mx-auto text-center px-4 py-[276px] relative z-10 font-bold">
               <p className="text-[56px] font-medium leading-[72px] font-aeonik text-[#180426]">
@@ -478,9 +478,7 @@ export default function ScrollStorySection() {
               transition: "opacity 0.5s ease",
             }}
           >
-            <span className="text-xs text-[#180426] opacity-40 font-aeonik tracking-widest uppercase">
-              scroll
-            </span>
+           
             <div className="w-px h-6 bg-[#180426] opacity-25 animate-pulse" />
           </div>
         </div>

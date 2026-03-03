@@ -59,6 +59,11 @@ export default function Footer() {
                   Contact Us
                 </Link>
               </li>
+               <li>
+                <Link href="/faq" className="cursor-pointer">
+                  FAQs
+                </Link>
+              </li>
             </ul>
           </div>
 
