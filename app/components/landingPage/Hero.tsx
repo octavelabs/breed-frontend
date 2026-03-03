@@ -89,16 +89,16 @@ viewport={{ once: false, amount: 0.3 }}
             <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
               Download app
               <div className="flex items-center gap-1">
-                <img src="/apple-play.svg" className="w-5 h-5" />
+                <img src="/apple-play.svg" className="w-5 h-5 fill-current" />
                 <img src="/google-play.svg" className="w-5 h-5 fill-current" />
               </div>
             </button>
 
-            <Link href='/welcome' className="w-full md:w-[200px]">
+            <a href='https://form.typeform.com/to/EMh4jnRi' className="w-full md:w-[200px]" target="_blank" rel="noreferrer">
             <Button customClass="!w-full md:!w-[200px] h-[64px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
-              Join Us For Free
+              Join The Waitlist
             </Button>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

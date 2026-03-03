@@ -1,146 +1,165 @@
-'use client'
-
-import { useState, useEffect, useRef } from "react";
 import Footer from "../components/landingPage/Footer";
 import Navbar from "../components/landingPage/Navbar";
 
-const sections = [
-  {
-    id: "intro",
-    title: "Lorem Ipsum",
-    content: `At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident...`,
-  },
-  {
-    id: "section1",
-    title: "Lorem Ipsum",
-    content: `At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident...\n\nNam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus...`,
-  },
-  {
-    id: "section2",
-    title: "Lorem Ipsum",
-    content: `At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident...`,
-  },
-  {
-    id: "section3",
-    title: "Lorem Ipsum",
-    content: `At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident...`,
-  },
-];
-
 export default function TermsPage() {
-  const [activeId, setActiveId] = useState(sections[0].id);
-  const [openMobile, setOpenMobile] = useState(sections[0].id);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Lock scroll during transition
-  useEffect(() => {
-    if (isTransitioning) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, [isTransitioning]);
-
-  const handleSectionChange = (sectionId: string | null) => {
-    if (sectionId === null) return;
-    setActiveId(sectionId);
-    setIsTransitioning(true);
-
-    // Clear any existing timeout
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
-
-    // Unlock scroll after 600ms
-    transitionTimeoutRef.current = setTimeout(() => {
-      setIsTransitioning(false);
-    }, 600);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const activeSection = sections.find(s => s.id === activeId);
-
   return (
     <>
-    <Navbar />
-    <div className="min-h-screen bg-[#F7EFFF] px-4 py-10 ">
-      <div className="container mx-auto  pt-[100px] md:pt-[200px]">
-        <h1 className="text-[64px] leading-[72px] font-medium text-[#4E0A7C]">Terms Of Service</h1>
-        <p className="text-[18px] font-medium text-[#180426] mt-[40px] mb-5">Last Updated: 6th of August, 2025</p>
-        <p className="text-[#4E5255] text-[18px] border-b border-[#D2D9DF] pb-10">
-          At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat
-        </p>
-        {/* Desktop Layout */}
-        <div className="hidden md:grid grid-cols-[240px_1fr] gap-10 mt-10">
-          <aside className="space-y-[36px]">
-            {sections.map(section => (
-              <button
-                key={section.id}
-                onClick={() => handleSectionChange(section.id)}
-                className={`block w-full text-left text-sm font-medium px-2 pb-5 rounded transition ${
-                  activeId === section.id
-                    ? "text-purple-800 border-b border-[#D2D9DF]"
-                    : "text-purple-600 "
-                }`}
-              >
-                {section.title}
-              </button>
-            ))}
-          </aside>
+      <Navbar />
+      <div className="bg-[#F7EDFE] pt-[100px] md:pt-[200px] ">
+        <main className="w-[80%] mx-auto pb-8">
+          <h1 className="text-[64px] leading-[72px] font-medium text-[#4E0A7C]">
+            Terms Of Service
+          </h1>
+          <p className="text-[18px] font-medium text-[#180426] mt-[40px] mb-2">
+            Breed Believers Network
+          </p>
+          <p className="text-[18px] font-medium text-[#180426]  mb-5">
+            Last updated: February 21, 2026
+          </p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Acceptance of Terms
+          </h2>
+          <p>
+            By accessing or using Breed, you agree to be bound by these Terms.
+            If you do not agree, please discontinue use.
+          </p>
 
-          <main className="text-sm text-purple-800 leading-relaxed space-y-6">
-            <h2 className="text-lg font-semibold">{activeSection?.title}</h2>
-            {activeSection?.content.split("\n\n").map((p: string, i: number) => (
-              <p key={i}>{p}</p>
-            ))}
-          </main>
-        </div>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Description of Service
+          </h2>
+          <p>
+            Breed is a faith-based platform that supports spiritual growth
+            through:
+          </p>
 
-        {/* Mobile Accordion */}
-        <div className="md:hidden mt-8 space-y-4">
-          {sections.map(section => {
-            const isOpen = openMobile === section.id;
-            return (
-              <div key={section.id} className="border-b border-purple-300 pb-2">
-                <button
-                  onClick={() =>
-                    setOpenMobile(isOpen ? '' : section.id)
-                  }
-                  className="w-full flex items-center justify-between text-left text-purple-800 font-medium"
-                >
-                  {section.title}
-                  <span className="text-xl">{isOpen ? "−" : "+"}</span>
-                </button>
+          <ul className="pl-8">
+            <li className="list-disc">Curated Christian content</li>
+            <li className="list-disc">Personal and group devotion tools</li>
+            <li className="list-disc">Discipleship tracking</li>
+            <li className="list-disc">Accountability circles</li>
+            <li className="list-disc">
+              Learning resources and courses (currently free)
+            </li>
+            <li className="list-disc">Progress dashboards</li>
+          </ul>
+          <p>Features may change or expand over time.</p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Eligibility
+          </h2>
 
-                {isOpen && (
-                  <div className="mt-3 text-sm text-purple-700 leading-relaxed space-y-4">
-                    {section.content.split("\n\n").map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+          <p className="my-2">
+            You must be at least 13 years old to use Breed.
+          </p>
+
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            User Accounts
+          </h2>
+          <p>You agree to:</p>
+          <ul className="pl-8">
+            <li className="list-disc">Provide accurate information.</li>
+            <li className="list-disc">Keep your login details secure.</li>
+            <li className="list-disc">
+              Accept responsibility for activity on your account.
+            </li>
+          </ul>
+          <p>We may suspend accounts that violate these Terms.</p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Community Standards
+          </h2>
+          <p>You agree not to:</p>
+          <ul className="pl-8">
+            <li className="list-disc">Post harmful or offensive content.</li>
+            <li className="list-disc">Misrepresent your identity.</li>
+            <li className="list-disc">Promote hatred or division.</li>
+            <li className="list-disc">Attempt to disrupt the platform.</li>
+          </ul>
+
+          <p>
+            Breed is built on Christian values of love, respect, and
+            edification.
+          </p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Free courses
+          </h2>
+          <p>
+            All learning content and courses are currently offered free of
+            charge. Breed Believers Network reserves the right to introduce paid
+            features in the future, with prior notice.
+          </p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Children’s Privacy
+          </h2>
+          <p>
+            Breed is intended for users aged 13 and above. We do not knowingly
+            collect data from children under 13.{" "}
+          </p>
+
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Intellectual Property
+          </h2>
+          <p>
+            All platform branding, design, and software belong to Breed
+            Believers Network.
+          </p>
+          <p>
+            You may not copy or redistribute any part of Breed without written
+            permission.{" "}
+          </p>
+
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Termination
+          </h2>
+          <p>
+            We reserve the right to suspend or terminate accounts that violate
+            these Terms.
+          </p>
+          <p>Users may delete their accounts at any time.</p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Disclaimer
+          </h2>
+          <p>
+            Breed provides spiritual growth tools and Christian educational
+            resources but does not replace pastoral counseling, medical advice,
+            or professional services.
+          </p>
+          <p>All content is provided “as is.”</p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Limitation of Liability
+          </h2>
+          <p>
+            Breed Believers Network is not responsible for indirect or
+            consequential damages arising from platform use.
+          </p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Governing Law
+          </h2>
+          <p>
+            These Terms are governed by applicable local laws where Breed
+            Believers Network is registered.
+          </p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Changes to Terms
+          </h2>
+          <p>
+            We may update these Terms periodically. Continued use of Breed means
+            acceptance of changes.
+          </p>
+          <h2 className="text-[#4E0A7C] text-xl my-4 font-semibold">
+            Contact Us
+          </h2>
+          <p>Questions about these Terms?</p>
+          <p className="mt-2">
+            Email:{" "}
+            <a
+              href="mailto:support@joinbreed.com
+"
+            >
+              support@joinbreed.com
+            </a>
+          </p>
+        </main>
       </div>
-    </div>
-    <Footer />
+      <Footer />
     </>
   );
 }
