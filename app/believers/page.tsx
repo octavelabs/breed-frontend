@@ -6,6 +6,7 @@ import GetBreedApp from "../components/landingPage/GetBreedApp";
 import Navbar from "../components/landingPage/Navbar";
 import Footer from "../components/landingPage/Footer";
 import Link from "next/link";
+import Button from "../components/Button";
 
  const days = [
     { day: 'M'},
@@ -62,21 +63,21 @@ viewport={{ once: false, amount: 0.3 }}
               their faith journey
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="w-[90%] md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
+              <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
                 Download app
                 <div className="flex items-center gap-1">
-                  <img src="/apple-play.svg" className="w-5 h-5" />
+                  <img src="/apple-play.svg" className="w-5 h-5 fill-current" />
                   <img
                     src="/google-play.svg"
                     className="w-5 h-5 fill-current"
                   />
                 </div>
               </button>
-          <Link href='/welcome'>
-              <button className="w-[90%] md:w-auto px-8 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold">
-                Join Us Today
-              </button>
-              </Link>
+          <a href='https://form.typeform.com/to/EMh4jnRi' className="w-full md:w-[200px]" target="_blank" rel="noreferrer">
+                      <Button customClass="!w-full md:!w-[200px] h-[64px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
+                        Join The Waitlist
+                      </Button>
+                      </a>
             </div>
           </div>
         </div>
@@ -87,7 +88,7 @@ viewport={{ once: false, amount: 0.3 }}
   whileInView="visible"
 viewport={{ once: false, amount: 0.3 }}
   transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 py-8 md:py-12">
+        className="container mx-auto  py-8 md:py-12">
           <div className="bg-purple-600 rounded-[32px] overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 ">
               <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white">
@@ -134,7 +135,7 @@ viewport={{ once: false, amount: 0.3 }}
  whileInView="visible"
 viewport={{ once: false, amount: 0.3 }}
   transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 py-8 md:py-12">
+        className="container mx-auto  py-8 md:py-12">
           <div className="bg-[#34399C] rounded-3xl overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white order-2 md:order-1">
@@ -216,7 +217,7 @@ viewport={{ once: false, amount: 0.3 }}
   whileInView="visible"
 viewport={{ once: false, amount: 0.3 }}
   transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 py-8 md:py-12">
+        className="container mx-auto  py-8 md:py-12">
           <div className="bg-[#C83785] rounded-3xl overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               <div className="px-5 xl:px-12 py-10 xl:py-20  flex flex-col justify-between text-white">
@@ -248,7 +249,7 @@ viewport={{ once: false, amount: 0.3 }}
   whileInView="visible"
 viewport={{ once: false, amount: 0.3 }}
   transition={{ duration: 0.5 }}
-        className="container mx-auto px-4 py-8 md:py-12">
+        className="container mx-auto py-8 md:py-12">
           <div className="bg-[#1FA564] rounded-3xl overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white order-2 md:order-1">

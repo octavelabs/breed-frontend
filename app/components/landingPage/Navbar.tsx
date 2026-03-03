@@ -85,9 +85,9 @@ const Navbar = () => {
             <Link href="/partner">Partner With Us</Link>
           </button>
           <button className="px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
-            <Link href="/welcome">
-              Join Us Today
-            </Link>
+            <a href="https://form.typeform.com/to/EMh4jnRi" target="_blank" rel="noreferrer">
+              Join The Waitlist
+            </a>
           </button>
         </div>
 
@@ -135,13 +135,14 @@ const Navbar = () => {
             >
               Partner With Us
             </Link>
-             <Link
-              href="/welcome"
+             <a
+              href="https://form.typeform.com/to/EMh4jnRi"
+              target="_blank" rel="noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-medium text-center hover:shadow-lg transition-all"
             >
-              Join Us Today
-            </Link>
+              Join The Waitlist
+            </a>
           </div>
         </div>
       </div>

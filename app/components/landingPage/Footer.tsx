@@ -40,24 +40,24 @@ export default function Footer() {
             <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Company</h3>
             <ul className="space-y-5 text-white text-sm xl:text-[18px]">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/about" className="cursor-pointer">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/partner" className="cursor-pointer">
                   Partner With Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="#" className="cursor-pointer">
                   Give
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href="/contact" className="cursor-pointer">
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -67,22 +67,22 @@ export default function Footer() {
             <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Social</h3>
             <ul className="space-y-5 text-white text-sm xl:text-[18px]">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="https://www.instagram.com/joinbreed" className="hover:text-white transition-colors">
                   Instagram
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="https://x.com/joinbreed" className="hover:text-white transition-colors">
                   Twitter
                 </a>
               </li>
                <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="https://www.facebook.com/share/1CBghY2MbV/?mibetid=wwXIfr" className="hover:text-white transition-colors">
                   Facebook
                 </a>
               </li>
                <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a href="https://threads.net/joinbreed" className="hover:text-white transition-colors">
                   Threads
                 </a>
               </li>
