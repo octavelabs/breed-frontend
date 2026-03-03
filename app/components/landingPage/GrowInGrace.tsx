@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export default function GrowInGrace() {
   const [activeTab, setActiveTab] = useState(0);
 
-   const slideInRight = {
+  const slideInRight = {
     hidden: { x: -60, opacity: 0 },
     visible: { x: 0, opacity: 1 },
   };
@@ -44,13 +44,14 @@ export default function GrowInGrace() {
       {/* Top Grid - 2 Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Blue Card - Grow in Grace */}
-        <motion.div 
-        variants={slideInRight}
-            initial="hidden"
-  whileInView="visible"
-viewport={{ once: false, amount: 0.3 }}
-  transition={{ duration: 0.5 }}
-        className="bg-[#34399C] rounded-[24px] xl:rounded-[40px] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px]">
+        <motion.div
+          variants={slideInRight}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.5 }}
+          className="bg-[#34399C] rounded-[24px] xl:rounded-[40px] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px]"
+        >
           <div className="inline-block mb-6">
             <span className="px-4 py-1.5 text-xs xl:text-base text-white border border-white/50 rounded-full font-medium">
               For All Believers
@@ -88,7 +89,10 @@ viewport={{ once: false, amount: 0.3 }}
               Download app
               <div className="flex items-center gap-2.5">
                 <img src="/apple-white.svg" className="w-4 xl:w-5 h-4 xl:h-5" />
-                <img src="/google-white.svg" className="w-4 xl:w-5 h-4 xl:h-5" />
+                <img
+                  src="/google-white.svg"
+                  className="w-4 xl:w-5 h-4 xl:h-5"
+                />
               </div>
             </button>
             <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[50%] lg:w-[200px] bg-white text-black rounded-full text-sm font-bold">
@@ -100,12 +104,13 @@ viewport={{ once: false, amount: 0.3 }}
 
         {/* Image Card - Prayer */}
         <motion.div
-         variants={slideInRight}
-            initial="hidden"
-  whileInView="visible"
-viewport={{ once: false, amount: 0.3 }}
-  transition={{ duration: 0.5 }}
-         className="bg-gradient-to-br from-amber-200 to-amber-100 rounded-[24px] xl:rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center">
+          variants={slideInRight}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gradient-to-br from-amber-200 to-amber-100 rounded-[24px] xl:rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center"
+        >
           <img
             className="h-full w-full object-cover"
             src="./growInGrace1.png"
@@ -117,13 +122,14 @@ viewport={{ once: false, amount: 0.3 }}
       {/* Bottom Grid - 2 Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Image Card - Pastor */}
-        <motion.div 
+        <motion.div
           variants={slideInLeft}
-            initial="hidden"
-  whileInView="visible"
-viewport={{ once: false, amount: 0.3 }}
-  transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-[24px] rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center">
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-[24px] rounded-[40px] overflow-hidden min-h-[500px] flex items-center justify-center"
+        >
           <img
             className="h-full w-full object-cover"
             src="./Rectangle.png"
@@ -132,13 +138,14 @@ viewport={{ once: false, amount: 0.3 }}
         </motion.div>
 
         {/* Pink Card - Lead with Purpose */}
-        <motion.div 
-         variants={slideInLeft}
-            initial="hidden"
-whileInView="visible"
-viewport={{ once: false, amount: 0.3 }}
-  transition={{ duration: 0.5 }}
-        className="bg-[#C83785] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px] rounded-[24px] xl:rounded-[40px] text-white">
+        <motion.div
+          variants={slideInLeft}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.5 }}
+          className="bg-[#C83785] py-[32px] xl:py-[80px] px-[20px] xl:px-[48px] rounded-[24px] xl:rounded-[40px] text-white"
+        >
           <div className="inline-block mb-6">
             <span className="px-4 py-1.5 text-xs xl:text-base text-white border border-white/50 rounded-full font-medium">
               For Preachers
@@ -178,7 +185,10 @@ viewport={{ once: false, amount: 0.3 }}
               Download app
               <div className="flex items-center gap-2.5">
                 <img src="/apple-white.svg" className="w-4 xl:w-5 h-4 xl:h-5" />
-                <img src="/google-white.svg" className="w-4 xl:w-5 h-4 xl:h-5" />
+                <img
+                  src="/google-white.svg"
+                  className="w-4 xl:w-5 h-4 xl:h-5"
+                />
               </div>
             </button>
             <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[200px] bg-white text-black rounded-full text-sm font-bold">
@@ -243,12 +253,18 @@ const TabContentOne = () => {
           ))}
         </div>
 
-        <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full text-sm transition">
-          Get started
-          <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-            <ChevronRight size={12} stroke="#6A0BA9" />
-          </div>
-        </button>
+        <a
+          href="https://form.typeform.com/to/EMh4jnRi"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full cursor-pointer text-sm transition">
+            Get started
+            <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+              <ChevronRight size={12} stroke="#6A0BA9" />
+            </div>
+          </button>
+        </a>
       </div>
 
       {/* Right Preview Cards */}
@@ -265,7 +281,9 @@ const TabContentOne = () => {
                 Grace is God's response to our brokenness undeserved, yet freely
                 given through the gift of Christ.
               </p>
-              <p className="text-xs text-[#60666B]">📅 &nbsp; Today · 3 Chapters</p>
+              <p className="text-xs text-[#60666B]">
+                📅 &nbsp; Today · 3 Chapters
+              </p>
             </div>
             <div className="w-[96px] rounded-[11px] flex items-center justify-center flex-shrink-0">
               <img src="./DailyEdification1.png" />
@@ -315,7 +333,7 @@ const TabContentTwo = () => {
             "Join communities that reflect your season — students, parents, young professionals, etc.",
             "Get answers to your questions in a safe, Spirit-filled environment.",
             "Receive encouragement through testimonies, scriptures, and life stories.",
-            "Stay accountable with peers walking the same journey of faith."
+            "Stay accountable with peers walking the same journey of faith.",
           ].map((item, index) => (
             <div
               className="flex items-center gap-2 bg-[#E7C8FF] text-[#330750] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
@@ -327,12 +345,18 @@ const TabContentTwo = () => {
           ))}
         </div>
 
-        <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full text-sm transition">
-          Get started
-          <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-            <ChevronRight size={12} stroke="#6A0BA9" />
-          </div>
-        </button>
+        <a
+          href="https://form.typeform.com/to/EMh4jnRi"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full cursor-pointer text-sm transition">
+            Get started
+            <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+              <ChevronRight size={12} stroke="#6A0BA9" />
+            </div>
+          </button>
+        </a>
       </div>
 
       {/* Right Preview Cards */}
@@ -340,13 +364,13 @@ const TabContentTwo = () => {
         className="bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
-       <div className="flex flex-col items-center space-y-[35px]">
-           {/* Bible Plan Card */}
-           <div className="rounded-[32px] h-[220px] w-full">
-             <img src="./Forum1.png" className="h-full w-full" />
+        <div className="flex flex-col items-center space-y-[35px]">
+          {/* Bible Plan Card */}
+          <div className="rounded-[32px] h-[220px] w-full">
+            <img src="./Forum1.png" className="h-full w-full" />
           </div>
-           <div className="flex gap-4 w-[70%]">
-             {[
+          <div className="flex gap-4 w-[70%]">
+            {[
               "./heart.png",
               "./pray.png",
               "./percent.png",
@@ -358,7 +382,10 @@ const TabContentTwo = () => {
                 className="h-6 xl:h-[40px] w-6 xl:w-[40px] border-[0.5px] border-[#D2D9DF] bg-white rounded-full flex justify-center items-center"
                 key={index}
               >
-                <img src={item} className="w-[10px] xl:w-[20px] h-[10px] xl:h-[20px]" />
+                <img
+                  src={item}
+                  className="w-[10px] xl:w-[20px] h-[10px] xl:h-[20px]"
+                />
               </div>
             ))}
           </div>
@@ -401,12 +428,18 @@ const TabContentThree = () => {
           ))}
         </div>
 
-        <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full text-sm transition">
-          Get started
-          <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-            <ChevronRight size={12} stroke="#6A0BA9" />
-          </div>
-        </button>
+        <a
+          href="https://form.typeform.com/to/EMh4jnRi"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full cursor-pointer text-sm transition">
+            Get started
+            <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+              <ChevronRight size={12} stroke="#6A0BA9" />
+            </div>
+          </button>
+        </a>
       </div>
 
       {/* Right Preview Cards */}
@@ -446,12 +479,18 @@ const TabContentFour = () => {
           ))}
         </div>
 
-        <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full text-sm transition">
-          Get started
-          <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-            <ChevronRight size={12} stroke="#6A0BA9" />
-          </div>
-        </button>
+        <a
+          href="https://form.typeform.com/to/EMh4jnRi"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-white rounded-full cursor-pointer text-sm transition">
+            Get started
+            <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+              <ChevronRight size={12} stroke="#6A0BA9" />
+            </div>
+          </button>
+        </a>
       </div>
 
       {/* Right Preview Cards */}

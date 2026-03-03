@@ -91,7 +91,7 @@ export default function GetBreedApp() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold transition-all w-fit">
+                  <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full cursor-pointer font-semibold transition-all w-fit">
                     Join The Waitlist
                     <ArrowRight className="w-4 h-4" />
                   </button>

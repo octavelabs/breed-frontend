@@ -127,14 +127,12 @@ export const metadata: Metadata = {
     images: [OG_IMAGE_URL],
   },
 
-  // These are safe even if you haven't created the files yet (but it's best to add them later).
   icons: {
     icon: [{ url: "/favicon.ico" }],
     shortcut: ["/favicon.ico"],
     apple: [{ url: "/apple-touch-icon.png" }],
   },
 
-  // If/when you add these files, crawlers will pick them up automatically.
   manifest: "/site.webmanifest",
 
   category: "technology",
