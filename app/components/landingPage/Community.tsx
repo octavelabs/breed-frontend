@@ -181,13 +181,7 @@ export default function Community() {
 
                 {/* Center content - Stage 1 */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center px-4 md:px-8">
-                  <div
-                    className="inline-block px-4 md:px-6 py-2 border-2 rounded-full text-xs md:text-sm font-semibold mb-4 md:mb-8"
-                    style={{
-                      borderColor: "#9333ea",
-                      color: "#9333ea",
-                    }}
-                  >
+                  <div className="border border-[#161717] bg-[#E7C8FF] text-[#161717] px-4 py-1.5 rounded-full text-xs font-semibold  mb-4 md:mb-8">
                     Breed is free to use
                   </div>
 
