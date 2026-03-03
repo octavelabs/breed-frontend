@@ -5,7 +5,7 @@ import Testimonials from "./Testimonial";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function GetBreedApp({showTestimonials = true, bgColor = '#F7EDFE'}: {showTestimonials: boolean, bgColor: string}) {
+export default function GetBreedApp({showTestimonials = true, bgColor = '#F7EDFE'}: {showTestimonials?: boolean, bgColor?: string}) {
   return (
     <>
       {showTestimonials && <Testimonials />}
@@ -51,7 +51,7 @@ export default function GetBreedApp({showTestimonials = true, bgColor = '#F7EDFE
               <button className="group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
                 Download app
                 <div className="flex items-center gap-1">
-                  <img src="/apple-play.svg" className="w-5 h-5 fill-current" />
+                  <img src="/Apple-play.svg" className="w-5 h-5 fill-current" />
                   <img
                     src="/google-play.svg"
                     className="w-5 h-5 fill-current"

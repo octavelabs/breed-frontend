@@ -1,16 +1,14 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Button from "../Button";
 
 export default function Hero() {
-   const fadeIn = {
+  const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
-
-
 
   return (
     <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-[31px]">
@@ -61,12 +59,13 @@ export default function Hero() {
           </div>
 
           <motion.h1
-          variants={fadeIn}
+            variants={fadeIn}
             initial="hidden"
-  whileInView="visible"
-viewport={{ once: false, amount: 0.3 }}
-  transition={{ duration: 0.5 }}
-          className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik relative">
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.5 }}
+            className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik relative"
+          >
             Grow in FAITH <br /> WALK in Purpose
             <img
               src="./heroImage2.svg"
@@ -89,26 +88,32 @@ viewport={{ once: false, amount: 0.3 }}
             <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
               Download app
               <div className="flex items-center gap-1">
-                <img src="/apple-play.svg" className="w-5 h-5 fill-current" />
+                <img src="/Apple-play.svg" className="w-5 h-5 fill-current" />
                 <img src="/google-play.svg" className="w-5 h-5 fill-current" />
               </div>
             </button>
 
-            <a href='https://form.typeform.com/to/EMh4jnRi' className="w-full md:w-[200px]" target="_blank" rel="noreferrer">
-            <Button customClass="!w-full md:!w-[200px] h-[64px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
-              Join The Waitlist
-            </Button>
+            <a
+              href="https://form.typeform.com/to/EMh4jnRi"
+              className="w-full md:w-[200px]"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button customClass="!w-full md:!w-[200px] h-[64px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full  text-base hover:bg-purple-800 transition-all shadow-lg font-bold cursor-pointer">
+                Join The Waitlist
+              </Button>
             </a>
           </div>
         </div>
       </div>
 
-      <motion.div 
-       initial={{ opacity: 0, scale: 0.8 }}
-         whileInView={{ opacity: 1, scale: 1 }}
-viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.8 }}
-      className="mt-10 md:mt-20 max-w-7xl mx-auto h-[224px] lg:h-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        className="mt-10 md:mt-20 max-w-7xl mx-auto h-[224px] lg:h-auto"
+      >
         <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-2xl h-full xl:h-auto">
           <div className="relative lg:aspect-[3/4] bg-gradient-to-b from-[#A967F1] to-[#5B26B1]">
             <div className="absolute inset-0 ">
