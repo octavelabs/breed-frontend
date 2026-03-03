@@ -77,7 +77,7 @@ const timelineData: TimelineItem[] = [
     lineHeight: "h-[162px]",
     content: {
       type: "text-only",
-      text: "This led to grace anew and a fostered culture of fellowship under God's guidance, but along the way, technical problems arose as the online radio service we used had its shortcomings as it was not built to lorem ipsum",
+      text: "This led to grace anew and a fostered culture of fellowship under God's guidance, but along the way, technical problems arose as the online radio service we used had its shortcomings as it was not built to foster stronger connections between people of like minds, alongside technical issues.",
     },
   },
   {
@@ -121,7 +121,7 @@ const timelineData: TimelineItem[] = [
         logo: "/logo3.png",
         after:
           "your spiritual growth companion app, on a mission to continue fostering",
-        continuation: "a community",
+        continuation: "a community where the ultimate goal is to make heaven.",
       },
     },
   },
@@ -133,13 +133,12 @@ export const TimelineSection = (): React.ReactElement => {
       {timelineData.map((item, index) => (
         <div key={`timeline-${index}`} className="flex w-full">
           <div className="flex flex-col items-center relative">
-            <div className="w-[44px] h-[44px] border border-[#5B26B1] rounded-full relative z-10 bg-[#D49CFD] flex justify-center items-center">
             <img
-              className="h-[30px] w-[30px] object-cover "
+              className="w-[44px] h-[44px]  "
               alt={` ${item.year}`}
               src={item.icon}
             />
-            </div>
+            
             
 
             {item.lineHeight && (

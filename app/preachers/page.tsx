@@ -5,10 +5,8 @@ import { ArrowRight } from "lucide-react";
 import GetBreedApp from "../components/landingPage/GetBreedApp";
 import Navbar from "../components/landingPage/Navbar";
 import Footer from "../components/landingPage/Footer";
-import Link from "next/link";
 import Button from "../components/Button";
-import AppleIcon from "../assets/icons/apple-play.svg";
-import GoogleIcon from "../assets/icons/google-play.svg";
+
 
 export default function PreachersPage() {
   const fadeIn = {
@@ -31,8 +29,8 @@ export default function PreachersPage() {
       <Navbar />
       <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
         <div className="container mx-auto px-4 pt-[150px] md:pt-[230px]">
-          <div className="relative max-w-5xl">
-            <div className="text-center relative z-10 mb-8">
+          <div className="relative max-w-5xl mx-auto">
+            <div className="text-center relative z-10 mb-12">
               <div className="inline-block mb-6">
                 <div className="border border-[#161717] rounded-full px-5 py-[6px] bg-[#E7C8FF]">
                   <span className="text-[#161717] text-sm md:text-base font-medium">
@@ -50,9 +48,9 @@ export default function PreachersPage() {
               >
                 Lead With Purpose
               </motion.h1>
-              <p className="text-base xl:text-[20px] text-[#4E5255] mb-10  mx-auto">
+              <p className="text-base xl:text-[20px] text-[#4E5255] mb-12  mx-auto">
                 For pastors, preachers, and leaders called to teach, disciple,
-                and equip the body of Christ.
+                and <br /> equip the body of Christ.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
@@ -89,7 +87,7 @@ export default function PreachersPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto py-8 md:py-12"
+            className="container mx-auto pb-4 md:pb-6"
           >
             <div className="bg-purple-600 rounded-[32px] overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 ">
@@ -137,7 +135,7 @@ export default function PreachersPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto py-8 md:py-12"
+            className="container mx-auto pb-4 md:pb-6"
           >
             <div className="bg-[#34399C] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -170,7 +168,7 @@ export default function PreachersPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto  py-8 md:py-12"
+            className="container mx-auto"
           >
             <div className="bg-[#C83785] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
