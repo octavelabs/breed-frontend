@@ -5,13 +5,13 @@ import Testimonials from "./Testimonial";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function GetBreedApp() {
+export default function GetBreedApp({showTestimonials = true, bgColor = '#F7EDFE'}: {showTestimonials: boolean, bgColor: string}) {
   return (
     <>
-      <Testimonials />
+      {showTestimonials && <Testimonials />}
       <div className="min-h-screen">
         {/* Hero Section */}
-        <div className="bg-[#F7EDFE] pt-12 pb-5 md:py-20">
+        <div className=" pt-12 pb-5 md:py-20" style={{backgroundColor: bgColor}}>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -86,12 +86,20 @@ export default function GetBreedApp() {
                   purpose. Join here and take the next step in your faith
                   journey.
                 </p>
+                <div className="flex flex-col lg:flex-row gap-4">
+                   <a href="/contact" target="_blank" rel="noreferrer">
+                  <button className="text-sm inline-flex items-center gap-6 px-6 h-[56px]  bg-white text-[#5B26B1] rounded-full font-bold transition-all w-fit">
+                    Start a conversation
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </a>
                 <a href="https://form.typeform.com/to/EMh4jnRi" target="_blank" rel="noreferrer">
-                  <button className="text-sm inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold transition-all w-fit">
+                  <button className="text-sm inline-flex items-center gap-[70px] px-6 h-[56px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-bold transition-all w-fit">
                     Join The Waitlist
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </a>
+                </div>
               </div>
             </div>
           </div>
