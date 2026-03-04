@@ -334,7 +334,7 @@ export default function PartnerWithUsPage() {
                     onClick={() => console.log("done")}
                     type="button"
                   >
-                    <p className="flex w-full px-5 sm:px-[28px] items-center justify-between text-sm sm:text-base">
+                    <p className="flex w-full px-5 sm:px-[28px] gap-2 items-center justify-center lg:justify-between text-sm sm:text-base">
                       Give now{" "}
                       <ArrowRight
                         className="w-4 h-4 sm:w-5 sm:h-4"
