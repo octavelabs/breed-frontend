@@ -6,94 +6,100 @@ export default function Footer() {
       <div className="container mx-auto px-6">
         {/* Footer Content */}
         <div className="w-full flex flex-col xl:flex-row gap-[32px] xl:gap-0">
-         <div className="w-full xl:w-[50%]">
-
+          <div className="w-full xl:w-[50%]">
             <p className="text-white text-sm xl:text-[18px] leading-relaxed w-full xl:w-1/2">
               Your spiritual companion app built to help you stay consistent in
               your walk with God
             </p>
           </div>
-        <div className="w-full xl:w-[50%] grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr] gap-8 mb-12">
-          <div>
-            <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Product</h3>
-            <ul className="space-y-5 text-white text-sm xl:text-[18px]">
-              <li>
-                <Link href="/believers" className="cursor-pointer">
-                  For Believers
-                </Link>
-              </li>
-              <li>
-                <Link href="/preachers" className="cursor-pointer">
-                  For Preachers
-                </Link>
-              </li>
-              <li>
-                <a href="#" className="cursor-pointer">
-                  For Churches(coming soon)
-                </a>
-              </li>
-            </ul>
-          </div>
+          <div className="w-full xl:w-[50%] grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr] gap-8 mb-12">
+            <div>
+              <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Product</h3>
+              <ul className="space-y-5 text-white text-sm xl:text-[18px]">
+                <li>
+                  <Link href="/believers" className="cursor-pointer">
+                    For Believers
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/preachers" className="cursor-pointer">
+                    For Preachers
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="cursor-pointer">
+                    For Churches(coming soon)
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-    
-          <div>
-            <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Company</h3>
-            <ul className="space-y-5 text-white text-sm xl:text-[18px]">
-              <li>
-                <Link href="/about" className="cursor-pointer">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/partner" className="cursor-pointer">
-                  Partner With Us
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="cursor-pointer">
-                  Give
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="cursor-pointer">
-                  Contact Us
-                </Link>
-              </li>
-               <li>
-                <Link href="/faq" className="cursor-pointer">
-                  FAQs
-                </Link>
-              </li>
-            </ul>
-          </div>
+            <div>
+              <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Company</h3>
+              <ul className="space-y-5 text-white text-sm xl:text-[18px]">
+                <li>
+                  <Link href="/about" className="cursor-pointer">
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/partner" className="cursor-pointer">
+                    Partner With Us
+                  </Link>
+                </li>
 
-          {/* Company */}
-          <div className="text-end">
-            <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Social</h3>
-            <ul className="space-y-5 text-white text-sm xl:text-[18px]">
-              <li>
-                <a href="https://www.instagram.com/joinbreed" className="hover:text-white transition-colors">
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a href="https://x.com/joinbreed" className="hover:text-white transition-colors">
-                  Twitter
-                </a>
-              </li>
-               <li>
-                <a href="https://www.facebook.com/share/1CBghY2MbV/?mibetid=wwXIfr" className="hover:text-white transition-colors">
-                  Facebook
-                </a>
-              </li>
-               <li>
-                <a href="https://threads.net/joinbreed" className="hover:text-white transition-colors">
-                  Threads
-                </a>
-              </li>
-            </ul>
+                <li>
+                  <Link href="/contact" className="cursor-pointer">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="cursor-pointer">
+                    FAQs
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div className="text-end">
+              <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Social</h3>
+              <ul className="space-y-5 text-white text-sm xl:text-[18px]">
+                <li>
+                  <a
+                    href="https://www.instagram.com/joinbreed"
+                    className="hover:text-white transition-colors"
+                  >
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://x.com/joinbreed"
+                    className="hover:text-white transition-colors"
+                  >
+                    Twitter
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.facebook.com/share/1CBghY2MbV/?mibetid=wwXIfr"
+                    className="hover:text-white transition-colors"
+                  >
+                    Facebook
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://threads.net/joinbreed"
+                    className="hover:text-white transition-colors"
+                  >
+                    Threads
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
         </div>
 
         {/* Divider */}
