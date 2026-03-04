@@ -181,10 +181,11 @@ export default function BelieversPage() {
                   key={index}
                   className={`relative rounded-2xl md:rounded-[32px] pt-8 sm:pt-10 md:pt-[56px] px-5 sm:px-6 md:px-[36px] text-white overflow-hidden ${
                     card.hasButton ? "min-h-[220px]" : "min-h-[200px]"
-                  } sm:min-h-[240px] md:min-h-[260px] ${card.span} w-full`}
+                  } sm:min-h-[240px] md:min-h-[260px] ${card.span} w-full md:h-[var(--card-h)]`}
                   style={{
                     backgroundColor: `${card.bgColor}`,
-                    height: window.innerWidth >= 768 ? card.height : "auto",
+                    // set CSS var for md:h-[var(--card-h)] to read
+                    ["--card-h" as any]: card.height,
                   }}
                 >
                   <div
