@@ -248,7 +248,8 @@ export default function ScrollStorySection() {
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
-    if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+    if (animationFrameId.current)
+      cancelAnimationFrame(animationFrameId.current);
 
     animationFrameId.current = requestAnimationFrame(() => {
       if (!containerRef.current) return;
@@ -257,7 +258,8 @@ export default function ScrollStorySection() {
       const viewportHeight = window.innerHeight;
       const containerHeight = containerRef.current.offsetHeight;
 
-      const shouldBeFixed = rect.top <= 0 && rect.top + containerHeight > viewportHeight;
+      const shouldBeFixed =
+        rect.top <= 0 && rect.top + containerHeight > viewportHeight;
       const scrolledPastTop = -rect.top;
       const maxScroll = viewportHeight * SCROLL_MULTIPLIER;
       const progress = Math.min(Math.max(scrolledPastTop / maxScroll, 0), 1);
@@ -274,7 +276,8 @@ export default function ScrollStorySection() {
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+      if (animationFrameId.current)
+        cancelAnimationFrame(animationFrameId.current);
     };
   }, [handleScroll]);
 
@@ -315,7 +318,11 @@ export default function ScrollStorySection() {
     };
   };
 
-  const positionStyle = animationComplete ? "absolute" : isFixed ? "fixed" : "relative";
+  const positionStyle = animationComplete
+    ? "absolute"
+    : isFixed
+      ? "fixed"
+      : "relative";
   const spacerHeight = isFixed ? "100vh" : "0px";
 
   return (
@@ -348,7 +355,8 @@ export default function ScrollStorySection() {
           <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(160deg, #f0eef8 0%, #e8e4f5 50%, #ede8f7 100%)",
+              background:
+                "linear-gradient(160deg, #f0eef8 0%, #e8e4f5 50%, #ede8f7 100%)",
             }}
           >
             <div
@@ -387,14 +395,15 @@ export default function ScrollStorySection() {
                   className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#A22F6E" }}
                 >
-                  prayer thread,
+                  community,
                 </span>
                 <span
                   className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#34399C" }}
                 >
-                  sermon tool,
-                </span>and{" "}
+                  mentor,
+                </span>
+                and{" "}
                 <span
                   className="font-aeonik text-[56px] leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ backgroundColor: "#ffffff", color: "#1A8454" }}
@@ -413,7 +422,7 @@ export default function ScrollStorySection() {
           >
             <div className="container mx-auto text-center font-bold">
               <p className="text-[56px] font-medium leading-[72px] font-aeonik text-[#4E0A7C]">
-                To help people know{" "}
+                To help believers know{" "}
                 <span
                   className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ backgroundColor: "#ffffff", color: "#870BD6" }}
@@ -422,11 +431,12 @@ export default function ScrollStorySection() {
                 </span>{" "}
                 more deeply and walk
                 <br />
-                faithfully toward eternity. <img
-              src="./heroImage.svg"
-              alt="pathway"
-              className=" w-6 h-6 xl:w-[56px] xl:h-[56px] inline-block"
-            />
+                boldly in purpose until Jesus returns.{" "}
+                <img
+                  src="./heroImage.svg"
+                  alt="pathway"
+                  className=" w-6 h-6 xl:w-[56px] xl:h-[56px] inline-block"
+                />
               </p>
             </div>
           </div>
@@ -456,7 +466,8 @@ export default function ScrollStorySection() {
                 className="text-[28px] font-medium leading-[32px] font-aeonik"
                 style={{ color: "#4E0A7C" }}
               >
-                This isn&apos;t about <span className="line-through">scale</span>...
+                This isn&apos;t about{" "}
+                <span className="line-through">scale</span>...
               </p>
               <p className="text-[56px] font-bold leading-[72px] font-aeonik text-[#4E0A7C]">
                 It&apos;s about{" "}
@@ -478,7 +489,6 @@ export default function ScrollStorySection() {
               transition: "opacity 0.5s ease",
             }}
           >
-           
             <div className="w-px h-6 bg-[#180426] opacity-25 animate-pulse" />
           </div>
         </div>
