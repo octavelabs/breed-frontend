@@ -378,34 +378,35 @@ export default function ScrollStorySection() {
               className="absolute inset-0 bg-cover bg-center opacity-10"
               style={{ backgroundImage: "url('/aboutBackground.png')" }}
             />
-            <div className="container mx-auto text-center px-4 py-[276px] relative z-10 font-bold">
-              <p className="text-[56px] font-medium leading-[72px] font-aeonik text-[#180426]">
+
+            <div className="container mx-auto text-center px-4 py-16 sm:py-24 xl:py-[276px] relative z-10 font-bold">
+              <p className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-aeonik text-[#180426]">
                 Breed is intentionally free because we believe
                 <br />
                 spiritual growth should never sit behind a paywall.
                 <br />
                 Every{" "}
                 <span
-                  className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3"
+                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#5B26B1" }}
                 >
                   devotional,
                 </span>
                 <span
-                  className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3"
+                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#A22F6E" }}
                 >
                   community,
                 </span>
                 <span
-                  className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3"
+                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#34399C" }}
                 >
                   mentor,
                 </span>
                 and{" "}
                 <span
-                  className="font-aeonik text-[56px] leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
+                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ backgroundColor: "#ffffff", color: "#1A8454" }}
                 >
                   growth tracker
@@ -421,10 +422,10 @@ export default function ScrollStorySection() {
             style={slideStyle(1)}
           >
             <div className="container mx-auto text-center font-bold">
-              <p className="text-[56px] font-medium leading-[72px] font-aeonik text-[#4E0A7C]">
+              <p className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-aeonik text-[#4E0A7C]">
                 To help believers know{" "}
                 <span
-                  className="font-aeonik text-[56px] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
+                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ backgroundColor: "#ffffff", color: "#870BD6" }}
                 >
                   God
@@ -435,7 +436,7 @@ export default function ScrollStorySection() {
                 <img
                   src="./heroImage.svg"
                   alt="pathway"
-                  className=" w-6 h-6 xl:w-[56px] xl:h-[56px] inline-block"
+                  className="w-4 h-4 sm:w-6 sm:h-6 xl:w-[56px] xl:h-[56px] inline-block align-middle"
                 />
               </p>
             </div>
@@ -448,7 +449,7 @@ export default function ScrollStorySection() {
           >
             <div className="container mx-auto text-center flex justify-center items-center">
               <p
-                className="text-[56px] font-medium leading-[72px] font-aeonik"
+                className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-aeonik"
                 style={{ color: "#4E0A7C" }}
               >
                 This isn&apos;t about scale...
@@ -461,18 +462,19 @@ export default function ScrollStorySection() {
             className="absolute inset-0 flex items-center justify-center px-4"
             style={slideStyle(3)}
           >
-            <div className="container mx-auto text-center max-w-2xl flex flex-col items-center gap-3 font-bold">
+            <div className="container mx-auto text-center max-w-2xl flex flex-col items-center gap-3 font-bold px-2 sm:px-0">
               <p
-                className="text-[28px] font-medium leading-[32px] font-aeonik"
+                className="text-[18px] sm:text-[22px] xl:text-[28px] font-medium leading-[24px] sm:leading-[28px] xl:leading-[32px] font-aeonik"
                 style={{ color: "#4E0A7C" }}
               >
                 This isn&apos;t about{" "}
                 <span className="line-through">scale</span>...
               </p>
-              <p className="text-[56px] font-bold leading-[72px] font-aeonik text-[#4E0A7C]">
+
+              <p className="text-[34px] sm:text-[44px] xl:text-[56px] font-bold leading-[42px] sm:leading-[56px] xl:leading-[72px] font-aeonik text-[#4E0A7C]">
                 It&apos;s about{" "}
                 <span
-                  className="text-[56px] leading-[68px] px-3 py-1 rounded-[2px] text-white inline-block font-aeonik shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
+                  className="text-[34px] sm:text-[44px] xl:text-[56px] leading-[40px] sm:leading-[52px] xl:leading-[68px] px-3 py-1 rounded-[2px] text-white inline-block font-aeonik shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ background: "#A119F6" }}
                 >
                   souls.
@@ -483,7 +485,7 @@ export default function ScrollStorySection() {
 
           {/* Scroll hint — fades out after first scroll */}
           <div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+            className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             style={{
               opacity: progress < 0.04 ? 1 : 0,
               transition: "opacity 0.5s ease",
