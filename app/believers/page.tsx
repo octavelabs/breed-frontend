@@ -67,7 +67,7 @@ export default function BelieversPage() {
                   Download app
                   <div className="flex items-center gap-1">
                     <img
-                      src="/apple-play.svg"
+                      src="/Apple-play.svg"
                       className="w-5 h-5 fill-current"
                     />
                     <img
