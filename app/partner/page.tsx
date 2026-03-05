@@ -198,13 +198,13 @@ export default function PartnerWithUsPage() {
                     {/* Last grid item - Start a conversation button */}
                     <div className="relative rounded-2xl md:rounded-[16px] py-6 md:py-[28px] px-4 md:px-5 flex items-center justify-center border-[1.5px] border-[#4E0A7C] border-dashed">
                       <Button
-                        buttonType="bordered"
-                        customClass="!w-full sm:!w-[229px] !h-[52px] sm:!h-[56px] !border-white !text-white"
+                        buttonType="custom"
+                        customClass="!w-full sm:!w-[260px] !h-[52px] sm:!h-[56px] !text-white !bg-[rgba(255,255,255,0.16)] backdrop-blur-sm p-8"
                         onClick={() => console.log("done")}
                         type="button"
                       >
-                        <p className="flex items-center justify-center gap-[10px] text-sm sm:text-base">
-                          Start a conversation{" "}
+                        <p className="flex items-center justify-center gap-[10px] text-sm sm:text-base font-bold">
+                          Start a conversation
                           <ArrowRight className="w-5 h-4" stroke="white" />
                         </p>
                       </Button>
