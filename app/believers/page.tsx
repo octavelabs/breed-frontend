@@ -38,9 +38,9 @@ export default function BelieversPage() {
     <>
       <Navbar />
       <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
-        <div className="container mx-auto px-4 pt-[150px] md:pt-[230px]">
-          <div className="relative max-w-5xl mx-auto">
-            <div className="text-center relative z-10 mb-12">
+        <div className="px-4 lg:px-[50px] xl:px-[96px] pt-[150px] md:pt-[230px]">
+          <div className="relative">
+            <div className="text-center relative z-10 mb-22">
               <div className="inline-block mb-6">
                 <div className="border border-[#161717] rounded-full px-5 py-[6px] bg-[#E7C8FF]">
                   <span className="text-[#161717] text-sm md:text-base font-medium">
@@ -59,7 +59,7 @@ export default function BelieversPage() {
                 Grow in Grace
               </motion.h1>
               <p className="text-base xl:text-[20px] text-[#4E5255] mb-12 max-w-2xl mx-auto">
-                For believers seeking spiritual growth and new converts
+                For believers seeking spiritual growth and new converts<br />
                 beginning their faith journey
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -96,7 +96,7 @@ export default function BelieversPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto  pb-4 md:py-6"
+            className="pb-4 md:pb-6"
           >
             <div className="bg-purple-600 rounded-[32px] overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 ">
@@ -129,7 +129,7 @@ export default function BelieversPage() {
 
                 <div className="relative min-h-80 md:min-h-auto p-2">
                   <img
-                    src="/hero1.png"
+                    src="/believerHero1.png"
                     alt="Woman praying"
                     className="w-full h-full object-cover rounded-[32px]"
                   />
@@ -145,7 +145,7 @@ export default function BelieversPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto  pb-4 md:pb-6"
+            className="pb-4 md:pb-6"
           >
             <div className="bg-[#34399C] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -212,7 +212,7 @@ export default function BelieversPage() {
 
                 <div className="relative min-h-80 md:min-h-auto order-1 md:order-2 p-2">
                   <img
-                    src="/hero2.png"
+                    src="/believerHero2.png"
                     alt="Man reading bible"
                     className="w-full h-full object-cover rounded-3xl"
                   />

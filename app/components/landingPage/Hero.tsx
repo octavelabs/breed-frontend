@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+
 import { motion } from "framer-motion";
 import Button from "../Button";
 
@@ -11,10 +11,10 @@ export default function Hero() {
   };
 
   return (
-    <div className="container mx-auto pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-[31px]">
+    <div className=" pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-4 lg:px-[50px] xl:px-[96px]">
       <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full" />
 
-      <div className="relative max-w-5xl mx-auto">
+      <div className="relative  mx-auto">
         <div className="flex flex-col text-[#3C3E40] absolute left-0 xl:-left-10 -top-5 xl:top-12 md:top-20 -rotate-[5deg] text-[8.85px] xl:text-[18px]">
           <span className="px-2 xl:px-3 py-1 bg-[#E7C8FF] rounded-[8px] w-fit">
             Growth
@@ -112,48 +112,35 @@ export default function Hero() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: false, amount: 0.3 }}
         transition={{ duration: 0.8 }}
-        className="mt-10 md:mt-20 max-w-7xl mx-auto h-[224px] lg:h-auto"
+        className="mt-10 md:mt-20 max-w-7xl mx-auto z-10 relative"
       >
-        <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-2xl h-full xl:h-auto">
-          <div className="relative lg:aspect-[3/4] bg-gradient-to-b from-[#A967F1] to-[#5B26B1]">
-            <div className="absolute inset-0 ">
+        <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-lg h-[224px] lg:h-[520px]">
+          
               <img
                 src="/hero1.png"
                 alt="Woman praying"
-                className="w-full h-full object-cover mix-blend-overlay"
+                className="w-full h-full object-cover"
               />
-            </div>
-          </div>
-
-          <div className="relative lg:aspect-[3/4] bg-blue-600">
-            <div className="absolute inset-0">
-              <img
+               <img
                 src="/hero2.png"
                 alt="Man reading bible"
-                className="w-full h-full object-cover mix-blend-overlay"
+                className="w-full h-full object-cover"
               />
-            </div>
-          </div>
-
-          <div className="relative lg:aspect-[3/4] bg-gradient-to-b from-pink-500/70 to-pink-600/70">
-            <div className="absolute inset-0">
-              <img
-                src="/hero4.png"
-                alt="Happy family"
-                className="w-full h-full object-cover mix-blend-luminosity"
-              />
-            </div>
-          </div>
-
-          <div className="relative lg:aspect-[3/4] bg-[#1A8454]">
-            <div className="absolute inset-0 ">
-              <img
+          <img
                 src="/hero3.png"
-                alt="Hands with plant"
-                className="w-full h-full object-cover mix-blend-luminosity"
+                alt="Happy family"
+                className="w-full h-full object-cover"
               />
-            </div>
-          </div>
+               <img
+                src="/hero4.png"
+                alt="Hands with plant"
+                className="w-full h-full object-cover"
+              />
+
+   
+
+
+      
         </div>
       </motion.div>
     </div>

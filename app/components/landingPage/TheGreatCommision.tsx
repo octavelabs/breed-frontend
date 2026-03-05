@@ -111,7 +111,7 @@ export default function TheGreatCommission() {
   // Mobile render
   if (isMobile) {
     return (
-      <div className="w-full font-sans mb-8">
+      <div className="w-full mb-[96px]">
         <div className="bg-[#F4E3FE] px-4 py-8">
           {/* Image Section - Fixed height 224px */}
           <div className="w-full h-[224px] rounded-[24px] overflow-hidden shadow-lg mb-6">
@@ -159,7 +159,7 @@ export default function TheGreatCommission() {
 
   // Desktop render (original animation)
   return (
-    <div className="w-full font-sans mb-8">
+    <div className="w-full mb-[96px]">
       <div
         ref={containerRef}
         className="relative"

@@ -51,9 +51,9 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] flex w-full xl:w-[70%] h-[80px] box-border mx-auto items-center justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white xl:bg-[#FBF6FF] xl:rounded-full border-[5px] border-white">
-        <Link href="/">
-          <img src="/Logo.png" alt="logo" className="h-[30px] w-auto" />
+      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] flex w-full lg:w-fit h-[80px] box-border mx-auto items-center gap-0 lg:gap-[72px] justify-between lg:justify-none left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white lg:bg-[#FBF6FF] lg:rounded-full border-[5px] border-white">
+        <Link href="/" className="h-[30px] w-[80px]">
+          <img src="/Logo.png" alt="logo" className="h-full w-full" />
         </Link>
 
         <div className="hidden lg:flex items-center space-x-[28px]">
@@ -76,19 +76,21 @@ const Navbar = () => {
                     selected ? "text-[#330750] font-bold" : "text-[#4E5255]",
                   ].join(" ")} `}
                 >
-                  <p>{link.title}</p>
+                  <p className="whitespace-nowrap">{link.title}</p>
                 </Link>
               );
             }
           })}
-          <button className={`px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 ${pathname === '/partner' || pathname.startsWith('/partner') ? 'shadow-[2.5px_2.5px_0px_0px_#D49CFD,-2.5px_-2.5px_0px_0px_#D49CFD,2.5px_-2.5px_0px_0px_#D49CFD,-2.5px_2.5px_0px_0px_#D49CFD]' : ''}`}>
+          <div className="flex gap-4">
+          <button className={`whitespace-nowrap px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 ${pathname === '/partner' || pathname.startsWith('/partner') ? 'shadow-[2.5px_2.5px_0px_0px_#D49CFD,-2.5px_-2.5px_0px_0px_#D49CFD,2.5px_-2.5px_0px_0px_#D49CFD,-2.5px_2.5px_0px_0px_#D49CFD]' : ''}`}>
             <Link href="/partner">Partner With Us</Link>
           </button>
-          <button className="px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
+          <button className="whitespace-nowrap px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
             <a href="https://form.typeform.com/to/EMh4jnRi" target="_blank" rel="noreferrer">
               Join The Waitlist
             </a>
           </button>
+          </div>
         </div>
 
         <button

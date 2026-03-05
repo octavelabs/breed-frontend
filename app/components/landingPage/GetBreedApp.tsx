@@ -5,7 +5,7 @@ import Testimonials from "./Testimonial";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function GetBreedApp({showTestimonials = true, bgColor = '#F7EDFE'}: {showTestimonials?: boolean, bgColor?: string}) {
+export default function GetBreedApp({showTestimonials = false, bgColor = '#F7EDFE'}: {showTestimonials?: boolean, bgColor?: string}) {
   return (
     <>
       {showTestimonials && <Testimonials />}
@@ -63,7 +63,7 @@ export default function GetBreedApp({showTestimonials = true, bgColor = '#F7EDFE
         </div>
 
         {/* CTA Section - Dark Navy with Image */}
-        <div className="container mx-auto px-4 py-12">
+        <div className="px-4 lg:px-[50px] xl:px-[96px] py-12">
           <div className="bg-[#180426] rounded-[24px] xl:rounded-[40px] overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               {/* Image */}

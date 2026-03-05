@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-[#A967F1] from-0% to-[#5B26B1] to-100% text-white pt-16">
-      <div className="container mx-auto px-6">
+      <div className="px-4 lg:px-[50px] xl:px-[96px]">
         {/* Footer Content */}
         <div className="w-full flex flex-col xl:flex-row gap-[32px] xl:gap-0">
           <div className="w-full xl:w-[50%]">
@@ -12,7 +12,7 @@ export default function Footer() {
               your walk with God
             </p>
           </div>
-          <div className="w-full xl:w-[50%] grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr] gap-8 mb-12">
+          <div className="w-full xl:w-[50%] grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr] gap-6 lg:gap-8 mb-12">
             <div>
               <h3 className="font-bold mb-4 text-sm xl:text-[18px]">Product</h3>
               <ul className="space-y-5 text-white text-sm xl:text-[18px]">

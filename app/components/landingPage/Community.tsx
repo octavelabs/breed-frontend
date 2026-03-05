@@ -136,7 +136,7 @@ export default function Community() {
   ];
 
   return (
-    <div className="w-full font-sans">
+    <div className="w-full mt-[144px]">
       <div ref={containerRef} className="relative" style={{ height: "350vh" }}>
         <div style={{ height: spacerHeight }} aria-hidden="true" />
 

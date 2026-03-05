@@ -4,7 +4,6 @@ import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-
 interface NavbarDropdownProps {
   selected: boolean;
   link: {
@@ -15,6 +14,7 @@ interface NavbarDropdownProps {
 
 const NavbarDropdown: React.FC<NavbarDropdownProps> = ({ link, selected }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<String | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,13 +38,13 @@ const NavbarDropdown: React.FC<NavbarDropdownProps> = ({ link, selected }) => {
       <div>
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className={`flex h-12 items-center justify-center gap-2 rounded-full px-4 ${[
-            selected
-              ? "text-[#330750]"
-              : "text-[#4E5255]",
+          className={`cursor-pointer flex h-12 items-center justify-center gap-2 rounded-full px-4 ${[
+            selected ? "text-[#330750] font-bold" : "text-[#4E5255]",
           ].join(" ")} `}
         >
-          <p>{link.title}</p>
+          <p className="whitespace-nowrap">
+            {selectedOption ?? "For Believers"}
+          </p>
           <ChevronDown />
         </button>
       </div>
@@ -54,7 +54,10 @@ const NavbarDropdown: React.FC<NavbarDropdownProps> = ({ link, selected }) => {
             <Link
               href={option.path}
               key={index}
-              onClick={() => setDropdownOpen(false)}
+              onClick={() => {
+                setSelectedOption(option.title);
+                setDropdownOpen(false);
+              }}
               className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
             >
               {option.title}

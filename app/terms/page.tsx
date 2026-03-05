@@ -7,7 +7,7 @@ export default function TermsPage() {
       <Navbar />
       <div className="bg-[#F7EDFE] pt-[100px] md:pt-[200px] ">
         <main className="w-[80%] mx-auto pb-8">
-          <h1 className="text-[64px] leading-[72px] font-medium text-[#4E0A7C]">
+          <h1 className="text-[35px] md:text-[50px] xl:text-[64px] leading-[42px] md:leading-[60px] xl:leading-[72px] font-medium text-[#4E0A7C]">
             Terms Of Service
           </h1>
           <p className="text-[18px] font-medium text-[#180426] mt-[40px] mb-2">

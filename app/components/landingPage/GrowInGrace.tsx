@@ -40,9 +40,9 @@ export default function GrowInGrace() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 px-4">
+    <div className="space-y-2 px-4 lg:px-[50px] xl:px-[96px]">
       {/* Top Grid - 2 Cards */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-2">
         {/* Blue Card - Grow in Grace */}
         <motion.div
           variants={slideInRight}
@@ -120,7 +120,7 @@ export default function GrowInGrace() {
       </div>
 
       {/* Bottom Grid - 2 Cards */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-2">
         {/* Image Card - Pastor */}
         <motion.div
           variants={slideInLeft}
@@ -151,6 +151,7 @@ export default function GrowInGrace() {
               For Preachers
             </span>
           </div>
+
 
           <h2 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-aeonik font-bold mb-2">
             Lead with Purpose
@@ -200,7 +201,7 @@ export default function GrowInGrace() {
       </div>
 
       {/* Daily Edification Section */}
-      <div className="bg-[#870BD6] rounded-[24px] xl:rounded-[40px] p-[32px] xl:p-[48px]">
+      <div className="bg-[#870BD6] rounded-[24px] xl:rounded-[40px] p-[32px] xl:p-[48px] mt-10">
         {/* Tabs */}
         <div className="bg-white rounded-full p-1.5 mb-[72px] flex overflow-x-auto justify-between">
           {tabs.map((tab, index) => (
@@ -237,7 +238,7 @@ const TabContentOne = () => {
           Stay nourished in the Word — Every day.
         </p>
 
-        <div className="space-y-3 mb-[56px] xl:mb-[109px]">
+        <div className="space-y-3 mb-[40px] xl:mb-[91px]">
           {[
             "Spirit-filled devotionals designed to help you hear God clearly each day.",
             "Build spiritual consistency with gentle reminders to pray, read, and meditate every single day.",
@@ -247,7 +248,10 @@ const TabContentOne = () => {
               className="flex items-center gap-2 bg-[#E7C8FF] text-[#330750] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
               key={index}
             >
-              <img src="/abstract-pink-24.svg" className="w-[16px] h-[16px]" />
+              <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.4485 0.769352V4.16935L8.35685 6.52769V1.80269L11.2985 0.136019C11.4128 0.0698804 11.5423 0.034395 11.6744 0.0330017C11.8064 0.0316083 11.9366 0.0643542 12.0523 0.128066C12.168 0.191777 12.2652 0.284294 12.3347 0.396648C12.4041 0.509002 12.4433 0.637384 12.4485 0.769352ZM0.406848 8.76935L3.34851 10.436L7.44851 8.15269L3.35685 5.74435L0.415181 7.41102C0.290816 7.47517 0.186383 7.57214 0.113199 7.69142C0.0400151 7.8107 0.000872931 7.94773 1.4432e-05 8.08766C-0.000844067 8.2276 0.036614 8.3651 0.108329 8.48527C0.180044 8.60543 0.28328 8.70367 0.406848 8.76935ZM13.3568 13.8694V10.4694L9.26518 8.15269V12.8777L12.2152 14.5444C12.3323 14.61 12.4647 14.6438 12.599 14.6423C12.7332 14.6408 12.8648 14.604 12.9804 14.5356C13.096 14.4673 13.1916 14.3697 13.2577 14.2528C13.3238 14.1359 13.358 14.0037 13.3568 13.8694Z" fill="#4E0A7C"/>
+<path opacity="0.3" d="M5.41576 0.102717L8.35742 1.76938V6.49438L4.26576 4.16938V0.769383C4.26528 0.634575 4.30035 0.502024 4.36745 0.385098C4.43454 0.268171 4.53128 0.171003 4.64791 0.103393C4.76454 0.0357819 4.89693 0.000118986 5.03174 2.97226e-07C5.16655 -0.000118392 5.29901 0.0353113 5.41576 0.102717ZM4.49909 14.536L7.44909 12.8694V8.15272L3.35742 10.4694V13.8694C3.35778 14.003 3.39303 14.1342 3.4597 14.2499C3.52636 14.3657 3.62212 14.462 3.73748 14.5294C3.85285 14.5968 3.98382 14.6328 4.1174 14.634C4.25099 14.6352 4.38257 14.6014 4.49909 14.536ZM16.3074 7.44438L13.3658 5.77772L9.26576 8.15272L13.3574 10.4694L16.2991 8.80272C16.4235 8.73856 16.5279 8.64159 16.6011 8.52231C16.6743 8.40304 16.7134 8.26601 16.7143 8.12607C16.7151 7.98614 16.6777 7.84863 16.6059 7.72847C16.5342 7.6083 16.431 7.51006 16.3074 7.44438Z" fill="#4E0A7C"/>
+</svg>
               <span className="text-xs xl:text-sm leading-relaxed">{item}</span>
             </div>
           ))}
@@ -269,7 +273,7 @@ const TabContentOne = () => {
 
       {/* Right Preview Cards */}
       <div
-        className="flex flex-col gap-[35px] items-center bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
+        className="flex flex-col gap-[45px] items-center bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
         <div className="space-y-[10px]">
@@ -328,7 +332,7 @@ const TabContentTwo = () => {
           Grow Together with Like-Minded Believers.
         </p>
 
-        <div className="space-y-3 mb-[56px] xl:mb-[109px]">
+        <div className="space-y-3 mb-[40px]">
           {[
             "Join communities that reflect your season — students, parents, young professionals, etc.",
             "Get answers to your questions in a safe, Spirit-filled environment.",
@@ -339,7 +343,10 @@ const TabContentTwo = () => {
               className="flex items-center gap-2 bg-[#E7C8FF] text-[#330750] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
               key={index}
             >
-              <img src="/abstract-pink-24.svg" className="w-[16px] h-[16px]" />
+              <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.4485 0.769352V4.16935L8.35685 6.52769V1.80269L11.2985 0.136019C11.4128 0.0698804 11.5423 0.034395 11.6744 0.0330017C11.8064 0.0316083 11.9366 0.0643542 12.0523 0.128066C12.168 0.191777 12.2652 0.284294 12.3347 0.396648C12.4041 0.509002 12.4433 0.637384 12.4485 0.769352ZM0.406848 8.76935L3.34851 10.436L7.44851 8.15269L3.35685 5.74435L0.415181 7.41102C0.290816 7.47517 0.186383 7.57214 0.113199 7.69142C0.0400151 7.8107 0.000872931 7.94773 1.4432e-05 8.08766C-0.000844067 8.2276 0.036614 8.3651 0.108329 8.48527C0.180044 8.60543 0.28328 8.70367 0.406848 8.76935ZM13.3568 13.8694V10.4694L9.26518 8.15269V12.8777L12.2152 14.5444C12.3323 14.61 12.4647 14.6438 12.599 14.6423C12.7332 14.6408 12.8648 14.604 12.9804 14.5356C13.096 14.4673 13.1916 14.3697 13.2577 14.2528C13.3238 14.1359 13.358 14.0037 13.3568 13.8694Z" fill="#4E0A7C"/>
+<path opacity="0.3" d="M5.41576 0.102717L8.35742 1.76938V6.49438L4.26576 4.16938V0.769383C4.26528 0.634575 4.30035 0.502024 4.36745 0.385098C4.43454 0.268171 4.53128 0.171003 4.64791 0.103393C4.76454 0.0357819 4.89693 0.000118986 5.03174 2.97226e-07C5.16655 -0.000118392 5.29901 0.0353113 5.41576 0.102717ZM4.49909 14.536L7.44909 12.8694V8.15272L3.35742 10.4694V13.8694C3.35778 14.003 3.39303 14.1342 3.4597 14.2499C3.52636 14.3657 3.62212 14.462 3.73748 14.5294C3.85285 14.5968 3.98382 14.6328 4.1174 14.634C4.25099 14.6352 4.38257 14.6014 4.49909 14.536ZM16.3074 7.44438L13.3658 5.77772L9.26576 8.15272L13.3574 10.4694L16.2991 8.80272C16.4235 8.73856 16.5279 8.64159 16.6011 8.52231C16.6743 8.40304 16.7134 8.26601 16.7143 8.12607C16.7151 7.98614 16.6777 7.84863 16.6059 7.72847C16.5342 7.6083 16.431 7.51006 16.3074 7.44438Z" fill="#4E0A7C"/>
+</svg>
               <span className="text-xs xl:text-sm leading-relaxed">{item}</span>
             </div>
           ))}
@@ -419,10 +426,13 @@ const TabContentThree = () => {
             "Monitor growth metrics to help disciples stay accountable and motivated.",
           ].map((item, index) => (
             <div
-              className="flex items-center gap-2 bg-[#E7C8FF] text-[#6A0BA9] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
+              className="flex items-center gap-2 bg-[#E7C8FF] text-[#330750] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
               key={index}
             >
-              <img src="/abstract-pink-24.svg" className="w-[16px] h-[16px]" />
+              <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.4485 0.769352V4.16935L8.35685 6.52769V1.80269L11.2985 0.136019C11.4128 0.0698804 11.5423 0.034395 11.6744 0.0330017C11.8064 0.0316083 11.9366 0.0643542 12.0523 0.128066C12.168 0.191777 12.2652 0.284294 12.3347 0.396648C12.4041 0.509002 12.4433 0.637384 12.4485 0.769352ZM0.406848 8.76935L3.34851 10.436L7.44851 8.15269L3.35685 5.74435L0.415181 7.41102C0.290816 7.47517 0.186383 7.57214 0.113199 7.69142C0.0400151 7.8107 0.000872931 7.94773 1.4432e-05 8.08766C-0.000844067 8.2276 0.036614 8.3651 0.108329 8.48527C0.180044 8.60543 0.28328 8.70367 0.406848 8.76935ZM13.3568 13.8694V10.4694L9.26518 8.15269V12.8777L12.2152 14.5444C12.3323 14.61 12.4647 14.6438 12.599 14.6423C12.7332 14.6408 12.8648 14.604 12.9804 14.5356C13.096 14.4673 13.1916 14.3697 13.2577 14.2528C13.3238 14.1359 13.358 14.0037 13.3568 13.8694Z" fill="#4E0A7C"/>
+<path opacity="0.3" d="M5.41576 0.102717L8.35742 1.76938V6.49438L4.26576 4.16938V0.769383C4.26528 0.634575 4.30035 0.502024 4.36745 0.385098C4.43454 0.268171 4.53128 0.171003 4.64791 0.103393C4.76454 0.0357819 4.89693 0.000118986 5.03174 2.97226e-07C5.16655 -0.000118392 5.29901 0.0353113 5.41576 0.102717ZM4.49909 14.536L7.44909 12.8694V8.15272L3.35742 10.4694V13.8694C3.35778 14.003 3.39303 14.1342 3.4597 14.2499C3.52636 14.3657 3.62212 14.462 3.73748 14.5294C3.85285 14.5968 3.98382 14.6328 4.1174 14.634C4.25099 14.6352 4.38257 14.6014 4.49909 14.536ZM16.3074 7.44438L13.3658 5.77772L9.26576 8.15272L13.3574 10.4694L16.2991 8.80272C16.4235 8.73856 16.5279 8.64159 16.6011 8.52231C16.6743 8.40304 16.7134 8.26601 16.7143 8.12607C16.7151 7.98614 16.6777 7.84863 16.6059 7.72847C16.5342 7.6083 16.431 7.51006 16.3074 7.44438Z" fill="#4E0A7C"/>
+</svg>
               <span className="text-sm leading-relaxed">{item}</span>
             </div>
           ))}
@@ -470,10 +480,13 @@ const TabContentFour = () => {
             "Share course plans with friends or within communities for group learning.",
           ].map((item, index) => (
             <div
-              className="flex items-center gap-2 bg-[#E7C8FF] text-[#6A0BA9] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
+              className="flex items-center gap-2 bg-[#E7C8FF] text-[#330750] rounded-full px-5 py-2 border-[0.5px] border-[#6A0BA9]"
               key={index}
             >
-              <img src="/abstract-pink-24.svg" className="w-[16px] h-[16px]" />
+              <svg width="17" height="15" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.4485 0.769352V4.16935L8.35685 6.52769V1.80269L11.2985 0.136019C11.4128 0.0698804 11.5423 0.034395 11.6744 0.0330017C11.8064 0.0316083 11.9366 0.0643542 12.0523 0.128066C12.168 0.191777 12.2652 0.284294 12.3347 0.396648C12.4041 0.509002 12.4433 0.637384 12.4485 0.769352ZM0.406848 8.76935L3.34851 10.436L7.44851 8.15269L3.35685 5.74435L0.415181 7.41102C0.290816 7.47517 0.186383 7.57214 0.113199 7.69142C0.0400151 7.8107 0.000872931 7.94773 1.4432e-05 8.08766C-0.000844067 8.2276 0.036614 8.3651 0.108329 8.48527C0.180044 8.60543 0.28328 8.70367 0.406848 8.76935ZM13.3568 13.8694V10.4694L9.26518 8.15269V12.8777L12.2152 14.5444C12.3323 14.61 12.4647 14.6438 12.599 14.6423C12.7332 14.6408 12.8648 14.604 12.9804 14.5356C13.096 14.4673 13.1916 14.3697 13.2577 14.2528C13.3238 14.1359 13.358 14.0037 13.3568 13.8694Z" fill="#4E0A7C"/>
+<path opacity="0.3" d="M5.41576 0.102717L8.35742 1.76938V6.49438L4.26576 4.16938V0.769383C4.26528 0.634575 4.30035 0.502024 4.36745 0.385098C4.43454 0.268171 4.53128 0.171003 4.64791 0.103393C4.76454 0.0357819 4.89693 0.000118986 5.03174 2.97226e-07C5.16655 -0.000118392 5.29901 0.0353113 5.41576 0.102717ZM4.49909 14.536L7.44909 12.8694V8.15272L3.35742 10.4694V13.8694C3.35778 14.003 3.39303 14.1342 3.4597 14.2499C3.52636 14.3657 3.62212 14.462 3.73748 14.5294C3.85285 14.5968 3.98382 14.6328 4.1174 14.634C4.25099 14.6352 4.38257 14.6014 4.49909 14.536ZM16.3074 7.44438L13.3658 5.77772L9.26576 8.15272L13.3574 10.4694L16.2991 8.80272C16.4235 8.73856 16.5279 8.64159 16.6011 8.52231C16.6743 8.40304 16.7134 8.26601 16.7143 8.12607C16.7151 7.98614 16.6777 7.84863 16.6059 7.72847C16.5342 7.6083 16.431 7.51006 16.3074 7.44438Z" fill="#4E0A7C"/>
+</svg>
               <span className="text-sm leading-relaxed">{item}</span>
             </div>
           ))}

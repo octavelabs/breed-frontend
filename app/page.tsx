@@ -12,6 +12,7 @@ export default function Home() {
     <>
     <Navbar />
     <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
+      
       <Hero />
       <TheGreatCommission />
       <GrowInGrace />
