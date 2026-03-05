@@ -5,13 +5,22 @@ import Testimonials from "./Testimonial";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function GetBreedApp({showTestimonials = false, bgColor = '#F7EDFE'}: {showTestimonials?: boolean, bgColor?: string}) {
+export default function GetBreedApp({
+  showTestimonials = false,
+  bgColor = "#F7EDFE",
+}: {
+  showTestimonials?: boolean;
+  bgColor?: string;
+}) {
   return (
     <>
       {showTestimonials && <Testimonials />}
       <div className="min-h-screen">
         {/* Hero Section */}
-        <div className=" pt-12 pb-5 md:py-20" style={{backgroundColor: bgColor}}>
+        <div
+          className=" pt-12 pb-5 md:py-20"
+          style={{ backgroundColor: bgColor }}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -65,7 +74,7 @@ export default function GetBreedApp({showTestimonials = false, bgColor = '#F7EDF
         {/* CTA Section - Dark Navy with Image */}
         <div className="px-4 lg:px-[50px] xl:px-[96px] py-12">
           <div className="bg-[#180426] rounded-[24px] xl:rounded-[40px] overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 items-center">
               {/* Image */}
               <div className="relative min-h-64 md:min-h-auto order-2 md:order-1">
                 <img
@@ -81,24 +90,28 @@ export default function GetBreedApp({showTestimonials = false, bgColor = '#F7EDF
                   Rooted in Christ, Growing Together
                 </h2>
                 <p className=" mb-8 text-sm xl:text-base leading-relaxed text-white">
-                  Whether you're just beginning or leading others, Breed is your
-                  space to grow in Christ, stay accountable, and walk in
+                  Whether you&apos;re just beginning or leading others, Breed is
+                  your space to grow in Christ, stay accountable, and walk in
                   purpose. Join here and take the next step in your faith
                   journey.
                 </p>
                 <div className="flex flex-col lg:flex-row gap-4">
-                   <a href="/contact" target="_blank" rel="noreferrer">
-                  <button className="text-sm inline-flex items-center gap-6 px-6 h-[56px]  bg-white text-[#5B26B1] rounded-full font-bold transition-all w-fit">
-                    Start a conversation
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </a>
-                <a href="https://form.typeform.com/to/EMh4jnRi" target="_blank" rel="noreferrer">
-                  <button className="text-sm inline-flex items-center gap-[70px] px-6 h-[56px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-bold transition-all w-fit">
-                    Join The Waitlist
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </a>
+                  <a href="/contact" target="_blank" rel="noreferrer">
+                    <button className="text-sm inline-flex items-center gap-6 px-6 h-[56px]  bg-white text-[#5B26B1] rounded-full font-bold transition-all w-fit">
+                      Start a conversation
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </a>
+                  <a
+                    href="https://form.typeform.com/to/EMh4jnRi"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <button className="text-sm inline-flex items-center gap-6 lg:gap-[70px] px-6 h-[56px] bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-bold transition-all w-fit">
+                      Join The Waitlist
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </a>
                 </div>
               </div>
             </div>
