@@ -40,7 +40,7 @@ export default function GrowInGrace() {
   };
 
   return (
-    <div className="space-y-2 px-4 lg:px-[50px] xl:px-[96px]">
+    <div className="space-y-2 px-4 lg:px-[50px] xl:px-[96px] max-w-[1740px] mx-auto">
       {/* Top Grid - 2 Cards */}
       <div className="grid md:grid-cols-2 gap-2">
         {/* Blue Card - Grow in Grace */}
@@ -273,47 +273,10 @@ const TabContentOne = () => {
 
       {/* Right Preview Cards */}
       <div
-        className="flex flex-col gap-[45px] items-center bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
+        className="bg-[#F1DFFF] rounded-[28px] w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
-        <div className="space-y-[10px]">
-          {/* Bible Plan Card */}
-          <div className="bg-[#E7C8FF] rounded-[28px] p-6 flex flex-col xl:flex-row gap-4 border-[2.5px] border-[#FFFFFF8A] shadow-[0px_1.2px_29.92px_0px_#452A7C1A]">
-            <div className="flex-1">
-              <p className="text-xs text-[#60666B] mb-[6px]">Bible plan</p>
-              <p className="text-xs text-black mb-3">
-                Grace is God's response to our brokenness undeserved, yet freely
-                given through the gift of Christ.
-              </p>
-              <p className="text-xs text-[#60666B]">
-                📅 &nbsp; Today · 3 Chapters
-              </p>
-            </div>
-            <div className="w-[96px] rounded-[11px] flex items-center justify-center flex-shrink-0">
-              <img src="./DailyEdification1.png" />
-            </div>
-          </div>
-
-          {/* Personal Devotion Card */}
-          <div className="bg-[#E7C8FF] rounded-[28px] p-6 flex flex-col xl:flex-row gap-4 border-[2.5px] border-[#FFFFFF8A] shadow-[0px_1.2px_29.92px_0px_#452A7C1A]">
-            <div className="flex-1">
-              <p className="text-xs text-[#60666B] mb-[6px]">
-                Personal Devotion
-              </p>
-              <p className="text-xs text-black mb-3">
-                Lord, help me to develop and sustain a consistent time of
-                fellowship with You, no matter how busy life gets.
-              </p>
-              <p className="text-xs text-gray-500">🕐 &nbsp; 4 · 5mins</p>
-            </div>
-            <div className="w-[96px] rounded-[11px] flex items-center justify-center flex-shrink-0">
-              <img src="./DailyEdification2.png" />
-            </div>
-          </div>
-        </div>
-        <button className="w-fit px-[10px] py-2 bg-[#E7C8FF] text-[#4E0A7C] rounded-full text-sm font-medium transition">
-          Consistency builds intimacy with God 💜
-        </button>
+        <img src='/daily1.png' className="w-[326px] h-[284px] xl:w-[525px] xl:h-[456px]" />
       </div>
     </div>
   );
@@ -368,38 +331,10 @@ const TabContentTwo = () => {
 
       {/* Right Preview Cards */}
       <div
-        className="bg-[#F1DFFF] rounded-[28px] px-[19px] xl:px-[32px] py-[32px] xl:py-10 w-full h-full bg-cover bg-no-repeat bg-center"
+        className="bg-[#F1DFFF] rounded-[28px] w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
-        <div className="flex flex-col items-center space-y-[35px]">
-          {/* Bible Plan Card */}
-          <div className="rounded-[32px] h-[220px] w-full">
-            <img src="./Forum1.png" className="h-full w-full" />
-          </div>
-          <div className="flex gap-4 w-[70%]">
-            {[
-              "./heart.png",
-              "./pray.png",
-              "./percent.png",
-              "./fire.png",
-              "./sparks.png",
-              "./clap.png",
-            ].map((item, index) => (
-              <div
-                className="h-6 xl:h-[40px] w-6 xl:w-[40px] border-[0.5px] border-[#D2D9DF] bg-white rounded-full flex justify-center items-center"
-                key={index}
-              >
-                <img
-                  src={item}
-                  className="w-[10px] xl:w-[20px] h-[10px] xl:h-[20px]"
-                />
-              </div>
-            ))}
-          </div>
-          <button className="w-fit text-[8.85px] lg:text-sm px-[10px] py-2 bg-[#E7C8FF] text-[#4E0A7C] rounded-full text-sm font-medium transition">
-            Join friends. Meet new people. Grow in christ.
-          </button>
-        </div>
+        <img src='/daily2.png' className="w-[326px] h-[284px] xl:w-[525px] xl:h-[456px]" />
       </div>
     </div>
   );
@@ -453,8 +388,11 @@ const TabContentThree = () => {
       </div>
 
       {/* Right Preview Cards */}
-      <div className="bg-[#F1DFFF]  rounded-[28px] px-[32px] py-10">
-        <img src="./discipleship.png" className="" />
+      <div
+        className="bg-[#F1DFFF] rounded-[28px] w-full h-full bg-cover bg-no-repeat bg-center"
+        style={{ backgroundImage: `url('/tabsBackground.png')` }}
+      >
+        <img src='/daily3.png' className="w-[326px] h-[284px] xl:w-[525px] xl:h-[456px]" />
       </div>
     </div>
   );
@@ -508,17 +446,10 @@ const TabContentFour = () => {
 
       {/* Right Preview Cards */}
       <div
-        className="bg-[#F1DFFF] flex flex-col items-center gap-[35px] rounded-[28px] px-[32px] py-[56px] w-full h-full bg-cover bg-no-repeat bg-center"
+        className="bg-[#F1DFFF] rounded-[28px] w-full h-full bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url('/tabsBackground.png')` }}
       >
-        {/* Bible Plan Card */}
-        <div className="rounded-[32px] px-[25px] py-[36px] h-[70%] w-full bg-[#E7C8FF]">
-          <img src="./christianCourses.png" className="h-full w-full" />
-        </div>
-
-        <button className="w-fit px-[10px] py-2 bg-[#E7C8FF] text-[#4E0A7C] rounded-full text-sm font-medium transition">
-          Learn, Unlearn, Relearn and Grow 🌱
-        </button>
+        <img src='/daily4.png' className="w-[326px] h-[284px] xl:w-[525px] xl:h-[456px]" />
       </div>
     </div>
   );

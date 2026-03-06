@@ -11,10 +11,10 @@ export default function Hero() {
   };
 
   return (
-    <div className=" pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-4 lg:px-[50px] xl:px-[96px]">
+    <div className=" pb-[30px] xl:pb-[112px] pt-[150px] md:pt-[230px] px-4 lg:px-[50px] xl:px-[96px] max-w-[1740px] mx-auto">
       <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full" />
 
-      <div className="relative  mx-auto">
+      <div className="relative ">
         <div className="flex flex-col text-[#3C3E40] absolute left-0 xl:-left-10 -top-5 xl:top-12 md:top-20 -rotate-[5deg] text-[8.85px] xl:text-[18px]">
           <span className="px-2 xl:px-3 py-1 bg-[#E7C8FF] rounded-[8px] w-fit">
             Growth
@@ -59,30 +59,47 @@ export default function Hero() {
           </div>
 
           <motion.h1
-            variants={fadeIn}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.5 }}
-            className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik relative"
-          >
-            Grow in FAITH <br /> WALK in Purpose
-            <img
-              src="./heroImage2.svg"
-              alt="bird translating"
-              className="bird-animation absolute w-[52px] xl:w-[80px] h-[52px] xl:h-[80px] top-[-20px] left-[30px] xl:left-[190px]"
-            />
-            <img
-              src="./heroImage.svg"
-              alt="pathway"
-              className="absolute bottom-[-70px] xl:bottom-[20px] right-[40px] xl:right-[120px] w-6 h-6 xl:w-[56px] xl:h-[56px]"
-            />
-          </motion.h1>
+  variants={fadeIn}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: false, amount: 0.3 }}
+  transition={{ duration: 0.5 }}
+  className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik"
+>
+  {/* First Line */}
+  <span className="relative inline-block">
+    Grow in FAITH
+    <img
+      src="./heroImage2.svg"
+      alt="bird translating"
+      className="bird-animation absolute 
+      -top-4 -left-4 lg:-left-6 xl:-left-8
+      w-[36px] h-[36px]
+      lg:w-[60px] lg:h-[60px]"
+    />
+  </span>
 
-          <p className="text-base lg:text-[24px] text-[#4E5255] mb-12 max-w-2xl mx-auto font-medium">
-            A spiritual companion app built to help you stay consistent in your
-            walk with God
-          </p>
+  <br />
+
+  {/* Second Line */}
+  <span className="relative inline-block">
+    WALK in Purpose
+    <img
+      src="./heroImage.svg"
+      alt="pathway"
+      className="absolute 
+      bottom-4 -right-6 lg:-right-14
+      w-[20px] h-[20px]
+      lg:w-[50px] lg:h-[50px]"
+    />
+  </span>
+</motion.h1>
+
+<p className="text-base lg:text-[24px] text-[#4E5255] mb-12  max-w-2xl mx-auto font-medium">
+  A spiritual companion app built to help you stay consistent in your
+  walk with God
+</p>
+
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
             <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
@@ -112,9 +129,9 @@ export default function Hero() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: false, amount: 0.3 }}
         transition={{ duration: 0.8 }}
-        className="mt-10 md:mt-20 max-w-7xl mx-auto z-10 relative"
+        className="mt-10 md:mt-20  mx-auto z-10 relative"
       >
-        <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-lg h-[224px] lg:h-[520px]">
+        <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-lg h-[224px] md:h-[350px] lg:h-[520px]">
           
               <img
                 src="/hero1.png"

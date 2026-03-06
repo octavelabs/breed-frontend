@@ -38,7 +38,7 @@ export default function BelieversPage() {
     <>
       <Navbar />
       <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
-        <div className="px-4 lg:px-[50px] xl:px-[96px] pt-[150px] md:pt-[230px]">
+        <div className="px-4 lg:px-[50px] xl:px-[96px] pt-[150px] md:pt-[230px] max-w-[1740px] mx-auto">
           <div className="relative">
             <div className="text-center relative z-10 mb-22">
               <div className="inline-block mb-6">
