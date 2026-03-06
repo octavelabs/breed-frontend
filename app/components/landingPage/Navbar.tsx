@@ -82,14 +82,20 @@ const Navbar = () => {
             }
           })}
           <div className="flex gap-4">
-          <button className={`whitespace-nowrap px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 ${pathname === '/partner' || pathname.startsWith('/partner') ? 'shadow-[2.5px_2.5px_0px_0px_#D49CFD,-2.5px_-2.5px_0px_0px_#D49CFD,2.5px_-2.5px_0px_0px_#D49CFD,-2.5px_2.5px_0px_0px_#D49CFD]' : ''}`}>
-            <Link href="/partner">Partner With Us</Link>
-          </button>
-          <button className="whitespace-nowrap px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
-            <a href="https://form.typeform.com/to/EMh4jnRi" target="_blank" rel="noreferrer">
-              Join The Waitlist
-            </a>
-          </button>
+            <button
+              className={`whitespace-nowrap px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 ${pathname === "/partner" || pathname.startsWith("/partner") ? "shadow-[2.5px_2.5px_0px_0px_#D49CFD,-2.5px_-2.5px_0px_0px_#D49CFD,2.5px_-2.5px_0px_0px_#D49CFD,-2.5px_2.5px_0px_0px_#D49CFD]" : ""}`}
+            >
+              <Link href="/partner">Partner With Us</Link>
+            </button>
+            <button className="whitespace-nowrap px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <a
+                href="https://form.typeform.com/to/EMh4jnRi"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Join The Waitlist
+              </a>
+            </button>
           </div>
         </div>
 
@@ -114,32 +120,33 @@ const Navbar = () => {
       >
         <div className="flex flex-col py-6 px-6 h-[calc(100vh-80px)] overflow-y-auto">
           <div className="flex flex-col flex-grow">
-          {mobileNavLinks.map((link, index) => (
-            <Link
-              key={index}
-              href={link.path as string}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex py-4 items-center ${
-                pathname.includes(link.path as string)
-                  ? "text-[#330750] font-medium"
-                  : "text-[#4E5255]"
-              }`}
-            >
-              <p className="text-lg">{link.title}</p>
-            </Link>
-          ))}
+            {mobileNavLinks.map((link, index) => (
+              <Link
+                key={index}
+                href={link.path as string}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex py-4 items-center ${
+                  pathname.includes(link.path as string)
+                    ? "text-[#330750] font-medium"
+                    : "text-[#4E5255]"
+                }`}
+              >
+                <p className="text-lg">{link.title}</p>
+              </Link>
+            ))}
           </div>
           <div className="flex flex-col gap-3 mt-6">
             <Link
-              href="/"
+              href="/partner"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full px-6 py-3 text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full font-medium text-center hover:shadow-lg transition-all"
             >
               Partner With Us
             </Link>
-             <a
+            <a
               href="https://form.typeform.com/to/EMh4jnRi"
-              target="_blank" rel="noreferrer"
+              target="_blank"
+              rel="noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full px-6 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-medium text-center hover:shadow-lg transition-all"
             >
