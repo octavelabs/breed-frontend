@@ -129,7 +129,7 @@ const timelineData: TimelineItem[] = [
 
 export const TimelineSection = (): React.ReactElement => {
   return (
-    <section className="flex z-[3] w-full max-w-[1319px] mx-auto px-4 relative flex-col items-start font-aeonik mt-[97px]">
+    <section className="flex z-[3] w-full px-4 lg:px-[50px] xl:px-[96px] relative flex-col items-start font-aeonik mt-[97px]">
       {timelineData.map((item, index) => (
         <div key={`timeline-${index}`} className="flex w-full">
           <div className="flex flex-col items-center relative">
@@ -148,7 +148,7 @@ export const TimelineSection = (): React.ReactElement => {
             )}
           </div>
 
-          <article className="flex items-start gap-7 w-full ml-7 mb-[88px]">
+          <article className="flex items-start gap-7 w-full ml-4 mb-[88px]">
             <div className="w-[76px] bg-[linear-gradient(179deg,rgba(169,103,241,1)_0%,rgba(91,38,177,1)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] font-bold text-transparent text-[26px] tracking-[0] leading-10 flex-shrink-0">
               {item.year}
             </div>

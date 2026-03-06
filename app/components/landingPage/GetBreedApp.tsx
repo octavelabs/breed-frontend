@@ -63,7 +63,7 @@ export default function GetBreedApp({showTestimonials = false, bgColor = '#F7EDF
         </div>
 
         {/* CTA Section - Dark Navy with Image */}
-        <div className="px-4 lg:px-[50px] xl:px-[96px] py-12">
+        <div className="px-4 lg:px-[50px] xl:px-[96px] py-12 ">
           <div className="bg-[#180426] rounded-[24px] xl:rounded-[40px] overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
               {/* Image */}
@@ -76,7 +76,7 @@ export default function GetBreedApp({showTestimonials = false, bgColor = '#F7EDF
               </div>
 
               {/* Content */}
-              <div className="p-8 md:p-12 flex flex-col items-center text-center xl:items-start xl:text-start order-1 md:order-2">
+              <div className="p-8 md:p-12 flex flex-col items-center text-center xl:items-start xl:text-start order-1 md:order-2 2xl:justify-center">
                 <h2 className="text-[24px] xl:text-[36px] font-black text-white mb-4 leading-tight font-aeonik">
                   Rooted in Christ, Growing Together
                 </h2>

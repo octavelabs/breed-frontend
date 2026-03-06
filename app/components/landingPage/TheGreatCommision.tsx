@@ -23,7 +23,7 @@ export default function TheGreatCommission() {
   // Detect mobile
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 1440);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -114,7 +114,7 @@ export default function TheGreatCommission() {
       <div className="w-full mb-[96px]">
         <div className="bg-[#F4E3FE] px-4 py-8">
           {/* Image Section - Fixed height 224px */}
-          <div className="w-full h-[224px] rounded-[24px] overflow-hidden shadow-lg mb-6">
+          <div className="w-full h-[224px] md:h-[350px] rounded-[24px] overflow-hidden shadow-lg mb-6">
             <div
               className="w-full h-full bg-cover bg-center bg-no-repeat"
               style={{ backgroundImage: `url('/ValueProposition.png')` }}
@@ -214,14 +214,14 @@ export default function TheGreatCommission() {
                   Breed helps you stay rooted, consistent, and purpose-driven in
                   your walk with Christ.
                 </p>
-
-                <button className="flex items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
+<Link href='/about'>
+                <button className="flex cursor-pointer items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
                   Read our story
                   <div className="w-5 h-5 bg-gradient-to-r from-[#A967F1] to-[#5B26B1] rounded-full flex items-center justify-center">
                     <ChevronRight size={12} stroke="#FFFFFF" />
                   </div>
                 </button>
-
+                </Link>
                 <div className="mt-8 md:mt-10 text-[40px] xl:text-[60px] text-[#180426] italic font-mono">
                   Matthew 28:16-20
                 </div>

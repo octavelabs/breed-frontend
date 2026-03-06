@@ -28,7 +28,7 @@ export default function PreachersPage() {
     <>
       <Navbar />
       <div className="min-h-screen overflow-hidden bg-[#F7EDFE]">
-        <div className="px-4 lg:px-[50px] xl:px-[96px] pt-[150px] md:pt-[230px]">
+        <div className="px-4 lg:px-[50px] xl:px-[96px] pt-[150px] md:pt-[230px] max-w-[1740px] mx-auto">
           <div className="relative max-w-5xl mx-auto">
             <div className="text-center relative z-10 mb-22">
               <div className="inline-block mb-6">
@@ -135,7 +135,7 @@ export default function PreachersPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto pb-4 md:pb-6"
+            className="pb-4 md:pb-6"
           >
             <div className="bg-[#34399C] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -168,7 +168,7 @@ export default function PreachersPage() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto"
+            className=""
           >
             <div className="bg-[#C83785] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
