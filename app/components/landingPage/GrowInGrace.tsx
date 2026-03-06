@@ -3,9 +3,11 @@
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function GrowInGrace() {
   const [activeTab, setActiveTab] = useState(0);
+  const router = useRouter()
 
   const slideInRight = {
     hidden: { x: -60, opacity: 0 },
@@ -95,7 +97,7 @@ export default function GrowInGrace() {
                 />
               </div>
             </button>
-            <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[50%] lg:w-[200px] bg-white text-black rounded-full text-sm font-bold">
+            <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[50%] lg:w-[200px] bg-white text-black rounded-full text-sm font-bold" onClick={() => router.push('/believers')}>
               Learn more
               <ArrowRight size={16} />
             </button>
@@ -192,10 +194,11 @@ export default function GrowInGrace() {
                 />
               </div>
             </button>
-            <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[200px] bg-white text-black rounded-full text-sm font-bold">
+            <button className="flex items-center justify-between gap-2 px-5 py-2.5 w-[200px] bg-white text-black rounded-full text-sm font-bold" onClick={() => router.push('/preachers')}>
               Learn more
               <ArrowRight size={16} />
             </button>
+        
           </div>
         </motion.div>
       </div>
