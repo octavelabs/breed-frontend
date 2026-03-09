@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { ChevronRight } from "lucide-react";
@@ -26,8 +24,8 @@ export default function TheGreatCommission() {
       setIsMobile(window.innerWidth < 1440);
     };
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // const updateScrollDirection = useCallback(() => {
@@ -77,7 +75,7 @@ export default function TheGreatCommission() {
 
   useEffect(() => {
     if (isMobile) return;
-    
+
     lastScrollY.current = window.scrollY;
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -132,20 +130,20 @@ export default function TheGreatCommission() {
             </h1>
 
             <p className="text-[16px] leading-relaxed text-[#4E5255] mb-6">
-              At Breed, we believe growth in God shouldn't be left to
-              chance. That's why we've created a space where believers can
-              be intentional about their faith every single day. From
-              devotionals to prayer structures, discipleship to community,
-              Breed helps you stay rooted, consistent, and purpose-driven in
-              your walk with Christ.
+              At Breed, we believe growth in God shouldn't be left to chance.
+              That's why we've created a space where believers can be
+              intentional about their faith every single day. From devotionals
+              to prayer structures, discipleship to community, Breed helps you
+              stay rooted, consistent, and purpose-driven in your walk with
+              Christ.
             </p>
-             <Link href='/about'>
-            <button className="flex items-center font-[800] justify-between gap-2 px-6 py-4 w-[70%] md:w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
-              Read our story
-              <div className="w-5 h-5 bg-gradient-to-r from-[#A967F1] to-[#5B26B1] rounded-full flex items-center justify-center">
-                <ChevronRight size={12} stroke="#FFFFFF" />
-              </div>
-            </button>
+            <Link href="/about">
+              <button className="flex items-center font-[800] justify-between gap-2 px-6 py-4 w-[70%] md:w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
+                Read our story
+                <div className="w-5 h-5 bg-gradient-to-r from-[#A967F1] to-[#5B26B1] rounded-full flex items-center justify-center">
+                  <ChevronRight size={12} stroke="#FFFFFF" />
+                </div>
+              </button>
             </Link>
 
             <div className="mt-6 text-[40px] text-[#180426] italic font-mono">
@@ -199,7 +197,7 @@ export default function TheGreatCommission() {
             >
               <div className="max-w-xl w-full">
                 <div className="inline-block px-5 py-[6px] border border-[#161717] rounded-full text-base mb-7 text-[#161717] bg-[#E7C8FF]">
-                  Our Vision
+                  Our Drive
                 </div>
 
                 <h1 className="text-[32px] lg:text-[40px] font-[700] text-[#180426] mb-6 font-aeonik leading-tight">
@@ -214,13 +212,13 @@ export default function TheGreatCommission() {
                   Breed helps you stay rooted, consistent, and purpose-driven in
                   your walk with Christ.
                 </p>
-<Link href='/about'>
-                <button className="flex cursor-pointer items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
-                  Read our story
-                  <div className="w-5 h-5 bg-gradient-to-r from-[#A967F1] to-[#5B26B1] rounded-full flex items-center justify-center">
-                    <ChevronRight size={12} stroke="#FFFFFF" />
-                  </div>
-                </button>
+                <Link href="/about">
+                  <button className="flex cursor-pointer items-center font-[800] justify-between gap-2 px-[28px] py-[18px] w-[200px] border-[1.5px] border-[#5B26B1] rounded-full text-sm transition bg-[#FBF6FF] text-[#5B26B1]">
+                    Read our story
+                    <div className="w-5 h-5 bg-gradient-to-r from-[#A967F1] to-[#5B26B1] rounded-full flex items-center justify-center">
+                      <ChevronRight size={12} stroke="#FFFFFF" />
+                    </div>
+                  </button>
                 </Link>
                 <div className="mt-8 md:mt-10 text-[40px] xl:text-[60px] text-[#180426] italic font-mono">
                   Matthew 28:16-20

@@ -115,7 +115,7 @@ const timelineData: TimelineItem[] = [
     content: {
       type: "text-with-logo",
       paragraphs: [
-        "Spiritual growth cannot be left to chance—it requires intentional action. Through reading sound books, listening to sermons, taking Christian courses, and maintaining a consistent prayer and study life, believers create the conditions for real growth.",
+        "Spiritual growth cannot be left to chance. It requires intentional action. Through reading sound books, listening to sermons, taking Christian courses, and maintaining a consistent prayer and study life, believers create the conditions for real growth.",
         "For ministers, it also means having the tools to guide and measure the growth of those under their stewardship, while remaining intentional about their own spiritual maturity.",
       ],
       finalText: {
@@ -221,7 +221,7 @@ export const TimelineSection = (): React.ReactElement => {
                   {item.content.paragraphs.map((paragraph, pIndex) => (
                     <p
                       key={`paragraph-${pIndex}`}
-                      className="w-full max-w-[1171px] font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10"
+                      className="w-full font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10"
                     >
                       {paragraph}
                     </p>
@@ -232,7 +232,7 @@ export const TimelineSection = (): React.ReactElement => {
                     <p className="w-full font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10">
                       {item.content.finalText.before}{" "}
                       <img
-                        className="inline-block w-[60px] lg:w-[73.87px] h-[22px] lg:h-7 align-middle mx-1"
+                        className="inline-block h-[16px] lg:h-5  align-middle mx-1 -mt-2 g:-mt-1"
                         alt="Breed logo"
                         src={item.content.finalText.logo}
                       />{" "}
