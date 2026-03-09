@@ -50,20 +50,20 @@ const timelineData: TimelineItem[] = [
   {
     year: "2021",
     icon: "/about1.svg",
-    lineHeight: "h-[170px]",
+    lineHeight: "h-[233px] md:h-[170px]",
     content: {
       type: "text-with-image",
       text: (
         <>
-          <span className="text-[#180426] text-[26px] leading-[40px]">
+          <span className="text-[#180426] text-[18px] lg:text-[26px] leading-[36px] lg:leading-[40px]">
             The seed for Breed was sown with an instruction from God to start a
-            virtual discipleship platform - {" "}
+            virtual discipleship platform -{" "}
           </span>
-          <span className="italic text-[#4e0a7c] text-[26px] leading-[40px]">
+          <span className="italic text-[#4e0a7c] text-[18px] lg:text-[26px] leading-[36px] lg:leading-[40px]">
             Waxing Strong Community,
           </span>
           <span className="text-[#4e0a7c] leading-10">&nbsp;</span>
-          <span className="text-[#180426] text-[26px] leading-[40px]">
+          <span className="text-[#180426] text-[18px] lg:text-[26px] leading-[36px] lg:leading-[40px]">
             where we met twice a week to study the word and pray together
           </span>
         </>
@@ -74,7 +74,7 @@ const timelineData: TimelineItem[] = [
   {
     year: "2021",
     icon: "/about2.svg",
-    lineHeight: "h-[162px]",
+    lineHeight: "h-[270px] md:h-[162px]",
     content: {
       type: "text-only",
       text: "This led to grace anew and a fostered culture of fellowship under God's guidance, but along the way, technical problems arose as the online radio service we used had its shortcomings as it was not built to foster stronger connections between people of like minds, alongside technical issues.",
@@ -83,16 +83,18 @@ const timelineData: TimelineItem[] = [
   {
     year: "2021",
     icon: "/about3.svg",
-    lineHeight: "h-[376px]",
+    lineHeight: "h-[520px] md:h-[376px]",
     content: {
       type: "text-with-quote",
       text: (
         <>
-          <span className="leading-10">While meditating on </span>
-          <span className="italic leading-10">
+          <span className="leading-[36px] lg:leading-10">
+            While meditating on{" "}
+          </span>
+          <span className="italic leading-[36px] lg:leading-10">
             Philippians 1:25
           </span>
-          <span className="leading-10">
+          <span className="leading-[36px] lg:leading-10">
             , God laid an expanded vision to combat the issues at hand, and also
             to expand on what we were already achieving at Waxing Strong by
             connecting with more people on a more consistent and measurable
@@ -129,17 +131,16 @@ const timelineData: TimelineItem[] = [
 
 export const TimelineSection = (): React.ReactElement => {
   return (
-    <section className="flex z-[3] w-full px-4 lg:px-[50px] xl:px-[96px] relative flex-col items-start font-aeonik mt-[97px]">
+    <section className="flex z-[3] w-full px-4 lg:px-[50px] xl:px-[96px] relative flex-col items-start font-aeonik mt-[48px] lg:mt-[97px]">
       {timelineData.map((item, index) => (
         <div key={`timeline-${index}`} className="flex w-full">
-          <div className="flex flex-col items-center relative">
+          {/* Icon + vertical line column */}
+          <div className="flex flex-col items-center relative flex-shrink-0">
             <img
-              className="w-[44px] h-[44px]  "
-              alt={` ${item.year}`}
+              className="w-[36px] h-[36px] lg:w-[44px] lg:h-[44px]"
+              alt={`${item.year}`}
               src={item.icon}
             />
-            
-            
 
             {item.lineHeight && (
               <div
@@ -148,19 +149,23 @@ export const TimelineSection = (): React.ReactElement => {
             )}
           </div>
 
-          <article className="flex items-start gap-7 w-full ml-4 mb-[88px]">
-            <div className="w-[76px] bg-[linear-gradient(179deg,rgba(169,103,241,1)_0%,rgba(91,38,177,1)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] font-bold text-transparent text-[26px] tracking-[0] leading-10 flex-shrink-0">
+          {/* Content area */}
+          <article className="flex items-start gap-3 lg:gap-7 w-full ml-3 lg:ml-4 mb-[48px] lg:mb-[88px]">
+            {/* Year label */}
+            <div className="w-[52px] lg:w-[76px] bg-[linear-gradient(179deg,rgba(169,103,241,1)_0%,rgba(91,38,177,1)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] font-bold text-transparent text-[16px] lg:text-[26px] tracking-[0] leading-[36px] lg:leading-10 flex-shrink-0">
               {item.year}
             </div>
 
-            <div className="flex-1 flex flex-col items-start justify-center gap-6">
+            {/* Main content */}
+            <div className="flex-1 flex flex-col items-start justify-center gap-4 lg:gap-6 min-w-0">
               {item.content.type === "text-with-image" && (
                 <>
-                  <p className="w-full font-normal text-[#180426] text-[24px] tracking-[0] leading-10">
+                  <p className="w-full font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10">
                     {item.content.text}
                   </p>
-                  {/* <img
-                    className="w-full  h-auto aspect-[1171/672] rounded-[32px] object-cover"
+                  {/* Uncomment if image is needed:
+                  <img
+                    className="w-full h-auto aspect-[1171/672] rounded-[20px] lg:rounded-[32px] object-cover"
                     alt="Community gathering"
                     src={item.content.image}
                   /> */}
@@ -168,41 +173,41 @@ export const TimelineSection = (): React.ReactElement => {
               )}
 
               {item.content.type === "text-only" && (
-                <p className="w-full  font-normal text-[#180426] text-[24px] tracking-[0] leading-10">
+                <p className="w-full font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10">
                   {item.content.text}
                 </p>
               )}
 
               {item.content.type === "text-with-quote" && (
                 <>
-                  <p className="w-full  font-normal text-[#180426] text-[24px] tracking-[0] leading-10">
+                  <p className="w-full font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10">
                     {item.content.text}
                   </p>
 
-                  <Card className="w-full  border-0 shadow-none bg-transparent">
-                    <CardContent className="flex flex-col items-end justify-end gap-4 p-0">
-                      <blockquote className="flex flex-col items-start gap-2 w-full">
+                  <Card className="w-full border-0 shadow-none bg-transparent">
+                    <CardContent className="flex flex-col items-end justify-end gap-3 lg:gap-4 p-0">
+                      <blockquote className="flex flex-col items-start gap-1 lg:gap-2 w-full">
                         <div className="flex items-center justify-center gap-2 w-full">
-                          <div className="flex-1 font-courgette font-normal text-[#292a2b] text-[24px] tracking-[0] leading-6">
+                          <div className="flex-1 font-courgette font-normal text-[#292a2b] text-[20px] lg:text-[24px] tracking-[0] leading-6">
                             &quot;
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-center gap-2 px-10 py-0 w-full">
-                          <div className="flex-1 font-courgette font-normal text-[#3c3e40] text-[24px] tracking-[0] leading-[normal]">
+                        <div className="flex items-center justify-center gap-2 px-4 lg:px-10 py-0 w-full">
+                          <div className="flex-1 font-courgette font-normal text-[#3c3e40] text-[16px] lg:text-[24px] tracking-[0] leading-[normal]">
                             {item.content.quote.text}
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-center gap-2 px-8 py-0 w-full">
-                          <div className="text-right flex-1 font-courgette font-normal text-[#292a2b] text-[40px] tracking-[0] leading-6">
+                        <div className="flex items-center justify-center gap-2 px-3 lg:px-8 py-0 w-full">
+                          <div className="text-right flex-1 font-courgette font-normal text-[#292a2b] text-[32px] lg:text-[40px] tracking-[0] leading-6">
                             &quot;
                           </div>
                         </div>
                       </blockquote>
 
-                      <div className="flex items-center justify-center gap-2 px-8 py-0 w-full">
-                        <cite className="flex-1 [font-family:'Courgette',Helvetica] font-normal text-[#3c3e40] text-lg text-right tracking-[0] leading-6 not-italic">
+                      <div className="flex items-center justify-center gap-2 px-3 lg:px-8 py-0 w-full">
+                        <cite className="flex-1 [font-family:'Courgette',Helvetica] font-normal text-[#3c3e40] text-[14px] lg:text-lg text-right tracking-[0] leading-6 not-italic">
                           {item.content.quote.reference}
                         </cite>
                       </div>
@@ -212,34 +217,26 @@ export const TimelineSection = (): React.ReactElement => {
               )}
 
               {item.content.type === "text-with-logo" && (
-                <div className="flex flex-col items-start justify-center gap-7 w-full">
+                <div className="flex flex-col items-start justify-center gap-5 lg:gap-7 w-full">
                   {item.content.paragraphs.map((paragraph, pIndex) => (
                     <p
                       key={`paragraph-${pIndex}`}
-                      className="w-full max-w-[1171px] font-normal text-[#180426] text-[24px] tracking-[0] leading-10"
+                      className="w-full max-w-[1171px] font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10"
                     >
                       {paragraph}
                     </p>
                   ))}
 
-                  <div className="flex flex-col items-start w-full">
-                    <div className="flex items-center gap-2 w-full">
-                      <span className="w-fit font-normal text-[#180426] text-[24px] tracking-[0] leading-10 whitespace-nowrap">
-                        {item.content.finalText.before}
-                      </span>
-
+                  <div className="flex flex-col items-start w-full gap-0">
+                    {/* On mobile, wrap the inline sentence naturally */}
+                    <p className="w-full font-normal text-[#180426] text-[16px] lg:text-[24px] tracking-[0] leading-[32px] lg:leading-10">
+                      {item.content.finalText.before}{" "}
                       <img
-                        className="w-[73.87px] h-7"
+                        className="inline-block w-[60px] lg:w-[73.87px] h-[22px] lg:h-7 align-middle mx-1"
                         alt="Breed logo"
                         src={item.content.finalText.logo}
-                      />
-
-                      <span className="flex-1 font-normal text-[#180426] text-[24px] tracking-[0] leading-[30px]">
-                        {item.content.finalText.after}
-                      </span>
-                    </div>
-
-                    <p className="w-full max-w-[1171px] font-normal text-[#180426] text-[24px] tracking-[0] leading-[30px]">
+                      />{" "}
+                      {item.content.finalText.after}{" "}
                       {item.content.finalText.continuation}
                     </p>
                   </div>
