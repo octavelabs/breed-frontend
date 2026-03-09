@@ -3,6 +3,7 @@ import { Inter, Calligraffitti, Courgette } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -164,6 +165,20 @@ export default function RootLayout({
         {children}
         <Analytics />
       </body>
+
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-YCBCZ2JLSZ"
+        strategy="afterInteractive"
+      />
+
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-YCBCZ2JLSZ');
+        `}
+      </Script>
     </html>
   );
 }
