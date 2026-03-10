@@ -103,7 +103,7 @@ export default function GetBreedApp({
                     </button>
                   </a>
                   <a
-                    href="https://form.typeform.com/to/EMh4jnRi"
+                    href="https://forms.gle/sc8TGbWcBeE33Fw67"
                     target="_blank"
                     rel="noreferrer"
                   >

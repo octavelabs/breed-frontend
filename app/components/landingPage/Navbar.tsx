@@ -89,7 +89,7 @@ const Navbar = () => {
             </button>
             <button className="whitespace-nowrap px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
               <a
-                href="https://form.typeform.com/to/EMh4jnRi"
+                href="https://forms.gle/sc8TGbWcBeE33Fw67"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -144,7 +144,7 @@ const Navbar = () => {
               Partner With Us
             </Link>
             <a
-              href="https://form.typeform.com/to/EMh4jnRi"
+              href="https://forms.gle/sc8TGbWcBeE33Fw67"
               target="_blank"
               rel="noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
