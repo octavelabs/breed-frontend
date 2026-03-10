@@ -136,9 +136,15 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* NAME */}
                 <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Name</label>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Name
+                  </label>
 
                   <Input
+                    id="name"
                     variant="outlined"
                     type="text"
                     value={form.name}
@@ -149,11 +155,15 @@ export default function ContactPage() {
 
                 {/* EMAIL */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium mb-2"
+                  >
                     Email address
                   </label>
 
                   <Input
+                    id="email"
                     variant="outlined"
                     type="email"
                     value={form.email}
@@ -164,11 +174,15 @@ export default function ContactPage() {
 
                 {/* PHONE */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium mb-2"
+                  >
                     Phone Number
                   </label>
 
                   <Input
+                    id="phone"
                     variant="outlined"
                     type="text"
                     value={form.phone}
