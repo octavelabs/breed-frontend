@@ -25,7 +25,7 @@ export async function POST(req) {
     const recipient = emailMap[purpose];
 
     await resend.emails.send({
-      from: "Breed Contact <contact@joinbreed.com>",
+      from: "Breed Contact <clinton@joinbreed.com>",
       to: recipient,
       reply_to: email,
       subject: `New ${purpose} Request`,
