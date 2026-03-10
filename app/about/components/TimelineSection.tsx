@@ -123,7 +123,7 @@ const timelineData: TimelineItem[] = [
         logo: "/logo3.png",
         after:
           "your spiritual growth companion app, on a mission to continue fostering",
-        continuation: "a community where the ultimate goal is to make heaven.",
+        continuation: "a community where the ultimate goal is to see Jesus.",
       },
     },
   },
