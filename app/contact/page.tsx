@@ -8,6 +8,14 @@ import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
 import { contactInfo } from "@/utils/commonHelpers";
 
+type ContactForm = {
+  name: string;
+  email: string;
+  phone: string;
+  purpose: string;
+  message: string;
+};
+
 const contactPurpose = [
   { name: "Volunteer" },
   { name: "Partner" },
@@ -16,7 +24,7 @@ const contactPurpose = [
 ];
 
 export default function ContactPage() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ContactForm>({
     name: "",
     email: "",
     phone: "",
@@ -25,9 +33,14 @@ export default function ContactPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
+  type AlertType = {
+    type: "success" | "error";
+    message: string;
+  } | null;
 
-  const handleChange = (field, value) => {
+  const [alert, setAlert] = useState<AlertType>(null);
+
+  const handleChange = (field: keyof ContactForm, value: string) => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
