@@ -5,16 +5,20 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+   subTitle?: string;
   children: ReactNode;
   maxWidth?: string;
+  icon?: ReactNode;
 }
 
 export const CustomModal = ({ 
   isOpen, 
   onClose, 
   title, 
+  subTitle,
   children,
-  maxWidth = 'max-w-lg'
+  icon,
+  maxWidth
 }: ModalProps) => {
   if (!isOpen) return null;
 
@@ -24,12 +28,16 @@ export const CustomModal = ({
       onClick={onClose}
     >
       <div 
-        className={`relative w-full ${maxWidth} bg-white rounded-2xl shadow-xl`}
+        className={`relative w-fit ${maxWidth} bg-white rounded-2xl shadow-xl`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
-          <h2 className="text-[20px] font-bold">{title}</h2>
+        <div className="flex items-start justify-between px-6 py-5 border-b border-gray-200">
+          <div className=''>
+            {icon && icon}
+          <h2 className="text-[20px] font-bold leading-none mt-5">{title}</h2>
+          {subTitle && <p className="text-base text-[#60666B] leading-none mt-2">{subTitle}</p>}
+          </div>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100 transition-colors"
@@ -40,7 +48,7 @@ export const CustomModal = ({
         </div>
 
         {/* Content */}
-        <div className="px-6 py-6">
+        <div className="p-6">
           {children}
         </div>
       </div>

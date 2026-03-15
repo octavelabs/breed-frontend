@@ -51,3 +51,34 @@ export const faqs = [
 
     }
   ];
+
+
+export const capitalizeFirstLetter = (word:string) => {
+    if (word) {
+      return word?.replace(/\b([a-zÁ-ú]{3,})/g, (w) => w?.charAt(0)?.toUpperCase() + w?.slice(1));
+    }
+  
+    return null;
+  };
+
+  export const cleanupObject = (object: object) => {
+    return Object.entries(object).reduce((acc, [key, value]) => {
+      if (value) return { ...acc, [key]: value };
+      return { ...acc };
+    }, {});
+  };
+
+  export const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'submitted':
+      case 'accepted':
+      return 'bg-[#B4F6D5] border border-[#65E9A8] text-[#156342]';
+    case 'due':
+      case 'rejected':
+      return 'bg-[#FED3D3] text-[#B52222] border border-[#FBAFAF]';
+    case 'pending':
+      return 'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]';
+    default:
+      return 'bg-transparent texxt-[#3C3E40]';
+  }
+};

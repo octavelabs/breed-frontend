@@ -30,7 +30,7 @@ const Dropdown:FC<DropDownProps> = ({
         onClick={(e) => {
           e.stopPropagation()
           !disabled && setIsOpen(!isOpen)}}
-        className={`flex  p-2 px-4 text-base border border-[#60666B] rounded-[10px] w-full justify-between items-center text-[#60666B] capitalize ${isError && errorCondition ? 'border-2 border-red-500': '' } ${disabled ? "cursor-not-allowed": ""} ${className}`}
+        className={`flex  p-2 px-4 text-base border border-[#B9C2CA] rounded-[10px] w-full justify-between items-center text-[#60666B] capitalize ${isError && errorCondition ? 'border-2 border-red-500': '' } ${disabled ? "cursor-not-allowed": ""} ${className}`}
       >
         {value || "Select"}
         <span className="">

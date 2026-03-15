@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "utils/tableheaders.jsx"  ],
   "exclude": ["node_modules"]
 }
