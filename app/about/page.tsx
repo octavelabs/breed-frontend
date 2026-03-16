@@ -7,9 +7,7 @@ import Footer from "../components/landingPage/Footer";
 import { TimelineSection } from "./components/TimelineSection";
 import PartnerWithUs from "../partner/components/PartnerWithUs";
 
-
 export default function BelieversPage() {
-
   const imageGrid = [
     {
       image: "/aboutHero1.png",
@@ -21,7 +19,7 @@ export default function BelieversPage() {
       image: "/aboutHero3.png",
     },
     {
-      image: "/aboutHero4.png",
+      image: "/aboutHero4.jpeg",
     },
     {
       image: "/aboutHero5.png",
@@ -30,10 +28,10 @@ export default function BelieversPage() {
       image: "/aboutHero6.png",
     },
     {
-      image: "/aboutHero7.png",
+      image: "/aboutHero7.jpeg",
     },
     {
-      image: "/aboutHero8.png",
+      image: "/aboutHero8.jpeg",
     },
     {
       image: "/aboutHero9.png",
@@ -65,8 +63,11 @@ export default function BelieversPage() {
                     <img src="/frame.svg" className="w-[34px] h-[40px]" />
                   </p>
                   <p className="text-[20px]">
-                    For pastors, preachers, and leaders called to teach,
-                    disciple, and equip the body of Christ.
+                    Breed began with a simple instruction from God; to create a
+                    space where believers could grow stronger in their faith
+                    together. Today, we bring faith and technology together to
+                    help believers grow intentionally and equip disciplers to
+                    guide others.
                   </p>
                 </div>
                 <div className="w-full lg:w-1/2 grid grid-cols-3 gap-1">
@@ -133,7 +134,7 @@ export default function BelieversPage() {
             </div>
           </div>
         </div>
-       <PartnerWithUs />
+        <PartnerWithUs />
       </div>
       <Footer />
     </>

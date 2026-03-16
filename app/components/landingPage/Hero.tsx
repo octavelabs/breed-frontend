@@ -1,6 +1,5 @@
 "use client";
 
-
 import { motion } from "framer-motion";
 import Button from "../Button";
 
@@ -59,47 +58,46 @@ export default function Hero() {
           </div>
 
           <motion.h1
-  variants={fadeIn}
-  initial="hidden"
-  whileInView="visible"
-  viewport={{ once: false, amount: 0.3 }}
-  transition={{ duration: 0.5 }}
-  className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik"
->
-  {/* First Line */}
-  <span className="relative inline-block">
-    Grow in FAITH
-    <img
-      src="./heroImage2.svg"
-      alt="bird translating"
-      className="bird-animation absolute 
+            variants={fadeIn}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.5 }}
+            className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik"
+          >
+            {/* First Line */}
+            <span className="relative inline-block">
+              Grow in FAITH
+              <img
+                src="./heroImage2.svg"
+                alt="bird translating"
+                className="bird-animation absolute 
       -top-4 -left-4 lg:-left-6 xl:-left-8
       w-[36px] h-[36px]
       lg:w-[60px] lg:h-[60px]"
-    />
-  </span>
+              />
+            </span>
 
-  <br />
+            <br />
 
-  {/* Second Line */}
-  <span className="relative inline-block">
-    WALK in Purpose
-    <img
-      src="./heroImage.svg"
-      alt="pathway"
-      className="absolute 
+            {/* Second Line */}
+            <span className="relative inline-block">
+              WALK in Purpose
+              <img
+                src="./heroImage.svg"
+                alt="pathway"
+                className="absolute 
       bottom-4 -right-6 lg:-right-14
       w-[20px] h-[20px]
       lg:w-[50px] lg:h-[50px]"
-    />
-  </span>
-</motion.h1>
+              />
+            </span>
+          </motion.h1>
 
-<p className="text-base lg:text-[24px] text-[#4E5255] mb-12  max-w-2xl mx-auto font-medium">
-  A spiritual companion app built to help you stay consistent in your
-  walk with God
-</p>
-
+          <p className="text-base lg:text-[24px] text-[#4E5255] mb-12  max-w-2xl mx-auto font-medium">
+            A spiritual companion app built to help you stay consistent in your
+            walk with God
+          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
             <button className="w-full md:w-auto justify-center group flex items-center gap-3 px-8 py-4 bg-white border-2 border-purple-700 text-purple-700 rounded-full  text-base hover:bg-purple-50 transition-all shadow-sm font-bold">
@@ -111,7 +109,7 @@ export default function Hero() {
             </button>
 
             <a
-              href="https://form.typeform.com/to/EMh4jnRi"
+              href="https://forms.gle/sc8TGbWcBeE33Fw67"
               className="w-full md:w-[200px]"
               target="_blank"
               rel="noreferrer"
@@ -132,32 +130,26 @@ export default function Hero() {
         className="mt-10 md:mt-20  mx-auto z-10 relative"
       >
         <div className="grid grid-cols-4 lg:grid-cols-4 gap-0 rounded-3xl overflow-hidden shadow-lg h-[224px] md:h-[350px] lg:h-[520px]">
-          
-              <img
-                src="/hero1.png"
-                alt="Woman praying"
-                className="w-full h-full object-cover"
-              />
-               <img
-                src="/hero2.png"
-                alt="Man reading bible"
-                className="w-full h-full object-cover"
-              />
           <img
-                src="/hero3.png"
-                alt="Happy family"
-                className="w-full h-full object-cover"
-              />
-               <img
-                src="/hero4.png"
-                alt="Hands with plant"
-                className="w-full h-full object-cover"
-              />
-
-   
-
-
-      
+            src="/hero1.png"
+            alt="Woman praying"
+            className="w-full h-full object-cover"
+          />
+          <img
+            src="/hero2.png"
+            alt="Man reading bible"
+            className="w-full h-full object-cover"
+          />
+          <img
+            src="/hero3.png"
+            alt="Happy family"
+            className="w-full h-full object-cover"
+          />
+          <img
+            src="/hero4.png"
+            alt="Hands with plant"
+            className="w-full h-full object-cover"
+          />
         </div>
       </motion.div>
     </div>

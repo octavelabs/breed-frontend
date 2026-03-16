@@ -7,7 +7,6 @@ import Navbar from "../components/landingPage/Navbar";
 import Footer from "../components/landingPage/Footer";
 import Button from "../components/Button";
 
-
 export default function PreachersPage() {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -68,7 +67,7 @@ export default function PreachersPage() {
                 </button>
 
                 <a
-                  href="https://form.typeform.com/to/EMh4jnRi"
+                  href="https://forms.gle/sc8TGbWcBeE33Fw67"
                   className="w-full md:w-[200px]"
                   target="_blank"
                   rel="noreferrer"

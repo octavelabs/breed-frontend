@@ -59,7 +59,8 @@ export default function BelieversPage() {
                 Grow in Grace
               </motion.h1>
               <p className="text-base xl:text-[20px] text-[#4E5255] mb-12 max-w-2xl mx-auto">
-                For believers seeking spiritual growth and new converts<br />
+                For believers seeking spiritual growth and new converts
+                <br />
                 beginning their faith journey
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -77,7 +78,7 @@ export default function BelieversPage() {
                   </div>
                 </button>
                 <a
-                  href="https://form.typeform.com/to/EMh4jnRi"
+                  href="https://forms.gle/sc8TGbWcBeE33Fw67"
                   className="w-full md:w-[200px]"
                   target="_blank"
                   rel="noreferrer"
