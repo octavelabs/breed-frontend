@@ -13,7 +13,7 @@ interface TabsProps {
   defaultTab?: string;
   onChange?: (value: string) => void;
   className?: string;
-
+   customClass?: string
 }
 
 const Tabs: React.FC<TabsProps> = ({ 
@@ -21,6 +21,7 @@ const Tabs: React.FC<TabsProps> = ({
   defaultTab, 
   onChange,
   className = '',
+  customClass = ''
 
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.value);
@@ -46,7 +47,7 @@ const Tabs: React.FC<TabsProps> = ({
                 activeTab === tab.value
                   ? 'bg-white border-black'
                   : 'text-[#4E5255] border-[#D2D9DF]'
-              }
+              } ${customClass}
             `}
           >
             {tab.label}
