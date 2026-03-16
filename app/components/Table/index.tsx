@@ -6,10 +6,15 @@ import { CustomTableProps } from "./types";
 import EmptyStateIcon from "./EmptyState";
 
 const getNestedValue = (obj: any, path: string) => {
-  if (!path.includes('.')) {
+  if (!path.includes(".")) {
     return obj[path];
   }
-  return path.split('.').reduce((value, key) => (value && value[key] !== undefined) ? value[key] : null, obj);
+  return path
+    .split(".")
+    .reduce(
+      (value, key) => (value && value[key] !== undefined ? value[key] : null),
+      obj,
+    );
 };
 
 const CustomTable: FC<CustomTableProps> = ({
@@ -20,7 +25,7 @@ const CustomTable: FC<CustomTableProps> = ({
   checkboxes,
   rowStyles,
   rowClick,
-  isFetching
+  isFetching,
 }) => {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
@@ -40,8 +45,10 @@ const CustomTable: FC<CustomTableProps> = ({
   };
 
   function handleColumnWidths() {
+    const width = typeof window !== "undefined" ? window.innerWidth : 1024;
+
     // Desktop column widths
-    if (window.innerWidth >= 1024) {
+    if (width >= 1024) {
       let result = checkboxes ? "50px" : "";
       columns.forEach((column) => {
         if (column.bigWidth) {
@@ -51,9 +58,8 @@ const CustomTable: FC<CustomTableProps> = ({
         }
       });
       return result;
-    }
-    // Mobile column widths
-    else {
+    } else {
+      // Mobile column widths
       let result = checkboxes ? "50px" : "";
       columns.forEach((column) => {
         if (column.isMobileVisible && column.mobileWidth) {
@@ -132,13 +138,13 @@ const CustomTable: FC<CustomTableProps> = ({
                         : () => {}
                     }
                   >
-                    {
-                      isFetching ? <TableLoader /> :
-                      col.render
-                        ? col.render(rowIndex, row[col.dataIndex!], row)
-                        : getNestedValue(row, col.dataIndex! )
-                    }
-                   
+                    {isFetching ? (
+                      <TableLoader />
+                    ) : col.render ? (
+                      col.render(rowIndex, row[col.dataIndex!], row)
+                    ) : (
+                      getNestedValue(row, col.dataIndex!)
+                    )}
                   </span>
                 );
               })}
@@ -146,9 +152,11 @@ const CustomTable: FC<CustomTableProps> = ({
           ))}
         </section>
       ) : (
-        <section className={`relative w-full h-[220px] md:h-[300px] ${tableStyles}`}>
+        <section
+          className={`relative w-full h-[220px] md:h-[300px] ${tableStyles}`}
+        >
           <div
-          className={`absolute -top-7 md:top-0 bottom-0 flex flex-col justify-center items-center w-full pb-2 lg:pb-5 ${tableStyles}`}
+            className={`absolute -top-7 md:top-0 bottom-0 flex flex-col justify-center items-center w-full pb-2 lg:pb-5 ${tableStyles}`}
           >
             <EmptyStateIcon />
             <div className="max-w-[90%] font-bold text-sm md:text-base lg:text-lg md:translate-y-2 text-[#bababa] flex justify-center items-center gap-x-4">
