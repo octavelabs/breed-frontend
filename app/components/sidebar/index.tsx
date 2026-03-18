@@ -1,7 +1,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation";
-import {  LogOut, LayoutDashboard, Users, Calendar, Video, Settings } from 'lucide-react';
+import {  LogOut } from 'lucide-react';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
 import BuildupIcon from '@/app/assets/icons/buildupIcon';
@@ -27,7 +27,7 @@ export const navItems = [
 export const preacherNavItems = [
   { path: '/dashboard/preacher/dashboard', label: 'Dashboard', icon: DashboardIcon },
   { path: '/dashboard/preacher/mentorship', label: 'Mentorship', icon: MentorshipIcon },
-  { path: '/dashboard/community', label: 'Community', icon: PreacherCommunityIcon},
+  { path: '/dashboard/preacher/community', label: 'Community', icon: PreacherCommunityIcon},
   { path: '/dashboard/preacher/meetings', label: 'Meetings', icon: MeetingIcon },
   { path: '/dashboard/preacher/showreel', label: 'Showreel', icon: ShowReelIcon },
   { path: '/dashboard/preacher/settings', label: 'Settings', icon: SettingsIcon },
@@ -38,10 +38,13 @@ const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { userType } = useUser();
+
+  console.log(userType, 'ihuh')
   
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
   
-  const isPreacher = userType === 'preacher';
+  const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
+  const isPreacher = userType === 'preacher' || isPreacherRoute;
   const currentNavItems = isPreacher ? preacherNavItems : navItems;
   
   return (
@@ -132,7 +135,8 @@ export const MobileNav = () => {
   
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
   
-  const isPreacher = userType === 'preacher';
+  const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
+  const isPreacher = userType === 'preacher' || isPreacherRoute;
   const currentNavItems = isPreacher ? preacherNavItems : navItems;
   
   
