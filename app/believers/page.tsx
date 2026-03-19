@@ -54,7 +54,7 @@ export default function BelieversPage() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 0.5 }}
-                className="text-[32px] lg:text-[80px] font-aeonik font-[900] text-[#180426] leading-tight mb-6"
+                className="text-[32px] lg:text-[80px] font-almarai font-[800] text-[#180426] leading-tight mb-6"
               >
                 Grow in Grace
               </motion.h1>
@@ -103,7 +103,7 @@ export default function BelieversPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 ">
                 <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white">
                   <div>
-                    <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] font-aeonik mb-8 xl:mb-0">
+                    <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] font-almarai mb-8 xl:mb-0">
                       Access devotionals, guided Bible plans, and prayer prompts{" "}
                       <ArrowRight className="w-[35px] h-[27px] inline-block" />
                     </h2>
@@ -151,7 +151,7 @@ export default function BelieversPage() {
             <div className="bg-[#34399C] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white order-2 md:order-1">
-                  <h2 className="text-[28px] leading-10.5 xl:text-[50px] font-medium xl:leading-16 mb-19.5 xl:mb-56 font-aeonik">
+                  <h2 className="text-[28px] leading-10.5 xl:text-[50px] font-medium xl:leading-16 mb-19.5 xl:mb-56 font-almarai">
                     Grow in faith alongside a community of believers like you
                     <ArrowRight className="w-8.75 h-6.75 inline-block" />
                   </h2>
@@ -234,7 +234,7 @@ export default function BelieversPage() {
             <div className="bg-[#C83785] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 <div className="px-5 xl:px-12 py-10 xl:py-20  flex flex-col justify-between text-white">
-                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] font-aeonik">
+                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] font-almarai">
                     Share prayer requests and pray with others in real time
                     <ArrowRight className="w-[35px] h-[27px] inline-block" />
                   </h2>
@@ -267,7 +267,7 @@ export default function BelieversPage() {
             <div className="bg-[#1FA564] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white order-2 md:order-1">
-                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] xl:mb-[224px] font-aeonik">
+                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] xl:mb-[224px] font-almarai">
                     Track your growth - not for performance, but for purpose{" "}
                     <ArrowRight className="w-[35px] h-[27px] inline-block" />
                   </h2>

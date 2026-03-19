@@ -121,23 +121,23 @@
 //             style={slide1Style}
 //           >
 //             <div className="container mx-auto text-center max-w-5xl">
-//               <p className="text-[56px] font-medium leading-[72px] font-aeonik text-[#180426]">
+//               <p className="text-[56px] font-medium leading-[72px] font-almarai text-[#180426]">
 //                 Breed is intentionally free because we believe
 //                 <br />
 //                 spiritual growth should never sit behind a paywall.
 //                 <br />
 //                 Every{" "}
-//                 <span className="font-aeonik text-[56px] bg-white text-[#5B26B1] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3">
+//                 <span className="font-almarai text-[56px] bg-white text-[#5B26B1] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3">
 //                   devotional,
 //                 </span>
-//                 <span className="font-aeonik text-[56px] bg-white text-[#A22F6E] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3">
+//                 <span className="font-almarai text-[56px] bg-white text-[#A22F6E] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3">
 //                   prayer thread,
 //                 </span>
-//                 <span className="font-aeonik text-[56px] bg-white text-[#34399C] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3">
+//                 <span className="font-almarai text-[56px] bg-white text-[#34399C] leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-3">
 //                   sermon tool,
 //                 </span>
 //                 and{" "}
-//                 <span className="font-aeonik text-[56px] bg-white text-[#1A8454] leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]">
+//                 <span className="font-almarai text-[56px] bg-white text-[#1A8454] leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]">
 //                   growth tracker
 //                 </span>{" "}
 //                 exists for one purpose:
@@ -151,10 +151,10 @@
 //             style={slide2Style}
 //           >
 //             <div className="container mx-auto text-center max-w-3xl">
-//               <p className="text-[48px] font-medium leading-[64px] font-aeonik text-[#180426]">
+//               <p className="text-[48px] font-medium leading-[64px] font-almarai text-[#180426]">
 //                 To help people know{" "}
 //                 <span
-//                   className="font-aeonik"
+//                   className="font-almarai"
 //                   style={{
 //                     background: "linear-gradient(135deg, #5B26B1 10%, #34399C 70%)",
 //                     WebkitBackgroundClip: "text",
@@ -178,7 +178,7 @@
 //           >
 //             <div className="container mx-auto text-center max-w-2xl">
 //               <p
-//                 className="text-[40px] font-medium leading-[56px] font-aeonik"
+//                 className="text-[40px] font-medium leading-[56px] font-almarai"
 //                 style={{ color: "#5B26B1" }}
 //               >
 //                 This isn&apos;t about scale...
@@ -193,12 +193,12 @@
 //           >
 //             <div className="container mx-auto text-center max-w-2xl flex flex-col items-center gap-2">
 //               <p
-//                 className="text-[28px] font-medium font-aeonik line-through opacity-60"
+//                 className="text-[28px] font-medium font-almarai line-through opacity-60"
 //                 style={{ color: "#5B26B1" }}
 //               >
 //                 This isn&apos;t about scale...
 //               </p>
-//               <p className="text-[48px] font-bold leading-[60px] font-aeonik text-[#180426]">
+//               <p className="text-[48px] font-bold leading-[60px] font-almarai text-[#180426]">
 //                 It&apos;s about{" "}
 //                 <span
 //                   className="px-3 py-1 rounded-md text-white"
@@ -218,7 +218,7 @@
 //               transition: "opacity 0.4s ease",
 //             }}
 //           >
-//             <span className="text-sm text-[#180426] opacity-50 font-aeonik tracking-wide">
+//             <span className="text-sm text-[#180426] opacity-50 font-almarai tracking-wide">
 //               scroll
 //             </span>
 //             <div className="w-px h-8 bg-[#180426] opacity-30 animate-pulse" />
@@ -380,33 +380,33 @@ export default function ScrollStorySection() {
             />
 
             <div className="container mx-auto text-center px-4 py-16 sm:py-24 xl:py-[276px] relative z-10 font-bold">
-              <p className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-aeonik text-[#180426]">
+              <p className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-almarai text-[#180426]">
                 Breed is intentionally free because we believe
                 <br />
                 spiritual growth should never sit behind a paywall.
                 <br />
                 Every{" "}
                 <span
-                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
+                  className="font-almarai text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#5B26B1" }}
                 >
                   devotional,
                 </span>
                 <span
-                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
+                  className="font-almarai text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#A22F6E" }}
                 >
                   community,
                 </span>
                 <span
-                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
+                  className="font-almarai text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A] mr-2 sm:mr-3"
                   style={{ backgroundColor: "#ffffff", color: "#34399C" }}
                 >
                   mentor,
                 </span>
                 and{" "}
                 <span
-                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
+                  className="font-almarai text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ backgroundColor: "#ffffff", color: "#1A8454" }}
                 >
                   growth tracker
@@ -422,10 +422,10 @@ export default function ScrollStorySection() {
             style={slideStyle(1)}
           >
             <div className="container mx-auto text-center font-bold">
-              <p className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-aeonik text-[#4E0A7C]">
+              <p className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-almarai text-[#4E0A7C]">
                 To help believers know{" "}
                 <span
-                  className="font-aeonik text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
+                  className="font-almarai text-[28px] sm:text-[36px] xl:text-[56px] leading-[34px] sm:leading-[44px] xl:leading-[68px] px-[2px] rounded-[2px] shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ backgroundColor: "#ffffff", color: "#870BD6" }}
                 >
                   God
@@ -449,7 +449,7 @@ export default function ScrollStorySection() {
           >
             <div className="container mx-auto text-center flex justify-center items-center">
               <p
-                className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-aeonik"
+                className="text-[28px] sm:text-[36px] xl:text-[56px] font-medium leading-[36px] sm:leading-[46px] xl:leading-[72px] font-almarai"
                 style={{ color: "#4E0A7C" }}
               >
                 This isn&apos;t about scale...
@@ -464,17 +464,17 @@ export default function ScrollStorySection() {
           >
             <div className="container mx-auto text-center max-w-2xl flex flex-col items-center gap-3 font-bold px-2 sm:px-0">
               <p
-                className="text-[18px] sm:text-[22px] xl:text-[28px] font-medium leading-[24px] sm:leading-[28px] xl:leading-[32px] font-aeonik"
+                className="text-[18px] sm:text-[22px] xl:text-[28px] font-medium leading-[24px] sm:leading-[28px] xl:leading-[32px] font-almarai"
                 style={{ color: "#4E0A7C" }}
               >
                 This isn&apos;t about{" "}
                 <span className="line-through">scale</span>...
               </p>
 
-              <p className="text-[34px] sm:text-[44px] xl:text-[56px] font-bold leading-[42px] sm:leading-[56px] xl:leading-[72px] font-aeonik text-[#4E0A7C]">
+              <p className="text-[34px] sm:text-[44px] xl:text-[56px] font-bold leading-[42px] sm:leading-[56px] xl:leading-[72px] font-almarai text-[#4E0A7C]">
                 It&apos;s about{" "}
                 <span
-                  className="text-[34px] sm:text-[44px] xl:text-[56px] leading-[40px] sm:leading-[52px] xl:leading-[68px] px-3 py-1 rounded-[2px] text-white inline-block font-aeonik shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
+                  className="text-[34px] sm:text-[44px] xl:text-[56px] leading-[40px] sm:leading-[52px] xl:leading-[68px] px-3 py-1 rounded-[2px] text-white inline-block font-almarai shadow-[0px_4px_4px_-4px_#0C0C0D0D,0px_16px_16px_-8px_#0C0C0D1A]"
                   style={{ background: "#A119F6" }}
                 >
                   souls.

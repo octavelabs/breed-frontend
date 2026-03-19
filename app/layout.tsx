@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Calligraffitti, Courgette } from "next/font/google";
-import localFont from "next/font/local";
+import { Inter, Calligraffitti, Courgette, Almarai } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Script from "next/script";
@@ -18,6 +17,13 @@ const calligraffitti = Calligraffitti({
   display: "swap",
 });
 
+const almarai = Almarai({
+  weight: ["300", "400", "700", "800"],
+  variable: "--font-almarai",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 const courgette = Courgette({
   weight: "400",
   variable: "--font-courgette",
@@ -25,22 +31,6 @@ const courgette = Courgette({
   display: "swap",
 });
 
-const aeonikFont = localFont({
-  src: [
-    {
-      path: "../fonts/AeonikTRIAL-Regular.otf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../fonts/AeonikTRIAL-Bold.otf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-aeonik",
-  display: "swap",
-});
 
 const SITE_NAME = "Breed";
 const SITE_URL = "https://joinbreed.com";
@@ -160,7 +150,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${aeonikFont.variable} ${calligraffitti.variable} ${courgette.variable} antialiased`}
+        className={`${inter.variable} ${almarai.variable} ${calligraffitti.variable} ${courgette.variable} antialiased`}
       >
         {children}
         <Analytics />

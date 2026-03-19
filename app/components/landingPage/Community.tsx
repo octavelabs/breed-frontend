@@ -185,7 +185,7 @@ export default function Community() {
                     Breed is free to use
                   </div>
 
-                  <h1 className="text-[24px] leading-[32px] md:text-[20px] md:leading-[40px] xl:text-[58px] xl:leading-[72px] font-bold text-[#101828] font-aeonik text-center mb-4 md:mb-8">
+                  <h1 className="text-[24px] leading-[32px] md:text-[20px] md:leading-[40px] xl:text-[58px] xl:leading-[72px] font-bold text-[#101828] font-almarai text-center mb-4 md:mb-8">
                     A real sense of community
                   </h1>
 
@@ -238,7 +238,7 @@ export default function Community() {
                       .map((word, index) => (
                         <span
                           key={index}
-                          className="inline-block mr-4 animate-fadeIn font-aeonik"
+                          className="inline-block mr-4 animate-fadeIn font-almarai"
                           style={{
                             animationDelay: `${index * 0.1}s`,
                           }}
@@ -258,7 +258,7 @@ export default function Community() {
                     backgroundPosition: "center",
                   }}
                 >
-                  <h1 className="text-[28px] leading-[36px] font-bold text-white mb-6 font-aeonik">
+                  <h1 className="text-[28px] leading-[36px] font-bold text-white mb-6 font-almarai">
                     {titleWords
                       .slice(0, visibleWordCount)
                       .map((word, index) => (
@@ -292,7 +292,7 @@ export default function Community() {
                       Revelation 21:3-4 KJV
                     </div>
 
-                    <p className="text-[15px] leading-relaxed font-[700] font-aeonik">
+                    <p className="text-[15px] leading-relaxed font-[700] font-almarai">
                       <span
                         style={{ opacity: Math.min(1, rightTextProgress * 3) }}
                       >
@@ -304,7 +304,7 @@ export default function Community() {
                     </p>
 
                     <p
-                      className="text-[15px] leading-relaxed font-[700] font-aeonik"
+                      className="text-[15px] leading-relaxed font-[700] font-almarai"
                       style={{
                         opacity: Math.max(0, (rightTextProgress - 0.3) * 2),
                       }}
@@ -329,7 +329,7 @@ export default function Community() {
                       Revelation 21:3-4 KJV
                     </div>
 
-                    <p className="text-[14px] leading-relaxed font-[700] font-aeonik">
+                    <p className="text-[14px] leading-relaxed font-[700] font-almarai">
                       AND I HEARD A GREAT VOICE OUT OF HEAVEN SAYING, BEHOLD,
                       THE TABERNACLE OF GOD IS WITH MEN, AND HE WILL DWELL WITH
                       THEM, AND THEY SHALL BE HIS PEOPLE, AND GOD HIMSELF SHALL
@@ -337,7 +337,7 @@ export default function Community() {
                     </p>
 
                     <p
-                      className="text-[14px] leading-relaxed font-[700] font-aeonik"
+                      className="text-[14px] leading-relaxed font-[700] font-almarai"
                       style={{
                         opacity: Math.max(0, (rightTextProgress - 0.3) * 2),
                       }}

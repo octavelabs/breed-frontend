@@ -62,7 +62,7 @@ export default function PartnerWithUs(){
                 </span>
               </div>
 
-              <h2 className="text-[28px] sm:text-[36px] md:text-[55px] leading-[34px] sm:leading-[44px] md:leading-tight font-bold text-center font-aeonik mb-4 md:mb-6 px-1">
+              <h2 className="text-[28px] sm:text-[36px] md:text-[55px] leading-[34px] sm:leading-[44px] md:leading-tight font-bold text-center font-almarai mb-4 md:mb-6 px-1">
                 Ways You Can Partner with Us
               </h2>
 
@@ -96,7 +96,7 @@ export default function PartnerWithUs(){
                       className="absolute bottom-0 right-0 h-20 w-20 sm:h-24 sm:w-24 md:h-[144px] md:w-[144px] rounded-br-2xl md:rounded-br-[32px]"
                     />
 
-                    <p className="text-xl sm:text-2xl md:text-[30px] font-medium leading-7 sm:leading-8 md:leading-[38px] mb-2 md:mb-3 font-aeonik relative z-10 ">
+                    <p className="text-xl sm:text-2xl md:text-[30px] font-medium leading-7 sm:leading-8 md:leading-[38px] mb-2 md:mb-3 font-almarai relative z-10 ">
                       {card.title}
                     </p>
 

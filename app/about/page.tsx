@@ -58,7 +58,7 @@ export default function BelieversPage() {
                       About Us
                     </span>
                   </div>
-                  <p className="text-[34px] lg:text-[56px] leading-[40px] lg:leading-[72px] font-aeonik font-bold mb-6 flex items-center gap-4 lg:gap-[18px]">
+                  <p className="text-[34px] lg:text-[56px] leading-[40px] lg:leading-[72px] font-almarai font-bold mb-6 flex items-center gap-4 lg:gap-[18px]">
                     The Breed Story{" "}
                     <img src="/frame.svg" className="w-[34px] h-[40px]" />
                   </p>

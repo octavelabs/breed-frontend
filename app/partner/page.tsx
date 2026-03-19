@@ -71,7 +71,7 @@ export default function PartnerWithUsPage() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 0.5 }}
-                className="text-[42px] lg:text-[80px] text-center text-white font-[900] text-[#180426] leading-tight mt-4 font-aeonik"
+                className="text-[42px] lg:text-[80px] text-center text-white font-[800] text-[#180426] leading-tight mt-4 font-almarai"
               >
                 More than an app <br /> A MOVEMENT.
               </motion.h1>
@@ -89,7 +89,7 @@ export default function PartnerWithUsPage() {
                 />
                 <div className="relative z-10">
                   <div className="border border-[#161717] rounded-full px-4 md:px-5 py-1 md:py-[4px] bg-[#E7C8FF] mb-4 md:mb-5 w-fit mx-auto">
-                    <span className="text-[#161717] text-xs sm:text-sm md:text-base font-medium font-aeonik">
+                    <span className="text-[#161717] text-xs sm:text-sm md:text-base font-medium font-almarai">
                       Why we need you
                     </span>
                   </div>
@@ -176,7 +176,7 @@ export default function PartnerWithUsPage() {
 
               {/* content */}
               <div className="w-full lg:w-1/2 py-8 sm:py-10 lg:py-[78px] px-5 sm:px-8 lg:pr-[73px] lg:pl-0 text-white">
-                <p className="font-aeonik font-bold text-[26px] sm:text-[32px] lg:text-[40px] leading-[32px] sm:leading-[40px] lg:leading-normal mb-3 sm:mb-4">
+                <p className="font-almarai font-bold text-[26px] sm:text-[32px] lg:text-[40px] leading-[32px] sm:leading-[40px] lg:leading-normal mb-3 sm:mb-4">
                   Let’s work together in God’s vineyard
                 </p>
 

@@ -63,7 +63,7 @@ export default function Hero() {
             whileInView="visible"
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
-            className="text-[42px] lg:text-[80px] font-[900] text-[#180426] leading-tight mb-6 font-aeonik"
+            className="text-[42px] lg:text-[80px] font-[800] text-[#180426] leading-tight mb-6 font-almarai"
           >
             {/* First Line */}
             <span className="relative inline-block">
