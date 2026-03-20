@@ -103,8 +103,8 @@ export default function PreachersPage() {
                         Bible plan
                       </p>
                       <p className="text-xs text-black mb-3">
-                        Grace is God's response to our brokenness undeserved,
-                        yet freely given through the gift of Christ.
+                        Grace is God&apos;s response to our brokenness
+                        undeserved, yet freely given through the gift of Christ.
                       </p>
                       <p className="text-xs text-[#60666B]">
                         📅 &nbsp; Today · 3 Chapters

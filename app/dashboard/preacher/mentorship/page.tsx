@@ -9,30 +9,14 @@ import DisciplesList from './components/DisciplesList';
 import RequestsList from './components/RequestsList';
 import { HelpCircle } from 'lucide-react';
 import SessionsList from './components/sessionList';
+import AssessmentList from './components/AssessmentList';
+import ReportList from './components/ReportList';
 
 const PreacherMentorship = () => {
   const [openModal, setOpenModal] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
   const [breakDaysLeft, setBreakDaysLeft] = useState(12);
 
-  // Placeholder components for other tabs
-  const SessionsContent = () => (
-    <div className="px-4 lg:px-12 py-8">
-      <EmptyMentorshipState />
-    </div>
-  );
-
-  const AssessmentsContent = () => (
-    <div className="px-4 lg:px-12 py-8">
-      <EmptyMentorshipState />
-    </div>
-  );
-
-  const ReportsContent = () => (
-    <div className="px-4 lg:px-12 py-8">
-      <EmptyMentorshipState />
-    </div>
-  );
 
   const tabs = [
     {
@@ -53,12 +37,12 @@ const PreacherMentorship = () => {
     {
       label: "Assessments",
       value: "assessments",
-      content: <AssessmentsContent />,
+      content: <AssessmentList />,
     },
     {
       label: "Reports",
       value: "reports",
-      content: <ReportsContent />,
+      content: <ReportList />,
     },
   ];
 

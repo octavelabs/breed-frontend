@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Pause, PauseCircle } from 'lucide-react';
-import { Modal } from '@/app/components/Modal';
 import { CustomModal } from '@/app/components/Modal/customModal';
 import Input from '@/app/components/Input';
 import Dropdown from '@/app/components/Dropdown';
@@ -53,18 +51,13 @@ const TakeABreakModal: React.FC<TakeABreakModalProps> = ({ isOpen, onClose }) =>
               />
             </div>
             <div className="w-[20%]">
-              <label
-                htmlFor="reason"
-                className="block text-sm font-medium  mb-1"
-              >
-
-              </label>
+              
               <Dropdown
                 value="weeks"
                 options={['days', 'weeks']}
                 keySelector="interval"
                 onChange={(item) => console.log(item)}
-                className="!h-[48px]"
+                className="!h-[48px] mt-[26px]"
               />
             </div>
           </div>

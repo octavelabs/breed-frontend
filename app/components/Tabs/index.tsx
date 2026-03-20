@@ -13,7 +13,8 @@ interface TabsProps {
   defaultTab?: string;
   onChange?: (value: string) => void;
   className?: string;
-   customClass?: string
+   customClass?: string;
+   customButton?: ReactNode | ((activeTab: string) => ReactNode);
 }
 
 const Tabs: React.FC<TabsProps> = ({ 
@@ -21,7 +22,8 @@ const Tabs: React.FC<TabsProps> = ({
   defaultTab, 
   onChange,
   className = '',
-  customClass = ''
+  customClass = '',
+  customButton
 
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.value);
@@ -32,11 +34,13 @@ const Tabs: React.FC<TabsProps> = ({
   };
 
   const activeTabContent = tabs.find(tab => tab.value === activeTab)?.content;
+  const renderedCustomButton =
+    typeof customButton === 'function' ? customButton(activeTab) : customButton;
 
   return (
     <div>
-      {/* Tab Buttons */}
-      <div className={`flex gap-3 ${className}`}>
+    <div className={`flex justify-between items-center ${className}`}>
+      <div className={`flex gap-3`}>
         {tabs.map((tab) => (
           <button
             key={tab.value}
@@ -53,6 +57,8 @@ const Tabs: React.FC<TabsProps> = ({
             {tab.label}
           </button>
         ))}
+      </div>
+      {renderedCustomButton}
       </div>
 
       {/* Tab Content */}

@@ -1,19 +1,17 @@
 "use client";
 
 import React from "react";
-import { Search, SearchIcon, SlidersHorizontal } from "lucide-react";
+import { SearchIcon, SlidersHorizontal } from "lucide-react";
 import CustomTable from "@/app/components/Table";
-import { discipleHeaders, sessionHeaders } from "@/utils/tableheaders";
-import { mockDisciples, mockSessions } from "@/utils/dummyData";
+import { discipleHeaders } from "@/utils/tableheaders";
+import { mockDisciples } from "@/utils/dummyData";
 import Input from "@/app/components/Input";
 
-const SessionsList: React.FC = () => {
+const ReportList: React.FC = () => {
   return (
     <div className="bg-white mx-4 lg:mx-10 border border-[#E3E8EF] rounded-[16px]">
       <div className="flex items-center justify-between my-[21px] mx-6">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Session History (23)
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">Reports</h2>
         <div className="flex items-center gap-3">
           {/* Search */}
           <div className="relative">
@@ -23,12 +21,12 @@ const SessionsList: React.FC = () => {
               name="firstName"
               onChange={() => console.log("k")}
               value=""
-              placeholder="Search disciple name"
+              placeholder="Search by name or community"
               variant="outlined"
               icon={
                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2  w-5 h-5 opacity-50" />
               }
-              className="!bg-white !border-[#B9C2CA] !w-full !h-[36px] rounded-full"
+              className="!bg-white !border-[#B9C2CA] !w-[300px] !h-[36px] rounded-full"
             />
           </div>
           {/* Filter */}
@@ -40,8 +38,9 @@ const SessionsList: React.FC = () => {
       </div>
 
       <CustomTable
-        columns={sessionHeaders()}
-        data={mockSessions}
+        checkboxes={true}
+        columns={discipleHeaders()}
+        data={[]}
         tableStyles=""
       />
 
@@ -68,4 +67,4 @@ const SessionsList: React.FC = () => {
   );
 };
 
-export default SessionsList;
+export default ReportList;

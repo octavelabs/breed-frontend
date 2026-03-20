@@ -1,3 +1,5 @@
+import { title } from "process";
+
 export const discipleDummyData = [
   {
     id: '1',
@@ -217,3 +219,99 @@ export const mockSessions = [
     duration: '45mins',
   },
 ]
+
+export const mockCourses = [
+    {
+        id: '1',
+        title: 'Understanding Gods grace',
+        status: 'draft',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    chapters: 3,
+    lessons: 6,
+    participants: 45,
+    comments: 3,
+    },
+    {
+        id: '2',
+        title: 'Understanding Gods grace',
+        status: 'suspended',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    chapters: 3,
+    lessons: 6,
+    participants: 45,
+    comments: 3,
+    },
+
+    {
+        id: '3',
+        title: 'Understanding Gods grace',
+        status: 'live',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    chapters: 3,
+    lessons: 6,
+    participants: 45,
+    comments: 3,
+    },
+    {
+        id: '4',
+        title: 'Understanding Gods grace',
+        status: 'archived',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    chapters: 3,
+    lessons: 6,
+    participants: 45,
+    comments: 3,
+    },
+  ]
+
+  export const mockDevotionals = [
+    // {
+    //     id: '1',
+    //     title: 'Understanding Gods grace',
+    //     status: 'draft',
+    //     thumbnail: '',
+    //     date: "Apr 24, 2025",
+    // chapters: 3,
+    // lessons: 6,
+    // participants: 45,
+    // comments: 3,
+    // },
+    // {
+    //     id: '2',
+    //     title: 'Understanding Gods grace',
+    //     status: 'suspended',
+    //     thumbnail: '',
+    //     date: "Apr 24, 2025",
+    // chapters: 3,
+    // lessons: 6,
+    // participants: 45,
+    // comments: 3,
+    // },
+
+    // {
+    //     id: '3',
+    //     title: 'Understanding Gods grace',
+    //     status: 'live',
+    //     thumbnail: '',
+    //     date: "Apr 24, 2025",
+    // chapters: 3,
+    // lessons: 6,
+    // participants: 45,
+    // comments: 3,
+    // },
+    // {
+    //     id: '4',
+    //     title: 'Understanding Gods grace',
+    //     status: 'archived',
+    //     thumbnail: '',
+    //     date: "Apr 24, 2025",
+    // chapters: 3,
+    // lessons: 6,
+    // participants: 45,
+    // comments: 3,
+    // },
+  ]
