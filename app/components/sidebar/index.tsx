@@ -1,17 +1,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  LogOut,
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Video,
-  Settings,
-} from "lucide-react";
-import HomeIcon from "@/app/assets/icons/homeIcon";
-import LearnIcon from "@/app/assets/icons/learnIcon";
-import BuildupIcon from "@/app/assets/icons/buildupIcon";
-import CommunityIcon from "@/app/assets/icons/communityIcon";
+import {  LogOut } from 'lucide-react';
+import HomeIcon from '@/app/assets/icons/homeIcon';
+import LearnIcon from '@/app/assets/icons/learnIcon';
+import BuildupIcon from '@/app/assets/icons/buildupIcon';
+import CommunityIcon from '@/app/assets/icons/communityIcon';
 import MoreIcon from "@/app/assets/icons/MoreIcon";
 import { useUser } from "@/app/context/UserContext";
 import DashboardIcon from "@/app/assets/icons/dashboardIcon";
@@ -30,36 +23,12 @@ export const navItems = [
 ];
 
 export const preacherNavItems = [
-  {
-    path: "/dashboard/preacher/dashboard",
-    label: "Dashboard",
-    icon: DashboardIcon,
-  },
-  {
-    path: "/dashboard/preacher/mentorship",
-    label: "Mentorship",
-    icon: MentorshipIcon,
-  },
-  {
-    path: "/dashboard/community",
-    label: "Community",
-    icon: PreacherCommunityIcon,
-  },
-  {
-    path: "/dashboard/preacher/meetings",
-    label: "Meetings",
-    icon: MeetingIcon,
-  },
-  {
-    path: "/dashboard/preacher/showreel",
-    label: "Showreel",
-    icon: ShowReelIcon,
-  },
-  {
-    path: "/dashboard/preacher/settings",
-    label: "Settings",
-    icon: SettingsIcon,
-  },
+  { path: '/dashboard/preacher/dashboard', label: 'Dashboard', icon: DashboardIcon },
+  { path: '/dashboard/preacher/mentorship', label: 'Mentorship', icon: MentorshipIcon },
+  { path: '/dashboard/preacher/community', label: 'Community', icon: PreacherCommunityIcon},
+  { path: '/dashboard/preacher/meetings', label: 'Meetings', icon: MeetingIcon },
+  { path: '/dashboard/preacher/showreel', label: 'Showreel', icon: ShowReelIcon },
+  { path: '/dashboard/preacher/settings', label: 'Settings', icon: SettingsIcon },
 ];
 
 const SideBar = () => {
@@ -67,10 +36,12 @@ const SideBar = () => {
   const router = useRouter();
   const { userType } = useUser();
 
-  const isActive = (path: string) =>
-    pathname === path || pathname?.startsWith(path + "/");
-
-  const isPreacher = userType === "preacher";
+  console.log(userType, 'ihuh')
+  
+  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
+  
+  const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
+  const isPreacher = userType === 'preacher' || isPreacherRoute;
   const currentNavItems = isPreacher ? preacherNavItems : navItems;
 
   return (
@@ -181,11 +152,11 @@ const SideBar = () => {
 export const MobileNav = () => {
   const pathname = usePathname();
   const { userType } = useUser();
-
-  const isActive = (path: string) =>
-    pathname === path || pathname?.startsWith(path + "/");
-
-  const isPreacher = userType === "preacher";
+  
+  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
+  
+  const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
+  const isPreacher = userType === 'preacher' || isPreacherRoute;
   const currentNavItems = isPreacher ? preacherNavItems : navItems;
 
   return (

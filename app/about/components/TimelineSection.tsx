@@ -131,7 +131,7 @@ const timelineData: TimelineItem[] = [
 
 export const TimelineSection = (): React.ReactElement => {
   return (
-    <section className="flex z-[3] w-full px-4 lg:px-[50px] xl:px-[96px] relative flex-col items-start font-aeonik mt-[48px] lg:mt-[97px]">
+    <section className="flex z-[3] w-full px-4 lg:px-[50px] xl:px-[96px] relative flex-col items-start font-almarai mt-[48px] lg:mt-[97px]">
       {timelineData.map((item, index) => (
         <div key={`timeline-${index}`} className="flex w-full">
           {/* Icon + vertical line column */}

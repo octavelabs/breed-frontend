@@ -43,7 +43,7 @@ export default function PreachersPage() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 0.5 }}
-                className="text-[32px] lg:text-[80px] font-[900] font-aeonik text-[#180426] leading-tight mb-6"
+                className="text-[32px] lg:text-[80px] font-[800] font-almarai text-[#180426] leading-tight mb-6"
               >
                 Lead With Purpose
               </motion.h1>
@@ -92,7 +92,7 @@ export default function PreachersPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 ">
                 <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white">
                   <div>
-                    <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] font-aeonik mb-8 xl:mb-0">
+                    <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] font-almarai mb-8 xl:mb-0">
                       Curate bible plans, devotionals, and discipleship content{" "}
                       <ArrowRight className="w-[35px] h-[27px] inline-block" />
                     </h2>
@@ -139,7 +139,7 @@ export default function PreachersPage() {
             <div className="bg-[#34399C] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 <div className="px-5 xl:px-12 py-10 xl:py-20 flex flex-col justify-between text-white order-2 md:order-1">
-                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] xl:mb-[224px] font-aeonik">
+                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] xl:mb-[224px] font-almarai">
                     Get insights into how <br /> your members/disciples <br />{" "}
                     are engaging{" "}
                     <ArrowRight className="w-[35px] h-[27px] inline-block" />
@@ -172,7 +172,7 @@ export default function PreachersPage() {
             <div className="bg-[#C83785] rounded-3xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 <div className="px-5 xl:px-12 py-10 xl:py-20  flex flex-col justify-between text-white">
-                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] font-aeonik">
+                  <h2 className="text-[28px] leading-[42px] xl:text-[50px] font-medium xl:leading-[64px] mb-[78px] font-almarai">
                     Nurture deeper fellowship through online prayer circles,
                     group discussions, and focused teaching hub{" "}
                     <ArrowRight className="w-[35px] h-[27px] inline-block" />

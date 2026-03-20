@@ -37,7 +37,7 @@ export default function Testimonials() {
           style={{ backgroundColor: t.color }}
         >
           <img src="./quotation.svg" className="" />
-          <p className="text-[20px] xl:text-[34px] font-medium text-[#180426] font-aeonik">{t.quote}</p>
+          <p className="text-[20px] xl:text-[34px] font-medium text-[#180426] font-almarai">{t.quote}</p>
           <div className="">
             <p className="text-sm xl:text-[24px] text-black">{`${t.author}, ${t.location}`}</p>
             <p className="text-[10px] xl:text-base text-[#3C3E40]">{t.role}</p>

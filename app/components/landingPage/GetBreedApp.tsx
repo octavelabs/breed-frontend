@@ -36,7 +36,7 @@ export default function GetBreedApp({
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-[26px] xl:text-[55px] font-bold text-[#101828] font-aeonik mb-6 leading-tight">
+            <h1 className="text-[26px] xl:text-[55px] font-bold text-[#101828] font-almarai mb-6 leading-tight">
               Get The Breed App
             </h1>
 
@@ -86,7 +86,7 @@ export default function GetBreedApp({
 
               {/* Content */}
               <div className="p-8 md:p-12 flex flex-col items-center text-center xl:items-start xl:text-start order-1 md:order-2 2xl:justify-center">
-                <h2 className="text-[24px] xl:text-[36px] font-black text-white mb-4 leading-tight font-aeonik">
+                <h2 className="text-[24px] xl:text-[36px] font-black text-white mb-4 leading-tight font-almarai">
                   Rooted in Christ, Growing Together
                 </h2>
                 <p className=" mb-8 text-sm xl:text-base leading-relaxed text-white">

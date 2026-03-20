@@ -60,7 +60,7 @@ export default function GrowInGrace() {
             </span>
           </div>
 
-          <h1 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-aeonik font-bold mb-2 text-white">
+          <h1 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-almarai font-bold mb-2 text-white">
             Grow in Grace
           </h1>
 
@@ -157,7 +157,7 @@ export default function GrowInGrace() {
             </span>
           </div>
 
-          <h2 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-aeonik font-bold mb-2">
+          <h2 className="text-[32px] xl:text-[58px] xl:leading-[72px] font-[700] font-almarai font-bold mb-2">
             Lead with Purpose
           </h2>
 
@@ -237,7 +237,7 @@ const TabContentOne = () => {
     <div className="grid md:grid-cols-2 gap-10 xl:gap-[139px]">
       {/* Left Content */}
       <div className="text-white">
-        <h2 className="text-[28px] xl:text-[42px] leading-[44px] xl:leading-[56px] font-bold font-aeonik mb-1 text-white">
+        <h2 className="text-[28px] xl:text-[42px] leading-[44px] xl:leading-[56px] font-bold font-almarai mb-1 text-white">
           Daily Edification
         </h2>
 
@@ -310,7 +310,7 @@ const TabContentTwo = () => {
     <div className="grid md:grid-cols-2 gap-10 xl:gap-[139px]">
       {/* Left Content */}
       <div className="text-white">
-        <h2 className="text-[28px] xl:text-[42px] leading-[44px] xl:leading-[56px] font-bold font-aeonik mb-1 text-white">
+        <h2 className="text-[28px] xl:text-[42px] leading-[44px] xl:leading-[56px] font-bold font-almarai mb-1 text-white">
           Forums/Communities
         </h2>
 
@@ -457,7 +457,7 @@ const TabContentFour = () => {
     <div className="grid md:grid-cols-2 gap-[139px]">
       {/* Left Content */}
       <div className="text-white">
-        <h2 className="text-[42px] leading-[56px] font-bold mb-1 text-white font-aeonik">
+        <h2 className="text-[42px] leading-[56px] font-bold mb-1 text-white font-almarai">
           Online Christian Courses
         </h2>
 

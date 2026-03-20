@@ -105,7 +105,7 @@ export default function ContactPage() {
 
       <div className="h-full overflow-hidden bg-[#FBF6FF]">
         <div className="px-4 lg:px-[50px] xl:px-[184px] pt-[150px] md:pt-[230px] mb-[118px]">
-          <p className="text-[#330750] text-[35px] xl:text-[56px] xl:leading-[64px] mb-[72px] text-center font-aeonik font-bold">
+          <p className="text-[#330750] text-[35px] xl:text-[56px] xl:leading-[64px] mb-[72px] text-center font-almarai font-bold">
             Connect With Us
           </p>
 

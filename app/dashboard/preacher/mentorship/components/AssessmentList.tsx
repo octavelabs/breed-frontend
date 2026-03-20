@@ -7,11 +7,11 @@ import { discipleHeaders } from "@/utils/tableheaders";
 import { mockDisciples } from "@/utils/dummyData";
 import Input from "@/app/components/Input";
 
-const DisciplesList: React.FC = () => {
+const AssessmentList: React.FC = () => {
   return (
     <div className="bg-white mx-4 lg:mx-10 border border-[#E3E8EF] rounded-[16px]">
       <div className="flex items-center justify-between my-[21px] mx-6">
-        <h2 className="text-lg font-semibold text-gray-900">Disciples (23)</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Assessments</h2>
         <div className="flex items-center gap-3">
           {/* Search */}
           <div className="relative">
@@ -40,7 +40,7 @@ const DisciplesList: React.FC = () => {
       <CustomTable
         checkboxes={true}
         columns={discipleHeaders()}
-        data={mockDisciples}
+        data={[]}
         tableStyles=""
       />
 
@@ -67,4 +67,4 @@ const DisciplesList: React.FC = () => {
   );
 };
 
-export default DisciplesList;
+export default AssessmentList;

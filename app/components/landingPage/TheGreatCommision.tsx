@@ -125,7 +125,7 @@ export default function TheGreatCommission() {
               Our Vision
             </div>
 
-            <h1 className="text-[32px] font-[700] text-[#180426] mb-4 font-aeonik leading-tight">
+            <h1 className="text-[32px] font-[700] text-[#180426] mb-4 font-almarai leading-tight">
               The Great Commission
             </h1>
 
@@ -200,7 +200,7 @@ export default function TheGreatCommission() {
                   Our Drive
                 </div>
 
-                <h1 className="text-[32px] lg:text-[40px] font-[700] text-[#180426] mb-6 font-aeonik leading-tight">
+                <h1 className="text-[32px] lg:text-[40px] font-[700] text-[#180426] mb-6 font-almarai leading-tight">
                   The Great Commission
                 </h1>
 

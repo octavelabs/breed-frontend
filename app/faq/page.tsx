@@ -12,7 +12,7 @@ export default function FAQPage() {
       <Navbar />
       <div className="h-full overflow-hidden bg-[#FBF6FF]">
         <div className="px-4 lg:px-[50px] xl:px-[184px] xl:px-[70px] pt-[150px] md:pt-[230px] mb-[118px]">
-          <p className="text-[#330750] text-[35px] xl:text-[56px] xl:leading-[64px] mb-[72px] text-center font-aeonik font-bold">
+          <p className="text-[#330750] text-[35px] xl:text-[56px] xl:leading-[64px] mb-[72px] text-center font-almarai font-bold">
             Frequently asked questions
           </p>
           <div className="flex flex-col lg:flex-row gap-10 w-full items-start">
