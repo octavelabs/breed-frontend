@@ -46,10 +46,10 @@ const Tabs: React.FC<TabsProps> = ({
             key={tab.value}
             onClick={() => handleTabClick(tab.value)}
             className={`
-              border px-4 py-3 rounded-[12px] font-medium text-sm transition-all duration-200
+              border px-[18px] py-3 rounded-[12px] font-medium text-sm transition-all duration-200
               ${
                 activeTab === tab.value
-                  ? 'bg-white border-black'
+                  ? 'bg-white border-black font-semibold'
                   : 'text-[#4E5255] border-[#D2D9DF]'
               } ${customClass}
             `}

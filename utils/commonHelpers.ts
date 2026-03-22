@@ -82,3 +82,25 @@ export const capitalizeFirstLetter = (word:string) => {
       return 'bg-transparent texxt-[#3C3E40]';
   }
 };
+
+export function getWeekRange(date: Date) {
+  date = date || new Date();
+
+  const startOfWeek = new Date(date);
+  startOfWeek.setDate(date.getDate() - date.getDay());
+
+  const endOfWeek = new Date(date);
+  endOfWeek.setDate(date.getDate() + (6 - date.getDay()));
+
+  return { startOfWeek, endOfWeek };
+}
+
+export function getWeekDates(startOfWeek: Date, endOfWeek: Date) {
+  const weekDates = [];
+  let currentDate = startOfWeek;
+  while (currentDate <= endOfWeek) {
+    weekDates.push(new Date(currentDate).toISOString().slice(0, 10))
+    currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+  }
+  return weekDates;
+}

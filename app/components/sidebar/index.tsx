@@ -35,8 +35,6 @@ const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { userType } = useUser();
-
-  console.log(userType, 'ihuh')
   
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
   

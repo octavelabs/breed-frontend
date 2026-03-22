@@ -7,6 +7,8 @@ import DropdownWithMultipleSelect from '@/app/components/Dropdown/DropdownWithMu
 import { useDebounce } from '@/utils/useDebounce';
 import { CourseCategory, CourseFormData } from '../type';
 import { StepProgress } from '@/app/dashboard/community/list/components/StepProgress';
+import TextArea from '@/app/components/TextArea';
+import Input from '@/app/components/Input';
 
 
 // Types
@@ -24,15 +26,6 @@ interface CreateCommunityModalProps {
   onComplete?: (data: CourseFormData) => void;
 }
 
-
-
-const GUIDELINES = [
-  'Lorem ipsum',
-  'Lorem ipsum',
-  'Lorem ipsum',
-  'Lorem ipsum',
-  'Lorem ipsum',
-];
 
 export const CreateCourseModal = ({
   isOpen,
@@ -147,20 +140,23 @@ export const CreateCourseModal = ({
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
-        <div className="px-6 pb-6">
+        <div className="px-8 pb-6">
           {step === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Course title
                 </label>
-                <input
-                  type="text"
-                  placeholder="Enter title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                />
+          
+                <Input
+                                        id="title"
+                                        type="text"
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                        value={formData.title}
+                                        placeholder="Enter title"
+                                        variant="outlined"
+                                        className="!bg-white  !w-full !h-[48px] rounded-[10px]"
+                                      />
               </div>
 
         
@@ -168,14 +164,13 @@ export const CreateCourseModal = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
-                <textarea
-                  placeholder="Describe the goal of this community..."
+                <TextArea
+                  placeholder="Enter description"
                   value={formData.courseDescription}
                   onChange={(e) =>
                     setFormData({ ...formData, courseDescription: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm resize-none"
                 />
               </div>
               <div className="col-span-1 md:col-span-2">
@@ -249,7 +244,7 @@ export const CreateCourseModal = ({
 
           {/* Step 2: Permissions */}
           {step === 2 && (
-            <div className="space-y-5">
+            <div className="space-y-3">
             
 
               <div>
