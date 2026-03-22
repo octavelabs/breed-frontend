@@ -175,6 +175,71 @@ export const mockDisciples = [
     },
 ];
 
+export const mockRecentMeetings = [
+   {
+    id: '1',
+    meeting: 'SOC Open Meeting',
+    community: "Waxing Strong Community",
+    attendees: 34,
+    date: '24th April, 2025',
+    duration: '45mins',
+  },
+   {
+    id: '2',
+    meeting: 'SOC Open Meeting',
+    attendees: 34,
+     community: "Waxing Strong Community",
+    date: '24th April, 2025',
+    duration: '45mins',
+  },
+   {
+    id: '3',
+    meeting: 'SOC Open Meeting',
+     community: "Waxing Strong Community",
+    attendees: 34,
+    date: '24th April, 2025',
+    duration: '45mins',
+  },
+   {
+    id: '4',
+    meeting: 'SOC Open Meeting',
+     community: "Waxing Strong Community",
+    attendees: 34,
+    date: '24th April, 2025',
+    duration: '45mins',
+  },
+
+]
+
+export const mockCommunityMeetings = [
+   {
+    id: '1',
+    meeting: 'SOC Open Meeting',
+    community: "Waxing Strong Community",
+   sessionSummary: 'Mon, Tue, Wed, Sat',
+  },
+   {
+    id: '2',
+    meeting: 'SOC Open Meeting',
+sessionSummary: 'Mon, Tue, Wed, Sat',
+     community: "Waxing Strong Community",
+
+  },
+   {
+    id: '3',
+    meeting: 'SOC Open Meeting',
+     community: "Waxing Strong Community",
+sessionSummary: 'Mon, Tue, Wed, Sat',
+  },
+   {
+    id: '4',
+    meeting: 'SOC Open Meeting',
+     community: "Waxing Strong Community",
+   sessionSummary: 'Mon, Tue, Wed, Sat',
+  },
+
+]
+
 export const mockSessions = [
    {
     id: '1',
@@ -268,6 +333,80 @@ export const mockCourses = [
     },
   ]
 
+  export const mockDraftRecordings = [
+    {
+        id: '1',
+        title: 'Faith clinic',
+        status: 'draft',
+        thumbnail: '/recording.png',
+        date: "Apr 24, 2025",
+    attendees: 45,
+    comments: 3,
+    time: '3:00pm',
+    duration: '45mins',
+    },
+    {
+        id: '2',
+        title: 'Faith clinic',
+        status: 'draft',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    attendees: 45,
+    comments: 3,
+    time: '3:00pm',
+    duration: '45mins',
+    },
+    {
+        id: '3',
+        title: 'Faith clinic',
+        status: 'draft',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    attendees: 45,
+    comments: 3,
+    time: '3:00pm',
+    duration: '45mins',
+    },
+
+  ]
+
+    export const mockPublishedRecordings = [
+    {
+        id: '1',
+        title: 'Faith clinic',
+        status: 'published',
+        thumbnail: '/recording.png',
+        date: "Apr 24, 2025",
+    attendees: 45,
+    comments: 3,
+    time: '3:00pm',
+    duration: '45mins',
+    },
+    {
+        id: '2',
+        title: 'Faith clinic',
+        status: 'published',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    attendees: 45,
+    comments: 3,
+    time: '3:00pm',
+    duration: '45mins',
+    },
+    {
+        id: '3',
+        title: 'Faith clinic',
+        status: 'published',
+        thumbnail: '',
+        date: "Apr 24, 2025",
+    attendees: 45,
+    comments: 3,
+    time: '3:00pm',
+    duration: '45mins',
+    },
+
+  ]
+
   export const mockDevotionals = [
     // {
     //     id: '1',
@@ -315,3 +454,9 @@ export const mockCourses = [
     // comments: 3,
     // },
   ]
+
+  export const mockScheduleList = [
+  { id: 1, name: 'Weekly prayer for Ajanlekoko', time: '3:20 pm - 4:00 pm', location: 'Waxing Str...' },
+  { id: 2, name: 'Faith Clinic', time: '3:20 pm - 4:00 pm', location: 'SDC Com...' },
+  { id: 3, name: 'Meeting with Octave', time: '3:20 pm - 4:00 pm', location: 'Waxing Str...' },
+];

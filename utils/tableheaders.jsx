@@ -248,3 +248,144 @@ export const sessionHeaders = () => [
     ),
   }
 ];
+
+export const recentMeetingsHeaders = () => [
+  {
+      title: "Date",
+      bigWidth: "1fr",
+      isMobileVisible: false,
+      dataIndex: 'date',
+      render: (rowIndex, key, rowData) =>
+        rowData?.date
+    },
+   {
+      title: "Meeting",
+      bigWidth: "1.6fr",
+      isMobileVisible: true,
+      dataIndex: "host.user",
+      render: (rowIndex, key, rowData) => (
+        <div>
+          <p className='text-base text-[#292A2B]'>{rowData?.meeting}</p>
+          <p className="text-sm text-[#4E5255] mt-[4px]">{rowData?.community}</p>
+        </div>
+                
+      )
+    },
+ {
+      title: "Duration",
+      bigWidth: "0.7fr",
+      isMobileVisible: true,
+      dataIndex: "duration",
+      render: (rowIndex, key, rowData) => (
+                rowData?.duration
+      )
+    },
+     {
+      title: "Attendees",
+      bigWidth: "1.2fr",
+      isMobileVisible: true,
+      dataIndex: "attendees",
+      render: (rowIndex, key, rowData) => (
+                rowData?.attendees
+      )
+    },
+ {
+    title: "",
+    bigWidth: "0.5fr",
+    mobileWidth: "0.2fr",
+    isMobileVisible: true,
+    render: (rowIndex, key, rowData) => (
+      <MoreHorizontal
+        // onClick={(e) => {
+        //   e.stopPropagation();
+        //   renderPopover(e, rowData);
+        // }}
+        className="cursor-pointer rotate-90 scale-75"
+      />
+    ),
+  }
+];
+
+export const communityMeetingsHeaders = () => [
+ 
+   {
+      title: "Meeting",
+      bigWidth: "1.6fr",
+      isMobileVisible: true,
+      dataIndex: "host.user",
+      render: (rowIndex, key, rowData) => (
+        <div>
+          <p className='text-base text-[#292A2B]'>{rowData?.meeting}</p>
+          <p className="text-sm text-[#4E5255] mt-[4px]">{rowData?.community}</p>
+        </div>
+                
+      )
+    },
+     {
+      title: "Schedule Summary",
+      bigWidth: "1.2fr",
+      isMobileVisible: true,
+      dataIndex: "sessionSummary",
+      render: (rowIndex, key, rowData) => (rowData?.sessionSummary)
+    },
+ {
+    title: "",
+    bigWidth: "0.5fr",
+    mobileWidth: "0.2fr",
+    isMobileVisible: true,
+    render: (rowIndex, key, rowData) => (
+      <MoreHorizontal
+        // onClick={(e) => {
+        //   e.stopPropagation();
+        //   renderPopover(e, rowData);
+        // }}
+        className="cursor-pointer rotate-90 scale-75"
+      />
+    ),
+  }
+];
+
+export const openMeetingsHeaders = () => [
+ 
+   {
+      title: "Meeting",
+      bigWidth: "1.6fr",
+      isMobileVisible: true,
+      dataIndex: "host.user",
+      render: (rowIndex, key, rowData) => (
+        <div>
+          <p className='text-base text-[#292A2B]'>{rowData?.meeting}</p>
+        </div>
+                
+      )
+    },
+     {
+      title: "Commuinty",
+      bigWidth: "1.2fr",
+      isMobileVisible: true,
+      dataIndex: "community",
+      render: (rowIndex, key, rowData) => (rowData?.community)
+    },
+     {
+      title: "Schedule Summary",
+      bigWidth: "1.2fr",
+      isMobileVisible: true,
+      dataIndex: "sessionSummary",
+      render: (rowIndex, key, rowData) => (rowData?.sessionSummary)
+    },
+ {
+    title: "",
+    bigWidth: "0.5fr",
+    mobileWidth: "0.2fr",
+    isMobileVisible: true,
+    render: (rowIndex, key, rowData) => (
+      <MoreHorizontal
+        // onClick={(e) => {
+        //   e.stopPropagation();
+        //   renderPopover(e, rowData);
+        // }}
+        className="cursor-pointer rotate-90 scale-75"
+      />
+    ),
+  }
+]

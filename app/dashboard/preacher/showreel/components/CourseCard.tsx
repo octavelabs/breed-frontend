@@ -36,12 +36,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
         ) : (
           <div className="w-full h-full" />
         )}
-        
-        
           <span className={`absolute top-4 left-4  text-sm font-semibold px-4 py-1.5 rounded-full capitalize ${getStatusColor(data?.status)}`}>
             {data?.status}
           </span>
-    
       </div>
        </div>
 

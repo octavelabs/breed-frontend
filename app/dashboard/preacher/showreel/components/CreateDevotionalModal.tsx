@@ -8,6 +8,9 @@ import { useDebounce } from '@/utils/useDebounce';
 import { CourseCategory, CourseFormData } from '../type';
 import { StepProgress } from '@/app/dashboard/community/list/components/StepProgress';
 import { Modal } from '@/app/components/Modal';
+import { CustomModal } from '@/app/components/Modal/customModal';
+import Input from '@/app/components/Input';
+import TextArea from '@/app/components/TextArea';
 
 
 // Types
@@ -119,36 +122,51 @@ export const CreateDevotionalModal = ({
   };
 
   return (
-          <Modal isOpen={isOpen} onClose={handleComplete} customClass='!w-[520px]' title='Create Devotional' showHeader={true} >
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                />
-              </div>
+          <CustomModal isOpen={isOpen} onClose={handleComplete} title="Create Devotional" subTitle="Provide devotional information" maxWidth='!w-[520px]'>
+            <div className="space-y-3">
+               <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-[6px]">
+                        Name
+                      </label>
+                      <Input
+                        id="name"
+                        type="text"
+                        onChange={(e) => console.log(e.target.value)}
+                        value={''}
+                        placeholder=""
+                        variant="outlined"
+                        className="!bg-white  !w-full !h-[48px] rounded-[10px]"
+                      />
+                    </div>
 
         
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
-                <textarea
-                  placeholder="Describe the goal of this community..."
+                <TextArea
+                  placeholder="Enter description"
                   value={formData.courseDescription}
                   onChange={(e) =>
                     setFormData({ ...formData, courseDescription: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm resize-none"
                 />
               </div>
+               <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-[6px]">
+                        Date
+                      </label>
+                      <Input
+                        id="date"
+                        type="date"
+                        onChange={(e) => console.log(e.target.value)}
+                        value={''}
+                        placeholder=""
+                        variant="outlined"
+                        className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px]"
+                      />
+                    </div>
             
                 <div className='mx-auto w-fit'>
               <label
@@ -165,21 +183,16 @@ export const CreateDevotionalModal = ({
                     <Upload className="w-5 h-5" stroke='#B144F9' />
                   )}
                 </label>
-                <p className='text-sm mt-3'>Upload Course Thumbnail</p>
+                <p className='text-sm mt-3'>Upload Devotional Thumbnail</p>
                 </div>
-
+<Button
+        onClick={handleComplete}
+        buttonType="primary"
+        customClass='!w-full !text-white'
+      >
+        Create
+      </Button>
         
-              <button
-                onClick={handleProceed}
-                disabled={!canProceedStep1}
-                className={`w-full py-3 rounded-full text-white font-medium transition-all ${
-                  canProceedStep1
-                    ? 'bg-black hover:bg-gray-800 active:scale-[0.98]'
-                    : 'bg-gray-300 cursor-not-allowed'
-                }`}
-              >
-                Proceed
-              </button>
             </div>
-            </Modal>)
+            </CustomModal>)
 };

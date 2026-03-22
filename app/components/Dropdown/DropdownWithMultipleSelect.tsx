@@ -56,7 +56,7 @@ const DropdownWithMultipleSelect: FC<DropdownWithMultipleSelectProps> = ({
           e.stopPropagation();
           !disabled && setIsOpen(!isOpen);
         }}
-        className={`flex bg-[#d9d9d93d] p-2 px-4 text-sm rounded-full w-full justify-between items-center text-[#344054] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] capitalize ${
+        className={`flex bg-white border border-[#B9C2CA] p-2 px-4 text-sm rounded-full w-full justify-between items-center text-[#344054] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] capitalize ${
           disabled ? "cursor-not-allowed" : ""
         } ${className}`}
       >

@@ -28,8 +28,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom, cus
         </div>
         
         <MobileNav />
-        {/* Test toggle - remove in production */}
-        <TestUserToggle />
+     
       </div>
     </UserProvider>
   );
