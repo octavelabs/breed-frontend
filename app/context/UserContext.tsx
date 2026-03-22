@@ -15,10 +15,17 @@ const USER_TYPE_STORAGE_KEY = 'breed_user_type';
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-      const storedUserType = window.localStorage.getItem(USER_TYPE_STORAGE_KEY) as UserType
-  const [userType, setUserType] = useState<UserType>(storedUserType ?? 'believer');
+  const [userType, setUserType] = useState<UserType>(() => {
+    if (typeof window === 'undefined') {
+      return 'believer';
+    }
+
+    const storedUserType = window.localStorage.getItem(USER_TYPE_STORAGE_KEY) as UserType | null;
+    return storedUserType ?? 'believer';
+  });
+
   const router = useRouter();
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   useEffect(() => {
   pathname.startsWith('/dashboard/preacher') ? setUserType('preacher') : setUserType('believer')
