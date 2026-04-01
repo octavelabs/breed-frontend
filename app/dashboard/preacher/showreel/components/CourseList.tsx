@@ -85,7 +85,7 @@ const CourseList = ({
       ) : (
         <div className="grid grid-cols-3 gap-5 p-6">
           {mockCourses?.map((course) => (
-            <CourseCard data={course} />
+            <CourseCard data={course} key={course.id}/>
           ))}
         </div>
       )}

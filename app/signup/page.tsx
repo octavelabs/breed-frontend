@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 const CreateAccount: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +31,12 @@ const CreateAccount: React.FC = () => {
       ),
     },
     {
-      content: <StepThree />,
+      content: (
+        <StepThree setCurrentStep={setCurrentStep} currentStep={currentStep} />
+      ),
+    },
+    {
+      content: <StepFour />,
     },
   ];
 
@@ -203,7 +208,13 @@ const StepTwo = ({
   );
 };
 
-const StepThree = () => {
+const StepThree = ({
+  setCurrentStep,
+  currentStep,
+}: {
+  currentStep: number;
+  setCurrentStep: (step: number) => void;
+}) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="rounded-[24px] bg-white p-4 lg:p-8 max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
@@ -272,11 +283,47 @@ const StepThree = () => {
           </div>
         </div>
 
-        {/* Submit button */}
-        <Link href='/onboard'>
-        <Button customClass="!w-full !h-[58px] mt-4 !text-white">
-          Create Account
+        <Button
+          customClass="!w-full !h-[58px] mt-4 mb-2 !text-white"
+          type="button"
+          onClick={() => setCurrentStep(currentStep + 1)}
+        >
+          Proceed
         </Button>
+      </form>
+    </div>
+  );
+};
+
+const StepFour = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  return (
+    <div className="rounded-[24px] bg-white p-4 lg:p-8 max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
+      <h2 className="text-[24px] font-semibold leading-none text-center mb-8">
+        Set Username
+      </h2>
+
+      <form className="flex flex-col gap-4">
+        <div>
+          <label htmlFor="lastName" className="block text-sm font-medium  mb-2">
+            Username
+          </label>
+          <div className="relative">
+            <Input
+              variant="outlined"
+              type="text"
+              id="lastName"
+              onChange={() => console.log("lastname")}
+              placeholder="Enter username"
+            />
+          </div>
+        </div>
+
+        {/* Submit button */}
+        <Link href="/onboard">
+          <Button customClass="!w-full !h-[58px] mt-4 !text-white">
+            Create Account
+          </Button>
         </Link>
       </form>
     </div>
