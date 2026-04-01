@@ -2,10 +2,8 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import GetBreedApp from "../components/landingPage/GetBreedApp";
 import Navbar from "../components/landingPage/Navbar";
 import Footer from "../components/landingPage/Footer";
-import Link from "next/link";
 import Button from "../components/Button";
 import ScrollStorySection from "./components/StoryTelling";
 import PartnerWithUs from "./components/PartnerWithUs";

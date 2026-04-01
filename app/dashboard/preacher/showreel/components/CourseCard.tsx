@@ -16,7 +16,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/courses/${data?.id}`);
+    router.push(`/dashboard/preacher/showreel/${data?.id}`);
   };
 
   return (
