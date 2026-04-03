@@ -24,6 +24,14 @@ export const navLinks = [
     title: "Contact Us",
     path: "/contact",
   },
+  {
+    title: "Resources",
+    dropdown: true,
+    options: [
+      { title: "Blogs", path: "/blogs" },
+      { title: "FAQs", path: "/faq" },
+    ],
+  },
 ];
 
 export const mobileNavLinks = [
@@ -42,6 +50,14 @@ export const mobileNavLinks = [
   {
     title: "Contact Us",
     path: "/contact",
+  },
+   {
+    title: "Blogs",
+    path: "/blogs",
+  },
+   {
+    title: "FAQs",
+    path: "/faq",
   },
 ];
 

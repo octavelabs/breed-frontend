@@ -460,3 +460,150 @@ export const mockCourses = [
   { id: 2, name: 'Faith Clinic', time: '3:20 pm - 4:00 pm', location: 'SDC Com...' },
   { id: 3, name: 'Meeting with Octave', time: '3:20 pm - 4:00 pm', location: 'Waxing Str...' },
 ];
+
+export const fetchCourseData = async (courseId) => {
+  // This would be replaced with an actual API call
+  return {
+    id: courseId,
+    title: 'Understanding God\'s grace',
+    status: 'draft',
+    chapters: [
+      {
+        id: '1',
+        name: 'Explore the bible',
+        lessons: [
+          {
+            id: '1',
+            name: 'The Beginning',
+            content: `<p>Gratitude is more than a momentary feeling, it's a perspective that transforms how we experience life and relate to God. It shifts our attention from what's lacking to what's already been given, reminding us that even in difficult seasons, there is always something to be thankful for.</p>
+            <p>When we choose to give thanks, we're not denying hardship; rather, we're acknowledging God's goodness in the midst of it. Gratitude is a spiritual discipline that grounds us in trust that God is at work even when the path is unclear. It is the lens that brings clarity to our challenging circumstances.</p>
+            <p>In Scripture, gratitude is not just encouraged it's commanded, because it opens the door to deeper communion with God. "Give thanks in all circumstances," Paul writes in 1 Thessalonians 5:18, "for this is God's will for you in Christ Jesus." This verse reminds us that thanksgiving isn't situational, it's spiritual.</p>
+            <p>Whether in plenty or in lack, gratitude becomes a declaration of faith: that God is still good, still present, and still worthy of praise.</p>`,
+            isValid: true,
+          },
+          {
+            id: '2',
+            name: 'The fall of man',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '3',
+            name: 'A new hope',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '4',
+            name: 'Kings & Judges',
+            content: '',
+            isValid: false,
+          },
+        ],
+      },
+      {
+        id: '2',
+        name: 'Explore the bible',
+        lessons: [
+          {
+            id: '5',
+            name: 'Lesson 1',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '6',
+            name: 'Lesson 2',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '7',
+            name: 'Lesson 3',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '8',
+            name: 'Lesson 4',
+            content: '',
+            isValid: false,
+          },
+        ],
+      },
+    ],
+  };
+};
+export const fetchLiveCourseData = async (courseId) => {
+  // This would be replaced with an actual API call
+  return {
+    id: courseId,
+    title: 'Understanding God\'s grace',
+    status: 'draft',
+    chapters: [
+      {
+        id: '1',
+        name: 'Explore the bible',
+        lessons: [
+          {
+            id: '1',
+            name: 'The Beginning',
+            content: `<p>Gratitude is more than a momentary feeling, it's a perspective that transforms how we experience life and relate to God. It shifts our attention from what's lacking to what's already been given, reminding us that even in difficult seasons, there is always something to be thankful for.</p>
+            <p>When we choose to give thanks, we're not denying hardship; rather, we're acknowledging God's goodness in the midst of it. Gratitude is a spiritual discipline that grounds us in trust that God is at work even when the path is unclear. It is the lens that brings clarity to our challenging circumstances.</p>
+            <p>In Scripture, gratitude is not just encouraged it's commanded, because it opens the door to deeper communion with God. "Give thanks in all circumstances," Paul writes in 1 Thessalonians 5:18, "for this is God's will for you in Christ Jesus." This verse reminds us that thanksgiving isn't situational, it's spiritual.</p>
+            <p>Whether in plenty or in lack, gratitude becomes a declaration of faith: that God is still good, still present, and still worthy of praise.</p>`,
+            isValid: true,
+          },
+          {
+            id: '2',
+            name: 'The fall of man',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '3',
+            name: 'A new hope',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '4',
+            name: 'Kings & Judges',
+            content: '',
+            isValid: false,
+          },
+        ],
+      },
+      {
+        id: '2',
+        name: 'Explore the bible',
+        lessons: [
+          {
+            id: '5',
+            name: 'Lesson 1',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '6',
+            name: 'Lesson 2',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '7',
+            name: 'Lesson 3',
+            content: '',
+            isValid: false,
+          },
+          {
+            id: '8',
+            name: 'Lesson 4',
+            content: '',
+            isValid: false,
+          },
+        ],
+      },
+    ],
+  };
+};

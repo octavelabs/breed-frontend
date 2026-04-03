@@ -28,7 +28,7 @@ export const CustomModal = ({
       onClick={onClose}
     >
       <div 
-        className={`relative w-fit ${maxWidth} bg-white rounded-2xl shadow-xl`}
+        className={`relative w-fit ${maxWidth} bg-white rounded-[20px] h-[80vh] max-h-[500px] lg:max-h-[650px] overflow-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

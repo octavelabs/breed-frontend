@@ -15,7 +15,8 @@ const PreacherShowreel = () => {
     course: false,
     devotional: false
   });
-    const tabs = [
+  const [activeTab, setActiveTab] = useState("courses");
+  const tabs = [
     {
       label: "Courses",
       value: "courses",
@@ -58,10 +59,15 @@ const PreacherShowreel = () => {
 
       {/* Tabs */}
       <div className="bg-white pt-[33px] ">
-        <Tabs tabs={tabs} defaultTab={"courses"} className="px-4 lg:px-10" customClass='!rounded-full'
-        customButton={(activeTab) => (
-          <Button
-            customClass="!w-fit px-6 !h-[48px] !text-white"
+        <Tabs
+          tabs={tabs}
+          defaultTab={"courses"}
+          onChange={setActiveTab}
+          className="px-4 lg:px-10"
+          customClass='!rounded-full'
+          customButton={(activeTab) => (
+            <Button
+            customClass="hidden lg:block !w-fit px-6 !h-[48px] !text-white"
             type="button"
             onClick={() =>
               setOpenModal((prev) => ({
@@ -71,12 +77,26 @@ const PreacherShowreel = () => {
               }))
             }
           >
-            <p className="flex items-center gap-[6px]">
+            <p className="flex items-center gap-[6px] whitespace-nowrap">
               <Plus stroke="white" />
               {activeTab === 'devotionals' ? 'Create devotional' : 'Create course'}
             </p>
           </Button>
         )}/>
+      </div>
+       <div className="lg:hidden fixed bottom-20 right-4 z-40">
+        <button
+          onClick={() =>
+            setOpenModal((prev) => ({
+              ...prev,
+              course: activeTab === 'courses',
+              devotional: activeTab === 'devotionals',
+            }))
+          }
+          className="flex items-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:bg-purple-700 transition-colors"
+        >
+          <Plus stroke="white" />
+        </button>
       </div>
 
     

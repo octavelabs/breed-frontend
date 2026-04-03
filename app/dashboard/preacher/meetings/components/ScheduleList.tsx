@@ -1,6 +1,6 @@
 import MeetingIcon from "@/app/assets/icons/meetingIcon"
 import Button from "@/app/components/Button"
-import { getWeekDates, getWeekRange } from "@/utils/commonHelpers"
+import { daysLabel, getWeekDates, getWeekRange } from "@/utils/commonHelpers"
 import { mockScheduleList } from "@/utils/dummyData"
 import { ChevronLeft, ChevronRight, Clock4, ListFilter, MicOff, MoreVertical } from "lucide-react"
 
@@ -9,7 +9,6 @@ export const ScheduleList = () => {
  const { startOfWeek, endOfWeek } = getWeekRange(new Date());
   const weekDates = getWeekDates(startOfWeek, endOfWeek)?.map((date) => new Date(date).getDate());
   const today = new Date().getDate();
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
  
     return (
@@ -34,7 +33,7 @@ export const ScheduleList = () => {
         </div>
 
         <div className="grid grid-cols-7 gap-1 text-center mb-3">
-          {days.map((d) => <div key={d} className="text-xs font-medium text-gray-900">{d}</div>)}
+          {daysLabel.map((d) => <div key={d} className="text-xs font-medium text-gray-900">{d}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">
           {weekDates.map((day) => (

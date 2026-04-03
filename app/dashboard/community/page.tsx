@@ -49,7 +49,7 @@ const CommunityPage = () => {
       <div className="flex justify-between items-center pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
         <h1 className="text-[24px] lg:text-[32px] leading-none font-bold ">Community</h1>
         <Button
-          customClass="!w-fit px-6 !h-[48px] !text-white"
+          customClass="!w-fit px-6 !h-[48px] !text-white hidden lg:block"
           type="button"
           onClick={() => setOpenModal(true)}
         >
@@ -63,12 +63,12 @@ const CommunityPage = () => {
         <Tabs tabs={tabs} defaultTab="communities" className="px-4 lg:px-12" />
       </div>
       <Button
-                    customClass="!w-full px-6 !h-[48px] !text-white absolute mt-4 lg:hidden"
+                    customClass="!w-[90%] mx-auto px-6 !h-[48px] !text-white absolute mt-4 lg:hidden"
                     type="button"
                     onClick={() => setOpenModal(true)}
                   >
                     <p className="flex items-center gap-[6px]">
-                      Join community
+                      Create community
                     </p>
                   </Button>
     </DashboardLayout>

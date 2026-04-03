@@ -43,7 +43,7 @@ const NavbarDropdown: React.FC<NavbarDropdownProps> = ({ link, selected }) => {
           ].join(" ")} `}
         >
           <p className="whitespace-nowrap">
-            {selectedOption ?? "For Believers"}
+            {selectedOption ?? `${link.title}`}
           </p>
           <ChevronDown />
         </button>

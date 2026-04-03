@@ -8,8 +8,6 @@ import Button from "../components/Button";
 import ScrollStorySection from "./components/StoryTelling";
 import PartnerWithUs from "./components/PartnerWithUs";
 
-
-
 export default function PartnerWithUsPage() {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },

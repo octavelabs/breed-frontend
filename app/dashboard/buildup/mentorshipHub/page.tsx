@@ -104,7 +104,7 @@ const MentorShipPage = () => {
 const StepOne = ({ onNext }: { onNext: () => void }) => {
   const router = useRouter()
   return (
-    <div className="relative -mx-4 -mt-6 -mb-6 min-h-[calc(100vh-68px)]">
+    <div className="relative -mx-4 -mt-6 mb-6 min-h-[calc(100vh-68px)]">
     <div className="h-[250px] flex flex-col bg-top" style={{backgroundImage: "url('/mentorShipBanner.png')"}}>
         <button
         onClick={() => router.back()}

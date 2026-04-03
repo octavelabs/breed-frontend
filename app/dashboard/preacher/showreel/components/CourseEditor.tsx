@@ -20,6 +20,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Button from '@/app/components/Button';
+import BookOpenIcon from '@/app/assets/icons/BookOpenIcon';
 
 // Types
 interface Lesson {
@@ -103,12 +104,7 @@ const SortableLessonItem = ({
         <GripVertical size={16} className="text-gray-400" />
       </div>
       <div className="flex items-center gap-2 flex-1">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.66667 2.5H5.83333C4.33333 2.5 3.33333 3.5 3.33333 5V15C3.33333 16.5 4.33333 17.5 5.83333 17.5H14.1667C15.6667 17.5 16.6667 16.5 16.6667 15V5C16.6667 3.5 15.6667 2.5 14.1667 2.5H13.3333" stroke={isActive ? "#B144F9" : "#667085"} strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M6.66667 5.83333V4.16667C6.66667 3.25 7.41667 2.5 8.33333 2.5H11.6667C12.5833 2.5 13.3333 3.25 13.3333 4.16667V5.83333C13.3333 6.75 12.5833 7.5 11.6667 7.5H8.33333C7.41667 7.5 6.66667 6.75 6.66667 5.83333Z" stroke={isActive ? "#B144F9" : "#667085"} strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M6.66667 10.8333H10" stroke={isActive ? "#B144F9" : "#667085"} strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M6.66667 14.1667H13.3333" stroke={isActive ? "#B144F9" : "#667085"} strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+       <BookOpenIcon stroke={isActive ? "#B144F9" : "#667085"} />
         <input
           type="text"
           value={lesson.name}

@@ -7,12 +7,13 @@ import { mockCourses,  mockPublishedRecordings } from "@/utils/dummyData";
 import Input from "@/app/components/Input";
 import Button from "@/app/components/Button";
 import RecordingCard from "./RecordingCard";
+import { Pagination } from "./AllMeetings";
 
 const PublishedRecordings = () => {
     const [openModal, setOpenModal] = useState(false)
   return (
     <div className="bg-white mx-4 lg:mx-10 border border-[#E3E8EF] rounded-[16px]">
-      <div className="flex items-center justify-between my-[21px] mx-6">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 justify-between my-[21px] mx-6">
         <h2 className="text-lg font-semibold text-gray-900">Published recording(3)</h2>
         <div className="flex items-center gap-3">
           {/* Search */}
@@ -28,12 +29,12 @@ const PublishedRecordings = () => {
               icon={
                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2  w-5 h-5 opacity-50" />
               }
-              className="!bg-white !border-[#B9C2CA] !w-[300px] !h-[36px] rounded-full"
+              className="!bg-white !border-[#B9C2CA]  !h-[36px] rounded-full"
             />
           </div>
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
             <SlidersHorizontal className="w-4 h-4" />
-            Filter
+            <p className="hidden lg:block">Filter</p>
           </button>
         </div>
       </div>
@@ -79,7 +80,7 @@ const PublishedRecordings = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-5 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
           {mockPublishedRecordings?.map((recording) => (
             <RecordingCard data={recording} />
           ))}
@@ -87,24 +88,8 @@ const PublishedRecordings = () => {
       )}
 
       {/* Pagination */}
-      {mockPublishedRecordings.length > 0 && <div className="flex items-center justify-center gap-4 py-4 border-t border-gray-200">
-        <button className="px-[14px] py-2 text-sm font-medium text-[#3C3E40] border border-[#CDD5DF] rounded-full">
-          ← Previous
-        </button>
-        {[1, 2, 3, "...", 8, 9, 10].map((page, index) => (
-          <button
-            key={index}
-            className={`flex justify-center items-center w-10 h-10 text-sm font-medium rounded-[8px] text-[#4E5255] ${
-              page === 1 ? "bg-[#E2E3E5]" : "bg-white"
-            }`}
-          >
-            {page}
-          </button>
-        ))}
-        <button className="px-[14px] py-2 text-sm font-medium text-[#3C3E40] border border-[#CDD5DF] rounded-full">
-          Next →
-        </button>
-      </div>}
+      {mockPublishedRecordings.length > 0 && 
+      <Pagination />}
     </div>
   );
 };
