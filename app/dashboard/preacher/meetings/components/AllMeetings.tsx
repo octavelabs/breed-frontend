@@ -54,9 +54,9 @@ const AllMeetingsList = (
           </div>
         </div>
       </div>
-      <div className="flex gap-5 mx-4 lg:mx-10">
-      <div className="bg-white  border border-[#E3E8EF] rounded-[16px] w-[66%]">
-        <div className="flex items-center justify-between my-[21px] mx-6">
+      <div className="flex flex-col lg:flex-row gap-5 mx-4 lg:mx-10">
+      <div className="bg-white  border border-[#E3E8EF] rounded-[16px] w-full lg:w-[66%]">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 justify-between my-[21px] mx-6">
           <h2 className="text-lg font-semibold text-gray-900">Recent meetings</h2>
           <div className="flex items-center gap-3">
             {/* Search */}
@@ -72,13 +72,13 @@ const AllMeetingsList = (
                 icon={
                   <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2  w-5 h-5 opacity-50" />
                 }
-                className="!bg-white !border-[#B9C2CA] !w-[300px] !h-[36px] rounded-full"
+                className="!bg-white !border-[#B9C2CA] !h-[36px] rounded-full"
               />
             </div>
             {/* Filter */}
             <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
               <SlidersHorizontal className="w-4 h-4" />
-              Filter
+              <p className="hidden lg:block">Filter</p>
             </button>
           </div>
         </div>
@@ -91,9 +91,21 @@ const AllMeetingsList = (
         />
 
         {/* Pagination */}
-        <div className="flex items-center justify-center gap-4 py-4 border-t border-gray-200">
+       <Pagination />
+      </div>
+      <div className="w-full lg:w-[34%]">
+      <ScheduleList />
+      </div>
+      </div>
+    </>
+  );
+};
+
+export const Pagination = () => {
+  return(
+ <div className="flex items-center justify-center gap-4 py-4 border-t border-gray-200">
           <button className="px-[14px] py-2 text-sm font-medium text-[#3C3E40] border border-[#CDD5DF] rounded-full">
-            ← Previous
+            ← <p className="hidden lg:block">Previous</p>
           </button>
           {[1, 2, 3, "...", 8, 9, 10].map((page, index) => (
             <button
@@ -105,16 +117,10 @@ const AllMeetingsList = (
             </button>
           ))}
           <button className="px-[14px] py-2 text-sm font-medium text-[#3C3E40] border border-[#CDD5DF] rounded-full">
-            Next →
+            <p className="hidden lg:block">Next</p> →
           </button>
         </div>
-      </div>
-      <div className="w-[34%]">
-      <ScheduleList />
-      </div>
-      </div>
-    </>
-  );
-};
+  )
+}
 
 export default AllMeetingsList;

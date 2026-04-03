@@ -3,14 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
-import CourseEditor from '../components/CourseEditor';
 import Button from '@/app/components/Button';
 import { Archive, ArrowLeft, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PublishIcon from '@/app/assets/icons/publishIcon';
 import Tabs from '@/app/components/Tabs';
-import CourseContent from './components/CourseContent';
 import { fetchCourseData } from '@/utils/dummyData';
+import DevotionContent from './components/DevotionContent';
 
 // Mock API function to fetch course data
 
@@ -19,21 +18,21 @@ const tabs = [
     { 
       label: 'Content', 
       value: 'content',
-      content: <CourseContent />
+      content: <DevotionContent />
     },
     { 
       label: 'Metrics', 
       value: 'metrics',
-      content: <CourseContent />
+      content: <DevotionContent />
     },
     { 
       label: 'Comments', 
       value: 'comments',
-      content: <CourseContent />
+      content: <DevotionContent />
     },
   ];
 
-const UpdateCourse = () => {
+const UpdateDevotion = () => {
   const params = useParams();
   const router = useRouter();
   const courseId = params.courseId as string;
@@ -103,4 +102,4 @@ const UpdateCourse = () => {
 };
 
 
-export default UpdateCourse;
+export default UpdateDevotion;

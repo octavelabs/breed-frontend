@@ -28,7 +28,7 @@ export const preacherNavItems = [
   { path: '/dashboard/preacher/community', label: 'Community', icon: PreacherCommunityIcon},
   { path: '/dashboard/preacher/meetings', label: 'Meetings', icon: MeetingIcon },
   { path: '/dashboard/preacher/showreel', label: 'Showreel', icon: ShowReelIcon },
-  { path: '/dashboard/preacher/settings', label: 'Settings', icon: SettingsIcon },
+  // { path: '/dashboard/preacher/settings', label: 'Settings', icon: SettingsIcon },
 ];
 
 const SideBar = () => {

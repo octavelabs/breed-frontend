@@ -39,14 +39,14 @@ const Tabs: React.FC<TabsProps> = ({
 
   return (
     <div>
-    <div className={`flex justify-between items-center ${className}`}>
-      <div className={`flex gap-3`}>
+    <div className={`flex w-full justify-between items-center ${className}`}>
+      <div className={`flex gap-3 w-full max-w-full overflow-auto`}>
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => handleTabClick(tab.value)}
             className={`
-              border px-[18px] py-3 rounded-[12px] font-medium text-sm transition-all duration-200
+              border px-[18px] py-3 whitespace-nowrap rounded-[12px] font-medium text-sm transition-all duration-200
               ${
                 activeTab === tab.value
                   ? 'bg-white border-black font-semibold'

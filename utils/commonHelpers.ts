@@ -104,3 +104,19 @@ export function getWeekDates(startOfWeek: Date, endOfWeek: Date) {
   }
   return weekDates;
 }
+
+ export const daysLabel = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', ]
+
+
+export function getWeekDays(offset: number) {
+  const today = new Date();
+  const day = today.getDay();
+  const diff = day === 0 ? -6 : 1 - day; // Monday of current week
+  const start = new Date(today);
+  start.setDate(today.getDate() + diff + offset * 14);
+  return Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+}

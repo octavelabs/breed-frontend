@@ -16,7 +16,7 @@ const CourseList = ({
 }) => {
   return (
     <div className="bg-white mx-4 lg:mx-10 border border-[#E3E8EF] rounded-[16px]">
-      <div className="flex items-center justify-between my-[21px] mx-6">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 justify-between my-[21px] mx-6">
         <h2 className="text-lg font-semibold text-gray-900">Courses(23)</h2>
         <div className="flex items-center gap-3">
           {/* Search */}
@@ -32,12 +32,12 @@ const CourseList = ({
               icon={
                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2  w-5 h-5 opacity-50" />
               }
-              className="!bg-white !border-[#B9C2CA] !w-[300px] !h-[36px] rounded-full"
+              className="!bg-white !border-[#B9C2CA]  !h-[36px] rounded-full"
             />
           </div>
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
             <SlidersHorizontal className="w-4 h-4" />
-            Filter
+            <p className="hidden lg:block">Filter</p>
           </button>
         </div>
       </div>
@@ -83,7 +83,7 @@ const CourseList = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-5 p-6">
+        <div className="grid grid-cols-1 md:grids-cols-2 lg:grid-cols-3 gap-5 p-6">
           {mockCourses?.map((course) => (
             <CourseCard data={course} key={course.id}/>
           ))}

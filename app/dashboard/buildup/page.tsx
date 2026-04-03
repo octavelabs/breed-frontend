@@ -32,7 +32,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-[48px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-[48px] mb-8">
         {/* Suggested Course */}
         <div>
           <Link href='/dashboard/buildup/prayerBulletin'>

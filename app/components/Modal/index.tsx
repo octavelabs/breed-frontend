@@ -37,7 +37,7 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={onClose}>
-      <div className={`bg-white z-100 h-[80vh] w-fit rounded-[20px] p-4 lg:p-[50px] overflow-auto ${customClass}`}  onClick={(e) => e.stopPropagation()}>
+      <div className={`bg-white z-100 h-[80vh] max-h-[500px] lg:max-h-[650px] w-fit rounded-[20px] p-4 lg:p-[50px] overflow-auto ${customClass}`}  onClick={(e) => e.stopPropagation()}>
         {
           showHeader && <div className="flex justify-between items-start mb-8 pb-4 border-b border-[#D2D9DF]">
           <div className="">
