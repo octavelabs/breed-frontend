@@ -2,41 +2,83 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AuthLayout from "../layout/AuthLayout";
 import Input from "../components/Input";
 import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
-import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import StepProgress from "./components/StepProgress";
-import { useRouter } from "next/navigation";
+import { authService } from "../../lib/api-services";
+
+// ── Shared step data types ────────────────────────────────────────────────────
+
+interface StepData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  username: string;
+}
+
+// ── Root component ────────────────────────────────────────────────────────────
 
 const CreateAccount: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const router = useRouter();
+  const [stepData, setStepData] = useState<StepData>({
+    email: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    username: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    // navigate('/create-password');
+  const updateStepData = (partial: Partial<StepData>) => {
+    setStepData((prev) => ({ ...prev, ...partial }));
   };
+
   const exampleSteps = [
     {
       content: (
-        <StepOne setCurrentStep={setCurrentStep} currentStep={currentStep} />
+        <StepOne
+          setCurrentStep={setCurrentStep}
+          currentStep={currentStep}
+          stepData={stepData}
+          updateStepData={updateStepData}
+        />
       ),
     },
     {
       content: (
-        <StepTwo setCurrentStep={setCurrentStep} currentStep={currentStep} />
+        <StepTwo
+          setCurrentStep={setCurrentStep}
+          currentStep={currentStep}
+          stepData={stepData}
+          updateStepData={updateStepData}
+        />
       ),
     },
     {
       content: (
-        <StepThree setCurrentStep={setCurrentStep} currentStep={currentStep} />
+        <StepThree
+          setCurrentStep={setCurrentStep}
+          currentStep={currentStep}
+          stepData={stepData}
+          updateStepData={updateStepData}
+        />
       ),
     },
     {
-      content: <StepFour />,
+      content: (
+        <StepFour
+          stepData={stepData}
+          updateStepData={updateStepData}
+        />
+      ),
     },
   ];
 
@@ -51,13 +93,34 @@ const CreateAccount: React.FC = () => {
   );
 };
 
+// ── Step One: Email ───────────────────────────────────────────────────────────
+
 const StepOne = ({
   setCurrentStep,
   currentStep,
+  stepData,
+  updateStepData,
 }: {
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  stepData: StepData;
+  updateStepData: (partial: Partial<StepData>) => void;
 }) => {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleNext = () => {
+    setError(null);
+    if (!stepData.email.trim()) {
+      setError("Email address is required.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stepData.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    setCurrentStep(currentStep + 1);
+  };
+
   return (
     <div className="bg-white p-4 lg:p-8 rounded-[24px] max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-4 flex justify-center items-center mx-auto">
@@ -80,10 +143,16 @@ const StepOne = ({
         </Link>
       </p>
 
-      <form className="flex flex-col gap-4">
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleNext();
+        }}
+      >
         <div>
           <label
-            htmlFor="firstName"
+            htmlFor="email"
             className="block text-sm font-medium  mb-2"
           >
             Email address
@@ -92,18 +161,20 @@ const StepOne = ({
             <Input
               variant="outlined"
               type="text"
-              id="firstName"
-              onChange={() => console.log("firstname")}
+              id="email"
+              value={stepData.email}
+              onChange={(e) => updateStepData({ email: e.target.value })}
               placeholder="Enter email address"
             />
           </div>
         </div>
 
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
         {/* Submit button */}
         <Button
           customClass="!w-full !h-[58px] mt-4 !text-white"
-          onClick={() => setCurrentStep(currentStep + 1)}
-          type="button"
+          type="submit"
         >
           Proceed
         </Button>
@@ -112,19 +183,46 @@ const StepOne = ({
   );
 };
 
+// ── Step Two: Personal Info ───────────────────────────────────────────────────
+
 const StepTwo = ({
   setCurrentStep,
   currentStep,
+  stepData,
+  updateStepData,
 }: {
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  stepData: StepData;
+  updateStepData: (partial: Partial<StepData>) => void;
 }) => {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleNext = () => {
+    setError(null);
+    if (!stepData.firstName.trim()) {
+      setError("First name is required.");
+      return;
+    }
+    if (!stepData.lastName.trim()) {
+      setError("Last name is required.");
+      return;
+    }
+    setCurrentStep(currentStep + 1);
+  };
+
   return (
     <div className="bg-white p-4 lg:p-8 rounded-[24px] max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <h2 className="text-[24px] font-semibold leading-none text-center mb-8">
         Provide Personal Information
       </h2>
-      <form className="flex flex-col gap-4">
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleNext();
+        }}
+      >
         {/* First name */}
         <div>
           <label
@@ -138,7 +236,8 @@ const StepTwo = ({
               variant="outlined"
               type="text"
               id="firstName"
-              onChange={() => console.log("firstname")}
+              value={stepData.firstName}
+              onChange={(e) => updateStepData({ firstName: e.target.value })}
               placeholder="Enter first name"
             />
           </div>
@@ -154,7 +253,8 @@ const StepTwo = ({
               variant="outlined"
               type="text"
               id="lastName"
-              onChange={() => console.log("lastname")}
+              value={stepData.lastName}
+              onChange={(e) => updateStepData({ lastName: e.target.value })}
               placeholder="Enter last name"
             />
           </div>
@@ -173,7 +273,8 @@ const StepTwo = ({
               variant="outlined"
               type="tel"
               id="phone"
-              onChange={() => console.log("firstname")}
+              value={stepData.phone}
+              onChange={(e) => updateStepData({ phone: e.target.value })}
               placeholder="Enter Phone no"
             />
           </div>
@@ -193,36 +294,66 @@ const StepTwo = ({
           />
         </div>
 
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
         {/* Submit button */}
         <Button
           customClass="!w-full !h-[58px] mt-4 mb-2 !text-white"
-          type="button"
-          onClick={() => setCurrentStep(currentStep + 1)}
+          type="submit"
         >
           Proceed
         </Button>
       </form>
-
-      {/* Login link */}
     </div>
   );
 };
 
+// ── Step Three: Password ──────────────────────────────────────────────────────
+
 const StepThree = ({
   setCurrentStep,
   currentStep,
+  stepData,
+  updateStepData,
 }: {
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  stepData: StepData;
+  updateStepData: (partial: Partial<StepData>) => void;
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleNext = () => {
+    setError(null);
+    if (!stepData.password) {
+      setError("Password is required.");
+      return;
+    }
+    if (stepData.password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (stepData.password !== stepData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    setCurrentStep(currentStep + 1);
+  };
+
   return (
     <div className="rounded-[24px] bg-white p-4 lg:p-8 max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <h2 className="text-[24px] font-semibold leading-none text-center mb-8">
         Set Password
       </h2>
 
-      <form className="flex flex-col gap-4">
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleNext();
+        }}
+      >
         <div>
           <label htmlFor="password" className="block text-sm font-medium  mb-2">
             Password
@@ -244,9 +375,10 @@ const StepThree = ({
                 </div>
               }
               variant="outlined"
-              type="pasword"
+              type={showPassword ? "text" : "password"}
               id="password"
-              onChange={() => console.log("password")}
+              value={stepData.password}
+              onChange={(e) => updateStepData({ password: e.target.value })}
               placeholder="Enter password"
             />
           </div>
@@ -275,18 +407,22 @@ const StepThree = ({
                 </div>
               }
               variant="outlined"
-              type="pasword"
+              type={showPassword ? "text" : "password"}
               id="confirmPassword"
-              onChange={() => console.log("confirmPassword")}
+              value={stepData.confirmPassword}
+              onChange={(e) =>
+                updateStepData({ confirmPassword: e.target.value })
+              }
               placeholder="Re enter password"
             />
           </div>
         </div>
 
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
         <Button
           customClass="!w-full !h-[58px] mt-4 mb-2 !text-white"
-          type="button"
-          onClick={() => setCurrentStep(currentStep + 1)}
+          type="submit"
         >
           Proceed
         </Button>
@@ -295,36 +431,85 @@ const StepThree = ({
   );
 };
 
-const StepFour = () => {
-  const [showPassword, setShowPassword] = useState(false);
+// ── Step Four: Username + Final Submit ────────────────────────────────────────
+
+const StepFour = ({
+  stepData,
+  updateStepData,
+}: {
+  stepData: StepData;
+  updateStepData: (partial: Partial<StepData>) => void;
+}) => {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!stepData.username.trim()) {
+      setError("Username is required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await authService.register({
+        email: stepData.email,
+        password: stepData.password,
+        confirmPassword: stepData.confirmPassword,
+        firstName: stepData.firstName,
+        lastName: stepData.lastName,
+        username: stepData.username,
+        phone: stepData.phone || undefined,
+        role: "BELIEVER",
+      });
+      router.push("/login?registered=true");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again.";
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="rounded-[24px] bg-white p-4 lg:p-8 max-w-[90%]  sm:max-w-[70%] xl:max-w-[500px] mx-auto">
       <h2 className="text-[24px] font-semibold leading-none text-center mb-8">
         Set Username
       </h2>
 
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium  mb-2">
+          <label htmlFor="username" className="block text-sm font-medium  mb-2">
             Username
           </label>
           <div className="relative">
             <Input
               variant="outlined"
               type="text"
-              id="lastName"
-              onChange={() => console.log("lastname")}
+              id="username"
+              value={stepData.username}
+              onChange={(e) => updateStepData({ username: e.target.value })}
               placeholder="Enter username"
             />
           </div>
         </div>
 
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
         {/* Submit button */}
-        <Link href="/onboard">
-          <Button customClass="!w-full !h-[58px] mt-4 !text-white">
-            Create Account
-          </Button>
-        </Link>
+        <Button
+          customClass="!w-full !h-[58px] mt-4 !text-white"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creating Account..." : "Create Account"}
+        </Button>
       </form>
     </div>
   );

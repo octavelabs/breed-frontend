@@ -2,19 +2,43 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import AuthLayout from "../layout/AuthLayout";
 import Input from "../components/Input";
-import Dropdown from "../components/Dropdown";
 import Button from "../components/Button";
-import { Eye, EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const Login: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
+  const searchParams = useSearchParams();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const registered = searchParams.get("registered");
+  const reset = searchParams.get("reset");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    // navigate('/create-password');
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await login(emailOrUsername, password, rememberMe);
+      // AuthContext handles navigation on success
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Login failed. Please try again.";
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -40,10 +64,26 @@ const Login: React.FC = () => {
           </Link>
         </p>
 
-        <form className="flex flex-col gap-4">
+        {registered && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700 text-sm text-center">
+              Account created! Check your email to verify your account before logging in.
+            </p>
+          </div>
+        )}
+
+        {reset && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700 text-sm text-center">
+              Password reset successful! You can now log in with your new password.
+            </p>
+          </div>
+        )}
+
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="firstName"
+              htmlFor="emailOrUsername"
               className="block text-sm font-medium  mb-2"
             >
               Email address
@@ -52,8 +92,9 @@ const Login: React.FC = () => {
               <Input
                 variant="outlined"
                 type="text"
-                id="firstName"
-                onChange={() => console.log("firstname")}
+                id="emailOrUsername"
+                value={emailOrUsername}
+                onChange={(e) => setEmailOrUsername(e.target.value)}
                 placeholder="Enter email address"
               />
             </div>
@@ -61,7 +102,7 @@ const Login: React.FC = () => {
 
           <div>
             <label
-              htmlFor="lastName"
+              htmlFor="password"
               className="block text-sm font-medium  mb-2"
             >
               Password
@@ -83,17 +124,26 @@ const Login: React.FC = () => {
                   </div>
                 }
                 variant="outlined"
-                type="text"
-                id="lastName"
-                onChange={() => console.log("lastname")}
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
               />
             </div>
           </div>
 
+          {error && (
+            <p className="text-red-500 text-sm mt-2">{error}</p>
+          )}
+
           {/* Submit button */}
-          <Button customClass="!w-full !h-[58px] mt-[16px] mb-2 !text-white">
-            Proceed
+          <Button
+            customClass="!w-full !h-[58px] mt-[16px] mb-2 !text-white"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Signing in..." : "Proceed"}
           </Button>
         </form>
 

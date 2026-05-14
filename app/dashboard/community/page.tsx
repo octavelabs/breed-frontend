@@ -3,6 +3,7 @@
 import FlameIcon from "@/app/assets/icons/flame";
 import Tabs from "@/app/components/Tabs";
 import DashboardLayout from "@/app/layout/DashboardLayout";
+import { communityService } from "@/lib/api-services";
 import { ChevronRight, Clock, Plus, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { CommunitySidebar } from "./list/components/CommunitySidebar";
@@ -14,16 +15,16 @@ import { CreateCommunityModal } from "./list/components/CreateCommunityModal";
 
 const CommunityPage = () => {
   const [openModal, setOpenModal] = useState(false);
-   const [isMobile, setIsMobile] = useState(false)
-  
-    useEffect(() => {
-      const checkMobile = () => {
-        setIsMobile(window.matchMedia("(max-width: 767px)").matches)
-      }
-      checkMobile()
-      window.addEventListener('resize', checkMobile)
-      return () => window.removeEventListener('resize', checkMobile)
-    }, [])
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const tabs = [
     {
@@ -57,58 +58,105 @@ const CommunityPage = () => {
             <Plus stroke="white" /> Create a community
           </p>
         </Button>
-        <SearchIcon className="block lg:hidden" /> 
+        <SearchIcon className="block lg:hidden" />
       </div>
       <div className=" bg-white pt-5">
         <Tabs tabs={tabs} defaultTab="communities" className="px-4 lg:px-12" />
       </div>
       <Button
-                    customClass="!w-[90%] mx-auto px-6 !h-[48px] !text-white absolute mt-4 lg:hidden"
-                    type="button"
-                    onClick={() => setOpenModal(true)}
-                  >
-                    <p className="flex items-center gap-[6px]">
-                      Create community
-                    </p>
-                  </Button>
+        customClass="!w-[90%] mx-auto px-6 !h-[48px] !text-white absolute mt-4 lg:hidden"
+        type="button"
+        onClick={() => setOpenModal(true)}
+      >
+        <p className="flex items-center gap-[6px]">
+          Create community
+        </p>
+      </Button>
     </DashboardLayout>
   );
 };
 
 const Explore = () => {
-  const content = [
+  const [content, setContent] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fallback = [
     {
-      title: "Believers that Hangout",
+      name: "Believers that Hangout",
       image: "/dashboardCommunity1.jpg",
-      id: 1,
+      id: "1",
+      _count: { members: 0 },
     },
     {
-      title: "Growth Community",
+      name: "Growth Community",
       image: "/dashboardCommunity2.jpg",
-      id: 2,
+      id: "2",
+      _count: { members: 0 },
     },
     {
-      title: "Waxing Strong Community",
+      name: "Waxing Strong Community",
       image: "/dashboardCommunity1.jpg",
-      id: 3,
+      id: "3",
+      _count: { members: 0 },
     },
   ];
+
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const result = await communityService.getAll({ limit: 20 });
+        const data = (result as any)?.data ?? result;
+        const items = Array.isArray(data) ? data : [];
+        setContent(items.length > 0 ? items : fallback);
+      } catch {
+        setContent(fallback);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCommunities();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-[32px] lg:gap-4 px-4 lg:px-[44px] bg-[#fafafa] pt-6 border-t border-[#D2D9DF]">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-[10px] py-3 px-4 flex items-center gap-4 animate-pulse">
+            <div className="w-[88px] h-[88px] md:w-[64px] md:h-[64px] rounded-[10px] bg-gray-200" />
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (content.length === 0) {
+    return (
+      <div className="px-4 lg:px-[44px] bg-[#fafafa] pt-6 border-t border-[#D2D9DF]">
+        <p className="text-gray-500 text-sm">No communities found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-[32px] lg:gap-4 px-4 lg:px-[44px] bg-[#fafafa] pt-6 border-t border-[#D2D9DF]">
       {content.map((item, index) => (
-        <Link href={`/dashboard/community/${item.id}`} key={index}>
+        <Link href={`/dashboard/community/${item.id}`} key={item.id ?? index}>
           <div className="bg-white rounded-[10px] py-3 px-4 flex  items-center gap-4">
             <div className="w-[88px] h-[88px] md:w-[64px] md:h-[64px] rounded-[10px] overflow-hidden">
               <img
-                src={item?.image}
-                alt="Believers group"
+                src={item?.image ?? item?.coverImage ?? "/dashboardCommunity1.jpg"}
+                alt={item?.name}
                 className="w-full h-full object-cover rounded-[10px]"
               />
             </div>
 
             {/* Center: Title and avatars */}
             <div className="flex-1 flex flex-col gap-2">
-              <h2 className="text-base font-bold">{item?.title}</h2>
+              <h2 className="text-base font-bold">{item?.name}</h2>
 
               {/* Avatar group with count */}
               <div className="flex items-center gap-3">
@@ -135,6 +183,11 @@ const Explore = () => {
                     />
                   </div>
                 </div>
+                {(item?._count?.members ?? item?.memberCount) != null && (
+                  <span className="text-xs text-gray-500">
+                    {item?._count?.members ?? item?.memberCount} members
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -152,21 +205,40 @@ const Communities = ({
   isMobile: boolean;
 }) => {
   const [selectedCommunity, setSelectedCommunity] = useState(null);
+  const [communities, setCommunities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const communities = [
-    {
-      id: 1,
-      name: "Believers That Hangout",
-      avatar:
-        "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=100&h=100&fit=crop",
-    },
-    {
-      id: 2,
-      name: "GrowT Community",
-      avatar:
-        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=100&h=100&fit=crop",
-    },
-  ];
+  useEffect(() => {
+    const fetchMyCommunities = async () => {
+      try {
+        const result = await communityService.getMine();
+        const data = (result as any)?.data ?? result;
+        const items = Array.isArray(data) ? data : [];
+        setCommunities(items);
+      } catch {
+        setCommunities([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyCommunities();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] pt-6">
+        <div className="flex flex-col gap-3 w-full lg:w-64 px-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3 p-3 rounded-lg animate-pulse">
+              <div className="w-10 h-10 rounded-full bg-gray-200" />
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] pt-6">
       {communities.length < 1 ? (
@@ -174,7 +246,7 @@ const Communities = ({
           <div className="flex flex-col gap-4 w-[400px] items-center">
             <img src="/emptyCommunity.svg" className="w-[128px] h-[128px]" />
             <p className="text-sm text-[#60666B]">
-              You haven’t joined any community yet. Explore communities on Breed
+              You haven't joined any community yet. Explore communities on Breed
               or create yours and invite your friends
             </p>
             <Button
@@ -201,7 +273,7 @@ const Communities = ({
             ) : null
           ) : (
             selectedCommunity ? (
-              <CommunityChatView community={selectedCommunity} setSelectedCommunity={setSelectedCommunity}/>
+              <CommunityChatView community={selectedCommunity} setSelectedCommunity={setSelectedCommunity} />
             ) : (
               <EmptyState />
             )

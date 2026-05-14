@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\" -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "Bash(npm --version)",
+      "Bash(npx @nestjs/cli --version)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src",
+      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src\\modules\\cache"
+    ]
+  }
+}

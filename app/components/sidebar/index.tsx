@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {  LogOut } from 'lucide-react';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
@@ -7,6 +7,7 @@ import BuildupIcon from '@/app/assets/icons/buildupIcon';
 import CommunityIcon from '@/app/assets/icons/communityIcon';
 import MoreIcon from "@/app/assets/icons/MoreIcon";
 import { useUser } from "@/app/context/UserContext";
+import { useAuth } from "@/app/context/AuthContext";
 import DashboardIcon from "@/app/assets/icons/dashboardIcon";
 import MentorshipIcon from "@/app/assets/icons/MentorshipIcon";
 import PreacherCommunityIcon from "@/app/assets/icons/preacherCommunityIcon";
@@ -33,8 +34,8 @@ export const preacherNavItems = [
 
 const SideBar = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const { userType } = useUser();
+  const { user, logout } = useAuth();
   
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
   
@@ -102,36 +103,46 @@ const SideBar = () => {
         <div className="px-[26px] pb-[44px]">
           <div className="flex items-center gap-3">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${
                 isPreacher ? "bg-[#2D1B4E]" : "bg-gray-200"
               }`}
             >
-              <span
-                className={`font-semibold ${
-                  isPreacher ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
-                AJ
-              </span>
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.firstName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span
+                  className={`font-semibold ${
+                    isPreacher ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {user
+                    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`
+                    : '??'}
+                </span>
+              )}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p
-                className={`font-semibold text-sm ${
+                className={`font-semibold text-sm truncate ${
                   isPreacher ? "text-white" : "text-gray-900"
                 }`}
               >
-                Amber James
+                {user ? `${user.firstName} ${user.lastName}` : '—'}
               </p>
               <p
-                className={`text-xs ${
+                className={`text-xs truncate ${
                   isPreacher ? "text-gray-400" : "text-gray-500"
                 }`}
               >
-                alison.e@rayna.ui
+                {user?.email ?? ''}
               </p>
             </div>
             <button
-              onClick={() => router.push("/login")}
+              onClick={logout}
               className={`p-2 rounded-lg transition-colors ${
                 isPreacher
                   ? "hover:bg-[#2D1B4E] text-gray-300"

@@ -3,6 +3,7 @@ import { Inter, Calligraffitti, Courgette, Almarai } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Script from "next/script";
+import { Providers } from "./providers";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -152,7 +153,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${almarai.variable} ${calligraffitti.variable} ${courgette.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
 
