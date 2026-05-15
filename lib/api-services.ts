@@ -82,6 +82,9 @@ export const authService = {
   verifyEmail: (token: string) =>
     api.post('/auth/verify-email', { token }),
 
+  verifyResetToken: (token: string): Promise<{ valid: boolean }> =>
+    api.post('/auth/verify-reset-token', { token }),
+
   changePassword: (data: {
     currentPassword: string;
     newPassword: string;

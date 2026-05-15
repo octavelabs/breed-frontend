@@ -228,7 +228,9 @@ const StepTwo = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -238,8 +240,23 @@ const StepTwo = ({
       return;
     }
 
-    setResetToken(token);
-    setCurrentStep(currentStep + 1);
+    setIsVerifying(true);
+    try {
+      await authService.verifyResetToken(token);
+      setResetToken(token);
+      setCurrentStep(currentStep + 1);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Invalid or expired reset code. Please try again.";
+      setError(message);
+      // Clear boxes so user can re-enter
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const allFilled = otp.every((d) => d !== "");
@@ -310,9 +327,9 @@ const StepTwo = ({
         <Button
           customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
-          disabled={!allFilled}
+          disabled={!allFilled || isVerifying}
         >
-          Verify Code
+          {isVerifying ? "Verifying..." : "Verify Code"}
         </Button>
       </form>
     </div>
