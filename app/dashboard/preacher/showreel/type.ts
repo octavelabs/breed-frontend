@@ -10,7 +10,7 @@ export type CourseFormData = {
  courseDescription: string;
  chapterDescription: string;
  chapterName: string;
- categories: string[]
+ categories: CourseCategory[]
 }
 
 export type CourseDetails = {
