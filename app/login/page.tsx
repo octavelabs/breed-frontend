@@ -22,6 +22,7 @@ const Login: React.FC = () => {
 
   const registered = searchParams.get("registered");
   const reset = searchParams.get("reset");
+  const verified = searchParams.get("verified");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +98,14 @@ const Login: React.FC = () => {
           <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-green-700 text-sm text-center">
               Password reset successful! You can now log in with your new password.
+            </p>
+          </div>
+        )}
+
+        {verified && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700 text-sm text-center">
+              ✓ Email verified successfully! You can now log in.
             </p>
           </div>
         )}

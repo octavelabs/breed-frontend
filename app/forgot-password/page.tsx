@@ -74,6 +74,12 @@ const StepOne = ({
 
     setIsSubmitting(true);
     try {
+      // Check if an account exists before sending the reset code
+      const { available } = await authService.checkEmail(trimmed);
+      if (available) {
+        setError("No account found with this email address. Please check and try again.");
+        return;
+      }
       await authService.forgotPassword(trimmed);
       setCurrentStep(currentStep + 1);
     } catch (err: unknown) {

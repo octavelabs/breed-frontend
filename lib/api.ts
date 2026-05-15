@@ -23,6 +23,8 @@ export const clearTokens = (): void => {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
+  // Also clear the middleware-readable cookie so no redirect loop occurs
+  document.cookie = 'breed_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
 };
 
 export const getAccessToken = (): string | null => {
@@ -91,7 +93,19 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Auth endpoints (login, register, forgot-password, etc.) intentionally
+    // return 401/403 — never treat those as "expired session" and never redirect.
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/');
+
+    // Extract and surface the error message for ALL non-refresh failures first,
+    // so callers always get a readable rejection regardless of what happens below.
+    const responseData = error.response?.data as { message?: string } | undefined;
+    const errorMessage =
+      responseData?.message ||
+      error.message ||
+      'An unexpected error occurred. Please try again.';
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       const refreshToken = getRefreshToken();
 
       if (!refreshToken) {
@@ -99,9 +113,7 @@ api.interceptors.response.use(
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
-        return Promise.reject(
-          new Error('Session expired. Please log in again.'),
-        );
+        return Promise.reject(new Error('Session expired. Please log in again.'));
       }
 
       if (isRefreshing) {
@@ -150,16 +162,8 @@ api.interceptors.response.use(
       }
     }
 
-    // Non-401 errors: unwrap the error message from the response body
-    const data = error.response?.data as
-      | { message?: string }
-      | undefined;
-    const message =
-      data?.message ||
-      error.message ||
-      'An unexpected error occurred. Please try again.';
-
-    return Promise.reject(new Error(message));
+    // All other errors (including 401 on auth endpoints, 400, 403, 404, 500…)
+    return Promise.reject(new Error(errorMessage));
   },
 );
 
