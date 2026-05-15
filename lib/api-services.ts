@@ -133,11 +133,58 @@ export const courseService = {
     limit?: number;
     categoryId?: string;
     search?: string;
+    authorId?: string;
+    status?: string;
   }) => api.get('/courses', { params }),
 
   getById: (id: string) => api.get(`/courses/${id}`),
 
   getCategories: () => api.get('/courses/categories'),
+
+  createCourse: (data: {
+    title: string;
+    description: string;
+    categoryId?: string;
+    tags?: string[];
+    isFree?: boolean;
+    level?: string;
+    coverImageUrl?: string;
+  }) => api.post('/courses', data),
+
+  updateCourse: (id: string, data: {
+    title?: string;
+    description?: string;
+    categoryId?: string;
+    tags?: string[];
+    isFree?: boolean;
+    level?: string;
+    coverImageUrl?: string;
+    status?: string;
+  }) => api.patch(`/courses/${id}`, data),
+
+  publishCourse: (id: string) => api.post(`/courses/${id}/publish`),
+
+  deleteCourse: (id: string) => api.delete(`/courses/${id}`),
+
+  createLesson: (courseId: string, data: {
+    title: string;
+    description?: string;
+    content?: string;
+    type: string;
+    sortOrder?: number;
+    isPublished?: boolean;
+  }) => api.post(`/courses/${courseId}/lessons`, data),
+
+  updateLesson: (courseId: string, lessonId: string, data: {
+    title?: string;
+    description?: string;
+    content?: string;
+    sortOrder?: number;
+    isPublished?: boolean;
+  }) => api.patch(`/courses/${courseId}/lessons/${lessonId}`, data),
+
+  deleteLesson: (courseId: string, lessonId: string) =>
+    api.delete(`/courses/${courseId}/lessons/${lessonId}`),
 
   enroll: (id: string) => api.post(`/courses/${id}/enroll`),
 
