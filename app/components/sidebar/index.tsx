@@ -7,7 +7,7 @@ import BuildupIcon from '@/app/assets/icons/buildupIcon';
 import CommunityIcon from '@/app/assets/icons/communityIcon';
 import MoreIcon from "@/app/assets/icons/MoreIcon";
 import { useUser } from "@/app/context/UserContext";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import DashboardIcon from "@/app/assets/icons/dashboardIcon";
 import MentorshipIcon from "@/app/assets/icons/MentorshipIcon";
 import PreacherCommunityIcon from "@/app/assets/icons/preacherCommunityIcon";

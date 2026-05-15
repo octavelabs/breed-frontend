@@ -47,6 +47,9 @@ export interface PaginatedResponse<T> {
 // ── Auth services ──────────────────────────────────────────────────────────────
 
 export const authService = {
+  checkEmail: (email: string): Promise<{ available: boolean }> =>
+    api.get(`/auth/check-email?email=${encodeURIComponent(email)}`),
+
   register: (data: {
     email: string;
     password: string;

@@ -84,7 +84,7 @@ const processPendingQueue = (error: unknown, token: string | null): void => {
 };
 
 api.interceptors.response.use(
-  (response: AxiosResponse) => response.data,
+  (response: AxiosResponse) => response.data?.data ?? response.data,
 
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {

@@ -26,16 +26,37 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!emailOrUsername.trim()) {
+      setError("Please enter your email address or username.");
+      return;
+    }
+    if (!password) {
+      setError("Please enter your password.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await login(emailOrUsername, password, rememberMe);
-      // AuthContext handles navigation on success
+      await login(emailOrUsername.trim(), password, rememberMe);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Login failed. Please try again.";
-      setError(message);
+      const raw = err instanceof Error ? err.message : "";
+      // Map backend messages to user-friendly copy
+      if (raw.toLowerCase().includes("no account found")) {
+        setError("No account found with that email or username. Please check and try again.");
+      } else if (raw.toLowerCase().includes("incorrect password")) {
+        setError("Incorrect password. Please try again or reset your password.");
+      } else if (raw.toLowerCase().includes("verify your email")) {
+        setError("Please verify your email address before logging in. Check your inbox.");
+      } else if (raw.toLowerCase().includes("suspended")) {
+        setError("Your account has been suspended. Please contact support.");
+      } else if (raw.toLowerCase().includes("deactivated")) {
+        setError("Your account has been deactivated. Please contact support.");
+      } else if (raw.toLowerCase().includes("social login") || raw.toLowerCase().includes("google")) {
+        setError("This account was created with Google. Please sign in with Google.");
+      } else {
+        setError(raw || "Login failed. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -4,7 +4,9 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\" -Force)",
       "Bash(Select-Object Name, Mode)",
       "Bash(npm --version)",
-      "Bash(npx @nestjs/cli --version)"
+      "Bash(npx @nestjs/cli --version)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src",

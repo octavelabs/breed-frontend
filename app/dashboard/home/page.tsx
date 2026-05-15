@@ -2,7 +2,7 @@
 
 import FlameIcon from "@/app/assets/icons/flame";
 import DashboardLayout from "@/app/layout/DashboardLayout";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { courseService, devotionalService, userService } from "@/lib/api-services";
 import { ChevronRight, Clock } from "lucide-react";
 import Link from "next/link";
@@ -211,7 +211,7 @@ const HomePage = () => {
                     ) : (
                       <>
                         <p className="text-[10px] lg:text-sm text-gray-500 mb-2">
-                          {devotional?.category ?? 'Personal Devotion'}
+                          {devotional?.category?.name ?? 'Personal Devotion'}
                         </p>
                         <p className="text-xs lg:text-base font-bold text-gray-900 leading-tight mb-2 lg:mb-4">
                           {devotional?.excerpt ?? devotional?.title ?? 'Lord, help me to develop and sustain a consistent time of fellowship with You, no matter how busy life gets.'}

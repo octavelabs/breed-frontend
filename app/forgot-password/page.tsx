@@ -3,10 +3,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../layout/AuthLayout";
-import Input from "../components/Input";
 import Button from "../components/Button";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, X } from "lucide-react";
 import { authService } from "../../lib/api-services";
+
+const inputCls =
+  "w-full h-[48px] border border-[#B9C2CA] rounded-[10px] px-4 text-[#60666B] outline-none focus:border-purple-400 bg-white text-sm";
 
 const ForgotPassword: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -33,7 +35,7 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <AuthLayout>
-      <div className="bg-white p-4 p-8 rounded-[24px] max-w-[500px] mx-auto">
+      <div className="bg-white p-4 lg:p-8 rounded-[24px] max-w-[500px] mx-auto">
         {steps[currentStep]}
       </div>
     </AuthLayout>
@@ -59,17 +61,26 @@ const StepOne = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!email.trim()) {
+
+    const trimmed = email.trim();
+    if (!trimmed) {
       setError("Email address is required.");
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await authService.forgotPassword(email.trim());
+      await authService.forgotPassword(trimmed);
       setCurrentStep(currentStep + 1);
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Failed to send reset email. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Failed to send reset code. Please try again.";
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -77,50 +88,50 @@ const StepOne = ({
   };
 
   return (
-    <div className="">
+    <div>
       <h2 className="text-[32px] font-bold text-center leading-none">
         Forgot Password
       </h2>
-      <p className="text-[20px] text-[#60666B] font-[300] text-center mb-8 mt-2 leading-none">
-        Enter your registered email address
+      <p className="text-[16px] text-[#60666B] font-light text-center mb-8 mt-2">
+        Enter your registered email address and we'll send you a 6-digit reset code.
       </p>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label
-            htmlFor="forgotEmail"
-            className="block text-sm font-medium  mb-2"
-          >
+          <label htmlFor="forgotEmail" className="block text-sm font-medium mb-2">
             Email address
           </label>
-          <div className="relative">
-            <Input
-              variant="outlined"
-              type="text"
-              id="forgotEmail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email address"
-            />
-          </div>
+          <input
+            id="forgotEmail"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter email address"
+            className={inputCls}
+            autoFocus
+          />
         </div>
 
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm flex items-start gap-1">
+            <X size={14} className="mt-0.5 shrink-0" />
+            {error}
+          </p>
+        )}
 
-        {/* Submit button */}
         <Button
-          customClass="!w-full !h-[58px] mt-4 !text-white"
+          customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Sending..." : "Proceed"}
+          {isSubmitting ? "Sending..." : "Send Reset Code"}
         </Button>
       </form>
     </div>
   );
 };
 
-// ── Step Two: OTP / Token Entry ───────────────────────────────────────────────
+// ── Step Two: 6-digit OTP ─────────────────────────────────────────────────────
 
 const StepTwo = ({
   setCurrentStep,
@@ -134,9 +145,9 @@ const StepTwo = ({
   setResetToken: (token: string) => void;
 }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [fallbackToken, setFallbackToken] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
 
@@ -144,19 +155,51 @@ const StepTwo = ({
     inputRefs.current[0]?.focus();
   }, []);
 
+  // Countdown timer for resend cooldown
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
   const handleChange = (index: number, value: string) => {
-    if (value.length > 1) return;
+    // Only allow single digits
+    if (!/^\d?$/.test(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    setError(null);
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+    if (e.key === "Backspace") {
+      if (otp[index]) {
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        inputRefs.current[index - 1]?.focus();
+      }
+    }
+    if (e.key === "ArrowLeft" && index > 0) inputRefs.current[index - 1]?.focus();
+    if (e.key === "ArrowRight" && index < 5) inputRefs.current[index + 1]?.focus();
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted) {
+      const newOtp = [...otp];
+      pasted.split("").forEach((char, i) => {
+        if (i < 6) newOtp[i] = char;
+      });
+      setOtp(newOtp);
+      const nextEmpty = newOtp.findIndex((v) => !v);
+      const focusIndex = nextEmpty === -1 ? 5 : nextEmpty;
+      inputRefs.current[focusIndex]?.focus();
     }
   };
 
@@ -166,7 +209,10 @@ const StepTwo = ({
     setIsResending(true);
     try {
       await authService.forgotPassword(email);
-      setResendMessage("A new reset token has been sent.");
+      setResendMessage("A new code has been sent to your email.");
+      setResendCooldown(60);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Failed to resend. Please try again.";
@@ -179,93 +225,100 @@ const StepTwo = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    // Prefer the fallback text input if filled, otherwise use OTP boxes
-    const token = fallbackToken.trim() || otp.join("");
-    if (!token) {
-      setError("Please enter your reset token.");
+
+    const token = otp.join("");
+    if (token.length < 6) {
+      setError("Please enter all 6 digits of your reset code.");
       return;
     }
+
     setResetToken(token);
     setCurrentStep(currentStep + 1);
   };
 
+  const allFilled = otp.every((d) => d !== "");
+
   return (
-    <div className="">
+    <div>
       <h2 className="text-[32px] font-bold leading-none text-center">
-        Enter OTP
+        Enter Reset Code
       </h2>
-      <p className="text-[20px] text-[#60666B] font-[300] mb-8 mt-2 text-center leading-none">
-        We sent an otp to {email || "your email"}. Please check your inbox and enter
-        the code below.
+      <p className="text-[16px] text-[#60666B] font-light mb-8 mt-2 text-center">
+        We sent a 6-digit code to{" "}
+        <span className="font-medium text-gray-700">{email}</span>.
+        Check your inbox.
       </p>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <div className="flex justify-center gap-2">
+        {/* OTP boxes */}
+        <div className="flex justify-center gap-2 sm:gap-3">
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
+              ref={(el) => { inputRefs.current[index] = el; }}
               type="text"
+              inputMode="numeric"
+              pattern="\d*"
               maxLength={1}
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-12 h-12 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:ring-none focus:border-transparent"
+              onPaste={index === 0 ? handlePaste : undefined}
+              className={`w-11 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold border-2 rounded-xl outline-none transition-colors ${
+                digit
+                  ? "border-purple-500 text-purple-700 bg-purple-50"
+                  : "border-[#B9C2CA] text-gray-700"
+              } focus:border-purple-400`}
             />
           ))}
         </div>
 
-        {/* Dev-mode fallback for full hex token */}
-        <div className="mt-2">
-          <p className="text-xs text-gray-500 text-center mb-1">
-            In development mode, check the server console for your reset token and paste it below.
-          </p>
-          <Input
-            variant="outlined"
-            type="text"
-            id="fallbackToken"
-            value={fallbackToken}
-            onChange={(e) => setFallbackToken(e.target.value)}
-            placeholder="Paste full reset token here (dev mode)"
-          />
-        </div>
-
-        {/* Resend OTP */}
+        {/* Resend */}
         <div className="text-center">
-          <button
-            type="button"
-            className="text-sm text-gray-600 hover:text-purple-600"
-            onClick={handleResend}
-            disabled={isResending}
-          >
-            {isResending ? "Resending..." : "Resend OTP"}
-          </button>
           {resendMessage && (
-            <p className="text-green-600 text-xs mt-1">{resendMessage}</p>
+            <p className="text-green-600 text-sm mb-1">{resendMessage}</p>
+          )}
+          {resendCooldown > 0 ? (
+            <p className="text-sm text-gray-400">
+              Resend code in {resendCooldown}s
+            </p>
+          ) : (
+            <button
+              type="button"
+              className="text-sm text-purple-600 hover:underline disabled:opacity-50"
+              onClick={handleResend}
+              disabled={isResending}
+            >
+              {isResending ? "Resending..." : "Resend code"}
+            </button>
           )}
         </div>
 
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm flex items-start gap-1">
+            <X size={14} className="mt-0.5 shrink-0" />
+            {error}
+          </p>
+        )}
 
-        {/* Submit button */}
         <Button
-          customClass="!w-full !h-[58px] mt-4 !text-white"
+          customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
+          disabled={!allFilled}
         >
-          Proceed
+          Verify Code
         </Button>
       </form>
     </div>
   );
 };
 
-// ── Step Three: Reset Password ────────────────────────────────────────────────
+// ── Step Three: New Password ──────────────────────────────────────────────────
 
 const StepThree = ({ resetToken }: { resetToken: string }) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -274,6 +327,7 @@ const StepThree = ({ resetToken }: { resetToken: string }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
     if (!password) {
       setError("Password is required.");
       return;
@@ -282,17 +336,24 @@ const StepThree = ({ resetToken }: { resetToken: string }) => {
       setError("Password must be at least 8 characters.");
       return;
     }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      setError("Password must include uppercase, lowercase, and a number.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
+
     setIsSubmitting(true);
     try {
       await authService.resetPassword({ token: resetToken, password, confirmPassword });
       router.push("/login?reset=true");
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Failed to reset password. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Failed to reset password. Please try again.";
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -300,79 +361,71 @@ const StepThree = ({ resetToken }: { resetToken: string }) => {
   };
 
   return (
-    <div className="">
+    <div>
       <h2 className="text-[32px] font-bold leading-none text-center mb-8">
-        Reset Password
+        New Password
       </h2>
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="newPassword" className="block text-sm font-medium  mb-2">
-            Password
+          <label htmlFor="newPassword" className="block text-sm font-medium mb-2">
+            New password
           </label>
           <div className="relative">
-            <Input
-              icon={
-                <div
-                  className="absolute inset-y-0 right-[15px] flex items-center pl-2 cursor-pointer"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
-                  <span className="text-gray-500 sm:text-sm">
-                    {showPassword ? (
-                      <EyeOffIcon className="scale-[0.7] lg:scale-75" />
-                    ) : (
-                      <EyeIcon className="scale-[0.7] lg:scale-75" />
-                    )}
-                  </span>
-                </div>
-              }
-              variant="outlined"
-              type={showPassword ? "text" : "password"}
+            <input
               id="newPassword"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
+              placeholder="Enter new password"
+              className={`${inputCls} pr-11`}
             />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+              onClick={() => setShowPassword((p) => !p)}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+            </button>
           </div>
         </div>
+
         <div>
-          <label
-            htmlFor="confirmNewPassword"
-            className="block text-sm font-medium  mb-2"
-          >
-            Confirm Password
+          <label htmlFor="confirmNewPassword" className="block text-sm font-medium mb-2">
+            Confirm new password
           </label>
           <div className="relative">
-            <Input
-              icon={
-                <div
-                  className="absolute inset-y-0 right-[15px] flex items-center pl-2 cursor-pointer"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
-                  <span className="text-gray-500 sm:text-sm">
-                    {showPassword ? (
-                      <EyeOffIcon className="scale-[0.7] lg:scale-75" />
-                    ) : (
-                      <EyeIcon className="scale-[0.7] lg:scale-75" />
-                    )}
-                  </span>
-                </div>
-              }
-              variant="outlined"
-              type={showPassword ? "text" : "password"}
+            <input
               id="confirmNewPassword"
+              type={showConfirm ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re enter password"
+              placeholder="Re-enter new password"
+              className={`${inputCls} pr-11 ${
+                confirmPassword && password !== confirmPassword ? "border-red-400" : ""
+              }`}
             />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+              onClick={() => setShowConfirm((p) => !p)}
+              tabIndex={-1}
+            >
+              {showConfirm ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+            </button>
           </div>
         </div>
 
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm flex items-start gap-1">
+            <X size={14} className="mt-0.5 shrink-0" />
+            {error}
+          </p>
+        )}
 
-        {/* Submit button */}
         <Button
-          customClass="!w-full !h-[58px] mt-4 !text-white"
+          customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
           disabled={isSubmitting}
         >
