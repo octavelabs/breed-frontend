@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import AuthLayout from "../layout/AuthLayout";
@@ -9,7 +9,7 @@ import Button from "../components/Button";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-const Login: React.FC = () => {
+const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const searchParams = useSearchParams();
 
@@ -190,5 +190,11 @@ const Login: React.FC = () => {
     </AuthLayout>
   );
 };
+
+const Login: React.FC = () => (
+  <Suspense fallback={<div className="min-h-screen bg-[#FBF6FF]" />}>
+    <LoginForm />
+  </Suspense>
+);
 
 export default Login;
