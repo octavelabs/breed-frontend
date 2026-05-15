@@ -61,11 +61,11 @@ export const authService = {
     role?: 'BELIEVER' | 'PREACHER';
   }) => api.post('/auth/register', data),
 
-  login: (data: {
+  login: <T = LoginResponse>(data: {
     emailOrUsername: string;
     password: string;
     rememberMe?: boolean;
-  }) => api.post<LoginResponse>('/auth/login', data),
+  }) => api.post<T>('/auth/login', data),
 
   logout: (refreshToken?: string) =>
     api.post('/auth/logout', { refreshToken }),
@@ -88,7 +88,7 @@ export const authService = {
     confirmNewPassword: string;
   }) => api.post('/auth/change-password', data),
 
-  me: () => api.get<User>('/auth/me'),
+  me: <T = User>() => api.get<T>('/auth/me'),
 };
 
 // ── User services ──────────────────────────────────────────────────────────────

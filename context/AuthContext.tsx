@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const fetchedUser = (await authService.me()) as User;
+        const fetchedUser = await authService.me<User>();
         setUser(fetchedUser);
         setLoggedInCookie();
       } catch {
@@ -98,11 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ): Promise<void> => {
       // The response interceptor unwraps response.data, so the resolved value
       // IS the login payload directly.
-      const response = (await authService.login({
-        emailOrUsername,
-        password,
-        rememberMe,
-      })) as { accessToken: string; refreshToken: string; user: User };
+      const response = await authService.login<{
+        accessToken: string;
+        refreshToken: string;
+        user: User;
+      }>({ emailOrUsername, password, rememberMe });
 
       setTokens(response.accessToken, response.refreshToken);
       setLoggedInCookie();
@@ -133,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = useCallback(async (): Promise<void> => {
     try {
-      const fetchedUser = (await authService.me()) as User;
+      const fetchedUser = await authService.me<User>();
       setUser(fetchedUser);
     } catch {
       clearTokens();

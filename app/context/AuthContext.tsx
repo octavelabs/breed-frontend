@@ -26,11 +26,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
     try {
-      const result = await authService.me();
-      // api interceptor returns response.data, so result may be the User directly
-      // or wrapped as { data: User }
-      const userData: User = (result as any)?.data ?? result;
-      setUser(userData as User);
+      const userData = await authService.me<User>();
+      setUser(userData);
     } catch {
       setUser(null);
     } finally {

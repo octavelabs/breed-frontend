@@ -1,9 +1,22 @@
 import axios, {
   AxiosInstance,
+  AxiosRequestConfig,
   InternalAxiosRequestConfig,
   AxiosResponse,
   AxiosError,
 } from 'axios';
+
+// Our response interceptor unwraps the backend wrapper ({ success, data, ... })
+// so every call resolves to T directly — not AxiosResponse<T>. This interface
+// tells TypeScript about that runtime behaviour so casts across the codebase
+// stay clean.
+interface ApiInstance {
+  get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>;
+}
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
@@ -167,4 +180,4 @@ api.interceptors.response.use(
   },
 );
 
-export default api;
+export default api as unknown as ApiInstance;
