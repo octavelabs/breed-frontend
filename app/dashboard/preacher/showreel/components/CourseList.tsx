@@ -30,7 +30,7 @@ function mapToCourseDetails(c: ApiCourse): CourseDetails {
   return {
     id: c.id,
     title: c.title,
-    status: c.status?.toLowerCase() ?? "draft",
+    status: c.status?.toLowerCase() === "published" ? "live" : (c.status?.toLowerCase() ?? "draft"),
     date: new Date(c.createdAt).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
