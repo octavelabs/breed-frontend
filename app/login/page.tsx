@@ -171,9 +171,9 @@ const LoginForm: React.FC = () => {
           <Button
             customClass="!w-full !h-[58px] mt-[16px] mb-2 !text-white"
             type="submit"
-            disabled={isSubmitting}
+            loading={isSubmitting}
           >
-            {isSubmitting ? "Signing in..." : "Proceed"}
+            Proceed
           </Button>
         </form>
 

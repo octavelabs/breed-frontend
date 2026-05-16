@@ -228,9 +228,9 @@ const StepOne = ({
         <Button
           customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
-          disabled={isChecking}
+          loading={isChecking}
         >
-          {isChecking ? "Checking..." : "Proceed"}
+          Proceed
         </Button>
       </form>
     </div>
@@ -639,9 +639,9 @@ const StepFour = ({
         <Button
           customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
-          disabled={isSubmitting}
+          loading={isSubmitting}
         >
-          {isSubmitting ? "Creating Account..." : "Create Account"}
+          Create Account
         </Button>
       </form>
     </div>

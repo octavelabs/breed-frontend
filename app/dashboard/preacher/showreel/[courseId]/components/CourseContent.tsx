@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import CourseEditor from "../../components/CourseEditor";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { courseService } from "@/lib/api-services";
 
 interface ApiLesson {
@@ -41,7 +41,11 @@ interface EditorCourse {
 // IDs starting with "new_" are client-side only and need to be created via API
 const isNewLesson = (id: string) => id.startsWith("new_");
 
-function mapApiToEditor(course: ApiCourse, initialChapterName?: string): EditorCourse {
+function mapApiToEditor(
+  course: ApiCourse,
+  initialChapterName?: string,
+  addFallback = true,
+): EditorCourse {
   const lessons: EditorLesson[] = (course.lessons ?? []).map((l) => ({
     id: l.id,
     name: l.title,
@@ -49,7 +53,9 @@ function mapApiToEditor(course: ApiCourse, initialChapterName?: string): EditorC
     isValid: !!l.content,
   }));
 
-  if (lessons.length === 0) {
+  // Only add the placeholder on the very first load (not after saves) to prevent
+  // an infinite loop where a stale/empty API response re-creates the placeholder.
+  if (lessons.length === 0 && addFallback) {
     lessons.push({ id: `new_${Date.now()}`, name: "Lesson 1", content: "", isValid: false });
   }
 
@@ -71,6 +77,7 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
   const [editorCourse, setEditorCourse] = useState<EditorCourse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [editorVersion, setEditorVersion] = useState(0);
 
   // Track original backend lesson IDs so we can diff on save
   const originalLessonIds = useRef<Set<string>>(new Set());
@@ -99,7 +106,7 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
     load();
   }, [courseId]);
 
-  const handleSaveDraft = async (courseData: EditorCourse) => {
+  const handleSaveDraft = useCallback(async (courseData: EditorCourse) => {
     setSaveStatus("saving");
     try {
       const allEditorLessons = courseData.chapters.flatMap((ch) => ch.lessons);
@@ -107,6 +114,8 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
 
       // Determine which backend lessons were deleted
       const deletedIds = [...originalLessonIds.current].filter((id) => !editorIds.has(id));
+
+      const hasNewLessons = allEditorLessons.some((l) => isNewLesson(l.id));
 
       await Promise.all([
         // Create new lessons
@@ -139,45 +148,36 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
       setSaveStatus("saved");
       onCourseUpdate?.();
 
-      // Reload to sync real IDs for newly created lessons
-      const fresh = (await courseService.getById(courseId)) as ApiCourse;
-      const mapped = mapApiToEditor(fresh);
-      setEditorCourse(mapped);
-      originalLessonIds.current = new Set((fresh.lessons ?? []).map((l) => l.id));
+      // Reload to sync real backend IDs for newly created lessons, then remount editor.
+      // Pass addFallback=false so a stale/empty response never injects a phantom "Lesson 1".
+      if (hasNewLessons || deletedIds.length > 0) {
+        const fresh = (await courseService.getById(courseId)) as ApiCourse;
+        const mapped = mapApiToEditor(fresh, undefined, false);
+        setEditorCourse(mapped);
+        originalLessonIds.current = new Set((fresh.lessons ?? []).map((l) => l.id));
+        setEditorVersion((v) => v + 1);
+      }
 
       setTimeout(() => setSaveStatus("idle"), 2500);
     } catch {
       setSaveStatus("error");
       setTimeout(() => setSaveStatus("idle"), 3000);
     }
-  };
+  }, [courseId, onCourseUpdate]);
 
   return (
     <div className="bg-white px-4 lg:px-10">
-      {saveStatus !== "idle" && (
-        <div
-          className={`mb-3 px-4 py-2 rounded-lg text-sm font-medium ${
-            saveStatus === "saving"
-              ? "bg-blue-50 text-blue-700 border border-blue-200"
-              : saveStatus === "saved"
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-red-50 text-red-700 border border-red-200"
-          }`}
-        >
-          {saveStatus === "saving" && "Saving changes…"}
-          {saveStatus === "saved" && "Draft saved successfully."}
-          {saveStatus === "error" && "Failed to save. Please try again."}
-        </div>
-      )}
-
       {loading ? (
         <div className="flex justify-center items-center h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
         </div>
       ) : (
         <CourseEditor
+          key={editorVersion}
           initialCourse={editorCourse ?? undefined}
           onSaveDraft={handleSaveDraft}
+          onChange={handleSaveDraft}
+          saveStatus={saveStatus}
         />
       )}
     </div>

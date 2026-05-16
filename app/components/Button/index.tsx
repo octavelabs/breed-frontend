@@ -1,30 +1,19 @@
-import React, {ForwardedRef, forwardRef } from "react";
-import Loader from "../Loader";
-
+import React, { ForwardedRef, forwardRef } from "react";
 
 type Props = {
-    children: React.ReactNode;
-    buttonType?: "primary" | "bordered" | "custom";
-    customClass?: string;
-    loading?: boolean;
-    onClick?: (e?: any) => void;
-    disabled?: boolean;
-    ref?: ForwardedRef<HTMLButtonElement>;
-    title?: string;
-    type?: 'reset' | 'submit' | 'button'
+  children: React.ReactNode;
+  buttonType?: "primary" | "bordered" | "custom";
+  customClass?: string;
+  loading?: boolean;
+  onClick?: (e?: any) => void;
+  disabled?: boolean;
+  ref?: ForwardedRef<HTMLButtonElement>;
+  title?: string;
+  type?: "reset" | "submit" | "button";
 };
 
 const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
-  {
-    buttonType = "primary",
-    customClass,
-    children,
-    loading,
-    onClick,
-    disabled,
-    title,
-    type
-  },
+  { buttonType = "primary", customClass, children, loading, onClick, disabled, title, type },
   ref: React.ForwardedRef<HTMLButtonElement>
 ) => {
   let buttonStyleClass = "";
@@ -34,10 +23,7 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
     buttonStyleClass = "border border-purple-700 bg-transparent";
   }
 
-  const customClasses = customClass ? customClass : "";
-
-  const loaderClass =
-    buttonType === "primary" ? "button-loader black" : "button-loader yellow";
+  const customClasses = customClass ?? "";
 
   return (
     <button
@@ -53,7 +39,12 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
             : ""
       } flex gap-1 relative justify-center cursor-pointer items-center rounded-full text-base h-10 w-auto  text-sm font-semibold  ${customClasses}`}
     >
-      {loading ? <Loader  /> : children}
+      {loading ? (
+        <span className="flex items-center gap-2">
+          <span className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin flex-shrink-0" />
+          {children}
+        </span>
+      ) : children}
     </button>
   );
 };
