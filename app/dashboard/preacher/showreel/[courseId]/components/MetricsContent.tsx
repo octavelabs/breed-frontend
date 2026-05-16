@@ -22,28 +22,22 @@ interface MetricsContentProps {
 }
 
 // ── Brand card tokens ──────────────────────────────────────────────────────────
-// Two-tone purple/pink palette matching the Meetings module design system
 
-const PURPLE = {
-  bg: "#FBF6FF",
-  border: "#E7C8FF",
-  icon: "#E7C8FF",
-  accent: "#870BD6",
-} as const;
+type Palette = { bg: string; border: string; icon: string; accent: string };
 
-const PINK = {
-  bg: "#FBEAF3",
-  border: "#F3C4DD",
-  icon: "#F3C4DD",
-  accent: "#C83785",
-} as const;
+const PURPLE:  Palette = { bg: "#FBF6FF", border: "#E7C8FF", icon: "#E7C8FF", accent: "#870BD6" };
+const BLUE:    Palette = { bg: "#EFF8FF", border: "#B2DDFF", icon: "#B2DDFF", accent: "#175CD3" };
+const AMBER:   Palette = { bg: "#FFFAEB", border: "#FEDF89", icon: "#FEDF89", accent: "#B54708" };
+const GREEN:   Palette = { bg: "#ECFDF3", border: "#ABEFC6", icon: "#ABEFC6", accent: "#067647" };
+const PINK:    Palette = { bg: "#FBEAF3", border: "#F3C4DD", icon: "#F3C4DD", accent: "#C83785" };
+const INDIGO:  Palette = { bg: "#EEF4FF", border: "#C7D7FD", icon: "#C7D7FD", accent: "#3538CD" };
 
 interface CardConfig {
   label: string;
   value: string | number;
   sub?: string;
   Icon: React.ElementType;
-  palette: typeof PURPLE | typeof PINK;
+  palette: Palette;
 }
 
 const MetricCard = ({ label, value, sub, Icon, palette }: CardConfig) => (
@@ -113,33 +107,33 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
       value: lessonCount,
       sub: "Across all chapters",
       Icon: BookOpen,
-      palette: PINK,
+      palette: BLUE,
     },
     {
       label: "Difficulty Level",
       value: level,
       Icon: Layers,
-      palette: PURPLE,
+      palette: AMBER,
     },
     {
       label: "Status",
       value: status,
       sub: `Since ${createdAt}`,
       Icon: Activity,
-      palette: PINK,
+      palette: GREEN,
     },
     {
       label: "Pricing",
       value: course.isFree ? "Free" : "Paid",
       Icon: BadgeCheck,
-      palette: PURPLE,
+      palette: PINK,
     },
     {
       label: "Category",
       value: course.category?.name ?? "Uncategorised",
       sub: `Updated ${updatedAt}`,
       Icon: Tag,
-      palette: PINK,
+      palette: INDIGO,
     },
   ];
 
