@@ -63,8 +63,7 @@ const CourseList = ({
     if (!user?.id) return;
     setLoading(true);
     try {
-      const result = (await courseService.getAll({
-        authorId: user.id,
+      const result = (await courseService.getAuthored({
         search: debouncedSearch || undefined,
         page,
         limit,

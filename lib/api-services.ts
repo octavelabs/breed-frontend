@@ -188,6 +188,9 @@ export const courseService = {
 
   enroll: (id: string) => api.post(`/courses/${id}/enroll`),
 
+  getAuthored: (params?: { page?: number; limit?: number; search?: string }) =>
+    api.get('/courses/me/authored', { params }),
+
   getEnrolled: () => api.get('/courses/me/enrolled'),
 
   getCompleted: () => api.get('/courses/me/completed'),
