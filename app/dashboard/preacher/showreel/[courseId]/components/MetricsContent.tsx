@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Users, BarChart2, Tag, DollarSign, Star } from "lucide-react";
+import { BookOpen, Users, Layers, Activity, Tag, BadgeCheck } from "lucide-react";
 
 interface ApiCourse {
   id: string;
@@ -21,25 +21,48 @@ interface MetricsContentProps {
   course: ApiCourse | null;
 }
 
-const MetricCard = ({
-  icon,
-  label,
-  value,
-  sub,
-}: {
-  icon: React.ReactNode;
+// ── Brand card tokens ──────────────────────────────────────────────────────────
+// Two-tone purple/pink palette matching the Meetings module design system
+
+const PURPLE = {
+  bg: "#FBF6FF",
+  border: "#E7C8FF",
+  icon: "#E7C8FF",
+  accent: "#870BD6",
+} as const;
+
+const PINK = {
+  bg: "#FBEAF3",
+  border: "#F3C4DD",
+  icon: "#F3C4DD",
+  accent: "#C83785",
+} as const;
+
+interface CardConfig {
   label: string;
   value: string | number;
   sub?: string;
-}) => (
-  <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6 flex items-start gap-4 shadow-sm">
-    <div className="w-11 h-11 flex items-center justify-center rounded-full bg-[#F5EBFF] shrink-0">
-      {icon}
-    </div>
-    <div>
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-[#180426]">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+  Icon: React.ElementType;
+  palette: typeof PURPLE | typeof PINK;
+}
+
+const MetricCard = ({ label, value, sub, Icon, palette }: CardConfig) => (
+  <div
+    className="rounded-[16px] border p-6"
+    style={{ backgroundColor: palette.bg, borderColor: palette.border }}
+  >
+    <div className="flex items-start gap-4">
+      <div
+        className="w-[48px] h-[48px] rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{ backgroundColor: palette.icon }}
+      >
+        <Icon size={22} color={palette.accent} />
+      </div>
+      <div>
+        <p className="text-[13px] text-[#60666B]">{label}</p>
+        <h3 className="text-base font-bold text-gray-900 mt-0.5">{value}</h3>
+        {sub && <p className="text-[13px] text-[#60666B] mt-1">{sub}</p>}
+      </div>
     </div>
   </div>
 );
@@ -47,7 +70,7 @@ const MetricCard = ({
 const MetricsContent = ({ course }: MetricsContentProps) => {
   if (!course) {
     return (
-      <div className="flex justify-center items-center h-64 text-gray-400 text-sm">
+      <div className="flex justify-center items-center h-64 text-[#60666B] text-sm">
         No course data available.
       </div>
     );
@@ -59,7 +82,9 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
     ? course.level.charAt(0).toUpperCase() + course.level.slice(1).toLowerCase()
     : "Beginner";
   const status =
-    course.status.charAt(0).toUpperCase() + course.status.slice(1).toLowerCase();
+    course.status === "PUBLISHED"
+      ? "Live"
+      : course.status.charAt(0).toUpperCase() + course.status.slice(1).toLowerCase();
   const createdAt = course.createdAt
     ? new Date(course.createdAt).toLocaleDateString("en-US", {
         month: "long",
@@ -75,50 +100,62 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
       })
     : "—";
 
+  const cards: CardConfig[] = [
+    {
+      label: "Enrolled Students",
+      value: enrollmentCount,
+      sub: "Total enrollments",
+      Icon: Users,
+      palette: PURPLE,
+    },
+    {
+      label: "Total Lessons",
+      value: lessonCount,
+      sub: "Across all chapters",
+      Icon: BookOpen,
+      palette: PINK,
+    },
+    {
+      label: "Difficulty Level",
+      value: level,
+      Icon: Layers,
+      palette: PURPLE,
+    },
+    {
+      label: "Status",
+      value: status,
+      sub: `Since ${createdAt}`,
+      Icon: Activity,
+      palette: PINK,
+    },
+    {
+      label: "Pricing",
+      value: course.isFree ? "Free" : "Paid",
+      Icon: BadgeCheck,
+      palette: PURPLE,
+    },
+    {
+      label: "Category",
+      value: course.category?.name ?? "Uncategorised",
+      sub: `Updated ${updatedAt}`,
+      Icon: Tag,
+      palette: PINK,
+    },
+  ];
+
   return (
     <div className="bg-white px-4 lg:px-10 py-6">
       <h2 className="text-lg font-semibold text-[#180426] mb-6">Course Metrics</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <MetricCard
-          icon={<Users size={22} className="text-[#B144F9]" />}
-          label="Enrolled Students"
-          value={enrollmentCount}
-          sub="Total enrollments"
-        />
-        <MetricCard
-          icon={<BookOpen size={22} className="text-[#B144F9]" />}
-          label="Total Lessons"
-          value={lessonCount}
-          sub="Across all chapters"
-        />
-        <MetricCard
-          icon={<Star size={22} className="text-[#B144F9]" />}
-          label="Difficulty Level"
-          value={level}
-        />
-        <MetricCard
-          icon={<BarChart2 size={22} className="text-[#B144F9]" />}
-          label="Status"
-          value={status}
-          sub={`Published: ${createdAt}`}
-        />
-        <MetricCard
-          icon={<DollarSign size={22} className="text-[#B144F9]" />}
-          label="Pricing"
-          value={course.isFree ? "Free" : "Paid"}
-        />
-        <MetricCard
-          icon={<Tag size={22} className="text-[#B144F9]" />}
-          label="Category"
-          value={course.category?.name ?? "Uncategorised"}
-          sub={`Last updated: ${updatedAt}`}
-        />
+        {cards.map((card) => (
+          <MetricCard key={card.label} {...card} />
+        ))}
       </div>
 
-      <div className="bg-[#FAFAFA] border border-[#E3E8EF] rounded-2xl p-6">
-        <h3 className="text-base font-semibold text-[#180426] mb-2">Description</h3>
-        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+      <div className="bg-[#FBF6FF] border border-[#E7C8FF] rounded-[16px] p-6">
+        <h3 className="text-base font-bold text-gray-900 mb-2">Description</h3>
+        <p className="text-[13px] text-[#60666B] leading-relaxed whitespace-pre-line">
           {course.description ?? "No description provided."}
         </p>
       </div>
