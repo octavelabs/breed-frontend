@@ -129,7 +129,7 @@ const PreacherDashboard = () => {
   const pendingReqs  = requests.filter(r => r.status?.toLowerCase() === 'pending').length;
 
   return (
-    <DashboardLayout>
+    <DashboardLayout custom={true}>
       {createModalOpen && (
         <CreateCourseModal
           isOpen={createModalOpen}
@@ -137,7 +137,7 @@ const PreacherDashboard = () => {
         />
       )}
 
-      <div className="px-4 lg:px-10 pt-6 pb-10 space-y-8">
+      <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10 space-y-8">
 
         {/* Greeting */}
         <div>
