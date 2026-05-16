@@ -113,7 +113,10 @@ export const CreateCourseModal = ({
       })) as { id: string };
       onCreated?.();
       onClose();
-      router.push(`/dashboard/preacher/showreel/${course.id}`);
+      const qs = chapterName.trim()
+        ? `?chapterName=${encodeURIComponent(chapterName.trim())}`
+        : "";
+      router.push(`/dashboard/preacher/showreel/${course.id}${qs}`);
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Failed to create course. Please try again.";

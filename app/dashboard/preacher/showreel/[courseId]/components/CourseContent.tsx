@@ -41,7 +41,7 @@ interface EditorCourse {
 // IDs starting with "new_" are client-side only and need to be created via API
 const isNewLesson = (id: string) => id.startsWith("new_");
 
-function mapApiToEditor(course: ApiCourse): EditorCourse {
+function mapApiToEditor(course: ApiCourse, initialChapterName?: string): EditorCourse {
   const lessons: EditorLesson[] = (course.lessons ?? []).map((l) => ({
     id: l.id,
     name: l.title,
@@ -56,7 +56,7 @@ function mapApiToEditor(course: ApiCourse): EditorCourse {
   return {
     id: course.id,
     title: course.title,
-    chapters: [{ id: "ch-1", name: "Chapter 1", lessons }],
+    chapters: [{ id: "ch-1", name: initialChapterName || "Chapter 1", lessons }],
   };
 }
 
@@ -80,7 +80,12 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
       setLoading(true);
       try {
         const data = (await courseService.getById(courseId)) as ApiCourse;
-        const mapped = mapApiToEditor(data);
+        // Read the chapter name passed from the Create Course modal (only present on first load)
+        const initialChapterName =
+          typeof window !== "undefined"
+            ? new URLSearchParams(window.location.search).get("chapterName") ?? undefined
+            : undefined;
+        const mapped = mapApiToEditor(data, initialChapterName);
         setEditorCourse(mapped);
         originalLessonIds.current = new Set(
           (data.lessons ?? []).map((l) => l.id),
