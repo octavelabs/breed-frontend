@@ -3,10 +3,9 @@
 import Tabs from '@/app/components/Tabs';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { courseService } from '@/lib/api-services';
-import { BookOpen, Users, Clock, SearchIcon, CheckCircle } from 'lucide-react';
+import { BookOpen, Users, Clock, SearchIcon, CheckCircle, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -23,10 +22,10 @@ interface Course {
   progressPercent?: number;
   createdAt?: string;
   category?: { name: string } | null;
-  author?: { firstName?: string; lastName?: string } | null;
+  author?: { id?: string; firstName?: string; lastName?: string } | null;
 }
 
-// ── Level label map ────────────────────────────────────────────────────────────
+// ── Level maps ────────────────────────────────────────────────────────────────
 
 const levelLabel: Record<string, string> = {
   BEGINNER: 'Foundational',
@@ -42,7 +41,15 @@ const levelColor: Record<string, string> = {
 
 // ── Course Card ───────────────────────────────────────────────────────────────
 
-const CourseCard = ({ course, showProgress }: { course: Course; showProgress?: boolean }) => {
+const CourseCard = ({
+  course,
+  showProgress,
+  search = '',
+}: {
+  course: Course;
+  showProgress?: boolean;
+  search?: string;
+}) => {
   const level = course.level ?? 'BEGINNER';
   const progress = course.progressPercent ?? 0;
 
@@ -58,7 +65,6 @@ const CourseCard = ({ course, showProgress }: { course: Course; showProgress?: b
             ) : (
               <BookOpen size={40} className="text-white opacity-20" />
             )}
-            {/* Level badge */}
             <span className={`absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1 rounded-full ${levelColor[level] ?? levelColor.BEGINNER}`}>
               {levelLabel[level] ?? level}
             </span>
@@ -79,7 +85,7 @@ const CourseCard = ({ course, showProgress }: { course: Course; showProgress?: b
             {course.title}
           </h3>
 
-          <div className="flex items-center gap-3 text-[13px] text-[#60666B] mb-3">
+          <div className="flex items-center gap-3 text-[13px] text-[#60666B] mb-3 flex-wrap">
             <span className="flex items-center gap-1">
               <BookOpen size={13} />
               {course.lessonCount ?? 0} lessons
@@ -90,13 +96,12 @@ const CourseCard = ({ course, showProgress }: { course: Course; showProgress?: b
             </span>
             {course.author && (
               <span className="flex items-center gap-1 truncate">
-                <Clock size={13} />
+                <UserRound size={13} />
                 {course.author.firstName} {course.author.lastName}
               </span>
             )}
           </div>
 
-          {/* Progress bar (In Progress tab) */}
           {showProgress && (
             <div className="mt-auto">
               <div className="flex justify-between text-[11px] text-[#60666B] mb-1">
@@ -119,7 +124,15 @@ const CourseCard = ({ course, showProgress }: { course: Course; showProgress?: b
 
 // ── Empty state ───────────────────────────────────────────────────────────────
 
-const EmptyState = ({ icon: Icon, message, sub }: { icon: React.ElementType; message: string; sub?: string }) => (
+const EmptyState = ({
+  icon: Icon,
+  message,
+  sub,
+}: {
+  icon: React.ElementType;
+  message: string;
+  sub?: string;
+}) => (
   <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
     <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
       <Icon size={24} color="#870BD6" />
@@ -132,7 +145,7 @@ const EmptyState = ({ icon: Icon, message, sub }: { icon: React.ElementType; mes
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 
 const CoursesSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-4 lg:px-12 pt-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 pt-6 pb-10">
     {Array.from({ length: 6 }).map((_, i) => (
       <div key={i} className="border border-[#E2E3E5] rounded-[16px] animate-pulse">
         <div className="bg-gray-100 rounded-t-[16px] p-[14px]">
@@ -150,14 +163,13 @@ const CoursesSkeleton = () => (
 
 // ── Discover tab ──────────────────────────────────────────────────────────────
 
-const DiscoverCourses = () => {
+const DiscoverCourses = ({ search }: { search: string }) => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
 
   useEffect(() => {
     courseService
-      .getAll({ limit: 20 })
+      .getAll({ limit: 30 })
       .then((res: unknown) => {
         const r = res as { data?: Course[] };
         const list: Course[] = Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
@@ -167,34 +179,30 @@ const DiscoverCourses = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = courses.filter(c =>
-    c.title.toLowerCase().includes(search.toLowerCase()) ||
-    c.category?.name?.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = search
+    ? courses.filter(
+        (c) =>
+          c.title.toLowerCase().includes(search.toLowerCase()) ||
+          c.category?.name?.toLowerCase().includes(search.toLowerCase()) ||
+          `${c.author?.firstName} ${c.author?.lastName}`.toLowerCase().includes(search.toLowerCase()),
+      )
+    : courses;
 
   if (loading) return <CoursesSkeleton />;
 
   return (
     <div className="border-t border-[#D2D9DF]">
-      {/* Search bar */}
-      <div className="px-4 lg:px-12 py-4 flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search courses…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 h-10 border border-[#B9C2CA] rounded-full text-sm outline-none focus:border-purple-400 bg-white"
-          />
-        </div>
-      </div>
-
       {filtered.length === 0 ? (
-        <EmptyState icon={BookOpen} message="No courses found" sub="Check back later or try a different search." />
+        <EmptyState
+          icon={BookOpen}
+          message="No courses found"
+          sub={search ? `No results for "${search}"` : 'Check back later for new courses.'}
+        />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 pb-10">
-          {filtered.map(course => <CourseCard key={course.id} course={course} />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 py-6 pb-10">
+          {filtered.map((course) => (
+            <CourseCard key={course.id} course={course} search={search} />
+          ))}
         </div>
       )}
     </div>
@@ -213,8 +221,7 @@ const InProgressCourses = () => {
       .then((res: unknown) => {
         const r = res as { data?: Course[] };
         const list: Course[] = Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
-        // In Progress = enrolled but not 100% complete
-        setCourses(list.filter(c => (c.progressPercent ?? 0) < 100));
+        setCourses(list.filter((c) => (c.progressPercent ?? 0) < 100));
       })
       .catch(() => setCourses([]))
       .finally(() => setLoading(false));
@@ -222,7 +229,7 @@ const InProgressCourses = () => {
 
   if (loading) return <CoursesSkeleton />;
 
-  if (courses.length === 0) {
+  if (courses.length === 0)
     return (
       <div className="border-t border-[#D2D9DF]">
         <EmptyState
@@ -232,12 +239,13 @@ const InProgressCourses = () => {
         />
       </div>
     );
-  }
 
   return (
     <div className="border-t border-[#D2D9DF]">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 py-6 pb-10">
-        {courses.map(course => <CourseCard key={course.id} course={course} showProgress />)}
+        {courses.map((course) => (
+          <CourseCard key={course.id} course={course} showProgress />
+        ))}
       </div>
     </div>
   );
@@ -263,7 +271,7 @@ const CompletedCourses = () => {
 
   if (loading) return <CoursesSkeleton />;
 
-  if (courses.length === 0) {
+  if (courses.length === 0)
     return (
       <div className="border-t border-[#D2D9DF]">
         <EmptyState
@@ -273,15 +281,13 @@ const CompletedCourses = () => {
         />
       </div>
     );
-  }
 
   return (
     <div className="border-t border-[#D2D9DF]">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 py-6 pb-10">
-        {courses.map(course => (
+        {courses.map((course) => (
           <div key={course.id} className="relative">
             <CourseCard course={course} />
-            {/* Completed ribbon */}
             <div className="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#ECFDF3] border border-[#ABEFC6] flex items-center justify-center shadow-sm">
               <CheckCircle size={18} className="text-[#067647]" />
             </div>
@@ -295,10 +301,12 @@ const CompletedCourses = () => {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const Learn: React.FC = () => {
+  const [search, setSearch] = useState('');
+
   const tabs = [
-    { label: 'Discover',    value: 'discover',    content: <DiscoverCourses /> },
-    { label: 'In Progress', value: 'inProgress',  content: <InProgressCourses /> },
-    { label: 'Completed',   value: 'completed',   content: <CompletedCourses /> },
+    { label: 'Discover',    value: 'discover',   content: <DiscoverCourses search={search} /> },
+    { label: 'In Progress', value: 'inProgress', content: <InProgressCourses /> },
+    { label: 'Completed',   value: 'completed',  content: <CompletedCourses /> },
   ];
 
   return (
@@ -307,7 +315,25 @@ const Learn: React.FC = () => {
         <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Learn</h1>
       </div>
       <div className="bg-white pt-5">
-        <Tabs tabs={tabs} defaultTab="discover" className="px-4 lg:px-12" />
+        <Tabs
+          tabs={tabs}
+          defaultTab="discover"
+          className="px-4 lg:px-12"
+          customButton={(activeTab) =>
+            activeTab === 'discover' ? (
+              <div className="relative ml-3 shrink-0">
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search courses…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-[200px] lg:w-[240px] pl-9 pr-4 h-[42px] border border-[#B9C2CA] rounded-full text-sm outline-none focus:border-purple-400 bg-white"
+                />
+              </div>
+            ) : null
+          }
+        />
       </div>
     </DashboardLayout>
   );
