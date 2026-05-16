@@ -34,7 +34,7 @@ const INDIGO:  Palette = { bg: "#EEF4FF", border: "#C7D7FD", icon: "#C7D7FD", ac
 
 interface CardConfig {
   label: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   sub?: string;
   Icon: React.ElementType;
   palette: Palette;
@@ -54,7 +54,9 @@ const MetricCard = ({ label, value, sub, Icon, palette }: CardConfig) => (
       </div>
       <div>
         <p className="text-[13px] text-[#60666B]">{label}</p>
-        <h3 className="text-base font-bold text-gray-900 mt-0.5">{value}</h3>
+        {typeof value === "string" || typeof value === "number"
+          ? <h3 className="text-base font-bold text-gray-900 mt-0.5">{value}</h3>
+          : <div className="mt-0.5">{value}</div>}
         {sub && <p className="text-[13px] text-[#60666B] mt-1">{sub}</p>}
       </div>
     </div>
@@ -72,9 +74,12 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
 
   const lessonCount = course.lessonCount ?? course.lessons?.length ?? 0;
   const enrollmentCount = course.enrollmentCount ?? 0;
-  const level = course.level
-    ? course.level.charAt(0).toUpperCase() + course.level.slice(1).toLowerCase()
-    : "Beginner";
+  const levelMap: Record<string, string> = {
+    BEGINNER: "Foundational",
+    INTERMEDIATE: "Intermediate",
+    ADVANCED: "Advanced",
+  };
+  const level = course.level ? (levelMap[course.level] ?? course.level) : "Foundational";
   const status =
     course.status === "PUBLISHED"
       ? "Live"
@@ -111,7 +116,12 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
     },
     {
       label: "Difficulty Level",
-      value: level,
+      value: (
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold mt-0.5"
+          style={{ backgroundColor: AMBER.icon, color: AMBER.accent }}>
+          {level}
+        </span>
+      ),
       Icon: Layers,
       palette: AMBER,
     },
@@ -130,7 +140,18 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
     },
     {
       label: "Category",
-      value: course.category?.name ?? "Uncategorised",
+      value: (
+        <div className="flex flex-wrap gap-1.5 mt-0.5">
+          {course.category?.name ? (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold"
+              style={{ backgroundColor: INDIGO.icon, color: INDIGO.accent }}>
+              {course.category.name}
+            </span>
+          ) : (
+            <span className="text-base font-bold text-gray-900">Uncategorised</span>
+          )}
+        </div>
+      ),
       sub: `Updated ${updatedAt}`,
       Icon: Tag,
       palette: INDIGO,
