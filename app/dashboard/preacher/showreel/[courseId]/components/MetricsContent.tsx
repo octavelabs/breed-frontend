@@ -147,7 +147,7 @@ const MetricsContent = ({ course }: MetricsContentProps) => {
         ))}
       </div>
 
-      <div className="bg-[#FBF6FF] border border-[#E7C8FF] rounded-[16px] p-6">
+      <div className="bg-white border border-[#E3E8EF] rounded-[16px] p-6">
         <h3 className="text-base font-bold text-gray-900 mb-2">Description</h3>
         <p className="text-[13px] text-[#60666B] leading-relaxed whitespace-pre-line">
           {course.description ?? "No description provided."}
