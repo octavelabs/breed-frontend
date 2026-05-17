@@ -41,7 +41,7 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
     >
       {loading ? (
         <span className="flex items-center gap-2">
-          <span className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin flex-shrink-0" />
+          <span className="inline-block w-4 h-4 rounded-full border-t-2 border-white animate-spin flex-shrink-0" />
           {children}
         </span>
       ) : children}
