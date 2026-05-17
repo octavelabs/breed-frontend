@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, BookOpen, Play, Users, Lock, CheckCircle, UserRound } from "lucide-react";
+import {
+  ArrowLeft, BookOpen, Play, Users, Lock, CheckCircle,
+  ChevronDown, ChevronRight, UserRound,
+} from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import Link from "next/link";
@@ -9,7 +12,7 @@ import { courseService } from "@/lib/api-services";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface Lesson {
+interface ApiLesson {
   id: string;
   title: string;
   description?: string | null;
@@ -19,12 +22,21 @@ interface Lesson {
   isFree?: boolean;
 }
 
+interface ApiChapter {
+  id: string;
+  editorId: string;
+  title: string;
+  sortOrder: number;
+  lessons: ApiLesson[];
+}
+
 interface CourseAuthor {
   id: string;
   firstName: string;
   lastName: string;
   avatarUrl?: string | null;
   bio?: string | null;
+  churchName?: string | null;
 }
 
 interface Course {
@@ -35,37 +47,172 @@ interface Course {
   isFree?: boolean;
   coverImageUrl?: string | null;
   enrollmentCount?: number;
-  lessonCount?: number;
   isEnrolled?: boolean;
   progressPercent?: number;
   category?: { name: string } | null;
   author?: CourseAuthor | null;
-  lessons?: Lesson[];
+  chapters?: ApiChapter[];
+  lessons?: ApiLesson[];     // flat fallback for courses without chapters
 }
 
 const levelLabel: Record<string, string> = {
-  BEGINNER: "Foundational",
+  BEGINNER:     "Foundational",
   INTERMEDIATE: "Intermediate",
-  ADVANCED: "Advanced",
+  ADVANCED:     "Advanced",
 };
-
 const levelColor: Record<string, string> = {
   BEGINNER:     "bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]",
   INTERMEDIATE: "bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]",
   ADVANCED:     "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]",
 };
 
+// ── Derive unified chapter structure from API response ────────────────────────
+
+function buildChapters(course: Course): { id: string; name: string; lessons: ApiLesson[] }[] {
+  // Backend has proper chapter structure
+  if (course.chapters && course.chapters.length > 0) {
+    return course.chapters.map((ch) => ({
+      id:      ch.id,
+      name:    ch.title,
+      lessons: ch.lessons ?? [],
+    }));
+  }
+  // Fallback: flat list → single chapter
+  const flat = course.lessons ?? [];
+  if (flat.length === 0) return [];
+  return [{ id: "ch-fallback", name: "Chapter 1", lessons: flat }];
+}
+
+// ── Chapter accordion section ─────────────────────────────────────────────────
+
+const ChapterSection = ({
+  chapter,
+  chapterIndex,
+  isEnrolled,
+  enrolled,
+  enrolling,
+  globalLessonOffset,
+  onEnroll,
+}: {
+  chapter: { id: string; name: string; lessons: ApiLesson[] };
+  chapterIndex: number;
+  isEnrolled: boolean;
+  enrolled: boolean;
+  enrolling: boolean;
+  globalLessonOffset: number;
+  onEnroll: (lessonId: string) => void;
+}) => {
+  const [open, setOpen] = useState(true);
+  const completedCount  = 0; // TODO: wire lesson progress from API
+
+  return (
+    <div className="border border-[#E2E3E5] rounded-2xl overflow-hidden mb-4">
+      {/* Chapter header */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 bg-[#FAFAFA] hover:bg-[#F5F0FF] transition-colors"
+      >
+        <div className="flex items-center gap-3 text-left">
+          <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-xs font-bold flex-shrink-0">
+            {chapterIndex + 1}
+          </div>
+          <div>
+            <p className="font-semibold text-[#180426] text-sm leading-tight">{chapter.name}</p>
+            <p className="text-xs text-[#60666B] mt-0.5">
+              {chapter.lessons.length} lesson{chapter.lessons.length !== 1 ? "s" : ""}
+              {completedCount > 0 && ` · ${completedCount} completed`}
+            </p>
+          </div>
+        </div>
+        {open
+          ? <ChevronDown size={18} className="text-[#870BD6] flex-shrink-0" />
+          : <ChevronRight size={18} className="text-[#60666B] flex-shrink-0" />
+        }
+      </button>
+
+      {/* Lessons list */}
+      {open && (
+        <div className="divide-y divide-[#F0F2F4]">
+          {chapter.lessons.length === 0 ? (
+            <div className="px-5 py-6 text-center">
+              <p className="text-sm text-[#60666B] italic">No lessons in this chapter yet.</p>
+            </div>
+          ) : (
+            chapter.lessons.map((lesson, lessonIndex) => {
+              const globalIdx  = globalLessonOffset + lessonIndex;
+              const isFirst    = globalIdx === 0;
+              const canAccess  = enrolled || lesson.isFree || isFirst;
+
+              return (
+                <div
+                  key={lesson.id}
+                  className={`flex items-start gap-4 px-5 py-4 transition-colors ${
+                    canAccess ? "hover:bg-[#FBF6FF]" : ""
+                  }`}
+                >
+                  {/* Lesson number */}
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 ${
+                      canAccess
+                        ? "bg-[#F5EBFF] text-[#870BD6]"
+                        : "bg-[#F0F2F4] text-[#B0B7C3]"
+                    }`}
+                  >
+                    {globalIdx + 1}
+                  </div>
+
+                  {/* Lesson info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-[#B0B7C3] mb-0.5">
+                      Lesson {globalIdx + 1}
+                    </p>
+                    <h4 className={`font-semibold text-sm leading-snug mb-1 ${canAccess ? "text-[#180426]" : "text-[#B0B7C3]"}`}>
+                      {lesson.title}
+                    </h4>
+                    {lesson.description && canAccess && (
+                      <p className="text-xs text-[#60666B] line-clamp-2 mb-2">{lesson.description}</p>
+                    )}
+
+                    {canAccess ? (
+                      <button
+                        onClick={() => onEnroll(lesson.id)}
+                        disabled={enrolling}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-b from-[#A967F1] to-[#5B26B1] px-4 py-1.5 rounded-full disabled:opacity-60 transition-opacity"
+                      >
+                        {enrolling ? (
+                          <span className="inline-block w-3 h-3 rounded-full border-t-2 border-white animate-spin" />
+                        ) : (
+                          <Play size={11} />
+                        )}
+                        {isFirst && !enrolled ? "Start Learning" : "Continue"}
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs text-[#B0B7C3]">
+                        <Lock size={11} /> Enrol to unlock
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const CourseDetail: React.FC = () => {
-  const router = useRouter();
-  const params = useParams();
+  const router   = useRouter();
+  const params   = useParams();
   const courseId = params.courseId as string;
 
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [enrolling, setEnrolling] = useState(false);
-  const [enrolled, setEnrolled] = useState(false);
+  const [course,      setCourse]      = useState<Course | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  const [enrolling,   setEnrolling]   = useState(false);
+  const [enrolled,    setEnrolled]    = useState(false);
   const [enrollError, setEnrollError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -80,26 +227,25 @@ const CourseDetail: React.FC = () => {
       .finally(() => setLoading(false));
   }, [courseId]);
 
-  const handleEnroll = async (firstLessonId?: string) => {
-    if (enrolled && firstLessonId) {
-      router.push(`/dashboard/learn/materials/${firstLessonId}`);
+  const handleEnroll = async (lessonId?: string) => {
+    if (enrolled && lessonId) {
+      router.push(`/dashboard/learn/materials/${lessonId}`);
       return;
     }
-
     setEnrolling(true);
     setEnrollError(null);
     try {
       await courseService.enroll(courseId);
       setEnrolled(true);
-      if (firstLessonId) {
-        router.push(`/dashboard/learn/materials/${firstLessonId}`);
-      }
+      if (lessonId) router.push(`/dashboard/learn/materials/${lessonId}`);
     } catch (err: unknown) {
-      // If already enrolled, still navigate
       const msg = err instanceof Error ? err.message : "";
-      if (msg.toLowerCase().includes("already enrolled") || (err as any)?.response?.status === 409) {
+      if (
+        msg.toLowerCase().includes("already enrolled") ||
+        (err as { response?: { status?: number } })?.response?.status === 409
+      ) {
         setEnrolled(true);
-        if (firstLessonId) router.push(`/dashboard/learn/materials/${firstLessonId}`);
+        if (lessonId) router.push(`/dashboard/learn/materials/${lessonId}`);
       } else {
         setEnrollError("Failed to enrol. Please try again.");
       }
@@ -108,25 +254,31 @@ const CourseDetail: React.FC = () => {
     }
   };
 
-  const lessons = course?.lessons ?? [];
-  const firstLesson = lessons[0];
-  const level = course?.level ?? "BEGINNER";
-  const authorName = course?.author
+  const chapters    = course ? buildChapters(course) : [];
+  const allLessons  = chapters.flatMap((ch) => ch.lessons);
+  const firstLesson = allLessons[0];
+  const level       = course?.level ?? "BEGINNER";
+  const authorName  = course?.author
     ? `${course.author.firstName} ${course.author.lastName}`
     : null;
+
+  // Running offset so each lesson gets a globally unique number
+  let lessonOffset = 0;
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="animate-pulse space-y-6 p-6">
+        <div className="animate-pulse space-y-6 p-6 max-w-4xl mx-auto">
           <div className="h-8 bg-gray-200 rounded w-1/2" />
           <div className="flex gap-8">
             <div className="flex-1 space-y-3">
               <div className="h-4 bg-gray-200 rounded" />
               <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-4 bg-gray-200 rounded w-2/3" />
             </div>
-            <div className="w-1/2 h-64 bg-gray-200 rounded-2xl" />
+            <div className="w-1/2 h-56 bg-gray-200 rounded-2xl" />
+          </div>
+          <div className="space-y-3">
+            {[1, 2].map((i) => <div key={i} className="h-20 bg-gray-200 rounded-2xl" />)}
           </div>
         </div>
       </DashboardLayout>
@@ -149,43 +301,52 @@ const CourseDetail: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="mx-auto px-4 lg:px-0">
+      <div className="max-w-5xl mx-auto px-4 pb-16">
         {/* Back */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-5 cursor-pointer"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 pt-2"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        {/* Title + badges */}
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">{course.title}</h1>
-          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${levelColor[level] ?? levelColor.BEGINNER}`}>
-            {levelLabel[level] ?? level}
-          </span>
-          {course.isFree && (
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647]">
-              Free
-            </span>
-          )}
-        </div>
-
-        {/* Course header */}
+        {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <div className="flex flex-col lg:flex-row gap-10 mb-10">
-          <div className="w-full lg:w-1/2 text-[#60666B] text-base">
+          {/* Left: meta */}
+          <div className="w-full lg:w-1/2">
+            {/* Category */}
             {course.category?.name && (
-              <p className="text-xs font-semibold text-[#870BD6] mb-3 uppercase tracking-wide">
+              <p className="text-xs font-semibold text-[#870BD6] mb-3 uppercase tracking-widest">
                 {course.category.name}
               </p>
             )}
-            <p className="mb-4 leading-relaxed">{course.description ?? "No description provided."}</p>
+
+            {/* Title + badges */}
+            <h1 className="text-2xl lg:text-[32px] font-bold text-[#180426] leading-tight mb-3">
+              {course.title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className={`text-xs font-semibold px-3 py-1 rounded-full ${levelColor[level] ?? levelColor.BEGINNER}`}>
+                {levelLabel[level] ?? level}
+              </span>
+              {course.isFree && (
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647]">
+                  Free
+                </span>
+              )}
+            </div>
+
+            {/* Description */}
+            <p className="text-[#60666B] text-sm leading-relaxed mb-5">
+              {course.description ?? "No description provided."}
+            </p>
 
             {/* Stats row */}
-            <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-[#60666B] mb-5">
               <span className="flex items-center gap-1.5">
                 <BookOpen size={15} />
-                {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
+                {allLessons.length} lesson{allLessons.length !== 1 ? "s" : ""}
+                {chapters.length > 1 && ` · ${chapters.length} chapters`}
               </span>
               <span className="flex items-center gap-1.5">
                 <Users size={15} />
@@ -197,34 +358,26 @@ const CourseDetail: React.FC = () => {
             {course.author && (
               <Link
                 href={`/dashboard/learn/preacher/${course.author.id}`}
-                className="inline-flex items-center gap-2.5 mt-1 group"
+                className="inline-flex items-center gap-2.5 mb-6 group"
               >
-                <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm flex-shrink-0 overflow-hidden">
                   {course.author.avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={course.author.avatarUrl}
-                      alt={authorName ?? ""}
-                      className="w-full h-full object-cover rounded-full"
-                    />
+                    <img src={course.author.avatarUrl} alt={authorName ?? ""} className="w-full h-full object-cover" />
                   ) : (
-                    (authorName?.charAt(0) ?? "P")
+                    authorName?.charAt(0) ?? "P"
                   )}
                 </div>
                 <div>
-                  <p className="text-[13px] text-[#60666B]">Course by</p>
-                  <p className="text-sm font-semibold text-[#870BD6] group-hover:underline">
-                    {authorName}
-                  </p>
+                  <p className="text-[12px] text-[#60666B]">Course by</p>
+                  <p className="text-sm font-semibold text-[#870BD6] group-hover:underline">{authorName}</p>
                 </div>
               </Link>
             )}
 
-            {/* Enroll / Start Learning */}
-            <div className="mt-6">
-              {enrollError && (
-                <p className="text-red-500 text-sm mb-2">{enrollError}</p>
-              )}
+            {/* CTA */}
+            <div>
+              {enrollError && <p className="text-red-500 text-sm mb-2">{enrollError}</p>}
               <button
                 onClick={() => handleEnroll(firstLesson?.id)}
                 disabled={enrolling}
@@ -245,8 +398,8 @@ const CourseDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Cover image */}
-          <div className="w-full lg:w-1/2 h-full max-h-[320px] rounded-2xl overflow-hidden bg-[#180426] flex items-center justify-center">
+          {/* Right: cover image */}
+          <div className="w-full lg:w-1/2 max-h-[320px] rounded-2xl overflow-hidden bg-[#180426] flex items-center justify-center flex-shrink-0">
             {course.coverImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={course.coverImageUrl} alt={course.title} className="w-full h-full object-cover" />
@@ -256,86 +409,42 @@ const CourseDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Lessons list */}
+        {/* ── Course content ────────────────────────────────────────────────── */}
         <div>
-          <h2 className="text-[20px] font-bold mb-6 border-b border-[#D2D9DF] pb-3">
-            Lessons · {lessons.length}
+          <h2 className="text-lg font-bold text-[#180426] mb-2">
+            Course Content
           </h2>
+          <p className="text-sm text-[#60666B] mb-6">
+            {chapters.length} chapter{chapters.length !== 1 ? "s" : ""} &nbsp;·&nbsp; {allLessons.length} lesson{allLessons.length !== 1 ? "s" : ""}
+          </p>
 
-          {lessons.length === 0 ? (
-            <p className="text-[#60666B] text-sm py-8 text-center">
-              No lessons available yet. Check back soon.
-            </p>
+          {chapters.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-14 text-center border border-[#E2E3E5] rounded-2xl">
+              <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                <UserRound size={22} className="text-[#870BD6]" />
+              </div>
+              <p className="text-sm font-semibold text-gray-700">No lessons yet</p>
+              <p className="text-xs text-[#60666B] max-w-xs">
+                The creator hasn&apos;t published lessons yet. Check back soon!
+              </p>
+            </div>
           ) : (
-            <>
-              {/* Desktop */}
-              <div className="hidden lg:flex flex-col gap-6">
-                {lessons.map((lesson, idx) => {
-                  const isFirst = idx === 0;
-                  const canAccess = enrolled || lesson.isFree || isFirst;
-                  return (
-                    <div key={lesson.id} className="flex gap-5 px-2">
-                      <div className="w-[80px] h-[80px] rounded-xl bg-[#E7C8FF] flex items-center justify-center flex-shrink-0 text-[#870BD6] text-2xl font-bold">
-                        {idx + 1}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs text-[#60666B] mb-1 font-medium uppercase tracking-wide">
-                          Lesson {idx + 1}
-                        </p>
-                        <h3 className="font-semibold text-gray-900 mb-1">{lesson.title}</h3>
-                        {lesson.description && (
-                          <p className="text-sm text-[#60666B] mb-3 line-clamp-2">{lesson.description}</p>
-                        )}
-                        {canAccess ? (
-                          <button
-                            onClick={() => handleEnroll(lesson.id)}
-                            disabled={enrolling}
-                            className="flex items-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-5 py-2 rounded-full text-sm font-medium transition-opacity disabled:opacity-60"
-                          >
-                            <Play className="w-3.5 h-3.5" />
-                            {isFirst && !enrolled ? "Start Learning" : "Continue"}
-                          </button>
-                        ) : (
-                          <span className="flex items-center gap-1.5 text-[#60666B] text-sm">
-                            <Lock size={13} />
-                            Enrol to unlock
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Mobile */}
-              <div className="flex flex-col gap-4 lg:hidden">
-                {lessons.map((lesson, idx) => {
-                  const isFirst = idx === 0;
-                  const canAccess = enrolled || lesson.isFree || isFirst;
-                  return (
-                    <button
-                      key={lesson.id}
-                      onClick={() => canAccess && handleEnroll(lesson.id)}
-                      disabled={!canAccess || enrolling}
-                      className={`flex flex-col items-center w-1/2 ${(idx + 1) % 2 === 0 ? "ml-auto" : ""}`}
-                    >
-                      <div
-                        className={`w-[80px] h-[80px] rounded-full mb-2 flex justify-center items-center text-[40px] font-bold ${
-                          canAccess
-                            ? "text-[#5B26B1] bg-[#FBF6FF] border-2 border-[#5B26B1]"
-                            : "bg-[#D2D9DF] text-[#60666B]"
-                        }`}
-                      >
-                        {idx + 1}
-                      </div>
-                      <p className={`text-sm text-center ${canAccess ? "text-black" : "text-[#D2D9DF]"}`}>
-                        {lesson.title}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
+            chapters.map((chapter, chapterIndex) => {
+              const offset = lessonOffset;
+              lessonOffset += chapter.lessons.length;
+              return (
+                <ChapterSection
+                  key={chapter.id}
+                  chapter={chapter}
+                  chapterIndex={chapterIndex}
+                  isEnrolled={enrolled}
+                  enrolled={enrolled}
+                  enrolling={enrolling}
+                  globalLessonOffset={offset}
+                  onEnroll={handleEnroll}
+                />
+              );
+            })
           )}
         </div>
       </div>

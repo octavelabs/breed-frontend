@@ -99,6 +99,8 @@ export const authService = {
 export const userService = {
   getProfile: () => api.get<User>('/users/me'),
 
+  getPublicProfile: (id: string) => api.get(`/users/${id}`),
+
   updateProfile: (
     data: Partial<User> & {
       interests?: string[];
@@ -116,13 +118,15 @@ export const userService = {
     api.get<{
       coursesEnrolled: number;
       coursesCompleted: number;
-      streak: {
-        currentStreak: number;
-        longestStreak: number;
-      };
+      streak: { currentStreak: number; longestStreak: number };
       prayerCount: number;
       communitiesJoined: number;
     }>('/users/me/stats'),
+
+  follow:   (id: string) => api.post(`/users/${id}/follow`),
+  unfollow: (id: string) => api.delete(`/users/${id}/follow`),
+
+  getFollowers: (id: string) => api.get(`/users/${id}/followers`),
 };
 
 // ── Course services ────────────────────────────────────────────────────────────
@@ -166,12 +170,17 @@ export const courseService = {
 
   deleteCourse: (id: string) => api.delete(`/courses/${id}`),
 
+  syncChapters: (courseId: string, data: {
+    chapters: { editorId: string; title: string; sortOrder: number }[];
+  }) => api.post(`/courses/${courseId}/chapters/sync`, data),
+
   createLesson: (courseId: string, data: {
     title: string;
     description?: string;
     content?: string;
     type: string;
     sortOrder?: number;
+    chapterId?: string;
     isPublished?: boolean;
   }) => api.post(`/courses/${courseId}/lessons`, data),
 
@@ -180,6 +189,7 @@ export const courseService = {
     description?: string;
     content?: string;
     sortOrder?: number;
+    chapterId?: string;
     isPublished?: boolean;
   }) => api.patch(`/courses/${courseId}/lessons/${lessonId}`, data),
 

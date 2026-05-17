@@ -12,13 +12,22 @@ interface ApiLesson {
   title: string;
   content?: string | null;
   sortOrder?: number;
-  isPublished?: boolean;
+  chapterId?: string | null;
+}
+
+interface ApiChapter {
+  id: string;
+  editorId: string;
+  title: string;
+  sortOrder: number;
+  lessons?: ApiLesson[];
 }
 
 interface ApiCourse {
   id: string;
   title: string;
-  lessons?: ApiLesson[];
+  chapters?: ApiChapter[];
+  lessons?: ApiLesson[];   // flat fallback for courses without chapters
 }
 
 // ── Editor types (mirror CourseEditor internals) ──────────────────────────────
@@ -29,20 +38,36 @@ interface EditorCourse  { id: string; title: string; chapters: EditorChapter[]; 
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-// IDs starting with "new_" are client-side placeholders not yet persisted.
 const isNewLesson = (id: string) => id.startsWith("new_");
 
 /**
- * Map a flat API response into the editor's chapter-based structure.
- * `addFallback`: only true on the FIRST load so a brand-new course shows an
- * empty lesson ready to fill. Never true on post-save reloads — avoids the
- * phantom "Lesson 1" loop when the API response is briefly empty.
+ * Convert an API course to the editor format.
+ * Priority order:
+ *   1. Backend chapters with nested lessons (most accurate, synced to DB)
+ *   2. localStorage structure (preserved across tab switches/hard refresh)
+ *   3. Flat lesson list collapsed into one chapter (fallback for new courses)
  */
 function mapApiToEditor(
   course: ApiCourse,
   initialChapterName?: string,
   addFallback = true,
 ): EditorCourse {
+  // 1. Backend has chapter structure — use it directly
+  if (course.chapters && course.chapters.length > 0) {
+    const chapters: EditorChapter[] = course.chapters.map((ch) => ({
+      id:   ch.editorId || ch.id,   // editor uses editorId as its stable chapter key
+      name: ch.title,
+      lessons: (ch.lessons ?? []).map((l) => ({
+        id:      l.id,
+        name:    l.title,
+        content: l.content ?? "",
+        isValid: !!l.content,
+      })),
+    }));
+    return { id: course.id, title: course.title, chapters };
+  }
+
+  // 2. No backend chapters — use flat lessons (fallback / backwards compat)
   const lessons: EditorLesson[] = (course.lessons ?? []).map((l) => ({
     id:      l.id,
     name:    l.title,
@@ -62,23 +87,14 @@ function mapApiToEditor(
 }
 
 /**
- * Restore the multi-chapter structure from localStorage, merging it with
- * fresh lesson *content* from the API.
- *
- * Why this is necessary: the backend stores lessons as a flat list — it has
- * no concept of chapters. The chapter hierarchy is a client-side abstraction
- * persisted in localStorage by CourseEditor. On every load we:
- *   1. Read which lessons belong to which chapter from localStorage.
- *   2. Fill lesson content from the live API response (authoritative source).
- *   3. Orphan any lessons the API returned but the saved structure doesn't
- *      know about (e.g. created on another device) → append to chapter 1.
- *
- * Returns null if no valid saved structure exists (fall back to mapApiToEditor).
+ * Restore the multi-chapter structure from localStorage.
+ * Used when the backend doesn't have chapters yet (e.g. very first save).
+ * Returns null on any failure so the caller falls back to mapApiToEditor.
  */
-function restoreStructure(
-  apiCourse: ApiCourse,
-): EditorCourse | null {
+function restoreStructure(apiCourse: ApiCourse): EditorCourse | null {
   if (typeof window === "undefined") return null;
+  // Only use localStorage if backend has no chapters yet
+  if (apiCourse.chapters && apiCourse.chapters.length > 0) return null;
 
   const raw = localStorage.getItem(`course-structure-${apiCourse.id}`);
   if (!raw) return null;
@@ -95,14 +111,13 @@ function restoreStructure(
       id:   ch.id,
       name: ch.name,
       lessons: (ch.lessonIds ?? [])
-        .filter((id) => byId.has(id))           // skip lessons deleted from backend
+        .filter((id) => byId.has(id))
         .map((id) => {
           const l = byId.get(id)!;
           return { id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content };
         }),
     }));
 
-    // Orphaned lessons: exist in the API but not referenced by any saved chapter.
     const knownIds = new Set(saved.chapters.flatMap((ch) => ch.lessonIds ?? []));
     const orphans: EditorLesson[] = (apiCourse.lessons ?? [])
       .filter((l) => !knownIds.has(l.id))
@@ -113,11 +128,11 @@ function restoreStructure(
       else chapters.push({ id: "ch-fallback", name: "Chapter 1", lessons: orphans });
     }
 
-    if (chapters.length === 0) return null;  // nothing useful — fall back
+    if (chapters.length === 0) return null;
 
     return { id: apiCourse.id, title: apiCourse.title, chapters };
   } catch {
-    return null;  // corrupted storage — fall back gracefully
+    return null;
   }
 }
 
@@ -135,15 +150,8 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
   const [loading,      setLoading]      = useState(true);
   const [saveStatus,   setSaveStatus]   = useState<"idle" | "saving" | "saved" | "error">("idle");
 
-  // Ref to call patchLessonIds on the running editor without remounting it.
-  // Remounting would destroy the user's multi-chapter structure since the
-  // backend stores lessons flat and mapApiToEditor collapses them all into one chapter.
-  const editorRef = useRef<CourseEditorHandle>(null);
-
-  // Guard: prevent overlapping concurrent saves.
-  const isSavingRef = useRef(false);
-
-  // The set of lesson IDs that currently exist in the backend.
+  const editorRef      = useRef<CourseEditorHandle>(null);
+  const isSavingRef    = useRef(false);
   const originalLessonIds = useRef<Set<string>>(new Set());
 
   // ── Initial load ────────────────────────────────────────────────────────────
@@ -154,20 +162,17 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
       try {
         const data = (await courseService.getById(courseId)) as ApiCourse;
 
-        // The chapter name from the Create Course modal is in the URL only on first navigation.
         const initialChapterName =
           typeof window !== "undefined"
             ? new URLSearchParams(window.location.search).get("chapterName") ?? undefined
             : undefined;
 
-        // Prefer the saved chapter structure (preserved across tab switches and
-        // hard refreshes). Fall back to the flat single-chapter mapping only when
-        // no structure has been saved yet (brand-new course or first-ever load).
+        // Use backend chapters first, then localStorage, then flat fallback
         const restored = restoreStructure(data);
-        setEditorCourse(
-          restored ?? mapApiToEditor(data, initialChapterName),
+        setEditorCourse(restored ?? mapApiToEditor(data, initialChapterName));
+        originalLessonIds.current = new Set(
+          (data.lessons ?? []).map((l) => l.id)
         );
-        originalLessonIds.current = new Set((data.lessons ?? []).map((l) => l.id));
       } catch {
         setEditorCourse(null);
       } finally {
@@ -180,20 +185,40 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
   // ── Save handler ─────────────────────────────────────────────────────────────
 
   const handleSaveDraft = useCallback(async (courseData: EditorCourse) => {
-    // Prevent overlapping concurrent saves.
     if (isSavingRef.current) return;
     isSavingRef.current = true;
     setSaveStatus("saving");
 
     try {
-      const allLessons     = courseData.chapters.flatMap((ch) => ch.lessons);
-      const editorIds      = new Set(allLessons.map((l) => l.id));
-      const newLessons     = allLessons.filter((l) => isNewLesson(l.id));
-      const existingLessons = allLessons.filter((l) => !isNewLesson(l.id));
-      const deletedIds     = [...originalLessonIds.current].filter((id) => !editorIds.has(id));
+      // 1. Sync chapter structure to backend → get editorId→backendId mapping
+      const syncResult = (await courseService.syncChapters(courseId, {
+        chapters: courseData.chapters.map((ch, i) => ({
+          editorId:  ch.id,
+          title:     ch.name,
+          sortOrder: i,
+        })),
+      })) as { chapters: { editorId: string; id: string }[] };
 
-      // Run all mutations in parallel.
-      // We separate createLesson from the others so we can collect returned IDs.
+      const chapterIdMap = new Map<string, string>(
+        syncResult.chapters.map((c) => [c.editorId, c.id])
+      );
+
+      // 2. Build flat lesson list enriched with sortOrder and backendChapterId
+      let globalOrder = 0;
+      const allLessons = courseData.chapters.flatMap((ch) =>
+        ch.lessons.map((l) => ({
+          ...l,
+          backendChapterId: chapterIdMap.get(ch.id),
+          sortOrder: globalOrder++,
+        }))
+      );
+
+      const editorIds   = new Set(allLessons.map((l) => l.id));
+      const newLessons  = allLessons.filter((l) => isNewLesson(l.id));
+      const existing    = allLessons.filter((l) => !isNewLesson(l.id));
+      const deletedIds  = [...originalLessonIds.current].filter((id) => !editorIds.has(id));
+
+      // 3. Run lesson mutations in parallel
       const [createdLessons] = await Promise.all([
         Promise.all(
           newLessons.map((l) =>
@@ -201,17 +226,19 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
               title:       l.name || "Untitled Lesson",
               content:     l.content,
               type:        "TEXT",
-              sortOrder:   allLessons.findIndex((al) => al.id === l.id),
+              sortOrder:   l.sortOrder,
+              chapterId:   l.backendChapterId,
               isPublished: true,
             }) as Promise<{ id: string }>,
           ),
         ),
         Promise.all(
-          existingLessons.map((l) =>
+          existing.map((l) =>
             courseService.updateLesson(courseId, l.id, {
               title:       l.name || "Untitled Lesson",
               content:     l.content,
-              sortOrder:   allLessons.findIndex((al) => al.id === l.id),
+              sortOrder:   l.sortOrder,
+              chapterId:   l.backendChapterId,
               isPublished: true,
             }),
           ),
@@ -219,21 +246,16 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
         Promise.all(deletedIds.map((id) => courseService.deleteLesson(courseId, id))),
       ]);
 
-      // Build a map of client-side ID → real backend ID from the create responses.
+      // 4. Patch new_xxx IDs with real backend IDs (no editor remount needed)
       const idPatchMap = new Map<string, string>();
       newLessons.forEach((l, i) => {
         const created = createdLessons[i];
         if (created?.id) idPatchMap.set(l.id, created.id);
       });
 
-      // Keep originalLessonIds in sync without reloading.
       createdLessons.forEach((c) => { if (c?.id) originalLessonIds.current.add(c.id); });
       deletedIds.forEach((id) => originalLessonIds.current.delete(id));
 
-      // Surgically patch new_xxx IDs with real backend IDs inside the running
-      // editor — preserving all chapters and the user's current cursor position.
-      // This is the key fix: we never remount the editor after a save, so the
-      // multi-chapter structure the user built is never destroyed.
       if (idPatchMap.size > 0) {
         editorRef.current?.patchLessonIds(idPatchMap);
       }
@@ -258,8 +280,6 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
         </div>
       ) : (
-        // No `key` prop here — we never force-remount the editor.
-        // ID reconciliation is done via editorRef.patchLessonIds().
         <CourseEditor
           ref={editorRef}
           initialCourse={editorCourse ?? undefined}
