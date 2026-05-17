@@ -31,8 +31,9 @@ export interface CourseEditorHandle {
 interface CourseEditorProps {
   initialCourse?: CourseData;
   onSaveDraft: (courseData: CourseData) => void;
-  onChange?:    (courseData: CourseData) => void;
-  saveStatus?:  'idle' | 'saving' | 'saved' | 'error';
+  onChange?:   (courseData: CourseData) => void;
+  onPublish?:  (courseData: CourseData) => void;  // kept for back-compat with DevotionContent
+  saveStatus?: 'idle' | 'saving' | 'saved' | 'error';
 }
 
 // ── Module-level ID generator ─────────────────────────────────────────────────
