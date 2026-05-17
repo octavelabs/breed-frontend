@@ -317,9 +317,10 @@ export const CreateCourseModal = ({
                 customClass="!w-full px-3 !h-[48px] !text-white !text-sm"
                 type="button"
                 onClick={handleCreate}
-                disabled={!canSubmitStep2 || isSubmitting}
+                disabled={!canSubmitStep2}
+                loading={isSubmitting}
               >
-                {isSubmitting ? "Creating..." : "Create Course"}
+                Create Course
               </Button>
             </div>
           )}

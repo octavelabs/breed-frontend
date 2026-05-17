@@ -128,9 +128,9 @@ const StepOne = ({
         <Button
           customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
-          disabled={isSubmitting}
+          loading={isSubmitting}
         >
-          {isSubmitting ? "Sending..." : "Send Reset Code"}
+          Send Reset Code
         </Button>
       </form>
     </div>
@@ -327,9 +327,10 @@ const StepTwo = ({
         <Button
           customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
-          disabled={!allFilled || isVerifying}
+          disabled={!allFilled}
+          loading={isVerifying}
         >
-          {isVerifying ? "Verifying..." : "Verify Code"}
+          Verify Code
         </Button>
       </form>
     </div>
@@ -450,9 +451,9 @@ const StepThree = ({ resetToken }: { resetToken: string }) => {
         <Button
           customClass="!w-full !h-[48px] mt-2 !text-white"
           type="submit"
-          disabled={isSubmitting}
+          loading={isSubmitting}
         >
-          {isSubmitting ? "Resetting..." : "Reset Password"}
+          Reset Password
         </Button>
       </form>
     </div>

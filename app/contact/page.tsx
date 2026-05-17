@@ -222,10 +222,10 @@ export default function ContactPage() {
 
               <Button
                 onClick={handleSubmit}
-                disabled={loading}
+                loading={loading}
                 customClass="!w-[85%] !mx-auto !text-white"
               >
-                {loading ? "Sending..." : "Join Us Today"}
+                Join Us Today
               </Button>
             </div>
 

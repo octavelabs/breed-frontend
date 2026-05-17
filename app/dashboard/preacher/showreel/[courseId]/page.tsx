@@ -168,7 +168,7 @@ const UpdateCourse = () => {
                 className="w-10 h-10 flex justify-center items-center rounded-full border border-[#870BD6] bg-[#F3F4F6] text-[#6B7280] transition-colors hover:bg-purple-50 disabled:opacity-50"
               >
                 {actionLoading === 'publish' ? (
-                  <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-purple-600" />
+                  <span className="inline-block w-4 h-4 rounded-full border-2 border-purple-300 border-t-purple-600 animate-spin" />
                 ) : (
                   <PublishIcon />
                 )}
@@ -184,7 +184,7 @@ const UpdateCourse = () => {
                 className="w-10 h-10 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] text-[#6B7280] transition-colors hover:bg-gray-200 disabled:opacity-50"
               >
                 {actionLoading === 'archive' ? (
-                  <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-gray-500" />
+                  <span className="inline-block w-4 h-4 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin" />
                 ) : (
                   <Archive className="w-[18px] h-[18px]" />
                 )}
@@ -199,7 +199,7 @@ const UpdateCourse = () => {
               className="w-10 h-10 flex justify-center items-center rounded-full border border-[#FCA5A5] text-[#EF4444] bg-[#FFE4E4] transition-colors hover:bg-red-100 disabled:opacity-50"
             >
               {actionLoading === 'delete' ? (
-                <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-red-500" />
+                <span className="inline-block w-4 h-4 rounded-full border-2 border-red-300 border-t-red-500 animate-spin" />
               ) : (
                 <Trash2 className="w-[18px] h-[18px]" />
               )}

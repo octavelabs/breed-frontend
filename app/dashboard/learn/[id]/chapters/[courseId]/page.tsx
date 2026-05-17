@@ -231,7 +231,7 @@ const CourseDetail: React.FC = () => {
                 className="flex items-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold transition-opacity disabled:opacity-60"
               >
                 {enrolling ? (
-                  <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-white" />
+                  <span className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
                 ) : (
                   <Play className="w-4 h-4" />
                 )}

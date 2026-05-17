@@ -121,13 +121,9 @@ const Onboarding: React.FC = () => {
         <Button
           customClass="!w-full !h-[58px] mt-[20px] mb-2 !text-white"
           onClick={handleButtonClick}
-          disabled={isSubmitting}
+          loading={isSubmitting}
         >
-          {currentStep === 0
-            ? "Proceed"
-            : isSubmitting
-              ? "Saving..."
-              : "Let's Get Started"}
+          {currentStep === 0 ? "Proceed" : "Let's Get Started"}
         </Button>
       </div>
     </AuthLayout>
