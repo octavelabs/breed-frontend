@@ -33,40 +33,45 @@ const Tabs: React.FC<TabsProps> = ({
     onChange?.(value);
   };
 
-  const activeTabContent = tabs.find(tab => tab.value === activeTab)?.content;
   const renderedCustomButton =
     typeof customButton === 'function' ? customButton(activeTab) : customButton;
 
   return (
     <div>
-    <div className={`flex w-full justify-between items-center ${className}`}>
-      <div className={`flex gap-3 w-full max-w-full overflow-auto`}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => handleTabClick(tab.value)}
-            className={`
-              border px-[18px] py-3 whitespace-nowrap rounded-[12px] font-medium text-sm transition-all duration-200
-              ${
-                activeTab === tab.value
-                  ? 'bg-white border-black font-semibold'
-                  : 'text-[#4E5255] border-[#D2D9DF]'
-              } ${customClass}
-            `}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-      {renderedCustomButton}
+      <div className={`flex w-full justify-between items-center ${className}`}>
+        <div className={`flex gap-3 w-full max-w-full overflow-auto`}>
+          {tabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => handleTabClick(tab.value)}
+              className={`
+                border px-[18px] py-3 whitespace-nowrap rounded-[12px] font-medium text-sm transition-all duration-200
+                ${
+                  activeTab === tab.value
+                    ? 'bg-white border-black font-semibold'
+                    : 'text-[#4E5255] border-[#D2D9DF]'
+                } ${customClass}
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {renderedCustomButton}
       </div>
 
-      {/* Tab Content */}
-      {activeTabContent && (
-        <div className="mt-6">
-          {activeTabContent}
+      {/* All tab panels stay mounted; only the active one is visible.
+          This prevents React from unmounting stateful components (like the
+          course editor) when the user switches tabs, preserving all state. */}
+      {tabs.map((tab) => (
+        <div
+          key={tab.value}
+          className="mt-6"
+          style={activeTab === tab.value ? undefined : { display: 'none' }}
+        >
+          {tab.content}
         </div>
-      )}
+      ))}
     </div>
   );
 };

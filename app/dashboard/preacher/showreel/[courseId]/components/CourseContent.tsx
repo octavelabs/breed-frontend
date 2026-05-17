@@ -61,6 +61,66 @@ function mapApiToEditor(
   };
 }
 
+/**
+ * Restore the multi-chapter structure from localStorage, merging it with
+ * fresh lesson *content* from the API.
+ *
+ * Why this is necessary: the backend stores lessons as a flat list — it has
+ * no concept of chapters. The chapter hierarchy is a client-side abstraction
+ * persisted in localStorage by CourseEditor. On every load we:
+ *   1. Read which lessons belong to which chapter from localStorage.
+ *   2. Fill lesson content from the live API response (authoritative source).
+ *   3. Orphan any lessons the API returned but the saved structure doesn't
+ *      know about (e.g. created on another device) → append to chapter 1.
+ *
+ * Returns null if no valid saved structure exists (fall back to mapApiToEditor).
+ */
+function restoreStructure(
+  apiCourse: ApiCourse,
+): EditorCourse | null {
+  if (typeof window === "undefined") return null;
+
+  const raw = localStorage.getItem(`course-structure-${apiCourse.id}`);
+  if (!raw) return null;
+
+  try {
+    const saved = JSON.parse(raw) as {
+      chapters: { id: string; name: string; lessonIds: string[] }[];
+    };
+    if (!Array.isArray(saved?.chapters)) return null;
+
+    const byId = new Map((apiCourse.lessons ?? []).map((l) => [l.id, l]));
+
+    const chapters: EditorChapter[] = saved.chapters.map((ch) => ({
+      id:   ch.id,
+      name: ch.name,
+      lessons: (ch.lessonIds ?? [])
+        .filter((id) => byId.has(id))           // skip lessons deleted from backend
+        .map((id) => {
+          const l = byId.get(id)!;
+          return { id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content };
+        }),
+    }));
+
+    // Orphaned lessons: exist in the API but not referenced by any saved chapter.
+    const knownIds = new Set(saved.chapters.flatMap((ch) => ch.lessonIds ?? []));
+    const orphans: EditorLesson[] = (apiCourse.lessons ?? [])
+      .filter((l) => !knownIds.has(l.id))
+      .map((l) => ({ id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content }));
+
+    if (orphans.length > 0) {
+      if (chapters.length > 0) chapters[0].lessons.push(...orphans);
+      else chapters.push({ id: "ch-fallback", name: "Chapter 1", lessons: orphans });
+    }
+
+    if (chapters.length === 0) return null;  // nothing useful — fall back
+
+    return { id: apiCourse.id, title: apiCourse.title, chapters };
+  } catch {
+    return null;  // corrupted storage — fall back gracefully
+  }
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface CourseContentProps {
@@ -100,7 +160,13 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
             ? new URLSearchParams(window.location.search).get("chapterName") ?? undefined
             : undefined;
 
-        setEditorCourse(mapApiToEditor(data, initialChapterName));
+        // Prefer the saved chapter structure (preserved across tab switches and
+        // hard refreshes). Fall back to the flat single-chapter mapping only when
+        // no structure has been saved yet (brand-new course or first-ever load).
+        const restored = restoreStructure(data);
+        setEditorCourse(
+          restored ?? mapApiToEditor(data, initialChapterName),
+        );
         originalLessonIds.current = new Set((data.lessons ?? []).map((l) => l.id));
       } catch {
         setEditorCourse(null);

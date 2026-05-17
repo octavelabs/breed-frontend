@@ -334,7 +334,25 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
   useEffect(() => {
     if (isInitialMount.current) { isInitialMount.current = false; return; }
     if (isPatchingRef.current)  { isPatchingRef.current = false;  return; }
-    const t = setTimeout(() => { onChangeRef.current?.(course); }, 2_000);
+    const t = setTimeout(() => {
+      // Persist the chapter structure (id, name, which lessonIds belong where) so
+      // it can be restored after a hard refresh or cross-session navigation.
+      // Lesson *content* is authoritative in the backend; only the structure is
+      // local, because the backend stores lessons as a flat list with no chapters.
+      if (course.id) {
+        localStorage.setItem(
+          `course-structure-${course.id}`,
+          JSON.stringify({
+            chapters: course.chapters.map((ch) => ({
+              id:        ch.id,
+              name:      ch.name,
+              lessonIds: ch.lessons.map((l) => l.id),
+            })),
+          }),
+        );
+      }
+      onChangeRef.current?.(course);
+    }, 2_000);
     return () => clearTimeout(t);
   }, [course]);
 
