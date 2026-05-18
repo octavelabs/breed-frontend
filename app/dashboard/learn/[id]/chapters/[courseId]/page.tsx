@@ -261,7 +261,7 @@ const CourseDetail: React.FC = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="animate-pulse space-y-6 p-6 max-w-5xl mx-auto">
+        <div className="animate-pulse space-y-6">
           <div className="h-8 bg-gray-200 rounded w-1/2" />
           <div className="flex gap-8">
             <div className="flex-1 space-y-3">
@@ -294,11 +294,11 @@ const CourseDetail: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-5xl mx-auto px-4 pb-16">
+      <div className="pb-16">
         {/* Back */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 pt-2"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
