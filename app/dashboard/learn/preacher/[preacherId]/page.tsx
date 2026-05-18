@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { courseService, userService } from "@/lib/api-services";
-import { ArrowLeft, BookOpen, Users, Globe, Church, Check, UserPlus } from "lucide-react";
+import { ArrowLeft, BookOpen, Users, Check, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
@@ -47,7 +47,7 @@ const levelColor: Record<string, string> = {
   ADVANCED:     "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]",
 };
 
-// ── Mini Course Card ──────────────────────────────────────────────────────────
+// ── Course Card ───────────────────────────────────────────────────────────────
 
 const CourseCard = ({ course }: { course: Course }) => {
   const level = course.level ?? "BEGINNER";
@@ -89,19 +89,48 @@ const CourseCard = ({ course }: { course: Course }) => {
   );
 };
 
+// ── Stat item ─────────────────────────────────────────────────────────────────
+
+const StatItem = ({
+  value,
+  label,
+  icon,
+  backgroundColor,
+}: {
+  value: string | number;
+  label: string;
+  icon: React.ReactNode;
+  backgroundColor: string;
+}) => (
+  <div className="flex items-center gap-3">
+    <div
+      className="w-[42px] h-[42px] flex items-center justify-center rounded-[16px] shrink-0"
+      style={{ backgroundColor }}
+    >
+      {icon}
+    </div>
+    <div>
+      <p className="font-bold text-[17px] leading-none mb-[2px]">
+        {typeof value === "number" ? value.toLocaleString() : value}
+      </p>
+      <p className="text-[15px] text-[#60666B] leading-tight">{label}</p>
+    </div>
+  </div>
+);
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const PreacherProfilePage = () => {
-  const params      = useParams();
-  const router      = useRouter();
-  const { user }    = useAuth();
-  const preacherId  = params.preacherId as string;
+  const params     = useParams();
+  const router     = useRouter();
+  const { user }   = useAuth();
+  const preacherId = params.preacherId as string;
 
-  const [preacher,    setPreacher]    = useState<Preacher | null>(null);
-  const [courses,     setCourses]     = useState<Course[]>([]);
-  const [loading,     setLoading]     = useState(true);
-  const [following,   setFollowing]   = useState(false);   // loading state for follow action
-  const [activeTab,   setActiveTab]   = useState<"courses" | "about">("courses");
+  const [preacher,  setPreacher]  = useState<Preacher | null>(null);
+  const [courses,   setCourses]   = useState<Course[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [following, setFollowing] = useState(false);
+  const [activeTab, setActiveTab] = useState<"courses" | "about">("courses");
 
   const isOwnProfile = user?.id === preacherId;
 
@@ -112,12 +141,9 @@ const PreacherProfilePage = () => {
         userService.getPublicProfile(preacherId) as Promise<Preacher>,
         courseService.getAll({ authorId: preacherId, limit: 30 }) as Promise<unknown>,
       ]);
-
       setPreacher(profileRes);
-
       const r = coursesRes as { data?: Course[] };
-      const list: Course[] = Array.isArray(coursesRes) ? (coursesRes as Course[]) : (r.data ?? []);
-      setCourses(list);
+      setCourses(Array.isArray(coursesRes) ? (coursesRes as Course[]) : (r.data ?? []));
     } catch {
       setPreacher(null);
     } finally {
@@ -130,32 +156,16 @@ const PreacherProfilePage = () => {
   const handleFollow = async () => {
     if (!preacher) return;
     const wasFollowing = preacher.isFollowing;
-
-    // Optimistic update
     setPreacher((prev) =>
-      prev
-        ? {
-            ...prev,
-            isFollowing:    !wasFollowing,
-            followersCount: (prev.followersCount ?? 0) + (wasFollowing ? -1 : 1),
-          }
-        : prev,
+      prev ? { ...prev, isFollowing: !wasFollowing, followersCount: (prev.followersCount ?? 0) + (wasFollowing ? -1 : 1) } : prev
     );
-
     setFollowing(true);
     try {
       if (wasFollowing) await userService.unfollow(preacherId);
       else              await userService.follow(preacherId);
     } catch {
-      // Revert optimistic update on failure
       setPreacher((prev) =>
-        prev
-          ? {
-              ...prev,
-              isFollowing:    wasFollowing,
-              followersCount: (prev.followersCount ?? 0) + (wasFollowing ? 1 : -1),
-            }
-          : prev,
+        prev ? { ...prev, isFollowing: wasFollowing, followersCount: (prev.followersCount ?? 0) + (wasFollowing ? 1 : -1) } : prev
       );
     } finally {
       setFollowing(false);
@@ -165,20 +175,22 @@ const PreacherProfilePage = () => {
   const fullName    = preacher ? `${preacher.firstName} ${preacher.lastName}` : "Preacher";
   const initial     = preacher?.firstName?.charAt(0)?.toUpperCase() ?? "P";
   const totalEnroll = courses.reduce((s, c) => s + (c.enrollmentCount ?? 0), 0);
+  const location    = [preacher?.city, preacher?.country].filter(Boolean).join(", ");
 
   // ── Skeleton ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <DashboardLayout custom={true}>
         <div>
-          <div className="h-[200px] bg-[#180426] animate-pulse" />
-          <div className="px-4 lg:px-12 py-8 max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="h-48 bg-[#870BD6] animate-pulse" />
+          <div className="px-4 md:px-12 py-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="border border-[#E2E3E5] rounded-2xl animate-pulse">
                   <div className="bg-gray-100 rounded-t-2xl p-3"><div className="bg-gray-200 rounded-xl h-[140px]" /></div>
                   <div className="px-4 py-4 space-y-2">
-                    <div className="h-3 bg-gray-200 rounded w-1/3" /><div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
                   </div>
                 </div>
               ))}
@@ -191,27 +203,27 @@ const PreacherProfilePage = () => {
 
   return (
     <DashboardLayout custom={true}>
-      <div className="bg-white min-h-full pb-12">
+      <div className="border-l border-[#D2D9DF]">
 
-        {/* ── Back ─────────────────────────────────────────────────────────── */}
-        <div className="px-4 lg:px-12 pt-6 pb-0">
+        {/* ── Banner ──────────────────────────────────────────────────────── */}
+        <div
+          className="bg-[#870BD6] h-48 relative"
+          style={{ backgroundImage: "url('/dashboard-header.png')" }}
+        >
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#60666B] hover:text-gray-900"
+            className="flex items-center gap-2 cursor-pointer px-4 md:px-12 pt-16 relative z-20"
           >
-            <ArrowLeft size={18} />
-            <span className="text-sm">Back</span>
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.15)_1px,_transparent_1px)] [background-size:20px_20px]" />
         </div>
 
-        {/* ── Hero banner ──────────────────────────────────────────────────── */}
-        <div className="relative bg-gradient-to-br from-[#180426] via-[#2D0C53] to-[#3D1472] px-4 lg:px-12 pt-10 pb-16 mt-4">
-          {/* Subtle texture overlay */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #870BD6 0%, transparent 60%)" }} />
-
-          <div className="relative max-w-5xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-5">
-            {/* Avatar */}
-            <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-[#E7C8FF] flex items-center justify-center flex-shrink-0 border-4 border-white/20 overflow-hidden shadow-lg">
+        {/* ── Profile header ───────────────────────────────────────────────── */}
+        <div className="px-4 md:px-12 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 lg:gap-6">
+          <div className="flex items-center gap-5">
+            {/* Avatar overlapping the banner */}
+            <div className="w-[120px] lg:w-[150px] h-[120px] lg:h-[150px] rounded-full bg-[#E7C8FF] flex items-center justify-center shrink-0 border-[3px] border-white overflow-hidden -mt-20 relative z-20 shadow-lg">
               {preacher?.avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={preacher.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
@@ -220,82 +232,59 @@ const PreacherProfilePage = () => {
               )}
             </div>
 
-            {/* Info */}
-            <div className="flex-1 text-center sm:text-left text-white pb-1">
-              <p className="text-xs font-bold text-[#D49CFD] uppercase tracking-widest mb-1">
-                Course Creator
-              </p>
-              <h1 className="text-2xl lg:text-[28px] font-bold mb-1">{fullName}</h1>
-
-              {preacher?.churchName && (
-                <p className="flex items-center gap-1.5 justify-center sm:justify-start text-[#C4B5FD] text-sm mb-0.5">
-                  <Church size={13} /> {preacher.churchName}
-                </p>
-              )}
-              {(preacher?.city || preacher?.country) && (
-                <p className="flex items-center gap-1.5 justify-center sm:justify-start text-[#C4B5FD] text-sm">
-                  <Globe size={13} />
-                  {[preacher?.city, preacher?.country].filter(Boolean).join(", ")}
+            {/* Name + church (large screens) */}
+            <div className="hidden lg:block">
+              <h2 className="text-[24px] font-bold text-[#180426]">{fullName}</h2>
+              {(preacher?.churchName || location) && (
+                <p className="text-[#60666B]">
+                  {preacher?.churchName}
+                  {preacher?.churchName && location ? ` · ${location}` : location}
                 </p>
               )}
             </div>
-
-            {/* Follow button */}
-            {!isOwnProfile && (
-              <div className="pb-1">
-                <button
-                  onClick={handleFollow}
-                  disabled={following}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold text-sm transition-all disabled:opacity-60 ${
-                    preacher?.isFollowing
-                      ? "bg-white/10 border border-white/30 text-white hover:bg-white/20"
-                      : "bg-white text-[#870BD6] hover:bg-[#F5EBFF]"
-                  }`}
-                >
-                  {following ? (
-                    <span className="inline-block w-4 h-4 rounded-full border-t-2 border-current animate-spin" />
-                  ) : preacher?.isFollowing ? (
-                    <Check size={15} />
-                  ) : (
-                    <UserPlus size={15} />
-                  )}
-                  {preacher?.isFollowing ? "Following" : "Follow"}
-                </button>
-              </div>
-            )}
           </div>
+
+          {/* Name + church (small screens) */}
+          <div className="lg:hidden">
+            <h2 className="text-[24px] font-bold text-[#180426]">{fullName}</h2>
+            {preacher?.churchName && <p className="text-[#60666B]">{preacher.churchName}</p>}
+            {!preacher?.churchName && location && <p className="text-[#60666B]">{location}</p>}
+          </div>
+
+          {/* Follow button */}
+          {!isOwnProfile && (
+            <button
+              onClick={handleFollow}
+              disabled={following}
+              className={`flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all disabled:opacity-60 shrink-0 ${
+                preacher?.isFollowing
+                  ? "bg-white border border-[#D1D5DB] text-[#374151] hover:bg-gray-50"
+                  : "bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white"
+              }`}
+            >
+              {following ? (
+                <span className="inline-block w-4 h-4 rounded-full border-t-2 border-current animate-spin" />
+              ) : preacher?.isFollowing ? (
+                <Check size={15} />
+              ) : (
+                <UserPlus size={15} />
+              )}
+              {preacher?.isFollowing ? "Following" : "Follow"}
+            </button>
+          )}
         </div>
 
-        {/* ── Stats strip ──────────────────────────────────────────────────── */}
-        <div className="bg-[#FBF6FF] border-b border-[#E7C8FF] px-4 lg:px-12 py-4">
-          <div className="max-w-5xl mx-auto flex items-center justify-center sm:justify-start gap-8 lg:gap-12 flex-wrap">
-            {[
-              { value: preacher?.followersCount ?? 0, label: "Followers" },
-              { value: courses.length,                label: "Courses" },
-              { value: totalEnroll,                   label: "Students" },
-            ].map(({ value, label }, i, arr) => (
-              <React.Fragment key={label}>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-[#180426]">{value.toLocaleString()}</p>
-                  <p className="text-[12px] text-[#60666B]">{label}</p>
-                </div>
-                {i < arr.length - 1 && <div className="w-px h-7 bg-[#E7C8FF]" />}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Tabs ─────────────────────────────────────────────────────────── */}
-        <div className="border-b border-[#E2E3E5] px-4 lg:px-12">
-          <div className="max-w-5xl mx-auto flex gap-6">
+        {/* ── Tabs ────────────────────────────────────────────────────────── */}
+        <div className="px-4 md:px-12 pt-2">
+          <div className="flex gap-8 border-b border-[#D2D9DF]">
             {(["courses", "about"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-3 text-sm font-semibold capitalize border-b-2 transition-colors ${
+                className={`pb-3 font-medium capitalize transition-colors ${
                   activeTab === tab
-                    ? "border-[#870BD6] text-[#870BD6]"
-                    : "border-transparent text-[#60666B] hover:text-[#180426]"
+                    ? "border-b-2 border-[#870BD6] text-[#870BD6] font-semibold text-[18px]"
+                    : "text-[#60666B]"
                 }`}
               >
                 {tab}
@@ -304,64 +293,82 @@ const PreacherProfilePage = () => {
           </div>
         </div>
 
-        {/* ── Tab content ──────────────────────────────────────────────────── */}
-        <div className="px-4 lg:px-12 pt-8 max-w-5xl mx-auto">
+        {/* ── Content ─────────────────────────────────────────────────────── */}
+        <div className="px-4 lg:px-12 py-6 flex flex-col lg:flex-row gap-8 items-start">
+
           {/* Courses tab */}
           {activeTab === "courses" && (
             <>
-              <h2 className="text-base font-semibold text-[#180426] mb-5">
-                Courses by {fullName}
-              </h2>
-              {courses.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-[#E2E3E5] rounded-2xl">
-                  <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                    <BookOpen size={22} className="text-[#870BD6]" />
+              <div className="w-full lg:w-[60%]">
+                {courses.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-[#E2E3E5] rounded-2xl">
+                    <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                      <BookOpen size={22} className="text-[#870BD6]" />
+                    </div>
+                    <p className="text-sm font-semibold text-gray-700">No published courses yet</p>
+                    <p className="text-xs text-[#60666B] max-w-xs">
+                      This creator hasn&apos;t published any courses yet. Check back soon!
+                    </p>
                   </div>
-                  <p className="text-sm font-semibold text-gray-700">No published courses yet</p>
-                  <p className="text-xs text-[#60666B] max-w-xs">
-                    This creator hasn&apos;t published any courses yet. Check back soon!
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {courses.map((course) => <CourseCard key={course.id} course={course} />)}
-                </div>
-              )}
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {courses.map((course) => <CourseCard key={course.id} course={course} />)}
+                  </div>
+                )}
+              </div>
+
+              {/* Stats card */}
+              <div className="bg-white rounded-2xl p-5 shadow-[0px_4.29px_4.29px_0px_#60666B0D] border border-[#F0F2F4] flex flex-col w-full lg:w-[40%] shrink-0 gap-5 order-first lg:order-last">
+                <StatItem
+                  value={preacher?.followersCount ?? 0}
+                  label="Followers"
+                  icon={<UserRound stroke="#870BD6" className="w-5 h-5" />}
+                  backgroundColor="#F5EBFF"
+                />
+                <StatItem
+                  value={courses.length}
+                  label="Courses Published"
+                  icon={<BookOpen stroke="#4287FB" className="w-5 h-5" />}
+                  backgroundColor="#F0F5FF"
+                />
+                <StatItem
+                  value={totalEnroll}
+                  label="Total Students"
+                  icon={<Users stroke="#067647" className="w-5 h-5" />}
+                  backgroundColor="#ECFDF3"
+                />
+              </div>
             </>
           )}
 
           {/* About tab */}
           {activeTab === "about" && (
-            <div className="max-w-2xl">
-              <h2 className="text-base font-semibold text-[#180426] mb-4">About {fullName}</h2>
+            <div className="max-w-2xl w-full space-y-4 leading-relaxed">
               {preacher?.bio ? (
-                <p className="text-[#60666B] text-sm leading-relaxed whitespace-pre-wrap">
-                  {preacher.bio}
-                </p>
+                <p className="text-[#60666B] text-sm whitespace-pre-wrap">{preacher.bio}</p>
               ) : (
                 <p className="text-[#60666B] text-sm italic">No bio available yet.</p>
               )}
-
-              {(preacher?.churchName || preacher?.city || preacher?.country) && (
-                <div className="mt-8 space-y-3">
-                  <h3 className="text-sm font-semibold text-[#180426]">Details</h3>
+              {(preacher?.churchName || location) && (
+                <div className="pt-4 border-t border-[#F0F2F4] space-y-2">
                   {preacher?.churchName && (
-                    <div className="flex items-center gap-2 text-sm text-[#60666B]">
-                      <Church size={15} className="text-[#870BD6]" />
+                    <p className="text-sm text-[#60666B]">
+                      <span className="font-semibold text-[#180426]">Church: </span>
                       {preacher.churchName}
-                    </div>
+                    </p>
                   )}
-                  {(preacher?.city || preacher?.country) && (
-                    <div className="flex items-center gap-2 text-sm text-[#60666B]">
-                      <Globe size={15} className="text-[#870BD6]" />
-                      {[preacher?.city, preacher?.country].filter(Boolean).join(", ")}
-                    </div>
+                  {location && (
+                    <p className="text-sm text-[#60666B]">
+                      <span className="font-semibold text-[#180426]">Location: </span>
+                      {location}
+                    </p>
                   )}
                 </div>
               )}
             </div>
           )}
         </div>
+
       </div>
     </DashboardLayout>
   );

@@ -52,7 +52,7 @@ interface Course {
   category?: { name: string } | null;
   author?: CourseAuthor | null;
   chapters?: ApiChapter[];
-  lessons?: ApiLesson[];     // flat fallback for courses without chapters
+  lessons?: ApiLesson[];
 }
 
 const levelLabel: Record<string, string> = {
@@ -66,29 +66,77 @@ const levelColor: Record<string, string> = {
   ADVANCED:     "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]",
 };
 
-// ── Derive unified chapter structure from API response ────────────────────────
-
 function buildChapters(course: Course): { id: string; name: string; lessons: ApiLesson[] }[] {
-  // Backend has proper chapter structure
   if (course.chapters && course.chapters.length > 0) {
-    return course.chapters.map((ch) => ({
-      id:      ch.id,
-      name:    ch.title,
-      lessons: ch.lessons ?? [],
-    }));
+    return course.chapters.map((ch) => ({ id: ch.id, name: ch.title, lessons: ch.lessons ?? [] }));
   }
-  // Fallback: flat list → single chapter
   const flat = course.lessons ?? [];
   if (flat.length === 0) return [];
   return [{ id: "ch-fallback", name: "Chapter 1", lessons: flat }];
 }
 
-// ── Chapter accordion section ─────────────────────────────────────────────────
+// ── Lesson Item ───────────────────────────────────────────────────────────────
+
+const LessonItem = ({
+  lesson,
+  globalIdx,
+  enrolled,
+  enrolling,
+  onEnroll,
+}: {
+  lesson: ApiLesson;
+  globalIdx: number;
+  enrolled: boolean;
+  enrolling: boolean;
+  onEnroll: (id: string) => void;
+}) => {
+  const isFirst   = globalIdx === 0;
+  const canAccess = enrolled || lesson.isFree || isFirst;
+
+  return (
+    <div className="flex items-start gap-4 py-4 border-b border-[#F0F2F4] last:border-0 transition-colors">
+      <div
+        className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 ${
+          canAccess ? "bg-[#F5EBFF] text-[#870BD6]" : "bg-[#F0F2F4] text-[#B0B7C3]"
+        }`}
+      >
+        {globalIdx + 1}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-[#B0B7C3] mb-0.5">
+          Lesson {globalIdx + 1}
+        </p>
+        <h4 className={`font-semibold text-sm leading-snug mb-2 ${canAccess ? "text-[#180426]" : "text-[#B0B7C3]"}`}>
+          {lesson.title}
+        </h4>
+        {canAccess ? (
+          <button
+            onClick={() => onEnroll(lesson.id)}
+            disabled={enrolling}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-b from-[#A967F1] to-[#5B26B1] px-4 py-1.5 rounded-full disabled:opacity-60 transition-opacity"
+          >
+            {enrolling ? (
+              <span className="inline-block w-3 h-3 rounded-full border-t-2 border-white animate-spin" />
+            ) : (
+              <Play size={11} />
+            )}
+            {isFirst && !enrolled ? "Start Learning" : "Continue"}
+          </button>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-xs text-[#B0B7C3]">
+            <Lock size={11} /> Enrol to unlock
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Chapter Accordion (used only when there are 2+ chapters) ──────────────────
 
 const ChapterSection = ({
   chapter,
   chapterIndex,
-  isEnrolled,
   enrolled,
   enrolling,
   globalLessonOffset,
@@ -96,18 +144,15 @@ const ChapterSection = ({
 }: {
   chapter: { id: string; name: string; lessons: ApiLesson[] };
   chapterIndex: number;
-  isEnrolled: boolean;
   enrolled: boolean;
   enrolling: boolean;
   globalLessonOffset: number;
-  onEnroll: (lessonId: string) => void;
+  onEnroll: (id: string) => void;
 }) => {
   const [open, setOpen] = useState(true);
-  const completedCount  = 0; // TODO: wire lesson progress from API
 
   return (
     <div className="border border-[#E2E3E5] rounded-2xl overflow-hidden mb-4">
-      {/* Chapter header */}
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-5 py-4 bg-[#FAFAFA] hover:bg-[#F5F0FF] transition-colors"
@@ -120,7 +165,6 @@ const ChapterSection = ({
             <p className="font-semibold text-[#180426] text-sm leading-tight">{chapter.name}</p>
             <p className="text-xs text-[#60666B] mt-0.5">
               {chapter.lessons.length} lesson{chapter.lessons.length !== 1 ? "s" : ""}
-              {completedCount > 0 && ` · ${completedCount} completed`}
             </p>
           </div>
         </div>
@@ -130,71 +174,21 @@ const ChapterSection = ({
         }
       </button>
 
-      {/* Lessons list */}
       {open && (
-        <div className="divide-y divide-[#F0F2F4]">
+        <div className="px-5">
           {chapter.lessons.length === 0 ? (
-            <div className="px-5 py-6 text-center">
-              <p className="text-sm text-[#60666B] italic">No lessons in this chapter yet.</p>
-            </div>
+            <p className="py-4 text-sm text-[#60666B] italic text-center">No lessons in this chapter yet.</p>
           ) : (
-            chapter.lessons.map((lesson, lessonIndex) => {
-              const globalIdx  = globalLessonOffset + lessonIndex;
-              const isFirst    = globalIdx === 0;
-              const canAccess  = enrolled || lesson.isFree || isFirst;
-
-              return (
-                <div
-                  key={lesson.id}
-                  className={`flex items-start gap-4 px-5 py-4 transition-colors ${
-                    canAccess ? "hover:bg-[#FBF6FF]" : ""
-                  }`}
-                >
-                  {/* Lesson number */}
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 ${
-                      canAccess
-                        ? "bg-[#F5EBFF] text-[#870BD6]"
-                        : "bg-[#F0F2F4] text-[#B0B7C3]"
-                    }`}
-                  >
-                    {globalIdx + 1}
-                  </div>
-
-                  {/* Lesson info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-[#B0B7C3] mb-0.5">
-                      Lesson {globalIdx + 1}
-                    </p>
-                    <h4 className={`font-semibold text-sm leading-snug mb-1 ${canAccess ? "text-[#180426]" : "text-[#B0B7C3]"}`}>
-                      {lesson.title}
-                    </h4>
-                    {lesson.description && canAccess && (
-                      <p className="text-xs text-[#60666B] line-clamp-2 mb-2">{lesson.description}</p>
-                    )}
-
-                    {canAccess ? (
-                      <button
-                        onClick={() => onEnroll(lesson.id)}
-                        disabled={enrolling}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-b from-[#A967F1] to-[#5B26B1] px-4 py-1.5 rounded-full disabled:opacity-60 transition-opacity"
-                      >
-                        {enrolling ? (
-                          <span className="inline-block w-3 h-3 rounded-full border-t-2 border-white animate-spin" />
-                        ) : (
-                          <Play size={11} />
-                        )}
-                        {isFirst && !enrolled ? "Start Learning" : "Continue"}
-                      </button>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-[#B0B7C3]">
-                        <Lock size={11} /> Enrol to unlock
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })
+            chapter.lessons.map((lesson, i) => (
+              <LessonItem
+                key={lesson.id}
+                lesson={lesson}
+                globalIdx={globalLessonOffset + i}
+                enrolled={enrolled}
+                enrolling={enrolling}
+                onEnroll={onEnroll}
+              />
+            ))
           )}
         </div>
       )}
@@ -262,13 +256,12 @@ const CourseDetail: React.FC = () => {
     ? `${course.author.firstName} ${course.author.lastName}`
     : null;
 
-  // Running offset so each lesson gets a globally unique number
   let lessonOffset = 0;
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="animate-pulse space-y-6 p-6 max-w-4xl mx-auto">
+        <div className="animate-pulse space-y-6 p-6 max-w-5xl mx-auto">
           <div className="h-8 bg-gray-200 rounded w-1/2" />
           <div className="flex gap-8">
             <div className="flex-1 space-y-3">
@@ -278,7 +271,7 @@ const CourseDetail: React.FC = () => {
             <div className="w-1/2 h-56 bg-gray-200 rounded-2xl" />
           </div>
           <div className="space-y-3">
-            {[1, 2].map((i) => <div key={i} className="h-20 bg-gray-200 rounded-2xl" />)}
+            {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-gray-200 rounded-2xl" />)}
           </div>
         </div>
       </DashboardLayout>
@@ -314,18 +307,11 @@ const CourseDetail: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-10 mb-10">
           {/* Left: meta */}
           <div className="w-full lg:w-1/2">
-            {/* Category */}
-            {course.category?.name && (
-              <p className="text-xs font-semibold text-[#870BD6] mb-3 uppercase tracking-widest">
-                {course.category.name}
-              </p>
-            )}
-
-            {/* Title + badges */}
-            <h1 className="text-2xl lg:text-[32px] font-bold text-[#180426] leading-tight mb-3">
-              {course.title}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 mb-4">
+            {/* Title + badges on the same line */}
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <h1 className="text-2xl lg:text-[28px] font-bold text-[#180426] leading-tight">
+                {course.title}
+              </h1>
               <span className={`text-xs font-semibold px-3 py-1 rounded-full ${levelColor[level] ?? levelColor.BEGINNER}`}>
                 {levelLabel[level] ?? level}
               </span>
@@ -336,17 +322,23 @@ const CourseDetail: React.FC = () => {
               )}
             </div>
 
+            {/* Category */}
+            {course.category?.name && (
+              <p className="text-xs font-semibold text-[#870BD6] mb-3 uppercase tracking-widest">
+                {course.category.name}
+              </p>
+            )}
+
             {/* Description */}
             <p className="text-[#60666B] text-sm leading-relaxed mb-5">
               {course.description ?? "No description provided."}
             </p>
 
-            {/* Stats row */}
+            {/* Stats */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-[#60666B] mb-5">
               <span className="flex items-center gap-1.5">
                 <BookOpen size={15} />
                 {allLessons.length} lesson{allLessons.length !== 1 ? "s" : ""}
-                {chapters.length > 1 && ` · ${chapters.length} chapters`}
               </span>
               <span className="flex items-center gap-1.5">
                 <Users size={15} />
@@ -409,14 +401,11 @@ const CourseDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Course content ────────────────────────────────────────────────── */}
+        {/* ── Lessons section ───────────────────────────────────────────────── */}
         <div>
-          <h2 className="text-lg font-bold text-[#180426] mb-2">
-            Course Content
+          <h2 className="text-lg font-bold text-[#180426] mb-5">
+            Lessons &middot; {allLessons.length}
           </h2>
-          <p className="text-sm text-[#60666B] mb-6">
-            {chapters.length} chapter{chapters.length !== 1 ? "s" : ""} &nbsp;·&nbsp; {allLessons.length} lesson{allLessons.length !== 1 ? "s" : ""}
-          </p>
 
           {chapters.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-14 text-center border border-[#E2E3E5] rounded-2xl">
@@ -428,7 +417,22 @@ const CourseDetail: React.FC = () => {
                 The creator hasn&apos;t published lessons yet. Check back soon!
               </p>
             </div>
+          ) : chapters.length === 1 ? (
+            // Single chapter → flat list, no accordion wrapper
+            <div>
+              {chapters[0].lessons.map((lesson, i) => (
+                <LessonItem
+                  key={lesson.id}
+                  lesson={lesson}
+                  globalIdx={i}
+                  enrolled={enrolled}
+                  enrolling={enrolling}
+                  onEnroll={handleEnroll}
+                />
+              ))}
+            </div>
           ) : (
+            // Multiple chapters → accordion per chapter
             chapters.map((chapter, chapterIndex) => {
               const offset = lessonOffset;
               lessonOffset += chapter.lessons.length;
@@ -437,7 +441,6 @@ const CourseDetail: React.FC = () => {
                   key={chapter.id}
                   chapter={chapter}
                   chapterIndex={chapterIndex}
-                  isEnrolled={enrolled}
                   enrolled={enrolled}
                   enrolling={enrolling}
                   globalLessonOffset={offset}
