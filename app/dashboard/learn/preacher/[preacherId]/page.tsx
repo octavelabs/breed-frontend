@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { courseService, userService } from "@/lib/api-services";
-import { ArrowLeft, BookOpen, Users, Check, UserPlus, UserRound } from "lucide-react";
+import { ArrowLeft, BookOpen, Users, Check, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
@@ -89,35 +89,6 @@ const CourseCard = ({ course }: { course: Course }) => {
   );
 };
 
-// ── Stat item ─────────────────────────────────────────────────────────────────
-
-const StatItem = ({
-  value,
-  label,
-  icon,
-  backgroundColor,
-}: {
-  value: string | number;
-  label: string;
-  icon: React.ReactNode;
-  backgroundColor: string;
-}) => (
-  <div className="flex items-center gap-3">
-    <div
-      className="w-[42px] h-[42px] flex items-center justify-center rounded-[16px] shrink-0"
-      style={{ backgroundColor }}
-    >
-      {icon}
-    </div>
-    <div>
-      <p className="font-bold text-[17px] leading-none mb-[2px]">
-        {typeof value === "number" ? value.toLocaleString() : value}
-      </p>
-      <p className="text-[15px] text-[#60666B] leading-tight">{label}</p>
-    </div>
-  </div>
-);
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const PreacherProfilePage = () => {
@@ -184,7 +155,7 @@ const PreacherProfilePage = () => {
         <div>
           <div className="h-48 bg-[#870BD6] animate-pulse" />
           <div className="px-4 md:px-12 py-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="border border-[#E2E3E5] rounded-2xl animate-pulse">
                   <div className="bg-gray-100 rounded-t-2xl p-3"><div className="bg-gray-200 rounded-xl h-[140px]" /></div>
@@ -232,23 +203,49 @@ const PreacherProfilePage = () => {
               )}
             </div>
 
-            {/* Name + church (large screens) */}
+            {/* Name + location + stats (large screens) */}
             <div className="hidden lg:block">
               <h2 className="text-[24px] font-bold text-[#180426]">{fullName}</h2>
               {(preacher?.churchName || location) && (
-                <p className="text-[#60666B]">
+                <p className="text-[#60666B] text-sm">
                   {preacher?.churchName}
                   {preacher?.churchName && location ? ` · ${location}` : location}
                 </p>
               )}
+              <div className="flex items-center gap-3 mt-2 flex-wrap">
+                <span className="text-sm text-[#60666B]">
+                  <span className="font-bold text-[#180426]">{(preacher?.followersCount ?? 0).toLocaleString()}</span> Followers
+                </span>
+                <span className="w-1 h-1 rounded-full bg-[#C4B5FD]" />
+                <span className="text-sm text-[#60666B]">
+                  <span className="font-bold text-[#180426]">{courses.length}</span> Courses
+                </span>
+                <span className="w-1 h-1 rounded-full bg-[#C4B5FD]" />
+                <span className="text-sm text-[#60666B]">
+                  <span className="font-bold text-[#180426]">{totalEnroll.toLocaleString()}</span> Enrolled
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Name + church (small screens) */}
+          {/* Name + location + stats (small screens) */}
           <div className="lg:hidden">
             <h2 className="text-[24px] font-bold text-[#180426]">{fullName}</h2>
-            {preacher?.churchName && <p className="text-[#60666B]">{preacher.churchName}</p>}
-            {!preacher?.churchName && location && <p className="text-[#60666B]">{location}</p>}
+            {preacher?.churchName && <p className="text-[#60666B] text-sm">{preacher.churchName}</p>}
+            {!preacher?.churchName && location && <p className="text-[#60666B] text-sm">{location}</p>}
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
+              <span className="text-sm text-[#60666B]">
+                <span className="font-bold text-[#180426]">{(preacher?.followersCount ?? 0).toLocaleString()}</span> Followers
+              </span>
+              <span className="w-1 h-1 rounded-full bg-[#C4B5FD]" />
+              <span className="text-sm text-[#60666B]">
+                <span className="font-bold text-[#180426]">{courses.length}</span> Courses
+              </span>
+              <span className="w-1 h-1 rounded-full bg-[#C4B5FD]" />
+              <span className="text-sm text-[#60666B]">
+                <span className="font-bold text-[#180426]">{totalEnroll.toLocaleString()}</span> Enrolled
+              </span>
+            </div>
           </div>
 
           {/* Follow button */}
@@ -294,51 +291,25 @@ const PreacherProfilePage = () => {
         </div>
 
         {/* ── Content ─────────────────────────────────────────────────────── */}
-        <div className="px-4 lg:px-12 py-6 flex flex-col lg:flex-row gap-8 items-start">
+        <div className="px-4 lg:px-12 py-6">
 
           {/* Courses tab */}
           {activeTab === "courses" && (
-            <>
-              <div className="w-full lg:w-[60%]">
-                {courses.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-[#E2E3E5] rounded-2xl">
-                    <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                      <BookOpen size={22} className="text-[#870BD6]" />
-                    </div>
-                    <p className="text-sm font-semibold text-gray-700">No published courses yet</p>
-                    <p className="text-xs text-[#60666B] max-w-xs">
-                      This creator hasn&apos;t published any courses yet. Check back soon!
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {courses.map((course) => <CourseCard key={course.id} course={course} />)}
-                  </div>
-                )}
+            courses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-[#E2E3E5] rounded-2xl">
+                <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                  <BookOpen size={22} className="text-[#870BD6]" />
+                </div>
+                <p className="text-sm font-semibold text-gray-700">No published courses yet</p>
+                <p className="text-xs text-[#60666B] max-w-xs">
+                  This creator hasn&apos;t published any courses yet. Check back soon!
+                </p>
               </div>
-
-              {/* Stats card */}
-              <div className="bg-white rounded-2xl p-5 shadow-[0px_4.29px_4.29px_0px_#60666B0D] border border-[#F0F2F4] flex flex-col w-full lg:w-[40%] shrink-0 gap-5 order-first lg:order-last">
-                <StatItem
-                  value={preacher?.followersCount ?? 0}
-                  label="Followers"
-                  icon={<UserRound stroke="#870BD6" className="w-5 h-5" />}
-                  backgroundColor="#F5EBFF"
-                />
-                <StatItem
-                  value={courses.length}
-                  label="Courses Published"
-                  icon={<BookOpen stroke="#4287FB" className="w-5 h-5" />}
-                  backgroundColor="#F0F5FF"
-                />
-                <StatItem
-                  value={totalEnroll}
-                  label="Total Students"
-                  icon={<Users stroke="#067647" className="w-5 h-5" />}
-                  backgroundColor="#ECFDF3"
-                />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {courses.map((course) => <CourseCard key={course.id} course={course} />)}
               </div>
-            </>
+            )
           )}
 
           {/* About tab */}
