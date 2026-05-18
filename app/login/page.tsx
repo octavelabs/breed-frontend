@@ -133,33 +133,27 @@ const LoginForm: React.FC = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium  mb-2"
+              className="block text-sm font-medium mb-2"
             >
               Password
             </label>
             <div className="relative">
               <Input
-                icon={
-                  <div
-                    className="absolute inset-y-0 right-[15px] flex items-center pl-2 cursor-pointer"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                  >
-                    <span className="text-gray-500 sm:text-sm">
-                      {showPassword ? (
-                        <EyeOffIcon className="scale-[0.7] lg:scale-75" />
-                      ) : (
-                        <EyeIcon className="scale-[0.7] lg:scale-75" />
-                      )}
-                    </span>
-                  </div>
-                }
                 variant="outlined"
                 type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
+                className="pr-10 sm:pr-10"
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+              </button>
             </div>
           </div>
 
