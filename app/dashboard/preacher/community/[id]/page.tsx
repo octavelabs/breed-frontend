@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { communityService, userService } from "@/lib/api-services";
@@ -21,7 +21,6 @@ import {
   Check,
   UserPlus,
   Search,
-  AlertTriangle,
 } from "lucide-react";
 import Button from "@/app/components/Button";
 
@@ -90,8 +89,6 @@ const BLUE: Palette = {
 };
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
-
-const ROLES = ["OWNER", "ADMIN", "MODERATOR", "MEMBER"] as const;
 
 const roleColor: Record<string, string> = {
   OWNER: "bg-[#FBF6FF] text-[#870BD6] border border-[#E7C8FF]",
@@ -750,11 +747,6 @@ const PreacherCommunityDetail = () => {
     loadCommunity();
   }, [loadCommunity]);
 
-  useEffect(() => {
-    const handler = () => setOpenDropdown(null);
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
 
   const handleSaveSettings = async () => {
     setSaving(true);
@@ -813,25 +805,6 @@ const PreacherCommunityDetail = () => {
     }
   };
 
-  const handleBan = async (userId: string, isBanned: boolean) => {
-    setMemberAction(userId);
-    setOpenDropdown(null);
-    try {
-      if (isBanned) await communityService.unbanMember(id, userId);
-      else await communityService.banMember(id, userId);
-      setMembers((prev) =>
-        prev.map((m) =>
-          m.user.id === userId
-            ? { ...m, status: isBanned ? "ACTIVE" : "BANNED" }
-            : m,
-        ),
-      );
-    } catch {
-      // silent
-    } finally {
-      setMemberAction(null);
-    }
-  };
 
   const handleRemoveMember = async (userId: string) => {
     setMemberAction(userId);
@@ -1208,10 +1181,7 @@ const PreacherCommunityDetail = () => {
                                 )}
 
                                 {!isOwner && (
-                                  <div
-                                    className="relative"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
+                                  <div className="relative">
                                     <button
                                       onClick={() =>
                                         setOpenDropdown(
@@ -1231,46 +1201,53 @@ const PreacherCommunityDetail = () => {
                                     </button>
 
                                     {openDropdown === member.user.id && (
-                                      <div className="absolute right-0 mt-1 w-52 bg-white border border-[#E3E8EF] rounded-xl shadow-lg z-50 overflow-hidden">
-                                        {/* Role changes */}
-                                        <p className="px-4 py-2 text-[10px] font-semibold text-[#60666B] uppercase tracking-wider border-b border-[#F0F2F4]">
-                                          Change Role
-                                        </p>
-                                        {promotionRoles.map((role) => (
-                                          <button
-                                            key={role}
-                                            onClick={() =>
-                                              handleRoleChange(
-                                                member.user.id,
-                                                role,
-                                              )
-                                            }
-                                            className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2"
-                                          >
-                                            {roleIcon[role]}
-                                            <span>
-                                              {role === "ADMIN"
-                                                ? "Promote to Admin"
-                                                : role === "MODERATOR"
-                                                  ? "Promote to Moderator"
-                                                  : "Demote to Member"}
-                                            </span>
-                                          </button>
-                                        ))}
+                                      <>
+                                        {/* Backdrop — closes dropdown on outside click */}
+                                        <div
+                                          className="fixed inset-0 z-40"
+                                          onClick={() => setOpenDropdown(null)}
+                                        />
+                                        <div className="absolute right-0 mt-1 w-52 bg-white border border-[#E3E8EF] rounded-xl shadow-lg z-50 overflow-hidden">
+                                          {/* Role changes */}
+                                          <p className="px-4 py-2 text-[10px] font-semibold text-[#60666B] uppercase tracking-wider border-b border-[#F0F2F4]">
+                                            Change Role
+                                          </p>
+                                          {promotionRoles.map((role) => (
+                                            <button
+                                              key={role}
+                                              onClick={() =>
+                                                handleRoleChange(
+                                                  member.user.id,
+                                                  role,
+                                                )
+                                              }
+                                              className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2"
+                                            >
+                                              {roleIcon[role]}
+                                              <span>
+                                                {role === "ADMIN"
+                                                  ? "Promote to Admin"
+                                                  : role === "MODERATOR"
+                                                    ? "Promote to Moderator"
+                                                    : "Demote to Member"}
+                                              </span>
+                                            </button>
+                                          ))}
 
-                                        {/* Remove */}
-                                        <div className="border-t border-[#F0F2F4]">
-                                          <button
-                                            onClick={() =>
-                                              handleRemoveMember(member.user.id)
-                                            }
-                                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]"
-                                          >
-                                            <UserX size={14} />
-                                            Remove from Community
-                                          </button>
+                                          {/* Remove */}
+                                          <div className="border-t border-[#F0F2F4]">
+                                            <button
+                                              onClick={() =>
+                                                handleRemoveMember(member.user.id)
+                                              }
+                                              className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]"
+                                            >
+                                              <UserX size={14} />
+                                              Remove from Community
+                                            </button>
+                                          </div>
                                         </div>
-                                      </div>
+                                      </>
                                     )}
                                   </div>
                                 )}
