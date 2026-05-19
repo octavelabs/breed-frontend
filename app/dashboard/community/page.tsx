@@ -18,6 +18,7 @@ interface Community {
   description?: string | null;
   coverImage?: string | null;
   privacy: "PUBLIC" | "PRIVATE" | "INVITE_ONLY";
+  memberCount?: number;
   _count?: { members: number; messages: number };
 }
 
@@ -34,7 +35,7 @@ const ExploreCard = ({
   isJoined: boolean;
 }) => {
   const initial     = community.name.charAt(0).toUpperCase();
-  const memberCount = community._count?.members ?? 0;
+  const memberCount = community.memberCount ?? community._count?.members ?? 0;
   const isPrivate   = community.privacy !== "PUBLIC";
 
   return (

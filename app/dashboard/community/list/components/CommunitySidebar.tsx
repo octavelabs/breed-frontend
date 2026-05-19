@@ -9,6 +9,7 @@ type CommunityEntry = {
   name: string;
   coverImage?: string | null;
   privacy?: string;
+  memberCount?: number;
   _count?: { members?: number; messages?: number };
 };
 

@@ -24,7 +24,8 @@ interface Community {
   description?: string | null;
   coverImage?: string | null;
   privacy: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
-  isMember?: boolean;
+  isJoined?: boolean;
+  memberCount?: number;
   _count?: { members: number; messages: number };
 }
 
@@ -70,9 +71,9 @@ const SingleCommunityPage = () => {
     }
   };
 
-  const isMember = community?.isMember ?? false;
+  const isMember = community?.isJoined ?? false;
   const isPrivate = community?.privacy !== 'PUBLIC';
-  const memberCount = community?._count?.members ?? 0;
+  const memberCount = community?.memberCount ?? community?._count?.members ?? 0;
 
   if (loading) {
     return (

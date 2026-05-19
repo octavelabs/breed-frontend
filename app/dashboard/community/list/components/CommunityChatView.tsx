@@ -31,6 +31,7 @@ type CommunityChatViewProps = {
     id: string;
     name: string;
     coverImage?: string | null;
+    memberCount?: number;
     _count?: { members?: number; messages?: number };
   };
   setSelectedCommunity: (community: any) => void;
@@ -179,7 +180,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   const formatTime = (iso: string) =>
     new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).toLowerCase();
 
-  const memberCount = (community._count as any)?.members ?? 0;
+  const memberCount = community.memberCount ?? community._count?.members ?? 0;
 
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-150px)] relative overflow-hidden" ref={parentRef}>

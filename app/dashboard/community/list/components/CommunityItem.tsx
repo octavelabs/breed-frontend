@@ -8,6 +8,7 @@ type CommunityItemProps = {
     id: string;
     name: string;
     coverImage?: string | null;
+    memberCount?: number;
     _count?: { members?: number; messages?: number };
   };
   isSelected: boolean;
@@ -16,7 +17,7 @@ type CommunityItemProps = {
 
 const CommunityItem: React.FC<CommunityItemProps> = ({ community, isSelected, onClick }) => {
   const [hovered, setHovered] = useState(false);
-  const memberCount = community._count?.members ?? 0;
+  const memberCount = community.memberCount ?? community._count?.members ?? 0;
   const initial     = community.name.charAt(0).toUpperCase();
 
   return (
