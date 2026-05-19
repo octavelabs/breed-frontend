@@ -127,6 +127,8 @@ export const userService = {
   unfollow: (id: string) => api.delete(`/users/${id}/follow`),
 
   getFollowers: (id: string) => api.get(`/users/${id}/followers`),
+
+  lookup: (q: string) => api.get(`/users/lookup?q=${encodeURIComponent(q)}`),
 };
 
 // ── Course services ────────────────────────────────────────────────────────────
