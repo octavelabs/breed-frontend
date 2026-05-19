@@ -1,69 +1,81 @@
-import { SearchIcon } from "lucide-react";
+"use client";
+
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import CommunityItem from "./CommunityItem";
 
+type CommunityEntry = {
+  id: string;
+  name: string;
+  coverImage?: string | null;
+  _count?: { members?: number; messages?: number };
+  [key: string]: unknown;
+};
 
 type CommunitySidebarProps = {
-  communities: Array<{
-    id: string;
-    name: string;
-    coverImage?: string | null;
-    [key: string]: unknown;
-  }>;
+  communities: CommunityEntry[];
   selectedCommunity: { id: string; [key: string]: unknown } | null;
   onSelectCommunity: (community: any) => void;
 };
 
-export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({ communities, selectedCommunity, onSelectCommunity }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-    const [isMobile, setIsMobile] = useState(false)
-  
-    useEffect(() => {
-      const checkMobile = () => {
-        setIsMobile(window.matchMedia("(max-width: 767px)").matches)
-      }
-      checkMobile()
-      window.addEventListener('resize', checkMobile)
-      return () => window.removeEventListener('resize', checkMobile)
-    }, [])
+export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
+  communities,
+  selectedCommunity,
+  onSelectCommunity,
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMobile, setIsMobile]       = useState(false);
 
-  const filteredCommunities = communities.filter(c => 
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const filtered = communities.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const isHidden = isMobile && !!selectedCommunity;
+
   return (
-    <div className={` ${isMobile && !selectedCommunity ? "block" : "hidden"}w-full lg:w-[40%] overflow-hidden h-[calc(100vh-150px)] border-r border-gray-200 flex flex-col `}>
+    <div className={`${isHidden ? "hidden" : "flex"} lg:flex flex-col w-full lg:w-72 shrink-0 border-r border-[#E3E8EF] h-full overflow-hidden`}>
       {/* Header */}
-      <div className="px-4 lg:px-[44px] pt-6 pb-4">
-        <p className="text-sm font-medium text-[#60666B] mb-3 leading-none">
-          Community
+      <div className="px-4 pt-4 pb-3 shrink-0">
+        <p className="text-xs font-semibold text-[#60666B] uppercase tracking-widest mb-3">
+          Communities ({communities.length})
         </p>
 
         {/* Search */}
-        {/* <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <SearchIcon />
-          </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search communities"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2.5 text-sm font-normal text-black bg-white border border-gray-200 rounded-lg outline-none focus:border-purple-400 transition-colors"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F8FAFC] border border-[#E3E8EF] rounded-lg outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]/20 transition-colors"
           />
-        </div> */}
+        </div>
       </div>
 
-      {/* Communities List */}
-      <div className="flex-1 overflow-y-auto pb-5">
-        {filteredCommunities.map(community => (
-          <CommunityItem
-            key={community.id}
-            community={community}
-            isSelected={selectedCommunity?.id === community.id}
-            onClick={() => onSelectCommunity(community)}
-          />
-        ))}
+      {/* List */}
+      <div className="flex-1 overflow-y-auto">
+        {filtered.length === 0 ? (
+          <p className="px-4 py-6 text-sm text-[#60666B] text-center">
+            {searchQuery ? `No results for "${searchQuery}"` : "No communities yet."}
+          </p>
+        ) : (
+          filtered.map((community) => (
+            <CommunityItem
+              key={community.id}
+              community={community}
+              isSelected={selectedCommunity?.id === community.id}
+              onClick={() => onSelectCommunity(community)}
+            />
+          ))
+        )}
       </div>
     </div>
   );
