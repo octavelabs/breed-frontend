@@ -62,7 +62,7 @@ const SingleCommunityPage = () => {
     setJoining(true);
     try {
       await communityService.join(id);
-      setCommunity((prev) => prev ? { ...prev, isMember: true } : prev);
+      setCommunity((prev) => prev ? { ...prev, isJoined: true } : prev);
     } catch {
       // already a member or error — silently proceed
     } finally {
