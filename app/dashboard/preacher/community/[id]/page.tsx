@@ -5,9 +5,23 @@ import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { communityService, userService } from "@/lib/api-services";
 import {
-  ArrowLeft, Users, Globe, Lock, Shield, UserX, MoreVertical,
-  Settings, Save, Trash2, UserCheck, Crown, Copy, Check,
-  UserPlus, Search, AlertTriangle,
+  ArrowLeft,
+  Users,
+  Globe,
+  Lock,
+  Shield,
+  UserX,
+  MoreVertical,
+  Settings,
+  Save,
+  Trash2,
+  UserCheck,
+  Crown,
+  Copy,
+  Check,
+  UserPlus,
+  Search,
+  AlertTriangle,
 } from "lucide-react";
 import Button from "@/app/components/Button";
 
@@ -50,38 +64,68 @@ interface LookupUser {
 // ── Brand palette (matches preacher dashboard) ────────────────────────────────
 
 type Palette = { bg: string; border: string; icon: string; accent: string };
-const PURPLE: Palette = { bg: "#FBF6FF", border: "#E7C8FF", icon: "#E7C8FF", accent: "#870BD6" };
-const GREEN:  Palette = { bg: "#ECFDF3", border: "#ABEFC6", icon: "#ABEFC6", accent: "#067647" };
-const AMBER:  Palette = { bg: "#FFFAEB", border: "#FEDF89", icon: "#FEDF89", accent: "#B54708" };
-const BLUE:   Palette = { bg: "#EFF8FF", border: "#B2DDFF", icon: "#B2DDFF", accent: "#175CD3" };
+const PURPLE: Palette = {
+  bg: "#FBF6FF",
+  border: "#E7C8FF",
+  icon: "#E7C8FF",
+  accent: "#870BD6",
+};
+const GREEN: Palette = {
+  bg: "#ECFDF3",
+  border: "#ABEFC6",
+  icon: "#ABEFC6",
+  accent: "#067647",
+};
+const AMBER: Palette = {
+  bg: "#FFFAEB",
+  border: "#FEDF89",
+  icon: "#FEDF89",
+  accent: "#B54708",
+};
+const BLUE: Palette = {
+  bg: "#EFF8FF",
+  border: "#B2DDFF",
+  icon: "#B2DDFF",
+  accent: "#175CD3",
+};
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
 const ROLES = ["OWNER", "ADMIN", "MODERATOR", "MEMBER"] as const;
 
 const roleColor: Record<string, string> = {
-  OWNER:     "bg-[#FBF6FF] text-[#870BD6] border border-[#E7C8FF]",
-  ADMIN:     "bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]",
+  OWNER: "bg-[#FBF6FF] text-[#870BD6] border border-[#E7C8FF]",
+  ADMIN: "bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]",
   MODERATOR: "bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]",
-  MEMBER:    "bg-[#F8F9FC] text-[#363F72] border border-[#D5D9EB]",
+  MEMBER: "bg-[#F8F9FC] text-[#363F72] border border-[#D5D9EB]",
 };
 
 const roleIcon: Record<string, React.ReactNode> = {
-  OWNER:     <Crown size={11} />,
-  ADMIN:     <Shield size={11} />,
+  OWNER: <Crown size={11} />,
+  ADMIN: <Shield size={11} />,
   MODERATOR: <UserCheck size={11} />,
-  MEMBER:    <Users size={11} />,
+  MEMBER: <Users size={11} />,
 };
 
 // ── Stat Card ─────────────────────────────────────────────────────────────────
 
 const StatCard = ({
-  label, value, sub, Icon, palette,
+  label,
+  value,
+  sub,
+  Icon,
+  palette,
 }: {
-  label: string; value: number | string; sub?: string;
-  Icon: React.ElementType; palette: Palette;
+  label: string;
+  value: number | string;
+  sub?: string;
+  Icon: React.ElementType;
+  palette: Palette;
 }) => (
-  <div className="rounded-[16px] border p-6" style={{ backgroundColor: palette.bg, borderColor: palette.border }}>
+  <div
+    className="rounded-[16px] border p-6"
+    style={{ backgroundColor: palette.bg, borderColor: palette.border }}
+  >
     <div className="flex items-start gap-4">
       <div
         className="w-[48px] h-[48px] rounded-xl flex items-center justify-center flex-shrink-0"
@@ -100,27 +144,51 @@ const StatCard = ({
 
 // ── Member Growth Chart ───────────────────────────────────────────────────────
 
-function buildGrowthData(memberCount: number, createdAt?: string, pts = 8): number[] {
-  if (memberCount === 0) return Array(pts).fill(0);
+type GrowthPoint = { label: string; count: number };
+
+function buildRealGrowthData(members: Member[], createdAt?: string, pts = 8): GrowthPoint[] {
+  const active = members.filter((m) => m.status !== "BANNED" && m.status !== "LEFT");
+  const now = Date.now();
+
+  // Start from community creation or oldest join date, whichever is earlier
+  const joinTimes = active.map((m) => new Date(m.joinedAt).getTime());
+  const created = createdAt ? new Date(createdAt).getTime() : (joinTimes.length ? Math.min(...joinTimes) : now);
+  const start = Math.min(created, joinTimes.length ? Math.min(...joinTimes) : created);
+
+  // Guarantee at least `pts` days of range so the chart isn't a single point
+  const minRange = pts * 24 * 60 * 60 * 1000;
+  const effectiveStart = Math.min(start, now - minRange);
+  const interval = (now - effectiveStart) / pts;
+
   return Array.from({ length: pts }, (_, i) => {
-    const t = i / (pts - 1);
-    const base = Math.pow(t, 0.65) * memberCount;
-    const noise = Math.sin(i * 2.3 + 1) * memberCount * 0.08;
-    return i === pts - 1 ? memberCount : Math.max(0, Math.round(base + noise));
+    const cutoff = effectiveStart + (i + 1) * interval;
+    const count = active.filter((m) => new Date(m.joinedAt).getTime() <= cutoff).length;
+    const mid = new Date(effectiveStart + (i + 0.5) * interval);
+    const label = mid.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    return { label, count };
   });
 }
 
-const MemberGrowthChart = ({ memberCount, createdAt }: { memberCount: number; createdAt?: string }) => {
-  const data = buildGrowthData(memberCount, createdAt);
-  const W = 300; const H = 130;
-  const pad = { t: 12, b: 24, l: 26, r: 8 };
+const MemberGrowthChart = ({
+  members,
+  createdAt,
+}: {
+  members: Member[];
+  createdAt?: string;
+}) => {
+  const data = buildRealGrowthData(members, createdAt);
+  const totalMembers = data[data.length - 1]?.count ?? 0;
+
+  const W = 300;
+  const H = 190;
+  const pad = { t: 14, b: 28, l: 28, r: 10 };
   const cW = W - pad.l - pad.r;
   const cH = H - pad.t - pad.b;
-  const maxV = Math.max(...data, 1);
+  const maxV = Math.max(...data.map((d) => d.count), 1);
 
-  const pts = data.map((v, i) => ({
+  const pts = data.map((d, i) => ({
     x: pad.l + (i / (data.length - 1)) * cW,
-    y: pad.t + cH - (v / maxV) * cH,
+    y: pad.t + cH - (d.count / maxV) * cH,
   }));
 
   const linePath = pts.reduce((acc, p, i) => {
@@ -135,15 +203,16 @@ const MemberGrowthChart = ({ memberCount, createdAt }: { memberCount: number; cr
   const yLabels = [0, Math.round(maxV / 2), maxV];
 
   return (
-    <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col h-full">
+    <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-[#180426]">Member Growth</h3>
         <span className="text-xs text-[#870BD6] bg-[#FBF6FF] border border-[#E7C8FF] px-2.5 py-0.5 rounded-full">
-          Last 8 weeks
+          Since creation
         </span>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+      <div className="flex-1 min-h-[180px]">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full">
         <defs>
           <linearGradient id="mgFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#870BD6" stopOpacity="0.18" />
@@ -154,34 +223,69 @@ const MemberGrowthChart = ({ memberCount, createdAt }: { memberCount: number; cr
         {[0, 0.5, 1].map((t, i) => (
           <line
             key={i}
-            x1={pad.l} y1={pad.t + (1 - t) * cH}
-            x2={W - pad.r} y2={pad.t + (1 - t) * cH}
-            stroke="#F0F2F4" strokeWidth="1"
+            x1={pad.l}
+            y1={pad.t + (1 - t) * cH}
+            x2={W - pad.r}
+            y2={pad.t + (1 - t) * cH}
+            stroke="#F0F2F4"
+            strokeWidth="1"
           />
         ))}
         {/* Area fill */}
         <path d={areaPath} fill="url(#mgFill)" />
         {/* Line */}
-        <path d={linePath} fill="none" stroke="#870BD6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        {/* End dot */}
-        <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="4" fill="#870BD6" />
-        <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="7" fill="#870BD6" fillOpacity="0.15" />
+        <path
+          d={linePath}
+          fill="none"
+          stroke="#870BD6"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* Dots on each data point */}
+        {pts.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={i === pts.length - 1 ? 4 : 2.5} fill="#870BD6"
+            fillOpacity={i === pts.length - 1 ? 1 : 0.5} />
+        ))}
+        {/* Pulse ring on last point */}
+        <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y}
+          r="8" fill="#870BD6" fillOpacity="0.12" />
         {/* Y-axis labels */}
         {yLabels.map((v, i) => (
-          <text key={i} x={pad.l - 4} y={pad.t + cH - (v / maxV) * cH + 3.5}
-            textAnchor="end" fontSize="8" fill="#60666B">{v}</text>
-        ))}
-        {/* X-axis week labels (every other) */}
-        {pts.map((p, i) => i % 2 === 0 ? (
-          <text key={i} x={p.x} y={H - 6} textAnchor="middle" fontSize="7.5" fill="#9CA3AF">
-            W{i + 1}
+          <text
+            key={i}
+            x={pad.l - 4}
+            y={pad.t + cH - (v / maxV) * cH + 3.5}
+            textAnchor="end"
+            fontSize="8"
+            fill="#60666B"
+          >
+            {v}
           </text>
-        ) : null)}
+        ))}
+        {/* X-axis date labels (every other) */}
+        {pts.map((p, i) =>
+          i % 2 === 0 ? (
+            <text
+              key={i}
+              x={p.x}
+              y={H - 8}
+              textAnchor="middle"
+              fontSize="7"
+              fill="#9CA3AF"
+            >
+              {data[i].label}
+            </text>
+          ) : null,
+        )}
       </svg>
+      </div>
 
-      <div className="flex items-center justify-between mt-auto pt-2 border-t border-[#F0F2F4]">
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#F0F2F4]">
         <p className="text-xs text-[#60666B]">Total members</p>
-        <p className="text-xl font-bold text-[#870BD6]">{memberCount.toLocaleString()}</p>
+        <p className="text-xl font-bold text-[#870BD6]">
+          {totalMembers.toLocaleString()}
+        </p>
       </div>
     </div>
   );
@@ -198,14 +302,16 @@ const InviteModal = ({
   communityName: string;
   onClose: () => void;
 }) => {
-  const [tab, setTab]               = useState<"link" | "username">("link");
-  const [copied, setCopied]         = useState(false);
-  const [query, setQuery]           = useState("");
-  const [searching, setSearching]   = useState(false);
-  const [foundUser, setFoundUser]   = useState<LookupUser | null | "notfound">(null);
-  const [inviting, setInviting]     = useState(false);
-  const [invited, setInvited]       = useState(false);
-  const [inviteErr, setInviteErr]   = useState("");
+  const [tab, setTab] = useState<"link" | "username">("link");
+  const [copied, setCopied] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [foundUser, setFoundUser] = useState<LookupUser | null | "notfound">(
+    null,
+  );
+  const [inviting, setInviting] = useState(false);
+  const [invited, setInvited] = useState(false);
+  const [inviteErr, setInviteErr] = useState("");
 
   const inviteLink =
     typeof window !== "undefined"
@@ -229,7 +335,7 @@ const InviteModal = ({
     setInvited(false);
     setInviteErr("");
     try {
-      const res = await userService.lookup(query.trim()) as LookupUser | null;
+      const res = (await userService.lookup(query.trim())) as LookupUser | null;
       setFoundUser(res ?? "notfound");
     } catch {
       setFoundUser("notfound");
@@ -246,7 +352,9 @@ const InviteModal = ({
       await communityService.invite(communityId, { recipientId: foundUser.id });
       setInvited(true);
     } catch (err: unknown) {
-      setInviteErr(err instanceof Error ? err.message : "Failed to send invite.");
+      setInviteErr(
+        err instanceof Error ? err.message : "Failed to send invite.",
+      );
     } finally {
       setInviting(false);
     }
@@ -269,11 +377,16 @@ const InviteModal = ({
                 <UserPlus size={18} className="text-[#870BD6]" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-[#180426]">Add Members</h2>
+                <h2 className="text-base font-semibold text-[#180426]">
+                  Add Members
+                </h2>
                 <p className="text-xs text-[#60666B]">{communityName}</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400">
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400"
+            >
               ✕
             </button>
           </div>
@@ -285,7 +398,9 @@ const InviteModal = ({
                 key={t}
                 onClick={() => setTab(t)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                  tab === t ? "bg-white text-[#180426] shadow-sm" : "text-[#60666B] hover:text-[#180426]"
+                  tab === t
+                    ? "bg-white text-[#180426] shadow-sm"
+                    : "text-[#60666B] hover:text-[#180426]"
                 }`}
               >
                 {t === "link" ? "Invite Link" : "By Username"}
@@ -298,10 +413,13 @@ const InviteModal = ({
           {tab === "link" && (
             <div className="space-y-4">
               <p className="text-sm text-[#60666B]">
-                Share this link with anyone you&apos;d like to invite. They can open it and join the community directly.
+                Share this link with anyone you&apos;d like to invite. They can
+                open it and join the community directly.
               </p>
               <div className="flex items-center gap-2 bg-[#F8F9FC] border border-[#E3E8EF] rounded-xl px-4 py-3">
-                <p className="text-sm text-[#180426] flex-1 truncate">{inviteLink}</p>
+                <p className="text-sm text-[#180426] flex-1 truncate">
+                  {inviteLink}
+                </p>
                 <button
                   onClick={handleCopy}
                   className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
@@ -310,19 +428,25 @@ const InviteModal = ({
                       : "bg-[#870BD6] text-white hover:bg-[#6B09B0]"
                   }`}
                 >
-                  {copied ? <><Check size={12} /> Copied!</> : <><Copy size={12} /> Copy</>}
+                  {copied ? (
+                    <>
+                      <Check size={12} /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} /> Copy
+                    </>
+                  )}
                 </button>
               </div>
-              <p className="text-xs text-[#9CA3AF] text-center">
-                Works like a WhatsApp or Telegram group invite link.
-              </p>
             </div>
           )}
 
           {tab === "username" && (
             <div className="space-y-4">
               <p className="text-sm text-[#60666B]">
-                Enter the exact Breed username or email address of the person you want to invite.
+                Enter the exact Breed username or email address of the person
+                you want to invite.
               </p>
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
@@ -331,7 +455,12 @@ const InviteModal = ({
                     type="text"
                     placeholder="Username or email..."
                     value={query}
-                    onChange={(e) => { setQuery(e.target.value); setFoundUser(null); setInvited(false); setInviteErr(""); }}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setFoundUser(null);
+                      setInvited(false);
+                      setInviteErr("");
+                    }}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="w-full pl-9 pr-4 py-2.5 border border-[#E3E8EF] rounded-xl text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10"
                   />
@@ -350,7 +479,9 @@ const InviteModal = ({
               {/* Result */}
               {foundUser === "notfound" && (
                 <div className="flex items-center gap-2 px-4 py-3 bg-[#FEF3F2] border border-[#FECDCA] rounded-xl">
-                  <p className="text-sm text-[#B42318]">No user found with that username or email.</p>
+                  <p className="text-sm text-[#B42318]">
+                    No user found with that username or email.
+                  </p>
                 </div>
               )}
 
@@ -358,17 +489,25 @@ const InviteModal = ({
                 <div className="flex items-center justify-between px-4 py-3 bg-[#F8F9FC] border border-[#E3E8EF] rounded-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm overflow-hidden shrink-0">
-                      {foundUser.avatarUrl
+                      {foundUser.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={foundUser.avatarUrl} alt="" className="w-full h-full object-cover" />
-                        : `${foundUser.firstName.charAt(0)}${foundUser.lastName.charAt(0)}`}
+                        <img
+                          src={foundUser.avatarUrl}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        `${foundUser.firstName.charAt(0)}${foundUser.lastName.charAt(0)}`
+                      )}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-[#180426]">
                         {foundUser.firstName} {foundUser.lastName}
                       </p>
                       {foundUser.username && (
-                        <p className="text-xs text-[#60666B]">@{foundUser.username}</p>
+                        <p className="text-xs text-[#60666B]">
+                          @{foundUser.username}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -386,7 +525,9 @@ const InviteModal = ({
               {invited && (
                 <div className="flex items-center gap-2 px-4 py-3 bg-[#ECFDF3] border border-[#ABEFC6] rounded-xl">
                   <Check size={14} className="text-[#067647]" />
-                  <p className="text-sm text-[#067647] font-medium">Invite sent successfully!</p>
+                  <p className="text-sm text-[#067647] font-medium">
+                    Invite sent successfully!
+                  </p>
                 </div>
               )}
 
@@ -430,20 +571,57 @@ const DeleteConfirmModal = ({
           <div>
             {/* Red warning icon */}
             <div className="relative w-[46px] h-[46px]">
-              <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="40" height="40" rx="20" fill="#FBAFAF" />
-                <rect x="3" y="3" width="40" height="40" rx="20" stroke="#FED3D3" strokeWidth="6" />
-                <path d="M23 17v7M23 28v1" stroke="#DB2929" strokeWidth="2" strokeLinecap="round" />
+              <svg
+                width="46"
+                height="46"
+                viewBox="0 0 46 46"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="3"
+                  y="3"
+                  width="40"
+                  height="40"
+                  rx="20"
+                  fill="#FBAFAF"
+                />
+                <rect
+                  x="3"
+                  y="3"
+                  width="40"
+                  height="40"
+                  rx="20"
+                  stroke="#FED3D3"
+                  strokeWidth="6"
+                />
+                <path
+                  d="M23 17v7M23 28v1"
+                  stroke="#DB2929"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
-            <h2 className="text-[20px] font-bold leading-none mt-4">Delete Community</h2>
-            <p className="text-base text-[#60666B] leading-none mt-2">This action cannot be undone</p>
+            <h2 className="text-[20px] font-bold leading-none mt-4">
+              Delete Community
+            </h2>
+            <p className="text-base text-[#60666B] leading-none mt-2">
+              This action cannot be undone
+            </p>
           </div>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-100 transition-colors text-gray-400"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
@@ -453,8 +631,9 @@ const DeleteConfirmModal = ({
       {/* Body */}
       <div className="p-6">
         <p className="text-base text-[#292A2B] pb-4 border-b border-dashed border-[#B9C2CA]">
-          <span className="font-semibold">&ldquo;{communityName}&rdquo;</span> will be permanently deleted.
-          All messages, member records, and community data will be lost forever.
+          <span className="font-semibold">&ldquo;{communityName}&rdquo;</span>{" "}
+          will be permanently deleted. All messages, member records, and
+          community data will be lost forever.
         </p>
 
         <p className="text-sm text-[#60666B] mt-4 mb-6">
@@ -491,17 +670,26 @@ const PreacherCommunityDetail = () => {
   const router = useRouter();
   const id = params.id as string;
 
-  const [community, setCommunity]       = useState<Community | null>(null);
-  const [members, setMembers]           = useState<Member[]>([]);
-  const [loading, setLoading]           = useState(true);
-  const [activeTab, setActiveTab]       = useState<"overview" | "members" | "settings">("overview");
-  const [showInviteModal, setShowInviteModal]   = useState(false);
-  const [showDeleteModal, setShowDeleteModal]   = useState(false);
-  const [deleting, setDeleting]         = useState(false);
+  const [community, setCommunity] = useState<Community | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "members" | "settings"
+  >("overview");
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const [settingsForm, setSettingsForm] = useState({ name: "", description: "", privacy: "PUBLIC" as string });
-  const [saving, setSaving]             = useState(false);
-  const [saveMsg, setSaveMsg]           = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [settingsForm, setSettingsForm] = useState({
+    name: "",
+    description: "",
+    privacy: "PUBLIC" as string,
+  });
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const [memberAction, setMemberAction] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -528,7 +716,9 @@ const PreacherCommunityDetail = () => {
     }
   }, [id]);
 
-  useEffect(() => { loadCommunity(); }, [loadCommunity]);
+  useEffect(() => {
+    loadCommunity();
+  }, [loadCommunity]);
 
   useEffect(() => {
     const handler = () => setOpenDropdown(null);
@@ -548,7 +738,10 @@ const PreacherCommunityDetail = () => {
       setSaveMsg({ type: "success", text: "Community updated successfully." });
       loadCommunity();
     } catch (err: unknown) {
-      setSaveMsg({ type: "error", text: err instanceof Error ? err.message : "Failed to save changes." });
+      setSaveMsg({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to save changes.",
+      });
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(null), 3000);
@@ -563,7 +756,11 @@ const PreacherCommunityDetail = () => {
       router.push("/dashboard/preacher/community");
     } catch (err: unknown) {
       setShowDeleteModal(false);
-      setSaveMsg({ type: "error", text: err instanceof Error ? err.message : "Failed to delete community." });
+      setSaveMsg({
+        type: "error",
+        text:
+          err instanceof Error ? err.message : "Failed to delete community.",
+      });
     } finally {
       setDeleting(false);
     }
@@ -575,7 +772,9 @@ const PreacherCommunityDetail = () => {
     try {
       await communityService.updateMemberRole(id, userId, role);
       setMembers((prev) =>
-        prev.map((m) => m.user.id === userId ? { ...m, role: role as Member["role"] } : m)
+        prev.map((m) =>
+          m.user.id === userId ? { ...m, role: role as Member["role"] } : m,
+        ),
       );
     } catch {
       // silent
@@ -589,9 +788,13 @@ const PreacherCommunityDetail = () => {
     setOpenDropdown(null);
     try {
       if (isBanned) await communityService.unbanMember(id, userId);
-      else          await communityService.banMember(id, userId);
+      else await communityService.banMember(id, userId);
       setMembers((prev) =>
-        prev.map((m) => m.user.id === userId ? { ...m, status: isBanned ? "ACTIVE" : "BANNED" } : m)
+        prev.map((m) =>
+          m.user.id === userId
+            ? { ...m, status: isBanned ? "ACTIVE" : "BANNED" }
+            : m,
+        ),
       );
     } catch {
       // silent
@@ -600,16 +803,15 @@ const PreacherCommunityDetail = () => {
     }
   };
 
-  const initial      = community?.name?.charAt(0)?.toUpperCase() ?? "C";
-  const memberCount  = community?.memberCount ?? community?._count?.members ?? 0;
-  const maxMembers   = community?.maxMembers ?? 1000;
-  const isPrivate    = community?.privacy !== "PUBLIC";
+  const initial = community?.name?.charAt(0)?.toUpperCase() ?? "C";
+  const memberCount = community?.memberCount ?? community?._count?.members ?? 0;
+  const isPrivate = community?.privacy !== "PUBLIC";
 
   const adminModCount = members.filter(
-    (m) => (m.role === "ADMIN" || m.role === "MODERATOR") && m.status === "ACTIVE"
+    (m) =>
+      (m.role === "ADMIN" || m.role === "MODERATOR") && m.status === "ACTIVE",
   ).length;
 
-  const capacityPct  = Math.round((memberCount / maxMembers) * 100);
 
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) {
@@ -620,7 +822,9 @@ const PreacherCommunityDetail = () => {
           <div className="px-4 md:px-12 py-8 space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/3" />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-gray-200 rounded-2xl" />)}
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-24 bg-gray-200 rounded-2xl" />
+              ))}
             </div>
           </div>
         </div>
@@ -633,7 +837,12 @@ const PreacherCommunityDetail = () => {
       <DashboardLayout custom={true}>
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <p className="text-gray-500">Community not found.</p>
-          <button onClick={() => router.back()} className="text-[#870BD6] text-sm underline">Go back</button>
+          <button
+            onClick={() => router.back()}
+            className="text-[#870BD6] text-sm underline"
+          >
+            Go back
+          </button>
         </div>
       </DashboardLayout>
     );
@@ -658,7 +867,6 @@ const PreacherCommunityDetail = () => {
       )}
 
       <div className="border-l border-[#D2D9DF] min-h-screen bg-[#F8F9FC]">
-
         {/* ── Banner ────────────────────────────────────────────────────────── */}
         <div
           className="bg-[#870BD6] h-48 relative"
@@ -690,18 +898,28 @@ const PreacherCommunityDetail = () => {
             )}
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-2xl font-bold text-[#180426]">{community.name}</h2>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
-                  isPrivate
-                    ? "bg-[#F8F9FC] text-[#363F72] border border-[#D5D9EB]"
-                    : "bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647]"
-                }`}>
+                <h2 className="text-2xl font-bold text-[#180426]">
+                  {community.name}
+                </h2>
+                <span
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
+                    isPrivate
+                      ? "bg-[#F8F9FC] text-[#363F72] border border-[#D5D9EB]"
+                      : "bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647]"
+                  }`}
+                >
                   {isPrivate ? <Lock size={10} /> : <Globe size={10} />}
-                  {community.privacy === "PUBLIC" ? "Public" : community.privacy === "PRIVATE" ? "Private" : "Invite Only"}
+                  {community.privacy === "PUBLIC"
+                    ? "Public"
+                    : community.privacy === "PRIVATE"
+                      ? "Private"
+                      : "Invite Only"}
                 </span>
               </div>
               {community.description && (
-                <p className="text-[#60666B] text-sm mt-1 max-w-md">{community.description}</p>
+                <p className="text-[#60666B] text-sm mt-1 max-w-md">
+                  {community.description}
+                </p>
               )}
             </div>
           </div>
@@ -711,7 +929,9 @@ const PreacherCommunityDetail = () => {
             type="button"
             onClick={() => setActiveTab("settings")}
           >
-            <span className="flex items-center gap-2"><Settings size={15} /> Settings</span>
+            <span className="flex items-center gap-2">
+              <Settings size={15} /> Settings
+            </span>
           </Button>
         </div>
 
@@ -736,7 +956,6 @@ const PreacherCommunityDetail = () => {
 
         {/* ── Content ───────────────────────────────────────────────────────── */}
         <div className="px-4 md:px-12 py-8">
-
           {/* ── Overview ──────────────────────────────────────────────────── */}
           {activeTab === "overview" && (
             <div className="space-y-6 max-w-5xl">
@@ -746,14 +965,21 @@ const PreacherCommunityDetail = () => {
                   Icon={Users}
                   label="Total Members"
                   value={memberCount.toLocaleString()}
-                  sub={`of ${maxMembers.toLocaleString()} capacity`}
                   palette={PURPLE}
                 />
                 <StatCard
                   Icon={isPrivate ? Lock : Globe}
                   label="Visibility"
-                  value={community.privacy === "PUBLIC" ? "Public" : community.privacy === "PRIVATE" ? "Private" : "Invite Only"}
-                  sub={isPrivate ? "Invite required to join" : "Open to everyone"}
+                  value={
+                    community.privacy === "PUBLIC"
+                      ? "Public"
+                      : community.privacy === "PRIVATE"
+                        ? "Private"
+                        : "Invite Only"
+                  }
+                  sub={
+                    isPrivate ? "Invite required to join" : "Open to everyone"
+                  }
                   palette={isPrivate ? AMBER : GREEN}
                 />
                 <StatCard
@@ -765,44 +991,34 @@ const PreacherCommunityDetail = () => {
                 />
               </div>
 
-              {/* Capacity bar */}
-              <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-semibold text-[#180426]">Community Capacity</p>
-                  <p className="text-sm font-bold text-[#870BD6]">{capacityPct}% filled</p>
-                </div>
-                <div className="w-full h-2.5 bg-[#F0F2F4] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(capacityPct, 100)}%`,
-                      background: capacityPct > 80 ? "#E44E4E" : capacityPct > 50 ? "#B54708" : "#870BD6",
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-[#60666B] mt-1.5">
-                  {memberCount.toLocaleString()} of {maxMembers.toLocaleString()} members
-                </p>
-              </div>
-
               {/* Two-column: About + Growth chart */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6 space-y-3">
-                  <h3 className="font-semibold text-[#180426]">About this community</h3>
+                  <h3 className="font-semibold text-[#180426]">
+                    About this community
+                  </h3>
                   <p className="text-[#60666B] text-sm leading-relaxed">
                     {community.description ?? "No description provided."}
                   </p>
                   {community.createdAt && (
                     <p className="text-xs text-[#60666B] mt-2 pt-3 border-t border-[#F0F2F4]">
                       Created on{" "}
-                      {new Date(community.createdAt).toLocaleDateString("en-GB", {
-                        day: "numeric", month: "long", year: "numeric",
-                      })}
+                      {new Date(community.createdAt).toLocaleDateString(
+                        "en-GB",
+                        {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        },
+                      )}
                     </p>
                   )}
                 </div>
 
-                <MemberGrowthChart memberCount={memberCount} createdAt={community.createdAt} />
+                <MemberGrowthChart
+                  members={members}
+                  createdAt={community.createdAt}
+                />
               </div>
             </div>
           )}
@@ -814,7 +1030,9 @@ const PreacherCommunityDetail = () => {
                 <div className="px-6 py-4 border-b border-[#F0F2F4] flex items-center justify-between">
                   <h3 className="font-semibold text-[#180426]">
                     Members{" "}
-                    <span className="text-[#60666B] font-normal text-sm">({members.length})</span>
+                    <span className="text-[#60666B] font-normal text-sm">
+                      ({members.length})
+                    </span>
                   </h3>
                   <Button
                     customClass="!w-fit px-4 !h-[36px] !text-white !text-xs"
@@ -832,7 +1050,9 @@ const PreacherCommunityDetail = () => {
                     <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
                       <Users size={22} className="text-[#870BD6]" />
                     </div>
-                    <p className="text-sm font-semibold text-gray-700">No members yet</p>
+                    <p className="text-sm font-semibold text-gray-700">
+                      No members yet
+                    </p>
                     <button
                       onClick={() => setShowInviteModal(true)}
                       className="text-sm text-[#870BD6] underline"
@@ -843,42 +1063,59 @@ const PreacherCommunityDetail = () => {
                 ) : (
                   <div className="divide-y divide-[#F0F2F4]">
                     {members.map((member) => {
-                      const fullName  = `${member.user.firstName} ${member.user.lastName}`.trim();
-                      const isBanned  = member.status === "BANNED";
-                      const isOwner   = member.role === "OWNER";
+                      const fullName =
+                        `${member.user.firstName} ${member.user.lastName}`.trim();
+                      const isBanned = member.status === "BANNED";
+                      const isOwner = member.role === "OWNER";
                       const isInFlight = memberAction === member.user.id;
 
                       return (
                         <div
                           key={member.id}
                           className={`flex items-center justify-between px-6 py-4 transition-colors ${
-                            isBanned ? "opacity-60 bg-[#FEF3F2]" : "hover:bg-[#FAFAFA]"
+                            isBanned
+                              ? "opacity-60 bg-[#FEF3F2]"
+                              : "hover:bg-[#FAFAFA]"
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm overflow-hidden shrink-0">
                               {member.user.avatarUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={member.user.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
+                                <img
+                                  src={member.user.avatarUrl}
+                                  alt={fullName}
+                                  className="w-full h-full object-cover"
+                                />
                               ) : (
                                 fullName.charAt(0).toUpperCase()
                               )}
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-[#180426]">{fullName}</p>
+                              <p className="text-sm font-semibold text-[#180426]">
+                                {fullName}
+                              </p>
                               <p className="text-xs text-[#60666B]">
                                 Joined{" "}
-                                {new Date(member.joinedAt).toLocaleDateString("en-GB", {
-                                  day: "numeric", month: "short", year: "numeric",
-                                })}
+                                {new Date(member.joinedAt).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  },
+                                )}
                               </p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${roleColor[member.role]}`}>
+                            <span
+                              className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${roleColor[member.role]}`}
+                            >
                               {roleIcon[member.role]}{" "}
-                              {member.role.charAt(0) + member.role.slice(1).toLowerCase()}
+                              {member.role.charAt(0) +
+                                member.role.slice(1).toLowerCase()}
                             </span>
                             {isBanned && (
                               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]">
@@ -886,9 +1123,18 @@ const PreacherCommunityDetail = () => {
                               </span>
                             )}
                             {!isOwner && (
-                              <div className="relative" onClick={(e) => e.stopPropagation()}>
+                              <div
+                                className="relative"
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 <button
-                                  onClick={() => setOpenDropdown(openDropdown === member.user.id ? null : member.user.id)}
+                                  onClick={() =>
+                                    setOpenDropdown(
+                                      openDropdown === member.user.id
+                                        ? null
+                                        : member.user.id,
+                                    )
+                                  }
                                   disabled={isInFlight}
                                   className="p-1.5 rounded-lg hover:bg-gray-100 text-[#60666B] disabled:opacity-50 transition-colors"
                                 >
@@ -903,23 +1149,35 @@ const PreacherCommunityDetail = () => {
                                     <p className="px-4 py-2 text-[10px] font-semibold text-[#60666B] uppercase tracking-wider border-b border-[#F0F2F4]">
                                       Change Role
                                     </p>
-                                    {ROLES.filter((r) => r !== "OWNER" && r !== member.role).map((role) => (
+                                    {ROLES.filter(
+                                      (r) => r !== "OWNER" && r !== member.role,
+                                    ).map((role) => (
                                       <button
                                         key={role}
-                                        onClick={() => handleRoleChange(member.user.id, role)}
+                                        onClick={() =>
+                                          handleRoleChange(member.user.id, role)
+                                        }
                                         className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2"
                                       >
                                         {roleIcon[role]}
-                                        <span>Make {role.charAt(0) + role.slice(1).toLowerCase()}</span>
+                                        <span>
+                                          Make{" "}
+                                          {role.charAt(0) +
+                                            role.slice(1).toLowerCase()}
+                                        </span>
                                       </button>
                                     ))}
                                     <div className="border-t border-[#F0F2F4]">
                                       <button
-                                        onClick={() => handleBan(member.user.id, isBanned)}
+                                        onClick={() =>
+                                          handleBan(member.user.id, isBanned)
+                                        }
                                         className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]"
                                       >
                                         <UserX size={14} />
-                                        {isBanned ? "Unban Member" : "Ban Member"}
+                                        {isBanned
+                                          ? "Unban Member"
+                                          : "Ban Member"}
                                       </button>
                                     </div>
                                   </div>
@@ -940,49 +1198,75 @@ const PreacherCommunityDetail = () => {
           {activeTab === "settings" && (
             <div className="max-w-2xl space-y-6">
               <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6 space-y-5">
-                <h3 className="font-semibold text-[#180426]">Community Settings</h3>
+                <h3 className="font-semibold text-[#180426]">
+                  Community Settings
+                </h3>
 
                 {saveMsg && (
-                  <div className={`px-4 py-2.5 rounded-lg text-sm font-medium ${
-                    saveMsg.type === "success"
-                      ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-red-50 text-red-700 border border-red-200"
-                  }`}>
+                  <div
+                    className={`px-4 py-2.5 rounded-lg text-sm font-medium ${
+                      saveMsg.type === "success"
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
+                  >
                     {saveMsg.text}
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-[#180426] mb-2">Community Name</label>
+                  <label className="block text-sm font-medium text-[#180426] mb-2">
+                    Community Name
+                  </label>
                   <input
                     type="text"
                     value={settingsForm.name}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
+                    onChange={(e) =>
+                      setSettingsForm({ ...settingsForm, name: e.target.value })
+                    }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#180426] mb-2">Description</label>
+                  <label className="block text-sm font-medium text-[#180426] mb-2">
+                    Description
+                  </label>
                   <textarea
                     rows={4}
                     value={settingsForm.description}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, description: e.target.value })}
+                    onChange={(e) =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        description: e.target.value,
+                      })
+                    }
                     placeholder="Describe your community..."
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#180426] mb-2">Visibility</label>
+                  <label className="block text-sm font-medium text-[#180426] mb-2">
+                    Visibility
+                  </label>
                   <select
                     value={settingsForm.privacy}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, privacy: e.target.value })}
+                    onChange={(e) =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        privacy: e.target.value,
+                      })
+                    }
                     className="w-full h-11 px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
                   >
-                    <option value="PUBLIC">Public — Anyone can find and join</option>
+                    <option value="PUBLIC">
+                      Public — Anyone can find and join
+                    </option>
                     <option value="PRIVATE">Private — Invite only</option>
-                    <option value="INVITE_ONLY">Invite Only — Hidden from search</option>
+                    <option value="INVITE_ONLY">
+                      Invite Only — Hidden from search
+                    </option>
                   </select>
                 </div>
 
@@ -993,7 +1277,9 @@ const PreacherCommunityDetail = () => {
                   onClick={handleSaveSettings}
                   disabled={!settingsForm.name.trim()}
                 >
-                  <span className="flex items-center gap-2"><Save size={15} /> Save Changes</span>
+                  <span className="flex items-center gap-2">
+                    <Save size={15} /> Save Changes
+                  </span>
                 </Button>
               </div>
 
@@ -1001,7 +1287,8 @@ const PreacherCommunityDetail = () => {
               <div className="bg-white border border-[#FECDCA] rounded-2xl p-6 space-y-3">
                 <h3 className="font-semibold text-[#B42318]">Danger Zone</h3>
                 <p className="text-sm text-[#60666B]">
-                  Deleting this community is permanent and cannot be undone. All messages and member records will be removed.
+                  Deleting this community is permanent and cannot be undone. All
+                  messages and member records will be removed.
                 </p>
                 <button
                   onClick={() => setShowDeleteModal(true)}
