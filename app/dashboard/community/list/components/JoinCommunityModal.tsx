@@ -88,7 +88,7 @@ export const JoinCommunityModal = ({
           type="button"
           onClick={handleJoin}
         >
-          Join
+          {joining ? "Joining..." : "Join Community"}
         </Button>
       </div>
     </CustomModal>

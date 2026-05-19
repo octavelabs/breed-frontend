@@ -62,7 +62,16 @@ const SingleCommunityPage = () => {
     setJoining(true);
     try {
       await communityService.join(id);
-      setCommunity((prev) => prev ? { ...prev, isJoined: true } : prev);
+      setCommunity((prev) => {
+        if (!prev) return prev;
+        const current = prev.memberCount ?? prev._count?.members ?? 0;
+        return {
+          ...prev,
+          isJoined: true,
+          memberCount: current + 1,
+          ...(prev._count ? { _count: { ...prev._count, members: current + 1 } } : {}),
+        };
+      });
     } catch {
       // already a member or error — silently proceed
     } finally {
