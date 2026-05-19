@@ -248,7 +248,7 @@ const PreacherCommunityPage = () => {
                 <CommunityCard
                   key={community.id}
                   data={community}
-                  onClick={() => router.push(`/dashboard/community/${community.id}`)}
+                  onClick={() => router.push(`/dashboard/preacher/community/${community.id}`)}
                 />
               ))}
             </div>

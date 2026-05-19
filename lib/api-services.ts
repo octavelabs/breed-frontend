@@ -272,6 +272,27 @@ export const communityService = {
 
   invite: (id: string, data: { recipientId: string; message?: string }) =>
     api.post(`/communities/${id}/invite`, data),
+
+  updateCommunity: (id: string, data: {
+    name?: string;
+    description?: string;
+    privacy?: string;
+    maxMembers?: number;
+  }) => api.patch(`/communities/${id}`, data),
+
+  deleteCommunity: (id: string) => api.delete(`/communities/${id}`),
+
+  getMembers: (id: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/communities/${id}/members`, { params }),
+
+  updateMemberRole: (id: string, userId: string, role: string) =>
+    api.patch(`/communities/${id}/members/${userId}/role`, { role }),
+
+  banMember: (id: string, userId: string, reason?: string) =>
+    api.post(`/communities/${id}/members/${userId}/ban`, { reason }),
+
+  unbanMember: (id: string, userId: string) =>
+    api.delete(`/communities/${id}/members/${userId}/ban`),
 };
 
 // ── Prayer services ────────────────────────────────────────────────────────────
