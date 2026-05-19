@@ -88,14 +88,17 @@ const ExploreCard = ({
 
 const ExploreTab = ({
   joinedIds,
+  search,
+  onClearSearch,
 }: {
   joinedIds: Set<string>;
   onJoined: (id: string) => void;
   onSwitchToMine: () => void;
+  search: string;
+  onClearSearch: () => void;
 }) => {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading]         = useState(true);
-  const [search, setSearch]           = useState("");
 
   useEffect(() => {
     communityService.getAll({ limit: 50 })
@@ -114,17 +117,6 @@ const ExploreTab = ({
 
   return (
     <div className="px-4 lg:px-12 py-6 border-t border-[#D2D9DF]">
-      {/* Search */}
-      <div className="relative mb-6 max-w-sm">
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search communities..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-[#E2E3E5] rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/20 focus:border-[#870BD6]"
-        />
-      </div>
 
       {/* Loading */}
       {loading && (
@@ -162,7 +154,7 @@ const ExploreTab = ({
             <SearchIcon size={24} className="text-[#870BD6]" />
           </div>
           <p className="text-base font-semibold text-[#180426]">No results for &quot;{search}&quot;</p>
-          <button onClick={() => setSearch("")} className="text-sm text-[#870BD6] underline">Clear search</button>
+          <button onClick={onClearSearch} className="text-sm text-[#870BD6] underline">Clear search</button>
         </div>
       )}
 
@@ -189,11 +181,13 @@ const MyCommunitiesTab = ({
   isMobile,
   refreshKey,
   onLeave,
+  search,
 }: {
   openModal: () => void;
   isMobile: boolean;
   refreshKey: number;
   onLeave: (id: string) => void;
+  search: string;
 }) => {
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
   const [communities, setCommunities]             = useState<Community[]>([]);
@@ -262,6 +256,7 @@ const MyCommunitiesTab = ({
         communities={communities}
         selectedCommunity={selectedCommunity}
         onSelectCommunity={(c) => setSelectedCommunity(c as Community)}
+        externalSearch={search}
       />
       {isMobile ? (
         selectedCommunity ? (
@@ -292,6 +287,7 @@ const CommunityPage = () => {
   const [isMobile, setIsMobile]   = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [joinedIds, setJoinedIds]   = useState<Set<string>>(new Set());
+  const [search, setSearch]         = useState("");
 
   useEffect(() => {
     const check = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
@@ -337,6 +333,11 @@ const CommunityPage = () => {
     { value: "explore"     as const, label: "Explore" },
   ];
 
+  const switchTab = (tab: "communities" | "explore") => {
+    setActiveTab(tab);
+    setSearch("");
+  };
+
   return (
     <DashboardLayout custom={true}>
       {openModal && (
@@ -362,22 +363,35 @@ const CommunityPage = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4 lg:px-12 mt-6 border-b border-[#D2D9DF]">
-        <div className="flex gap-8">
+      {/* Tab pills + search row */}
+      <div className="px-4 lg:px-12 mt-6 pb-6 flex items-center justify-between gap-4 border-b border-[#D2D9DF]">
+        {/* Pills */}
+        <div className="flex gap-3">
           {TABS.map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
-              className={`pb-3 text-sm font-medium transition-colors ${
+              onClick={() => switchTab(tab.value)}
+              className={`border px-[18px] py-2.5 rounded-full font-medium text-sm transition-all whitespace-nowrap ${
                 activeTab === tab.value
-                  ? "border-b-2 border-[#870BD6] text-[#870BD6] font-semibold"
-                  : "text-[#60666B] hover:text-[#180426]"
+                  ? "bg-white border-black font-semibold text-[#180426]"
+                  : "text-[#4E5255] border-[#D2D9DF] hover:border-gray-400"
               }`}
             >
               {tab.label}
             </button>
           ))}
+        </div>
+
+        {/* Search — filters My Communities sidebar or Explore grid */}
+        <div className="relative hidden sm:block w-56 lg:w-72">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder={activeTab === "communities" ? "Search your communities…" : "Search communities…"}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white transition-colors"
+          />
         </div>
       </div>
 
@@ -389,6 +403,7 @@ const CommunityPage = () => {
             isMobile={isMobile}
             refreshKey={refreshKey}
             onLeave={handleLeft}
+            search={search}
           />
         )}
         {activeTab === "explore" && (
@@ -396,6 +411,8 @@ const CommunityPage = () => {
             joinedIds={joinedIds}
             onJoined={handleJoined}
             onSwitchToMine={() => setActiveTab("communities")}
+            search={search}
+            onClearSearch={() => setSearch("")}
           />
         )}
 

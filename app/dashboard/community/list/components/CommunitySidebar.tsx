@@ -16,12 +16,14 @@ type CommunitySidebarProps = {
   communities: CommunityEntry[];
   selectedCommunity: CommunityEntry | null;
   onSelectCommunity: (community: CommunityEntry) => void;
+  externalSearch?: string;
 };
 
 export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
   communities,
   selectedCommunity,
   onSelectCommunity,
+  externalSearch,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobile, setIsMobile]       = useState(false);
@@ -33,8 +35,10 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  const activeSearch = externalSearch !== undefined ? externalSearch : searchQuery;
+
   const filtered = communities.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    c.name.toLowerCase().includes(activeSearch.toLowerCase())
   );
 
   const isHidden = isMobile && !!selectedCommunity;
@@ -47,24 +51,26 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
           Communities ({communities.length})
         </p>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search communities"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F8FAFC] border border-[#E3E8EF] rounded-lg outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]/20 transition-colors"
-          />
-        </div>
+        {/* Internal search — only shown when no external search is controlling filtering */}
+        {externalSearch === undefined && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search communities"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[#F8FAFC] border border-[#E3E8EF] rounded-lg outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]/20 transition-colors"
+            />
+          </div>
+        )}
       </div>
 
       {/* List */}
       <div className="flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
           <p className="px-4 py-6 text-sm text-[#60666B] text-center">
-            {searchQuery ? `No results for "${searchQuery}"` : "No communities yet."}
+            {activeSearch ? `No results for "${activeSearch}"` : "No communities yet."}
           </p>
         ) : (
           filtered.map((community) => (
