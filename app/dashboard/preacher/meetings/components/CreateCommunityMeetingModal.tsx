@@ -1,17 +1,20 @@
-import { useState, useId, ChangeEvent } from 'react';
-import { X, Upload, Search, Check, Plus } from 'lucide-react';
-
-import Button from '@/app/components/Button';
-import Dropdown from '@/app/components/Dropdown';
-import DropdownWithMultipleSelect from '@/app/components/Dropdown/DropdownWithMultipleSelect';
-import { useDebounce } from '@/utils/useDebounce';
+import { useState } from 'react';
+import { X } from 'lucide-react';
 import { StepProgress } from '@/app/dashboard/community/list/components/StepProgress';
-import { CourseFormData } from '../../showreel/type';
-import Input from '@/app/components/Input';
 import { CommunityMeetingFormData } from '../types';
 import { CommunityStepThree } from './CommunityStepThree';
 import { CommunityStepTwo } from './CommunityStepTwo';
 import { CommunityStepOne } from './CommunityStepOne';
+import { meetingsService } from '@/lib/api-services';
+
+function toScheduledAt(date: string, time: string, fmt: string): string {
+  if (!date || !time) return new Date().toISOString();
+  const [y, m, d] = date.split('-').map(Number);
+  let h = parseInt(time, 10) || 0;
+  if (fmt === 'PM' && h !== 12) h += 12;
+  if (fmt === 'AM' && h === 12) h = 0;
+  return new Date(y, m - 1, d, h, 0, 0).toISOString();
+}
 
 
 interface CreateCommunityModalProps {
@@ -26,49 +29,51 @@ export const CreateCommunityMeetingModal = ({
   onClose,
   onComplete,
 }: CreateCommunityModalProps) => {
-  const bannerInputId = useId();
   const [step, setStep] = useState(1);
-    const [selectedCategories, setSelectedCategories] = useState<[]>([]);
-      const [searchValueCategory, setSearchValueCategory] = useState<string>("");
-  const debouncedSearchValueCategory = useDebounce(searchValueCategory, 1000) ?? "";
-  const isLoading = false
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CommunityMeetingFormData>({
-    title:"",
- community: "",
- guests: "",
- description: "",
- date: "",
- timeZone: "",
- time: "",
- timeFormat:"",
- meetingFrequency: "",
- repeatInterval: 0,
- repeatPattern:"",
- repeatDays:[],
- saveDraftOfRecordings: false,
- lateInterval: "",
+    title: "", community: "", guests: "", description: "",
+    date: "", timeZone: "", time: "", timeFormat: "",
+    meetingFrequency: "", repeatInterval: 0, repeatPattern: "",
+    repeatDays: [], saveDraftOfRecordings: false, lateInterval: "",
   });
 
-
-
-  const canProceedStep1 = formData.title.trim() && formData.community.trim() && formData.guests && formData.description.trim();
-    const canProceedStep2 = formData.meetingFrequency === 'custom' ? formData.repeatInterval && formData.repeatPattern && formData.repeatDays.length > 0 :  formData.date.trim() && formData.time.trim() && formData.timeFormat.trim() && formData.timeZone.trim() && formData.meetingFrequency.trim() ;
-    const canProceedStep3 = formData.lateInterval
-
-    
+  const canProceedStep1 = formData.title.trim() && formData.community.trim() && formData.description.trim();
+  const canProceedStep2 = formData.meetingFrequency === 'custom'
+    ? formData.repeatInterval && formData.repeatPattern && formData.repeatDays.length > 0
+    : formData.date.trim() && formData.time.trim() && formData.timeFormat.trim() && formData.timeZone.trim() && formData.meetingFrequency.trim();
+  const canProceedStep3 = formData.lateInterval;
 
   const handleProceed = () => {
-    if (step === 1 && canProceedStep1) {
-      setStep(2);
-    } else if (step === 2 && canProceedStep2) {
-      setStep(3);
-    }
+    if (step === 1 && canProceedStep1) setStep(2);
+    else if (step === 2 && canProceedStep2) setStep(3);
   };
 
-  const handleComplete = () => {
-    onComplete?.(formData);
-    onClose();
+  const handleComplete = async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const isRecurring = formData.meetingFrequency !== 'once' && !!formData.meetingFrequency;
+      const freq = formData.meetingFrequency === 'custom' ? formData.repeatPattern : formData.meetingFrequency;
+      await meetingsService.create({
+        title: formData.title,
+        description: formData.description || undefined,
+        scheduledAt: toScheduledAt(formData.date, formData.time, formData.timeFormat),
+        communityId: formData.community || undefined,
+        type: 'COMMUNITY',
+        isRecurring,
+        recurrence: isRecurring && freq
+          ? { frequency: freq as 'daily' | 'weekly' | 'monthly', endsAt: new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0] }
+          : undefined,
+      });
+      onComplete?.(formData);
+      onClose();
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to schedule meeting.');
+      setSubmitting(false);
+    }
   };
 
  
@@ -113,7 +118,10 @@ export const CreateCommunityMeetingModal = ({
             <CommunityStepTwo formData={formData} setFormData={setFormData} handleProceed={handleProceed} canProceedStep2={canProceedStep2}/>
           )}
           {step === 3 && (
-           <CommunityStepThree formData={formData} setFormData={setFormData} handleComplete={handleComplete} canProceedStep3={canProceedStep3}/>
+            <>
+              {submitError && <p className="text-red-500 text-sm mb-2">{submitError}</p>}
+              <CommunityStepThree formData={formData} setFormData={setFormData} handleComplete={handleComplete} canProceedStep3={canProceedStep3} submitting={submitting} />
+            </>
           )}
 
         </div>

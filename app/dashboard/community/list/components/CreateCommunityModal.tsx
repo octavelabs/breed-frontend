@@ -15,7 +15,7 @@ interface Friend {
 interface CreateCommunityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete?: (data: CommunityFormData) => void;
+  onComplete?: (data: CommunityFormData) => Promise<void> | void;
 }
 
 interface CommunityFormData {
@@ -79,6 +79,8 @@ export const CreateCommunityModal = ({
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -128,9 +130,16 @@ export const CreateCommunityModal = ({
     }
   };
 
-  const handleComplete = () => {
-    onComplete?.(formData);
-    onClose();
+  const handleComplete = async () => {
+    if (!onComplete) { onClose(); return; }
+    setCreating(true);
+    setCreateError(null);
+    try {
+      await onComplete(formData);
+    } catch (err: unknown) {
+      setCreateError(err instanceof Error ? err.message : 'Failed to create community. Please try again.');
+      setCreating(false);
+    }
   };
 
   return (
@@ -435,13 +444,17 @@ export const CreateCommunityModal = ({
                 ))}
               </div>
 
-               <Button
-                                  customClass="!w-full px-3  !h-[48px] !text-white !text-sm"
-                                  type="button"
-                                  onClick={handleComplete}
-                                >
-Create Community
-                                </Button>
+              {createError && (
+                <p className="text-red-500 text-sm text-center">{createError}</p>
+              )}
+              <Button
+                customClass="!w-full px-3 !h-[48px] !text-white !text-sm"
+                type="button"
+                loading={creating}
+                onClick={handleComplete}
+              >
+                Create Community
+              </Button>
             </div>
           )}
         </div>

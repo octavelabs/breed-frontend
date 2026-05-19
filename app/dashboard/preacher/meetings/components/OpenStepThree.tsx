@@ -14,12 +14,13 @@ export const MOCK_GUESTS: Guest[] = [
 export const OpenStepThree = ({
   formData,
   setFormData,
-   handleComplete,
-
+  handleComplete,
+  submitting = false,
 }: {
   formData: OpenMeetingFormData;
   setFormData: Dispatch<SetStateAction<OpenMeetingFormData>>;
-   handleComplete: () => void
+  handleComplete: () => void;
+  submitting?: boolean;
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
       const [linkCopied, setLinkCopied] = useState(false);
@@ -125,11 +126,12 @@ export const OpenStepThree = ({
         ))}
       </div>
 
-      {/* Create Meeting button */}
       <Button
         onClick={handleComplete}
         buttonType="primary"
-        customClass='!w-full !text-white'
+        customClass="!w-full !text-white"
+        loading={submitting}
+        disabled={submitting}
       >
         Create Meeting
       </Button>

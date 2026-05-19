@@ -3,19 +3,19 @@ import Dropdown from "@/app/components/Dropdown";
 import { CommunityMeetingFormData } from "../types";
 import { Dispatch, SetStateAction } from "react";
 
-export const CommunityStepThree = (
-    {
-      formData,
-      setFormData,
-      handleComplete,
-  canProceedStep3
-    }: {
-      formData: CommunityMeetingFormData;
-      setFormData: Dispatch<SetStateAction<CommunityMeetingFormData>>;
-      handleComplete: () => void
-  canProceedStep3: string
-    }
-) => {
+export const CommunityStepThree = ({
+  formData,
+  setFormData,
+  handleComplete,
+  canProceedStep3,
+  submitting = false,
+}: {
+  formData: CommunityMeetingFormData;
+  setFormData: Dispatch<SetStateAction<CommunityMeetingFormData>>;
+  handleComplete: () => void;
+  canProceedStep3: string | boolean;
+  submitting?: boolean;
+}) => {
   return (
     <div className="space-y-3">
       <div>
@@ -62,10 +62,11 @@ export const CommunityStepThree = (
         </div>
       </div>
       <Button
-        customClass="!w-full px-3  !h-[48px] !text-white !text-sm"
+        customClass="!w-full px-3 !h-[48px] !text-white !text-sm"
         type="button"
         onClick={handleComplete}
-        disabled={!canProceedStep3}
+        disabled={!canProceedStep3 || submitting}
+        loading={submitting}
       >
         Create Meeting
       </Button>

@@ -5,15 +5,12 @@ import CommunityItem from "./CommunityItem";
 
 type CommunitySidebarProps = {
   communities: Array<{
-    id: number;
+    id: string;
     name: string;
-    avatar: string;
+    coverImage?: string | null;
+    [key: string]: unknown;
   }>;
-  selectedCommunity: {
-    id: number;
-    name: string;
-    avatar: string;
-  } | null;
+  selectedCommunity: { id: string; [key: string]: unknown } | null;
   onSelectCommunity: (community: any) => void;
 };
 

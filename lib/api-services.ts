@@ -292,6 +292,52 @@ export const prayerService = {
   getStats: () => api.get('/prayer/stats'),
 };
 
+// ── Meeting services ───────────────────────────────────────────────────────────
+
+export const meetingsService = {
+  create: (data: {
+    title: string;
+    description?: string;
+    scheduledAt: string;
+    duration?: number;
+    meetingLink?: string;
+    platform?: string;
+    communityId?: string;
+    type?: 'COMMUNITY' | 'OPEN';
+    attendeeIds?: string[];
+    reminderMinutes?: number[];
+    isRecurring?: boolean;
+    recurrence?: { frequency: 'daily' | 'weekly' | 'monthly'; endsAt: string };
+  }) => api.post('/meetings', data),
+
+  getAll: (params?: {
+    status?: string;
+    from?: string;
+    to?: string;
+    type?: 'COMMUNITY' | 'OPEN';
+    page?: number;
+    limit?: number;
+  }) => api.get('/meetings', { params }),
+
+  getUpcoming: () => api.get('/meetings/upcoming'),
+
+  getById: (id: string) => api.get(`/meetings/${id}`),
+
+  update: (id: string, data: {
+    title?: string;
+    description?: string;
+    scheduledAt?: string;
+    duration?: number;
+    meetingLink?: string;
+    platform?: string;
+  }) => api.patch(`/meetings/${id}`, data),
+
+  cancel: (id: string) => api.post(`/meetings/${id}/cancel`),
+
+  addAttendee: (id: string, userId: string) =>
+    api.post(`/meetings/${id}/attendees`, { userId }),
+};
+
 // ── Notification services ──────────────────────────────────────────────────────
 
 export const notificationService = {

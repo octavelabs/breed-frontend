@@ -16,6 +16,7 @@ import { CreateCommunityModal } from "./list/components/CreateCommunityModal";
 const CommunityPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -26,11 +27,25 @@ const CommunityPage = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const handleCreateCommunity = async (formData: {
+    name: string;
+    description: string;
+    isPrivate: boolean;
+  }) => {
+    await communityService.create({
+      name: formData.name,
+      description: formData.description || undefined,
+      privacy: formData.isPrivate ? 'PRIVATE' : 'PUBLIC',
+    });
+    setOpenModal(false);
+    setRefreshKey((k) => k + 1);
+  };
+
   const tabs = [
     {
       label: "Your Communities",
       value: "communities",
-      content: <Communities setOpenModal={setOpenModal} isMobile={isMobile} />,
+      content: <Communities setOpenModal={setOpenModal} isMobile={isMobile} refreshKey={refreshKey} />,
     },
     {
       label: "Explore",
@@ -45,6 +60,7 @@ const CommunityPage = () => {
         <CreateCommunityModal
           isOpen={openModal}
           onClose={() => setOpenModal(false)}
+          onComplete={handleCreateCommunity}
         />
       )}
       <div className="flex justify-between items-center pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
@@ -200,9 +216,11 @@ const Explore = () => {
 const Communities = ({
   setOpenModal,
   isMobile,
+  refreshKey,
 }: {
   setOpenModal: (val: boolean) => void;
   isMobile: boolean;
+  refreshKey: number;
 }) => {
   const [selectedCommunity, setSelectedCommunity] = useState(null);
   const [communities, setCommunities] = useState<any[]>([]);
@@ -210,6 +228,7 @@ const Communities = ({
 
   useEffect(() => {
     const fetchMyCommunities = async () => {
+      setLoading(true);
       try {
         const result = await communityService.getMine();
         const data = (result as any)?.data ?? result;
@@ -222,7 +241,7 @@ const Communities = ({
       }
     };
     fetchMyCommunities();
-  }, []);
+  }, [refreshKey]);
 
   if (loading) {
     return (

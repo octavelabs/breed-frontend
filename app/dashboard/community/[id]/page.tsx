@@ -1,206 +1,229 @@
-"use client"
-import DashboardLayout from "@/app/layout/DashboardLayout"
-import { ArrowLeft, Globe, Users } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { JoinCommunityModal } from "../list/components/JoinCommunityModal"
-import Button from "@/app/components/Button"
+"use client";
 
-  
-  const SingleCommunityPage = () => {
-        const [activeTab, setActiveTab] = useState("description")
-        const router = useRouter()
-        const [openModal, setOpenModal] = useState(false)
-        const [isMobile, setIsMobile] = useState(false)
-        
-          useEffect(() => {
-            const checkMobile = () => {
-              setIsMobile(window.matchMedia("(max-width: 767px)").matches)
-            }
-            checkMobile()
-            window.addEventListener('resize', checkMobile)
-            return () => window.removeEventListener('resize', checkMobile)
-          }, [])
+import DashboardLayout from "@/app/layout/DashboardLayout";
+import { ArrowLeft, Globe, Lock, Users } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { JoinCommunityModal } from "../list/components/JoinCommunityModal";
+import Button from "@/app/components/Button";
+import { communityService } from "@/lib/api-services";
+import { useAuth } from "@/context/AuthContext";
 
-        const community = {
-         id: 1,
-         title: "Believers That Hangout",
-         role: "Senior Software Engineer",
-         image: "/dashboardCommunity1.jpg",
-         about: "General Mentorship",
-         duration: '1 hour',
-         contact: "john.doe@example.com",
-        completedSessions: 10,
-        totalTime: 720,
-     }
+const GUIDELINES = [
+  'Be respectful and kind to all members',
+  'No spam or self-promotion without permission',
+  'Keep discussions relevant to the community topic',
+  'Report inappropriate behaviour to moderators',
+  'Follow all applicable laws and regulations',
+  'Respect intellectual property and privacy rights',
+];
 
-       const guidelines = [
-    'Be respectful and kind to all members',
-    'No spam or self-promotion without permission',
-    'Keep discussions relevant to the community topic',
-    'Report inappropriate behavior to moderators',
-    'Follow all applicable laws and regulations',
-    'Respect intellectual property and privacy rights'
-  ];
+interface Community {
+  id: string;
+  name: string;
+  description?: string | null;
+  coverImage?: string | null;
+  privacy: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
+  isMember?: boolean;
+  _count?: { members: number; messages: number };
+}
 
+const SingleCommunityPage = () => {
+  const [activeTab, setActiveTab] = useState("description");
+  const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+  const { user } = useAuth();
+
+  const [community, setCommunity] = useState<Community | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
+    communityService.getById(id)
+      .then((res: unknown) => setCommunity(res as Community))
+      .catch(() => setCommunity(null))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const handleJoin = async () => {
+    if (!id) return;
+    setJoining(true);
+    try {
+      await communityService.join(id);
+      setCommunity((prev) => prev ? { ...prev, isMember: true } : prev);
+    } catch {
+      // already a member or error — silently proceed
+    } finally {
+      setJoining(false);
+      setOpenModal(false);
+    }
+  };
+
+  const isMember = community?.isMember ?? false;
+  const isPrivate = community?.privacy !== 'PUBLIC';
+  const memberCount = community?._count?.members ?? 0;
+
+  if (loading) {
     return (
-  <DashboardLayout custom={true}>
-    {openModal && <JoinCommunityModal isOpen={openModal} onClose={() => setOpenModal(false)} communityName={community.title} guidelines={guidelines}/>}
-    <div className="border-l border-[#D2D9DF]">
-      {/* Header Banner */}
-      <div className="bg-[#870BD6] h-[250px] lg:h-48 relative bg-center bg-cover bg-no-repeat" style={{backgroundImage: `url('${
-      isMobile ? `${community.image}` : '/dashboard-header.png'
-    }')`}}>
-        {/* Pattern overlay */}
-         <button
-        onClick={() => router.back()}
-        className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
-      >
-        <ArrowLeft className="w-5 h-5 text-white" />
-      </button>
-        <div className="absolute inset-0 opacity-80 bg-gradient-to-b from-[#00000000] to-[#000000] lg:bg-none" />
-        <div className="block lg:hidden px-4 absolute bottom-[20px]">
-            <h2 className="text-[20px] text-white font-bold mb-1">{community?.title}</h2>
-             <div className="flex items-center gap-3">
-                      <div className="flex items-center -space-x-3">
-                        <div className="w-5 h-5 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
-                          <img
-                            src="/believers1.jpg"
-                            alt="Member 1"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="w-5 h-5 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
-                          <img
-                            src="/believers2.jpg"
-                            alt="Member 2"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="w-5 h-5 rounded-full border-[1.2px] border-[#A1A6E7] overflow-hidden bg-gray-300">
-                          <img
-                            src="/believers3.jpg"
-                            alt="Member 3"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Count badge */}
-                      <div className="text-white text-sm font-semibold">
-                        2000+
-                      </div>
-                    </div>
-          </div>
-      </div>
-
-      {/* Profile Header */}
-      <div className="hidden lg:flex px-6 md:px-12 py-6 flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <img
-            src={community?.image}
-            alt="mentor"
-            className="w-[180px] h-[180px] rounded-full border-[3px] border-white object-cover -mt-20 relative z-20"
-          />
-
-          <div>
-            <h2 className="text-2xl font-bold mb-1">{community?.title}</h2>
-             <div className="flex items-center gap-3">
-                      <div className="flex items-center -space-x-3">
-                        <div className="w-5 h-5  rounded-full border-[1.2px] border-[#870BD6] overflow-hidden bg-gray-300">
-                          <img
-                            src="/believers1.jpg"
-                            alt="Member 1"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="w-5 h-5  rounded-full border-[1.2px] border-[#870BD6] overflow-hidden bg-gray-300">
-                          <img
-                            src="/believers2.jpg"
-                            alt="Member 2"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="w-5 h-5  rounded-full border-[1.2px] border-[#870BD6] overflow-hidden bg-gray-300">
-                          <img
-                            src="/believers3.jpg"
-                            alt="Member 3"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Count badge */}
-                      <div className="text-sm font-semibold">
-                        2000+
-                      </div>
-                    </div>
+      <DashboardLayout custom={true}>
+        <div className="animate-pulse">
+          <div className="h-48 bg-gray-200" />
+          <div className="px-6 md:px-12 py-6 space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3" />
+            <div className="h-4 bg-gray-200 rounded w-2/3" />
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
           </div>
         </div>
+      </DashboardLayout>
+    );
+  }
 
-        <button className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer" onClick={() => setOpenModal(true)}>
-          Join Community
-        </button>
-      </div>
+  if (!community) {
+    return (
+      <DashboardLayout custom={true}>
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <p className="text-gray-500">Community not found.</p>
+          <button onClick={() => router.back()} className="text-[#870BD6] text-sm underline">Go back</button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-      {/* Tabs */}
-      <div className="hidden lg:block px-6 md:px-12 pt-6">
-        <div className="flex gap-8 border-b border-[#D2D9DF]">
+  return (
+    <DashboardLayout custom={true}>
+      {openModal && (
+        <JoinCommunityModal
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+          communityName={community.name}
+          communityId={id}
+          guidelines={GUIDELINES}
+          onJoin={handleJoin}
+          joining={joining}
+        />
+      )}
+
+      <div className="border-l border-[#D2D9DF]">
+        {/* Banner */}
+        <div
+          className="bg-[#870BD6] h-[250px] lg:h-48 relative bg-center bg-cover bg-no-repeat"
+          style={{ backgroundImage: isMobile && community.coverImage ? `url('${community.coverImage}')` : "url('/dashboard-header.png')" }}
+        >
           <button
-            onClick={() => setActiveTab("description")}
-            className={`pb-3 text-[18px] ${
-              activeTab === "description"
-                ? "border-b-2 border-[#870BD6] font-semibold"
-                : ""
-            }`}
+            onClick={() => router.back()}
+            className="flex items-center gap-2 cursor-pointer px-6 md:px-12 pt-16 relative z-20"
           >
-            Description
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
+          <div className="absolute inset-0 opacity-80 bg-gradient-to-b from-[#00000000] to-[#000000] lg:bg-none" />
+          {/* Mobile title overlay */}
+          <div className="block lg:hidden px-4 absolute bottom-[20px]">
+            <h2 className="text-[20px] text-white font-bold mb-1">{community.name}</h2>
+            <div className="flex items-center gap-2 text-white text-sm">
+              <Users size={14} /> {memberCount.toLocaleString()} members
+            </div>
+          </div>
+        </div>
+
+        {/* Profile header (desktop) */}
+        <div className="hidden lg:flex px-6 md:px-12 py-6 flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex items-center gap-5">
+            {community.coverImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={community.coverImage}
+                alt={community.name}
+                className="w-[150px] h-[150px] rounded-full border-[3px] border-white object-cover -mt-20 relative z-20 shadow-lg"
+              />
+            ) : (
+              <div className="w-[150px] h-[150px] rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-4xl font-bold border-[3px] border-white -mt-20 relative z-20 shadow-lg">
+                {community.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div>
+              <h2 className="text-2xl font-bold mb-1">{community.name}</h2>
+              <div className="flex items-center gap-2 text-[#60666B] text-sm">
+                <Users size={14} /> {memberCount.toLocaleString()} members
+              </div>
+            </div>
+          </div>
+
+          {!isMember && (
+            <button
+              onClick={() => setOpenModal(true)}
+              className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer"
+            >
+              Join Community
+            </button>
+          )}
+        </div>
+
+        {/* Tabs (desktop) */}
+        <div className="hidden lg:block px-6 md:px-12 pt-2">
+          <div className="flex gap-8 border-b border-[#D2D9DF]">
+            <button
+              onClick={() => setActiveTab("description")}
+              className={`pb-3 text-[18px] font-medium transition-colors ${
+                activeTab === "description" ? "border-b-2 border-[#870BD6] text-[#870BD6] font-semibold" : "text-[#60666B]"
+              }`}
+            >
+              Description
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-4 lg:px-12 py-5">
+          {activeTab === "description" && (
+            <div className="max-w-2xl space-y-4 leading-relaxed">
+              <p className="text-sm font-bold text-[#180426]">Description</p>
+              <p className="text-[#60666B] text-sm whitespace-pre-wrap">
+                {community.description ?? "No description available."}
+              </p>
+
+              <div className="space-y-3 mt-4">
+                <div className="flex items-center gap-2 text-[#4E5255] text-sm">
+                  {isPrivate ? <Lock stroke="#870BD6" className="w-5 h-5" /> : <Globe stroke="#870BD6" className="w-5 h-5" />}
+                  <p>
+                    {community.privacy === 'PUBLIC'
+                      ? 'This is an open community. Anyone can join.'
+                      : community.privacy === 'PRIVATE'
+                        ? 'This is a private community. Invite only.'
+                        : 'This community requires an invitation to join.'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-[#4E5255] text-sm">
+                  <Users stroke="#870BD6" className="w-5 h-5" />
+                  <p>Everyone can interact in this community</p>
+                </div>
+              </div>
+
+              {!isMember && (
+                <Button
+                  customClass="!w-full px-6 !h-[48px] !text-white mt-6 lg:hidden"
+                  type="button"
+                  onClick={() => setOpenModal(true)}
+                >
+                  Join Community
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
-     
+    </DashboardLayout>
+  );
+};
 
-      {/* Content */}
-      <div className="px-4 lg:px-12 py-5 flex gap-8 items-star">
-        {activeTab === "description" && (
-          <div>
-            {/* Description */}
-            <div className="w-full space-y-4 leading-relaxed text-base lg:text-[18px]">
-               <p className="text-sm font-bold mb-2">Description</p>
-              <p>
-                Believers That Hangout Global crafts uplifting experiences and connection points for faith‑filled individuals around the world. Their feed features curated events, trips, staycations, and online prayer sessions, encouraging believers to come together "don't come alone, bring a friend".
-              </p>
-              <p>
-                They also share spiritual resources like prayer reels and weekly playlists 
-(“BTH Global Weekly Faves”), blending community moments with worship and devotion
-              </p>
-              <div className="space-y-2 lg:space-y-8 text-base lg:text-[18px]">
-            <div className="flex items-center gap-2 text-[#4E5255]">
-              <Globe stroke='#870BD6' className="w-5 h-5" />
-              <p>This is an open community. Anyone can join this community.</p>
-            </div>
-            
-            <div className="flex items-center gap-2  text-[#4E5255]">
-              <Users stroke='#870BD6'className="w-5 h-5" />
-              <p>Everyone can interact in this community</p>
-            </div>
-          </div>
-            </div>
-             <Button
-              customClass="!w-full px-6 !h-[48px] !text-white absolute mt-4 lg:hidden"
-              type="button"
-              onClick={() => setOpenModal(true)}
-            >
-              <p className="flex items-center gap-[6px]">
-                Join community
-              </p>
-            </Button>
-          </div>
-        )}
-
-      </div>
-    </div>
- </DashboardLayout>
- )}
-
- export default SingleCommunityPage
+export default SingleCommunityPage;
