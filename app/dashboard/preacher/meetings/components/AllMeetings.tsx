@@ -182,4 +182,23 @@ const AllMeetingsList = ({
   );
 };
 
+export const Pagination = () => (
+  <div className="flex items-center justify-center gap-4 py-4 border-t border-gray-200">
+    <button className="px-[14px] py-2 text-sm font-medium text-[#3C3E40] border border-[#CDD5DF] rounded-full">
+      ← <span className="hidden lg:inline">Previous</span>
+    </button>
+    {[1, 2, 3, "...", 8, 9, 10].map((page, index) => (
+      <button
+        key={index}
+        className={`flex justify-center items-center w-10 h-10 text-sm font-medium rounded-[8px] text-[#4E5255] ${page === 1 ? "bg-[#E2E3E5]" : "bg-white"}`}
+      >
+        {page}
+      </button>
+    ))}
+    <button className="px-[14px] py-2 text-sm font-medium text-[#3C3E40] border border-[#CDD5DF] rounded-full">
+      <span className="hidden lg:inline">Next</span> →
+    </button>
+  </div>
+);
+
 export default AllMeetingsList;
