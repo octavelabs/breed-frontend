@@ -131,6 +131,29 @@ const PreacherCommunityPage = () => {
       .finally(() => setLoading(false));
   };
 
+  const handleCreateCommunity = async (formData: {
+    name: string;
+    description: string;
+    isPrivate: boolean;
+    friends: Array<{ id: string; role?: 'admin' | 'member' | 'added' }>;
+  }) => {
+    const created = await communityService.create({
+      name: formData.name,
+      description: formData.description || undefined,
+      privacy: formData.isPrivate ? 'PRIVATE' : 'PUBLIC',
+    }) as { id: string };
+
+    const toInvite = formData.friends.filter((f) => f.role === 'added' || f.role === 'admin' || f.role === 'member');
+    if (created?.id && toInvite.length > 0) {
+      await Promise.allSettled(
+        toInvite.map((f) => communityService.invite(created.id, { recipientId: f.id }))
+      );
+    }
+
+    setOpenModal(false);
+    fetchCommunities();
+  };
+
   useEffect(() => {
     fetchCommunities();
   }, []);
@@ -144,10 +167,8 @@ const PreacherCommunityPage = () => {
       {openModal && (
         <CreateCommunityModal
           isOpen={openModal}
-          onClose={() => {
-            setOpenModal(false);
-            fetchCommunities();
-          }}
+          onClose={() => setOpenModal(false)}
+          onComplete={handleCreateCommunity}
         />
       )}
 
