@@ -8,14 +8,14 @@ type CommunityEntry = {
   id: string;
   name: string;
   coverImage?: string | null;
+  privacy?: string;
   _count?: { members?: number; messages?: number };
-  [key: string]: unknown;
 };
 
 type CommunitySidebarProps = {
   communities: CommunityEntry[];
-  selectedCommunity: { id: string; [key: string]: unknown } | null;
-  onSelectCommunity: (community: any) => void;
+  selectedCommunity: CommunityEntry | null;
+  onSelectCommunity: (community: CommunityEntry) => void;
 };
 
 export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({

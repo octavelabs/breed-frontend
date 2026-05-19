@@ -30,8 +30,8 @@ type CommunityChatViewProps = {
   community: {
     id: string;
     name: string;
-    _count?: { members?: number };
-    [key: string]: unknown;
+    coverImage?: string | null;
+    _count?: { members?: number; messages?: number };
   };
   setSelectedCommunity: (community: any) => void;
   onLeave?: (communityId: string) => void;
@@ -190,9 +190,9 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
             <ArrowLeft size={20} className="text-[#60666B]" />
           </button>
           <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
-            {(community as any).coverImage
+            {community.coverImage
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={(community as any).coverImage} alt={community.name} className="w-full h-full object-cover rounded-full" />
+              ? <img src={community.coverImage} alt={community.name} className="w-full h-full object-cover rounded-full" />
               : community.name.charAt(0).toUpperCase()}
           </div>
           <div>

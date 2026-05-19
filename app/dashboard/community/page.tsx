@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Plus, SearchIcon, Globe, Lock, Users, BookOpen, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Plus, SearchIcon, Globe, Lock, Users, BookOpen, CheckCircle } from "lucide-react";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { communityService } from "@/lib/api-services";
 import Button from "@/app/components/Button";
@@ -21,93 +21,66 @@ interface Community {
   _count?: { members: number; messages: number };
 }
 
-const GUIDELINES = [
-  "Be respectful and kind to all members",
-  "No spam or self-promotion without permission",
-  "Keep discussions relevant to the community topic",
-  "Report inappropriate behaviour to moderators",
-  "Follow all applicable laws and regulations",
-  "Respect intellectual property and privacy rights",
-];
-
-// ── Toast ─────────────────────────────────────────────────────────────────────
-
-const Toast = ({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) => (
-  <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-lg text-sm font-medium ${type === "success" ? "bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]" : "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]"}`}>
-    {message}
-    <button onClick={onClose} className="ml-1 opacity-60 hover:opacity-100"><X size={14} /></button>
-  </div>
-);
 
 // ── Explore community card ────────────────────────────────────────────────────
 
+// Clicking the card navigates to the community detail page.
+// The Join badge / button is a visual indicator only — joining happens on the detail page.
 const ExploreCard = ({
   community,
   isJoined,
-  isJoining,
-  onJoin,
 }: {
   community: Community;
   isJoined: boolean;
-  isJoining: boolean;
-  onJoin: (c: Community) => void;
 }) => {
   const initial     = community.name.charAt(0).toUpperCase();
   const memberCount = community._count?.members ?? 0;
   const isPrivate   = community.privacy !== "PUBLIC";
 
   return (
-    <div className="bg-white border border-[#E2E3E5] rounded-2xl overflow-hidden hover:shadow-md transition-shadow flex flex-col">
-      {/* Cover */}
-      <div className="relative bg-[#180426] h-[140px] flex items-center justify-center overflow-hidden">
-        {community.coverImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={community.coverImage} alt={community.name} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-white text-5xl font-bold opacity-15">{initial}</span>
-        )}
-        <span className={`absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
-          isPrivate
-            ? "bg-[#F8F9FC]/90 text-[#363F72] border border-[#D5D9EB]"
-            : "bg-[#ECFDF3]/90 border border-[#ABEFC6] text-[#067647]"
-        }`}>
-          {isPrivate ? <Lock size={10} /> : <Globe size={10} />}
-          {community.privacy === "PUBLIC" ? "Public" : community.privacy === "PRIVATE" ? "Private" : "Invite Only"}
-        </span>
-      </div>
+    <Link href={`/dashboard/community/${community.id}`}>
+      <div className="bg-white border border-[#E2E3E5] rounded-2xl overflow-hidden hover:shadow-md transition-shadow flex flex-col cursor-pointer group">
+        {/* Cover */}
+        <div className="relative bg-[#180426] h-[140px] flex items-center justify-center overflow-hidden">
+          {community.coverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={community.coverImage} alt={community.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          ) : (
+            <span className="text-white text-5xl font-bold opacity-15">{initial}</span>
+          )}
+          <span className={`absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
+            isPrivate
+              ? "bg-[#F8F9FC]/90 text-[#363F72] border border-[#D5D9EB]"
+              : "bg-[#ECFDF3]/90 border border-[#ABEFC6] text-[#067647]"
+          }`}>
+            {isPrivate ? <Lock size={10} /> : <Globe size={10} />}
+            {community.privacy === "PUBLIC" ? "Public" : community.privacy === "PRIVATE" ? "Private" : "Invite Only"}
+          </span>
+          {isJoined && (
+            <span className="absolute top-3 right-3 bg-[#ECFDF3]/90 border border-[#ABEFC6] text-[#067647] text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+              <CheckCircle size={10} /> Joined
+            </span>
+          )}
+        </div>
 
-      {/* Content */}
-      <div className="px-4 py-3 flex-1 flex flex-col gap-2">
-        <h3 className="font-bold text-[#180426] text-sm leading-snug line-clamp-1">{community.name}</h3>
-        {community.description && (
-          <p className="text-xs text-[#60666B] leading-relaxed line-clamp-2">{community.description}</p>
-        )}
-        <div className="flex items-center gap-1.5 text-xs text-[#60666B] mt-auto pt-1">
-          <Users size={13} />
-          <span>{memberCount.toLocaleString()} member{memberCount !== 1 ? "s" : ""}</span>
+        {/* Content */}
+        <div className="px-4 py-3 flex-1 flex flex-col gap-2">
+          <h3 className="font-bold text-[#180426] text-sm leading-snug line-clamp-1 group-hover:text-[#870BD6] transition-colors">{community.name}</h3>
+          {community.description && (
+            <p className="text-xs text-[#60666B] leading-relaxed line-clamp-2">{community.description}</p>
+          )}
+          <div className="flex items-center justify-between mt-auto pt-1">
+            <span className="flex items-center gap-1.5 text-xs text-[#60666B]">
+              <Users size={13} />
+              {memberCount.toLocaleString()} member{memberCount !== 1 ? "s" : ""}
+            </span>
+            <span className="text-xs font-semibold text-[#870BD6] group-hover:underline">
+              {isJoined ? "Open chat →" : "View →"}
+            </span>
+          </div>
         </div>
       </div>
-
-      {/* Action */}
-      <div className="px-4 pb-4">
-        {isJoined ? (
-          <div className="w-full py-2 rounded-full text-center text-sm font-semibold text-[#067647] bg-[#ECFDF3] border border-[#ABEFC6]">
-            ✓ Joined
-          </div>
-        ) : (
-          <button
-            onClick={() => onJoin(community)}
-            disabled={isJoining}
-            className="w-full py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-b from-[#A967F1] to-[#5B26B1] hover:opacity-90 disabled:opacity-60 transition-opacity flex items-center justify-center gap-2"
-          >
-            {isJoining ? (
-              <span className="inline-block w-4 h-4 rounded-full border-t-2 border-white animate-spin" />
-            ) : null}
-            {isPrivate ? "Request to Join" : "Join Community"}
-          </button>
-        )}
-      </div>
-    </div>
+    </Link>
   );
 };
 
@@ -115,8 +88,6 @@ const ExploreCard = ({
 
 const ExploreTab = ({
   joinedIds,
-  onJoined,
-  onSwitchToMine,
 }: {
   joinedIds: Set<string>;
   onJoined: (id: string) => void;
@@ -125,10 +96,6 @@ const ExploreTab = ({
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading]         = useState(true);
   const [search, setSearch]           = useState("");
-  const [joinModal, setJoinModal]     = useState<Community | null>(null);
-  const [joiningId, setJoiningId]     = useState<string | null>(null);
-  const [joinError, setJoinError]     = useState<string | null>(null);
-  const [toast, setToast]             = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     communityService.getAll({ limit: 50 })
@@ -140,42 +107,6 @@ const ExploreTab = ({
       .finally(() => setLoading(false));
   }, []);
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const handleJoinConfirm = async () => {
-    if (!joinModal) return;
-    setJoiningId(joinModal.id);
-    setJoinError(null);
-    try {
-      await communityService.join(joinModal.id);
-      // Optimistically update member count
-      setCommunities((prev) =>
-        prev.map((c) =>
-          c.id === joinModal.id
-            ? { ...c, _count: { members: (c._count?.members ?? 0) + 1, messages: c._count?.messages ?? 0 } }
-            : c
-        )
-      );
-      onJoined(joinModal.id);
-      setJoinModal(null);
-      showToast(`You've joined "${joinModal.name}"!`, "success");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "";
-      if (msg.toLowerCase().includes("already")) {
-        // Already a member — treat as success
-        onJoined(joinModal.id);
-        setJoinModal(null);
-      } else {
-        setJoinError("Failed to join. Please try again.");
-      }
-    } finally {
-      setJoiningId(null);
-    }
-  };
-
   const filtered = communities.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     (c.description ?? "").toLowerCase().includes(search.toLowerCase())
@@ -183,67 +114,6 @@ const ExploreTab = ({
 
   return (
     <div className="px-4 lg:px-12 py-6 border-t border-[#D2D9DF]">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
-      {/* Join modal */}
-      {joinModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setJoinModal(null)}>
-          <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#180426]">Join Community</h2>
-              <button onClick={() => setJoinModal(null)} className="p-1 rounded-full hover:bg-gray-100">
-                <X size={18} className="text-gray-400" />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 bg-[#FBF6FF] rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0 overflow-hidden">
-                {joinModal.coverImage
-                  // eslint-disable-next-line @next/next/no-img-element
-                  ? <img src={joinModal.coverImage} alt={joinModal.name} className="w-full h-full object-cover" />
-                  : joinModal.name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="font-semibold text-sm text-[#180426]">{joinModal.name}</p>
-                <p className="text-xs text-[#60666B]">
-                  {(joinModal._count?.members ?? 0).toLocaleString()} members
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-sm text-[#4E5255]">
-              <div className="flex items-center gap-2">
-                {joinModal.privacy === "PUBLIC" ? <Globe stroke="#870BD6" size={14} /> : <Lock stroke="#870BD6" size={14} />}
-                <p>{joinModal.privacy === "PUBLIC" ? "Anyone can join this community." : "This community requires approval to join."}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users stroke="#870BD6" size={14} />
-                <p>Everyone can interact in this community</p>
-              </div>
-            </div>
-
-            <div className="bg-[#F6F8FA] rounded-2xl p-4 space-y-3">
-              <p className="text-sm font-medium text-[#180426]">Community Guidelines</p>
-              <ul className="space-y-1.5 text-xs text-[#60666B]">
-                {GUIDELINES.map((g, i) => (
-                  <li key={i} className="flex items-start gap-2"><span className="text-[#870BD6] mt-0.5">•</span>{g}</li>
-                ))}
-              </ul>
-            </div>
-
-            {joinError && <p className="text-red-500 text-sm text-center">{joinError}</p>}
-
-            <Button
-              customClass="!w-full !h-[48px] !text-white"
-              loading={joiningId === joinModal.id}
-              onClick={handleJoinConfirm}
-            >
-              {joinModal.privacy === "PUBLIC" ? "Join Community" : "Request to Join"}
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Search */}
       <div className="relative mb-6 max-w-sm">
         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -267,7 +137,6 @@ const ExploreTab = ({
                 <div className="h-3 bg-gray-200 rounded" />
                 <div className="h-3 bg-gray-200 rounded w-1/2" />
               </div>
-              <div className="px-4 pb-4"><div className="h-9 bg-gray-200 rounded-full" /></div>
             </div>
           ))}
         </div>
@@ -297,7 +166,7 @@ const ExploreTab = ({
         </div>
       )}
 
-      {/* Grid */}
+      {/* Grid — each card is a Link to the community detail page */}
       {!loading && filtered.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((c) => (
@@ -305,8 +174,6 @@ const ExploreTab = ({
               key={c.id}
               community={c}
               isJoined={joinedIds.has(c.id)}
-              isJoining={joiningId === c.id}
-              onJoin={setJoinModal}
             />
           ))}
         </div>
@@ -394,7 +261,7 @@ const MyCommunitiesTab = ({
       <CommunitySidebar
         communities={communities}
         selectedCommunity={selectedCommunity}
-        onSelectCommunity={setSelectedCommunity}
+        onSelectCommunity={(c) => setSelectedCommunity(c as Community)}
       />
       {isMobile ? (
         selectedCommunity ? (
@@ -531,6 +398,7 @@ const CommunityPage = () => {
             onSwitchToMine={() => setActiveTab("communities")}
           />
         )}
+
       </div>
     </DashboardLayout>
   );

@@ -9,7 +9,6 @@ type CommunityItemProps = {
     name: string;
     coverImage?: string | null;
     _count?: { members?: number; messages?: number };
-    [key: string]: unknown;
   };
   isSelected: boolean;
   onClick: () => void;

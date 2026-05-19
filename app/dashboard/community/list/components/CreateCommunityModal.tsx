@@ -97,7 +97,7 @@ export const CreateCommunityModal = ({
     }
   };
 
-  const handleToggleFriend = (friendId: string, role: 'admin' | 'member') => {
+  const handleToggleFriend = (friendId: string, role: 'admin' | 'member' | 'added') => {
     setFormData({
       ...formData,
       friends: formData.friends.map((f) =>
