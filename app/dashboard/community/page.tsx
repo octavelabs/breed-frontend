@@ -31,12 +31,22 @@ const CommunityPage = () => {
     name: string;
     description: string;
     isPrivate: boolean;
+    friends: Array<{ id: string; role?: 'admin' | 'member' | 'added' }>;
   }) => {
-    await communityService.create({
+    const created = await communityService.create({
       name: formData.name,
       description: formData.description || undefined,
       privacy: formData.isPrivate ? 'PRIVATE' : 'PUBLIC',
-    });
+    }) as { id: string };
+
+    // Send invites to selected followers (best-effort, don't block on failures)
+    const toInvite = formData.friends.filter((f) => f.role === 'added' || f.role === 'admin' || f.role === 'member');
+    if (created?.id && toInvite.length > 0) {
+      await Promise.allSettled(
+        toInvite.map((f) => communityService.invite(created.id, { recipientId: f.id }))
+      );
+    }
+
     setOpenModal(false);
     setRefreshKey((k) => k + 1);
   };

@@ -269,6 +269,9 @@ export const communityService = {
 
   sendMessage: (id: string, content: string, replyToId?: string) =>
     api.post(`/communities/${id}/messages`, { content, replyToId }),
+
+  invite: (id: string, data: { recipientId: string; message?: string }) =>
+    api.post(`/communities/${id}/invite`, data),
 };
 
 // ── Prayer services ────────────────────────────────────────────────────────────

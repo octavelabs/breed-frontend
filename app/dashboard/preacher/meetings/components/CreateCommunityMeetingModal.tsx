@@ -40,7 +40,7 @@ export const CreateCommunityMeetingModal = ({
     repeatDays: [], saveDraftOfRecordings: false, lateInterval: "",
   });
 
-  const canProceedStep1 = formData.title.trim() && formData.community.trim() && formData.description.trim();
+  const canProceedStep1 = formData.title.trim() && formData.community.trim() && formData.guests.trim() && formData.description.trim();
   const canProceedStep2 = formData.meetingFrequency === 'custom'
     ? formData.repeatInterval && formData.repeatPattern && formData.repeatDays.length > 0
     : formData.date.trim() && formData.time.trim() && formData.timeFormat.trim() && formData.timeZone.trim() && formData.meetingFrequency.trim();

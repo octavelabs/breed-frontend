@@ -44,12 +44,27 @@ export const CommunityStepOne = ({
         <select
           value={formData.community}
           onChange={(e) => setFormData({ ...formData, community: e.target.value })}
-          className="w-full h-[48px] px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm bg-white"
+          className="w-full h-[48px] px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
         >
           <option value="">Select a community</option>
           {communities.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-[6px]">
+          Meeting Audience
+        </label>
+        <select
+          value={formData.guests}
+          onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
+          className="w-full h-[48px] px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
+        >
+          <option value="">Who can attend this meeting?</option>
+          <option value="All Members">All Members</option>
+          <option value="Leaders Only">Leaders Only</option>
         </select>
       </div>
 
