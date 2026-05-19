@@ -121,7 +121,7 @@ const ExploreTab = ({
 
       {/* Loading */}
       {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="bg-white border border-[#E2E3E5] rounded-2xl overflow-hidden animate-pulse">
               <div className="h-[140px] bg-gray-200" />
@@ -161,7 +161,7 @@ const ExploreTab = ({
 
       {/* Grid — each card is a Link to the community detail page */}
       {!loading && filtered.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {filtered.map((c) => (
             <ExploreCard
               key={c.id}
