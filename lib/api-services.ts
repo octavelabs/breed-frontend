@@ -295,6 +295,9 @@ export const communityService = {
 
   unbanMember: (id: string, userId: string) =>
     api.delete(`/communities/${id}/members/${userId}/ban`),
+
+  removeMember: (id: string, userId: string) =>
+    api.delete(`/communities/${id}/members/${userId}`),
 };
 
 // ── Prayer services ────────────────────────────────────────────────────────────

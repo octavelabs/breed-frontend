@@ -691,8 +691,9 @@ const PreacherCommunityDetail = () => {
     text: string;
   } | null>(null);
 
-  const [memberAction, setMemberAction] = useState<string | null>(null);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [memberAction, setMemberAction]   = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown]   = useState<string | null>(null);
+  const [memberSearch, setMemberSearch]   = useState("");
 
   const loadCommunity = useCallback(async () => {
     setLoading(true);
@@ -796,6 +797,19 @@ const PreacherCommunityDetail = () => {
             : m,
         ),
       );
+    } catch {
+      // silent
+    } finally {
+      setMemberAction(null);
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    setMemberAction(userId);
+    setOpenDropdown(null);
+    try {
+      await communityService.removeMember(id, userId);
+      setMembers((prev) => prev.filter((m) => m.user.id !== userId));
     } catch {
       // silent
     } finally {
@@ -1024,175 +1038,177 @@ const PreacherCommunityDetail = () => {
           )}
 
           {/* ── Members ───────────────────────────────────────────────────── */}
-          {activeTab === "members" && (
-            <div className="max-w-4xl">
-              <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-[#F0F2F4] flex items-center justify-between">
-                  <h3 className="font-semibold text-[#180426]">
-                    Members{" "}
-                    <span className="text-[#60666B] font-normal text-sm">
-                      ({members.length})
-                    </span>
-                  </h3>
-                  <Button
-                    customClass="!w-fit px-4 !h-[36px] !text-white !text-xs"
-                    type="button"
-                    onClick={() => setShowInviteModal(true)}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <UserPlus size={13} /> Add Members
-                    </span>
-                  </Button>
-                </div>
+          {activeTab === "members" && (() => {
+            const filteredMembers = members.filter((m) => {
+              const name = `${m.user.firstName} ${m.user.lastName}`.toLowerCase();
+              const username = (m.user.username ?? "").toLowerCase();
+              const q = memberSearch.toLowerCase();
+              return !q || name.includes(q) || username.includes(q);
+            });
 
-                {members.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                      <Users size={22} className="text-[#870BD6]" />
-                    </div>
-                    <p className="text-sm font-semibold text-gray-700">
-                      No members yet
-                    </p>
-                    <button
-                      onClick={() => setShowInviteModal(true)}
-                      className="text-sm text-[#870BD6] underline"
-                    >
-                      Invite the first member
-                    </button>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-[#F0F2F4]">
-                    {members.map((member) => {
-                      const fullName =
-                        `${member.user.firstName} ${member.user.lastName}`.trim();
-                      const isBanned = member.status === "BANNED";
-                      const isOwner = member.role === "OWNER";
-                      const isInFlight = memberAction === member.user.id;
-
-                      return (
-                        <div
-                          key={member.id}
-                          className={`flex items-center justify-between px-6 py-4 transition-colors ${
-                            isBanned
-                              ? "opacity-60 bg-[#FEF3F2]"
-                              : "hover:bg-[#FAFAFA]"
-                          }`}
+            return (
+              <div className="max-w-4xl">
+                <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden">
+                  {/* Header row */}
+                  <div className="px-6 py-4 border-b border-[#F0F2F4]">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                      <h3 className="font-semibold text-[#180426] shrink-0">
+                        Members{" "}
+                        <span className="text-[#60666B] font-normal text-sm">({members.length})</span>
+                      </h3>
+                      <div className="flex items-center gap-2 flex-1 sm:max-w-xs">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                          <input
+                            type="text"
+                            placeholder="Search members..."
+                            value={memberSearch}
+                            onChange={(e) => setMemberSearch(e.target.value)}
+                            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F8F9FC] border border-[#E3E8EF] rounded-lg outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]/20 transition-colors"
+                          />
+                        </div>
+                        <Button
+                          customClass="!w-fit px-4 !h-[36px] !text-white !text-xs shrink-0"
+                          type="button"
+                          onClick={() => setShowInviteModal(true)}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm overflow-hidden shrink-0">
-                              {member.user.avatarUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={member.user.avatarUrl}
-                                  alt={fullName}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                fullName.charAt(0).toUpperCase()
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-[#180426]">
-                                {fullName}
-                              </p>
-                              <p className="text-xs text-[#60666B]">
-                                Joined{" "}
-                                {new Date(member.joinedAt).toLocaleDateString(
-                                  "en-GB",
-                                  {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                  },
-                                )}
-                              </p>
-                            </div>
-                          </div>
+                          <span className="flex items-center gap-1.5">
+                            <UserPlus size={13} /> Add
+                          </span>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
 
-                          <div className="flex items-center gap-3">
-                            <span
-                              className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${roleColor[member.role]}`}
-                            >
-                              {roleIcon[member.role]}{" "}
-                              {member.role.charAt(0) +
-                                member.role.slice(1).toLowerCase()}
-                            </span>
-                            {isBanned && (
-                              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]">
-                                Banned
-                              </span>
-                            )}
-                            {!isOwner && (
-                              <div
-                                className="relative"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <button
-                                  onClick={() =>
-                                    setOpenDropdown(
-                                      openDropdown === member.user.id
-                                        ? null
-                                        : member.user.id,
-                                    )
-                                  }
-                                  disabled={isInFlight}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-[#60666B] disabled:opacity-50 transition-colors"
-                                >
-                                  {isInFlight ? (
-                                    <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin" />
-                                  ) : (
-                                    <MoreVertical size={16} />
-                                  )}
-                                </button>
-                                {openDropdown === member.user.id && (
-                                  <div className="absolute right-0 mt-1 w-48 bg-white border border-[#E3E8EF] rounded-xl shadow-lg z-20 overflow-hidden">
-                                    <p className="px-4 py-2 text-[10px] font-semibold text-[#60666B] uppercase tracking-wider border-b border-[#F0F2F4]">
-                                      Change Role
-                                    </p>
-                                    {ROLES.filter(
-                                      (r) => r !== "OWNER" && r !== member.role,
-                                    ).map((role) => (
-                                      <button
-                                        key={role}
-                                        onClick={() =>
-                                          handleRoleChange(member.user.id, role)
-                                        }
-                                        className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2"
-                                      >
-                                        {roleIcon[role]}
-                                        <span>
-                                          Make{" "}
-                                          {role.charAt(0) +
-                                            role.slice(1).toLowerCase()}
-                                        </span>
-                                      </button>
-                                    ))}
-                                    <div className="border-t border-[#F0F2F4]">
-                                      <button
-                                        onClick={() =>
-                                          handleBan(member.user.id, isBanned)
-                                        }
-                                        className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]"
-                                      >
-                                        <UserX size={14} />
-                                        {isBanned
-                                          ? "Unban Member"
-                                          : "Ban Member"}
-                                      </button>
-                                    </div>
-                                  </div>
+                  {members.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 gap-3">
+                      <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                        <Users size={22} className="text-[#870BD6]" />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-700">No members yet</p>
+                      <button
+                        onClick={() => setShowInviteModal(true)}
+                        className="text-sm text-[#870BD6] underline"
+                      >
+                        Invite the first member
+                      </button>
+                    </div>
+                  ) : filteredMembers.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
+                      <Search size={22} className="text-gray-300" />
+                      <p className="text-sm text-[#60666B]">No members match &ldquo;{memberSearch}&rdquo;</p>
+                      <button onClick={() => setMemberSearch("")} className="text-xs text-[#870BD6] underline">Clear</button>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-[#F0F2F4]">
+                      {filteredMembers.map((member) => {
+                        const fullName = `${member.user.firstName} ${member.user.lastName}`.trim();
+                        const isBanned  = member.status === "BANNED";
+                        const isOwner   = member.role === "OWNER";
+                        const isInFlight = memberAction === member.user.id;
+
+                        // Only show roles the member can be promoted/demoted to (not OWNER)
+                        const promotionRoles = (["ADMIN", "MODERATOR", "MEMBER"] as const).filter(
+                          (r) => r !== member.role,
+                        );
+
+                        return (
+                          <div
+                            key={member.id}
+                            className={`flex items-center justify-between px-6 py-4 transition-colors ${
+                              isBanned ? "opacity-60 bg-[#FEF3F2]" : "hover:bg-[#FAFAFA]"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm overflow-hidden shrink-0">
+                                {member.user.avatarUrl ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={member.user.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
+                                ) : (
+                                  fullName.charAt(0).toUpperCase()
                                 )}
                               </div>
-                            )}
+                              <div>
+                                <p className="text-sm font-semibold text-[#180426]">{fullName}</p>
+                                <p className="text-xs text-[#60666B]">
+                                  Joined{" "}
+                                  {new Date(member.joinedAt).toLocaleDateString("en-GB", {
+                                    day: "numeric", month: "short", year: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${roleColor[member.role]}`}>
+                                {roleIcon[member.role]}{" "}
+                                {member.role.charAt(0) + member.role.slice(1).toLowerCase()}
+                              </span>
+                              {isBanned && (
+                                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]">
+                                  Banned
+                                </span>
+                              )}
+
+                              {!isOwner && (
+                                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    onClick={() => setOpenDropdown(openDropdown === member.user.id ? null : member.user.id)}
+                                    disabled={isInFlight}
+                                    className="p-1.5 rounded-lg hover:bg-gray-100 text-[#60666B] disabled:opacity-50 transition-colors"
+                                  >
+                                    {isInFlight ? (
+                                      <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin" />
+                                    ) : (
+                                      <MoreVertical size={16} />
+                                    )}
+                                  </button>
+
+                                  {openDropdown === member.user.id && (
+                                    <div className="absolute right-0 mt-1 w-52 bg-white border border-[#E3E8EF] rounded-xl shadow-lg z-20 overflow-hidden">
+                                      {/* Role changes */}
+                                      <p className="px-4 py-2 text-[10px] font-semibold text-[#60666B] uppercase tracking-wider border-b border-[#F0F2F4]">
+                                        Change Role
+                                      </p>
+                                      {promotionRoles.map((role) => (
+                                        <button
+                                          key={role}
+                                          onClick={() => handleRoleChange(member.user.id, role)}
+                                          className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2"
+                                        >
+                                          {roleIcon[role]}
+                                          <span>
+                                            {role === "ADMIN" ? "Promote to Admin"
+                                              : role === "MODERATOR" ? "Promote to Moderator"
+                                              : "Demote to Member"}
+                                          </span>
+                                        </button>
+                                      ))}
+
+                                      {/* Remove */}
+                                      <div className="border-t border-[#F0F2F4]">
+                                        <button
+                                          onClick={() => handleRemoveMember(member.user.id)}
+                                          className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]"
+                                        >
+                                          <UserX size={14} />
+                                          Remove from Community
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── Settings ──────────────────────────────────────────────────── */}
           {activeTab === "settings" && (
