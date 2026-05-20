@@ -6,11 +6,26 @@
       "Bash(npm --version)",
       "Bash(npx @nestjs/cli --version)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(ls \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-backend\\\\prisma\")",
+      "Read(//c/Users/Sommie/Desktop/AdabanyaC/breed-backend/prisma/**)",
+      "Read(//c/Users/Sommie/Desktop/AdabanyaC/breed-backend/**)",
+      "Bash(npx ts-node *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\" -Recurse -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\\\\app\\\\dashboard\\\\learn\\\\preacher\\\\[preacherId]\")",
+      "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-backend\\\\src\" -Filter \"mail*\")",
+      "Bash(Select-Object FullName)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\\\\*Button*\")",
+      "Bash(git push *)",
+      "Bash(dir \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-backend\\\\src\\\\modules\\\\users\" /b)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\\\\app\\\\dashboard\\\\community\" -Recurse -File)",
+      "Bash(npx prisma *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src",
-      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src\\modules\\cache"
+      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src\\modules\\cache",
+      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-frontend\\app\\dashboard\\learn\\preacher"
     ]
   }
 }

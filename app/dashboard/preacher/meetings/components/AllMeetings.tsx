@@ -136,8 +136,8 @@ const AllMeetingsList = ({
                 </thead>
                 <tbody className="divide-y divide-[#F0F2F4]">
                   {filtered.map((m) => (
-                    <tr key={m.id} className="hover:bg-[#FAFAFA]">
-                      <td className="px-6 py-3 font-medium text-[#180426] truncate max-w-[200px]">{m.title}</td>
+                    <tr key={m.id} className="hover:bg-[#FAFAFA] cursor-pointer" onClick={() => window.location.href = `/dashboard/preacher/meetings/${m.id}`}>
+                      <td className="px-6 py-3 font-medium text-[#180426] truncate max-w-[200px] hover:text-[#870BD6] transition-colors">{m.title}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                           m.type === 'COMMUNITY'
@@ -175,7 +175,7 @@ const AllMeetingsList = ({
 
         {/* Schedule sidebar */}
         <div className="w-full lg:w-[34%]">
-          <ScheduleList />
+          <ScheduleList onSchedule={() => setOpenModal((prev) => ({ ...prev, community: true }))} />
         </div>
       </div>
     </>
