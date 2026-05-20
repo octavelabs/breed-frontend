@@ -6,7 +6,7 @@ import DashboardLayout from "@/app/layout/DashboardLayout";
 import { meetingsService } from "@/lib/api-services";
 import {
   ArrowLeft, Calendar, Clock, Users, Globe, Lock, Copy,
-  Check, Video, Pencil, XCircle, ExternalLink, UserCircle, Repeat,
+  Check, Video, Pencil, XCircle, ExternalLink, UserCircle, Repeat, X,
 } from "lucide-react";
 import Button from "@/app/components/Button";
 import Link from "next/link";
@@ -75,6 +75,51 @@ function Avatar({ user, size = 9 }: { user: { firstName: string; lastName: strin
   );
 }
 
+// ── Cancel Modal ───────────────────────────────────────────────────────────
+
+function CancelMeetingModal({
+  title, cancelling, onClose, onConfirm,
+}: { title: string; cancelling: boolean; onClose: () => void; onConfirm: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="relative w-full max-w-sm bg-white rounded-[20px] shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="px-6 py-5 border-b border-gray-200">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="relative w-[46px] h-[46px]">
+                <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+                  <rect x="3" y="3" width="40" height="40" rx="20" fill="#FBAFAF" />
+                  <rect x="3" y="3" width="40" height="40" rx="20" stroke="#FED3D3" strokeWidth="6" />
+                  <path d="M23 17v7M23 28v1" stroke="#DB2929" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <h2 className="text-[20px] font-bold leading-none mt-4">Cancel Meeting</h2>
+              <p className="text-base text-[#60666B] leading-none mt-2">This action cannot be undone</p>
+            </div>
+            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors text-gray-400">
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+        <div className="p-6">
+          <p className="text-base text-[#292A2B] pb-4 border-b border-dashed border-[#B9C2CA]">
+            <span className="font-semibold">&ldquo;{title}&rdquo;</span> will be cancelled. All attendees will be notified.
+          </p>
+          <p className="text-sm text-[#60666B] mt-4 mb-6">Are you sure you want to continue? This cannot be reversed.</p>
+          <div className="flex gap-3 w-full">
+            <Button buttonType="bordered" customClass="!w-1/2 !h-[48px] !border-[#60666B] !text-[#60666B]" onClick={onClose} disabled={cancelling}>
+              Keep Meeting
+            </Button>
+            <Button buttonType="custom" customClass="!w-1/2 !h-[48px] text-white !bg-[#E44E4E]" loading={cancelling} onClick={onConfirm}>
+              Yes, Cancel
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────
 
 export default function MeetingDetailPage() {
@@ -84,6 +129,7 @@ export default function MeetingDetailPage() {
   const [meeting, setMeeting] = useState<MeetingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,11 +160,11 @@ export default function MeetingDetailPage() {
   };
 
   const handleCancel = async () => {
-    if (!window.confirm(`Cancel "${meeting?.title}"? This cannot be undone.`)) return;
     setCancelling(true);
     try {
       await meetingsService.cancel(id);
       setMeeting((prev) => prev ? { ...prev, status: "CANCELLED" } : prev);
+      setShowCancelModal(false);
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "Failed to cancel meeting.");
     } finally {
@@ -323,8 +369,7 @@ export default function MeetingDetailPage() {
                 <Button
                   buttonType="custom"
                   customClass="!w-full !h-[42px] !bg-[#FEF3F2] !text-[#B42318] border border-[#FECDCA] hover:!bg-[#FECDCA]"
-                  loading={cancelling}
-                  onClick={handleCancel}
+                  onClick={() => setShowCancelModal(true)}
                 >
                   <XCircle size={15} /> Cancel Meeting
                 </Button>
@@ -372,6 +417,15 @@ export default function MeetingDetailPage() {
         </div>
         </div>
       </div>
+
+      {showCancelModal && meeting && (
+        <CancelMeetingModal
+          title={meeting.title}
+          cancelling={cancelling}
+          onClose={() => setShowCancelModal(false)}
+          onConfirm={handleCancel}
+        />
+      )}
     </DashboardLayout>
   );
 }
