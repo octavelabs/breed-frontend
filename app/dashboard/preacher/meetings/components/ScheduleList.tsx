@@ -144,7 +144,7 @@ function CalendarModal({
 
 // ── ScheduleList Component ────────────────────────────────────────────────
 
-export const ScheduleList = ({ onSchedule }: { onSchedule?: () => void }) => {
+export const ScheduleList = ({ onSchedule, refreshKey = 0 }: { onSchedule?: () => void; refreshKey?: number }) => {
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [weekStart, setWeekStart] = useState<Date>(() => {
@@ -166,7 +166,6 @@ export const ScheduleList = ({ onSchedule }: { onSchedule?: () => void }) => {
 
   const loadMeetings = useCallback(() => {
     setLoading(true);
-    // Fetch a wide range (±60 days) to populate the calendar
     const from = new Date();
     from.setDate(from.getDate() - 7);
     const to = new Date();
@@ -179,7 +178,7 @@ export const ScheduleList = ({ onSchedule }: { onSchedule?: () => void }) => {
       })
       .catch(() => setAllMeetings([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => { loadMeetings(); }, [loadMeetings]);
 

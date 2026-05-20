@@ -22,22 +22,25 @@ interface Meeting {
 
 const AllMeetingsList = ({
   setOpenModal,
+  refreshKey = 0,
 }: {
   setOpenModal: Dispatch<SetStateAction<{ community: boolean; open: boolean }>>;
+  refreshKey?: number;
 }) => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    meetingsService.getAll({ limit: 20 })
+    setLoading(true);
+    meetingsService.getAll({ limit: 50 })
       .then((res: unknown) => {
         const data = (res as any)?.data ?? res;
         setMeetings(Array.isArray(data) ? data : []);
       })
       .catch(() => setMeetings([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   const filtered = meetings.filter((m) =>
     m.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -175,7 +178,7 @@ const AllMeetingsList = ({
 
         {/* Schedule sidebar */}
         <div className="w-full lg:w-[34%]">
-          <ScheduleList onSchedule={() => setOpenModal((prev) => ({ ...prev, community: true }))} />
+          <ScheduleList onSchedule={() => setOpenModal((prev) => ({ ...prev, community: true }))} refreshKey={refreshKey} />
         </div>
       </div>
     </>

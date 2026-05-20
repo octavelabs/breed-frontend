@@ -544,7 +544,7 @@ export default function MeetingRoomPage() {
 
         {/* ── Side panel ──────────────────────────────────────────────── */}
         {(showChat || showParticipants) && (
-          <div className="w-72 bg-[#1a1a2e] border-l border-white/5 flex flex-col shrink-0">
+          <div className="fixed inset-0 z-30 lg:relative lg:inset-auto lg:z-auto lg:w-72 bg-[#1a1a2e] border-l border-white/5 flex flex-col lg:shrink-0">
             {/* Panel header */}
             <div className="h-14 px-4 flex items-center justify-between border-b border-white/5">
               <h3 className="text-white font-semibold text-sm">

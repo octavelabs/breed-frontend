@@ -18,23 +18,25 @@ const PreacherMeetings = () => {
       community: false,
       open: false
     });
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  const handleMeetingCreated = () => setRefreshKey((k) => k + 1);
 
   const tabs = [
     {
       label: "All",
       value: "all",
-      content: <AllMeetingsList setOpenModal={setOpenModal}/>,
+      content: <AllMeetingsList setOpenModal={setOpenModal} refreshKey={refreshKey} />,
     },
     {
       label: "Community",
       value: "community",
-      content: <CommunityMeeting setOpenModal={setOpenModal}/>,
+      content: <CommunityMeeting setOpenModal={setOpenModal} refreshKey={refreshKey} />,
     },
     {
       label: "Open",
       value: "open",
-      content: <OpenMeeting setOpenModal={setOpenModal} />,
+      content: <OpenMeeting setOpenModal={setOpenModal} refreshKey={refreshKey} />,
     },
     {
       label: "Draft recordings",
@@ -55,12 +57,14 @@ const PreacherMeetings = () => {
              <CreateCommunityMeetingModal
                isOpen={openModal?.community}
                onClose={() => (setOpenModal(prev => ({...prev, community: false })))}
+               onComplete={handleMeetingCreated}
              />
            )}
              {openModal?.open && (
              <CreateOpenMeetingModal
                isOpen={openModal?.open}
                onClose={() => (setOpenModal(prev => ({...prev, open: false })))}
+               onComplete={handleMeetingCreated}
              />
            )}
       

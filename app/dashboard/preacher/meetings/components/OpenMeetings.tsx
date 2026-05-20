@@ -30,8 +30,10 @@ const STATUS_CLASSES: Record<string, string> = {
 
 export const OpenMeeting = ({
   setOpenModal,
+  refreshKey = 0,
 }: {
   setOpenModal: Dispatch<SetStateAction<{ community: boolean; open: boolean }>>;
+  refreshKey?: number;
 }) => {
   const router = useRouter();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -47,7 +49,7 @@ export const OpenMeeting = ({
       })
       .catch(() => setMeetings([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -170,7 +172,7 @@ export const OpenMeeting = ({
       </div>
 
       <div className="w-full lg:w-[34%]">
-        <ScheduleList onSchedule={() => setOpenModal((prev) => ({ ...prev, open: true }))} />
+        <ScheduleList onSchedule={() => setOpenModal((prev) => ({ ...prev, open: true }))} refreshKey={refreshKey} />
       </div>
     </div>
   );
