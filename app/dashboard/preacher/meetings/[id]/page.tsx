@@ -132,7 +132,7 @@ export default function MeetingDetailPage() {
       <DashboardLayout custom={true}>
         <div className="bg-white">
           <div className="pt-6 pb-8 px-4 lg:px-10 animate-pulse">
-            <div className="w-full lg:w-[60%] lg:mx-auto space-y-4">
+            <div className="w-full lg:w-[60%] space-y-4">
             <div className="h-7 bg-gray-200 rounded w-1/3" />
             <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
               <div className="space-y-4">
@@ -197,7 +197,7 @@ export default function MeetingDetailPage() {
         </div>
 
         <div className="pt-6 pb-8 px-4 lg:px-10">
-        <div className="w-full lg:w-[60%] lg:mx-auto">
+        <div className="w-full lg:w-[60%]">
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
 
           {/* ── Left column (40%) ──────────────────────────────────────── */}
