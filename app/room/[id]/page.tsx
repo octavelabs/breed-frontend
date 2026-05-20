@@ -218,12 +218,27 @@ export default function MeetingRoomPage() {
 
     socket.on("connect", () => {
       clearTimeout(connectTimeout);
-      socket.emit("meeting:join", { meetingId }, (res: { success: boolean; participants?: string[] }) => {
-        setConnecting(false);
-        if (res?.participants?.length) {
-          res.participants.forEach((pSocketId) => createPeer(pSocketId, true, stream));
-        }
-      });
+      socket.emit(
+        "meeting:join",
+        { meetingId },
+        (res: { success: boolean; participants?: Array<{ socketId: string; userId: string }> }) => {
+          setConnecting(false);
+          if (res?.participants?.length) {
+            // Add existing participants to state so their video tiles exist when ontrack fires
+            setParticipants(
+              res.participants.map(({ socketId, userId }) => ({
+                socketId,
+                userId,
+                name: userId ? `User ${userId.slice(0, 6)}` : "Participant",
+                video: true,
+                audio: true,
+              })),
+            );
+            // Create offers to each existing participant
+            res.participants.forEach(({ socketId }) => createPeer(socketId, true, stream));
+          }
+        },
+      );
     });
 
     socket.on("connect_error", (err) => {
