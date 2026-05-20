@@ -232,14 +232,6 @@ export default function MeetingDetailPage() {
               </div>
             </div>
           </div>
-          {canJoin && (
-            <Link
-              href={`/dashboard/preacher/meetings/${id}/room`}
-              className="flex items-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full px-6 py-2.5 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
-            >
-              <Video size={15} /> Join Meeting
-            </Link>
-          )}
         </div>
 
         <div className="pt-6 pb-8 px-4 lg:px-10">
@@ -353,6 +345,15 @@ export default function MeetingDetailPage() {
             {/* Actions */}
             <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 space-y-3">
               <h3 className="font-semibold text-[#180426] text-sm mb-1">Actions</h3>
+
+              {canJoin && (
+                <Link
+                  href={`/dashboard/preacher/meetings/${id}/room`}
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full py-3 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
+                >
+                  <Video size={16} /> Join Meeting
+                </Link>
+              )}
 
               <button
                 onClick={handleCopyLink}
