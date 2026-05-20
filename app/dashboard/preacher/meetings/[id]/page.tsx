@@ -131,14 +131,16 @@ export default function MeetingDetailPage() {
     return (
       <DashboardLayout custom={true}>
         <div className="bg-white">
-          <div className="px-4 lg:px-10 pt-6 pb-8 animate-pulse space-y-4">
+          <div className="pt-6 pb-8 px-4 lg:px-10 animate-pulse">
+            <div className="w-full lg:w-[60%] lg:mx-auto space-y-4">
             <div className="h-7 bg-gray-200 rounded w-1/3" />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              <div className="lg:col-span-2 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
+              <div className="space-y-4">
                 <div className="h-48 bg-gray-200 rounded-2xl" />
                 <div className="h-64 bg-gray-200 rounded-2xl" />
               </div>
               <div className="h-80 bg-gray-200 rounded-2xl" />
+            </div>
             </div>
           </div>
         </div>
@@ -194,11 +196,12 @@ export default function MeetingDetailPage() {
           )}
         </div>
 
-        <div className="px-4 lg:px-10 pt-6 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="pt-6 pb-8 px-4 lg:px-10">
+        <div className="w-full lg:w-[60%] lg:mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
 
-          {/* ── Left column (2/3) ───────────────────────────────────────── */}
-          <div className="lg:col-span-2 space-y-5">
+          {/* ── Left column (40%) ──────────────────────────────────────── */}
+          <div className="space-y-5">
 
             {/* Main card */}
             <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
@@ -365,6 +368,7 @@ export default function MeetingDetailPage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
         </div>
       </div>

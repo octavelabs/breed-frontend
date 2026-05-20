@@ -48,10 +48,10 @@ function VideoTile({
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream ?? null;
     }
-  }, [stream]);
+  }, [stream, video]);
 
   const initials = name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
@@ -419,6 +419,8 @@ export default function MeetingRoomPage() {
 
   const leaveMeeting = () => {
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
+    screenStream?.getTracks().forEach((t) => t.stop());
+    setLocalStream(null); // clears srcObject in VideoTile so browser releases camera
     socketRef.current?.emit("meeting:leave", { meetingId });
     socketRef.current?.disconnect();
     peerConns.current.forEach((pc) => pc.close());
