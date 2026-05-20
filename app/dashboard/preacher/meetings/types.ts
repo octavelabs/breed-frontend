@@ -6,6 +6,7 @@ export type CommunityMeetingFormData = {
  date: string;
  timeZone: string;
  time: string;
+ timeMinute: string;
  timeFormat: string;
  meetingFrequency: string;
  repeatInterval: number;

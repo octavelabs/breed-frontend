@@ -3,26 +3,28 @@ import { CommunityMeetingFormData } from "../types";
 import Input from "@/app/components/Input";
 import Dropdown from "@/app/components/Dropdown";
 
-export const CommunityStepTwo = (
-    {
-      formData,
-      setFormData,
-       handleProceed,
-  canProceedStep2
-      
-    }: {
-      formData: CommunityMeetingFormData;
-      setFormData: Dispatch<SetStateAction<CommunityMeetingFormData>>;
-       handleProceed: () => void
-  canProceedStep2: string| boolean | 0
-    }
-) => {
+const HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1));
+const MINUTES = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
+
+const selectCls =
+  "w-full h-[48px] border border-[#B9C2CA] rounded-[10px] px-3 text-sm text-[#60666B] bg-white outline-none focus:border-[#870BD6] transition-colors cursor-pointer appearance-none";
+
+export const CommunityStepTwo = ({
+  formData,
+  setFormData,
+  handleProceed,
+  canProceedStep2,
+}: {
+  formData: CommunityMeetingFormData;
+  setFormData: Dispatch<SetStateAction<CommunityMeetingFormData>>;
+  handleProceed: () => void;
+  canProceedStep2: string | boolean | 0;
+}) => {
   return (
     <div className="space-y-3">
+      {/* Date */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-[6px]">
-          Date
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-[6px]">Date</label>
         <Input
           id="date"
           type="date"
@@ -30,106 +32,84 @@ export const CommunityStepTwo = (
           value={formData.date}
           placeholder=""
           variant="outlined"
-          className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px]"
+          className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px] cursor-pointer"
         />
       </div>
-      <div className="w-full flex gap-2">
-        <div className="w-[80%]">
-          <label
-            htmlFor="duration"
-            className="block text-sm font-medium  mb-[6px]"
-          >
-            Time
-          </label>
-          <Dropdown
-            value={formData.time}
-            options={[
-              "6:00",
-              "7:00",
-              "8:00",
-              "9:00",
-              "10:00",
-              "11:00",
-              "12:00",
-            ]}
-            keySelector="interval"
-            onChange={(item) => setFormData({ ...formData, time: item })}
-            className="!h-[48px]"
-          />
-        </div>
-        <div className="w-[20%]">
-          <Dropdown
-            value={formData.timeFormat}
-            options={["AM", "PM"]}
-            keySelector="interval"
-            onChange={(item) => setFormData({ ...formData, timeFormat: item })}
-            className="!h-[48px] mt-[26px]"
-          />
+
+      {/* Time — hour : minute  AM/PM */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-[6px]">Time</label>
+        <div className="flex items-center gap-2">
+          {/* Hour */}
+          <div className="relative flex-1">
+            <select
+              value={formData.time}
+              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              className={selectCls}
+            >
+              <option value="" disabled>HH</option>
+              {HOURS.map((h) => (
+                <option key={h} value={h}>{h.padStart(2, "0")}</option>
+              ))}
+            </select>
+          </div>
+
+          <span className="text-[#60666B] font-semibold text-lg">:</span>
+
+          {/* Minute */}
+          <div className="relative flex-1">
+            <select
+              value={formData.timeMinute}
+              onChange={(e) => setFormData({ ...formData, timeMinute: e.target.value })}
+              className={selectCls}
+            >
+              <option value="" disabled>MM</option>
+              {MINUTES.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* AM / PM */}
+          <div className="w-[90px]">
+            <Dropdown
+              value={formData.timeFormat}
+              options={["AM", "PM"]}
+              keySelector="interval"
+              onChange={(item) => setFormData({ ...formData, timeFormat: item })}
+              className="!h-[48px] cursor-pointer"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Meeting frequency */}
       <div>
-        <label
-          htmlFor="duration"
-          className="block text-sm font-medium  mb-[6px]"
-        >
-          Time Zone
-        </label>
-        <Dropdown
-          value=""
-          options={[
-            "UTC-12:00",
-            "UTC-08:00 (PST)",
-            "UTC-05:00 (EST)",
-            "UTC+00:00 (GMT)",
-            "UTC+01:00 (WAT)",
-            "UTC+05:30 (IST)",
-            "UTC+08:00 (CST)",
-          ]}
-          keySelector="interval"
-          onChange={(item) => setFormData({ ...formData, timeZone: item })}
-          className="!h-[48px]"
-        />
-      </div>
-      <div>
-        <label
-          htmlFor="duration"
-          className="block text-sm font-medium  mb-[6px]"
-        >
-          Meeting frequency
-        </label>
+        <label className="block text-sm font-medium mb-[6px]">Meeting frequency</label>
         <Dropdown
           value={formData.meetingFrequency}
           options={["once", "daily", "weekly", "monthly", "custom"]}
           keySelector="interval"
-          onChange={(item) =>
-            setFormData({ ...formData, meetingFrequency: item })
-          }
-          className="!h-[48px]"
+          onChange={(item) => setFormData({ ...formData, meetingFrequency: item })}
+          className="!h-[48px] cursor-pointer"
         />
       </div>
+
       {formData.meetingFrequency === "custom" && (
         <>
           <div className="border-t border-dashed border-[#B9C2CA]" />
           <div className="bg-[#F6F8FA] rounded-[12px] p-[18px]">
             <div className="w-full flex gap-2 mb-5">
               <div className="w-[50%]">
-                <label
-                  htmlFor="repeatInterval"
-                  className="block text-sm font-medium  mb-[6px]"
-                >
-                  Repeats every
-                </label>
+                <label className="block text-sm font-medium mb-[6px]">Repeats every</label>
                 <Input
                   id="repeatInterval"
                   type="number"
-                  onChange={(e) =>
-                    setFormData({ ...formData, repeatInterval: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, repeatInterval: e.target.value })}
                   value={String(formData.repeatInterval)}
                   placeholder=""
                   variant="outlined"
-                  className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px]"
+                  className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px] cursor-pointer"
                 />
               </div>
               <div className="w-[50%]">
@@ -137,10 +117,8 @@ export const CommunityStepTwo = (
                   value={formData.repeatPattern}
                   options={["days", "weeks"]}
                   keySelector="interval"
-                  onChange={(item) =>
-                    setFormData({ ...formData, repeatPattern: item })
-                  }
-                  className="!h-[48px] mt-[26px]"
+                  onChange={(item) => setFormData({ ...formData, repeatPattern: item })}
+                  className="!h-[48px] mt-[26px] cursor-pointer"
                 />
               </div>
             </div>
@@ -154,10 +132,12 @@ export const CommunityStepTwo = (
                     onClick={() =>
                       setFormData({
                         ...formData,
-                        repeatDays: [...formData.repeatDays, day],
+                        repeatDays: active
+                          ? formData.repeatDays.filter((d) => d !== day)
+                          : [...formData.repeatDays, day],
                       })
                     }
-                    className={`w-10 h-10 rounded-full text-xs font-medium transition-colors flex-shrink-0 ${
+                    className={`w-10 h-10 rounded-full text-xs font-medium transition-colors flex-shrink-0 cursor-pointer ${
                       active
                         ? "bg-[#870BD6] text-white"
                         : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -172,19 +152,14 @@ export const CommunityStepTwo = (
         </>
       )}
 
-      {/* Description */}
-
-      {/* Proceed Button */}
       <button
         onClick={handleProceed}
         disabled={!canProceedStep2}
-        className={`w-full py-3 rounded-full text-white font-medium transition-all 
-                  ${
-                    canProceedStep2
-                      ? "bg-black hover:bg-gray-800 active:scale-[0.98]"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }
-                    `}
+        className={`w-full py-3 rounded-full text-white font-medium transition-all ${
+          canProceedStep2
+            ? "bg-black hover:bg-gray-800 active:scale-[0.98] cursor-pointer"
+            : "bg-gray-300 cursor-not-allowed"
+        }`}
       >
         Proceed
       </button>

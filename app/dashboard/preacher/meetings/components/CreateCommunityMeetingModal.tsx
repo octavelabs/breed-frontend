@@ -7,13 +7,14 @@ import { CommunityStepTwo } from './CommunityStepTwo';
 import { CommunityStepOne } from './CommunityStepOne';
 import { meetingsService } from '@/lib/api-services';
 
-function toScheduledAt(date: string, time: string, fmt: string): string {
+function toScheduledAt(date: string, time: string, minute: string, fmt: string): string {
   if (!date || !time) return new Date().toISOString();
   const [y, m, d] = date.split('-').map(Number);
   let h = parseInt(time, 10) || 0;
+  const min = parseInt(minute, 10) || 0;
   if (fmt === 'PM' && h !== 12) h += 12;
   if (fmt === 'AM' && h === 12) h = 0;
-  return new Date(y, m - 1, d, h, 0, 0).toISOString();
+  return new Date(y, m - 1, d, h, min, 0).toISOString();
 }
 
 
@@ -35,7 +36,7 @@ export const CreateCommunityMeetingModal = ({
 
   const [formData, setFormData] = useState<CommunityMeetingFormData>({
     title: "", community: "", guests: "", description: "",
-    date: "", timeZone: "", time: "", timeFormat: "",
+    date: "", timeZone: "", time: "", timeMinute: "", timeFormat: "",
     meetingFrequency: "", repeatInterval: 0, repeatPattern: "",
     repeatDays: [], saveDraftOfRecordings: false, lateInterval: "",
   });
@@ -43,7 +44,7 @@ export const CreateCommunityMeetingModal = ({
   const canProceedStep1 = formData.title.trim() && formData.community.trim() && formData.guests.trim() && formData.description.trim();
   const canProceedStep2 = formData.meetingFrequency === 'custom'
     ? formData.repeatInterval && formData.repeatPattern && formData.repeatDays.length > 0
-    : formData.date.trim() && formData.time.trim() && formData.timeFormat.trim() && formData.timeZone.trim() && formData.meetingFrequency.trim();
+    : formData.date.trim() && formData.time.trim() && formData.timeMinute.trim() && formData.timeFormat.trim() && formData.meetingFrequency.trim();
   const canProceedStep3 = formData.lateInterval;
 
   const handleProceed = () => {
@@ -60,7 +61,7 @@ export const CreateCommunityMeetingModal = ({
       await meetingsService.create({
         title: formData.title,
         description: formData.description || undefined,
-        scheduledAt: toScheduledAt(formData.date, formData.time, formData.timeFormat),
+        scheduledAt: toScheduledAt(formData.date, formData.time, formData.timeMinute, formData.timeFormat),
         communityId: formData.community || undefined,
         type: 'COMMUNITY',
         isRecurring,
