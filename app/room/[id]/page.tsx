@@ -29,9 +29,13 @@ interface ChatMessage {
   timestamp: string;
 }
 
-const ICE_SERVERS = [
+const ICE_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
   { urls: "stun:stun1.l.google.com:19302" },
+  // TURN relay — required for mobile/carrier-grade NAT (CGNAT) and symmetric NAT
+  { urls: "turn:openrelay.metered.ca:80",   username: "openrelayproject", credential: "openrelayproject" },
+  { urls: "turn:openrelay.metered.ca:443",  username: "openrelayproject", credential: "openrelayproject" },
+  { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" },
 ];
 
 // ── Video Tile ──────────────────────────────────────────────────────────────
@@ -162,13 +166,15 @@ export default function MeetingRoomPage() {
 
   // ── Create peer connection ──────────────────────────────────────────────
 
-  const createPeer = useCallback((targetSocketId: string, isInitiator: boolean, stream: MediaStream | null) => {
+  const createPeer = useCallback((targetSocketId: string, isInitiator: boolean) => {
     // Avoid duplicate peer connections
     const existing = peerConns.current.get(targetSocketId);
     if (existing && existing.signalingState !== "closed") return existing;
 
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
 
+    // Always read from ref so we never capture a stale null stream
+    const stream = localStreamRef.current;
     if (stream) stream.getTracks().forEach((t) => pc.addTrack(t, stream));
 
     pc.onicecandidate = (e) => {
@@ -207,7 +213,7 @@ export default function MeetingRoomPage() {
 
   const joinRoom = useCallback(async () => {
     setConnecting(true);
-    const stream = await getMedia();
+    await getMedia(); // populates localStreamRef.current
     const token = getAccessToken() ?? "";
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "https://breed-api.onrender.com";
 
@@ -221,12 +227,14 @@ export default function MeetingRoomPage() {
       socket.emit(
         "meeting:join",
         { meetingId },
-        (res: { success: boolean; participants?: Array<{ socketId: string; userId: string }> }) => {
+        (res: any) => {
           setConnecting(false);
-          if (res?.participants?.length) {
-            // Add existing participants to state so their video tiles exist when ontrack fires
+          // Handle both wrapped {event,data:{...}} and direct {success,...} ack formats
+          const payload = res?.data ?? res;
+          const existing: Array<{ socketId: string; userId: string }> = payload?.participants ?? [];
+          if (existing.length) {
             setParticipants(
-              res.participants.map(({ socketId, userId }) => ({
+              existing.map(({ socketId, userId }) => ({
                 socketId,
                 userId,
                 name: userId ? `User ${userId.slice(0, 6)}` : "Participant",
@@ -234,8 +242,7 @@ export default function MeetingRoomPage() {
                 audio: true,
               })),
             );
-            // Create offers to each existing participant
-            res.participants.forEach(({ socketId }) => createPeer(socketId, true, stream));
+            existing.forEach(({ socketId }) => createPeer(socketId, true));
           }
         },
       );
@@ -252,9 +259,8 @@ export default function MeetingRoomPage() {
         if (prev.some((p) => p.socketId === socketId)) return prev;
         return [...prev, { socketId, userId, name: `User ${userId.slice(0, 6)}`, video: true, audio: true }];
       });
-      // Only create if not already created by an incoming offer
       if (!peerConns.current.has(socketId)) {
-        createPeer(socketId, false, stream);
+        createPeer(socketId, false);
       }
     });
 
@@ -270,7 +276,7 @@ export default function MeetingRoomPage() {
 
       try {
         if (signal.type === "offer") {
-          if (!pc || pc.signalingState === "closed") pc = createPeer(from, false, stream);
+          if (!pc || pc.signalingState === "closed") pc = createPeer(from, false);
           await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
           await flushIce(pc, from);
           const answer = await pc.createAnswer();
@@ -288,7 +294,6 @@ export default function MeetingRoomPage() {
           if (pc?.remoteDescription) {
             await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
           } else {
-            // Buffer until remote description is ready
             const q = iceQueue.current.get(from) ?? [];
             q.push(signal.candidate);
             iceQueue.current.set(from, q);
@@ -308,7 +313,7 @@ export default function MeetingRoomPage() {
       if (!showChat) setUnreadCount((c) => c + 1);
     });
 
-    socket.on("connection:established", ({ userId, socketId }: { userId: string; socketId: string }) => {
+    socket.on("connection:established", ({ userId }: { userId: string }) => {
       setMyUserId(userId);
     });
 
