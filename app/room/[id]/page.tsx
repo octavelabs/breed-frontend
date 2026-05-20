@@ -74,7 +74,7 @@ function VideoTile({
               <WifiOff size={12} className="text-white" />
             </div>
           )}
-          {(connectionState === "connected" || connectionState === "completed") && stream && (
+          {connectionState === "connected" && stream && (
             <div className="bg-green-500/20 rounded-full p-1.5">
               <Wifi size={12} className="text-green-400" />
             </div>
@@ -352,7 +352,7 @@ export default function RoomPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{p.socketId === "me" ? `${p.name} (You)` : p.name}</p>
-                      {p.connectionState && p.connectionState !== "connected" && p.connectionState !== "completed" && p.socketId !== "me" && (
+                      {p.connectionState && p.connectionState !== "connected" && p.socketId !== "me" && (
                         <p className="text-white/30 text-[10px]">{p.connectionState}</p>
                       )}
                     </div>
