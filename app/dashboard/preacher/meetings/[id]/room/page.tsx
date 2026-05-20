@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
+import { getAccessToken } from "@/lib/api";
 import {
   Mic, MicOff, Video, VideoOff, Monitor, MonitorOff, MessageSquare,
   Phone, Users, MoreHorizontal, ArrowLeft, Send, X, Maximize2, Pin,
@@ -237,8 +238,7 @@ export default function MeetingRoomPage() {
     setConnecting(true);
     const stream = await getMedia();
 
-    // Get token from localStorage
-    const token = localStorage.getItem("accessToken") ?? "";
+    const token = getAccessToken() ?? "";
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "https://breed-api.onrender.com";
     const socket: Socket = io(apiUrl, {
@@ -248,18 +248,25 @@ export default function MeetingRoomPage() {
 
     socketRef.current = socket;
 
+    const connectTimeout = setTimeout(() => setConnecting(false), 10000);
+
     socket.on("connect", () => {
-      // Emit join event
+      clearTimeout(connectTimeout);
       socket.emit("meeting:join", { meetingId }, (res: { success: boolean; participants: string[] }) => {
         setJoined(true);
         setConnecting(false);
-        // Create offers to existing participants
         if (res?.participants) {
           res.participants.forEach((pSocketId) => {
             createPeer(pSocketId, true, stream);
           });
         }
       });
+    });
+
+    socket.on("connect_error", (err) => {
+      console.warn("Socket connection failed:", err.message);
+      clearTimeout(connectTimeout);
+      setConnecting(false);
     });
 
     // New participant joined → create answer peer

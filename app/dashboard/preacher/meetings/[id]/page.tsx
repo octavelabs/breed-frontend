@@ -102,7 +102,7 @@ export default function MeetingDetailPage() {
   useEffect(() => { load(); }, [load]);
 
   const joinLink = meeting
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/dashboard/preacher/meetings/${id}/room`
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/join/${id}`
     : "";
 
   const handleCopyLink = async () => {
@@ -129,15 +129,17 @@ export default function MeetingDetailPage() {
   // ── Loading skeleton ────────────────────────────────────────────────────
   if (loading) {
     return (
-      <DashboardLayout>
-        <div className="px-4 md:px-10 py-8 max-w-5xl mx-auto animate-pulse space-y-4">
-          <div className="h-7 bg-gray-200 rounded w-1/3" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="h-48 bg-gray-200 rounded-2xl" />
-              <div className="h-64 bg-gray-200 rounded-2xl" />
+      <DashboardLayout custom={true}>
+        <div className="bg-white">
+          <div className="px-4 lg:px-10 pt-6 pb-8 animate-pulse space-y-4">
+            <div className="h-7 bg-gray-200 rounded w-1/3" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+              <div className="lg:col-span-2 space-y-4">
+                <div className="h-48 bg-gray-200 rounded-2xl" />
+                <div className="h-64 bg-gray-200 rounded-2xl" />
+              </div>
+              <div className="h-80 bg-gray-200 rounded-2xl" />
             </div>
-            <div className="h-80 bg-gray-200 rounded-2xl" />
           </div>
         </div>
       </DashboardLayout>
@@ -146,8 +148,8 @@ export default function MeetingDetailPage() {
 
   if (error || !meeting) {
     return (
-      <DashboardLayout>
-        <div className="flex flex-col items-center justify-center h-64 gap-4">
+      <DashboardLayout custom={true}>
+        <div className="bg-white flex flex-col items-center justify-center h-64 gap-4">
           <p className="text-gray-500">{error ?? "Meeting not found."}</p>
           <button onClick={() => router.back()} className="text-[#870BD6] text-sm underline">Go back</button>
         </div>
@@ -162,21 +164,37 @@ export default function MeetingDetailPage() {
   const canCancel = meeting.status === "SCHEDULED";
 
   return (
-    <DashboardLayout>
-      <div className="px-4 md:px-10 py-8 max-w-5xl mx-auto">
-
-        {/* Back + breadcrumb */}
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <ArrowLeft size={18} className="text-[#60666B]" />
-          </button>
-          <div className="text-sm text-[#60666B]">
-            <Link href="/dashboard/preacher/meetings" className="hover:text-[#870BD6]">Meetings</Link>
-            <span className="mx-2">/</span>
-            <span className="text-[#180426] font-medium truncate">{meeting.title}</span>
+    <DashboardLayout custom={true}>
+      <div className="bg-white">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 px-4 lg:px-10 pt-6 pb-5 border-b border-[#F0F2F4]">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <ArrowLeft size={18} className="text-[#60666B]" />
+            </button>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-[22px] lg:text-[26px] leading-tight font-bold text-[#180426]">{meeting.title}</h1>
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusCfg.classes}`}>{statusCfg.label}</span>
+              </div>
+              <div className="text-sm text-[#60666B] mt-0.5">
+                <Link href="/dashboard/preacher/meetings" className="hover:text-[#870BD6]">Meetings</Link>
+                <span className="mx-2">/</span>
+                <span className="text-[#180426] font-medium">{meeting.title}</span>
+              </div>
+            </div>
           </div>
+          {canJoin && (
+            <Link
+              href={`/dashboard/preacher/meetings/${id}/room`}
+              className="flex items-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full px-6 py-2.5 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
+            >
+              <Video size={15} /> Join Meeting
+            </Link>
+          )}
         </div>
 
+        <div className="px-4 lg:px-10 pt-6 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
           {/* ── Left column (2/3) ───────────────────────────────────────── */}
@@ -287,15 +305,6 @@ export default function MeetingDetailPage() {
             <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 space-y-3">
               <h3 className="font-semibold text-[#180426] text-sm mb-1">Actions</h3>
 
-              {canJoin && (
-                <Link
-                  href={`/dashboard/preacher/meetings/${id}/room`}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full py-3 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
-                >
-                  <Video size={16} /> Join Meeting
-                </Link>
-              )}
-
               <button
                 onClick={handleCopyLink}
                 className={`w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold border transition-all ${
@@ -356,6 +365,7 @@ export default function MeetingDetailPage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </DashboardLayout>

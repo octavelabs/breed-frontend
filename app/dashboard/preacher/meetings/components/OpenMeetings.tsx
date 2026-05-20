@@ -1,6 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import MeetingIcon from "@/app/assets/icons/meetingIcon";
 import { ScheduleList } from "./ScheduleList";
 import Button from "@/app/components/Button";
@@ -32,6 +33,7 @@ export const OpenMeeting = ({
 }: {
   setOpenModal: Dispatch<SetStateAction<{ community: boolean; open: boolean }>>;
 }) => {
+  const router = useRouter();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState("");
@@ -133,7 +135,9 @@ export const OpenMeeting = ({
                 </thead>
                 <tbody className="divide-y divide-[#F0F2F4]">
                   {filtered.map((m) => (
-                    <tr key={m.id} className="hover:bg-[#FAFAFA] cursor-pointer transition-colors">
+                    <tr key={m.id}
+                      onClick={() => router.push(`/dashboard/preacher/meetings/${m.id}`)}
+                      className="hover:bg-[#FAFAFA] cursor-pointer transition-colors">
                       <td className="px-6 py-3">
                         <Link href={`/dashboard/preacher/meetings/${m.id}`} className="font-medium text-[#180426] hover:text-[#C83785] block truncate max-w-[200px]">
                           {m.title}
