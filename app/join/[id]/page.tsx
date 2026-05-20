@@ -9,7 +9,7 @@ export default function JoinRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(`/dashboard/preacher/meetings/${id}/room`);
+    router.replace(`/room/${id}`);
   }, [id, router]);
 
   return (
