@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Mic, MicOff, Video, VideoOff, Monitor, MonitorOff,
@@ -22,11 +22,17 @@ function VideoTile({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Attach stream whenever it or videoEnabled changes
-  const handleVideo = (el: HTMLVideoElement | null) => {
-    (videoRef as any).current = el;
-    if (el) el.srcObject = stream ?? null;
-  };
+  // Only update srcObject when stream or videoEnabled actually changes.
+  // Using a stable ref + effect avoids the "callback ref recreated on every
+  // render → React nulls then re-attaches → srcObject briefly reset → flash"
+  // issue that caused the visible glitch on Mute / Camera toggles.
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.srcObject !== (stream ?? null)) {
+      el.srcObject = stream ?? null;
+    }
+  }, [stream, videoEnabled]);
 
   const initials = name.split(" ").map((n) => n[0] ?? "").join("").toUpperCase().slice(0, 2) || "?";
   const isConnecting = connectionState === "connecting" || connectionState === "new";
@@ -36,7 +42,7 @@ function VideoTile({
     <div className="relative bg-[#1a0835] rounded-2xl overflow-hidden w-full h-full flex items-center justify-center group">
       {stream && videoEnabled ? (
         <video
-          ref={handleVideo}
+          ref={videoRef}
           autoPlay
           playsInline
           muted={muted}
@@ -95,13 +101,13 @@ function CtrlBtn({
 }) {
   const Ic = !on && OffIcon ? OffIcon : Icon;
   return (
-    <button onClick={onClick} title={label} className="relative flex flex-col items-center gap-1 group shrink-0">
-      <div className={`w-11 h-11 lg:w-12 lg:h-12 rounded-full flex items-center justify-center transition-all ${
+    <button onClick={onClick} title={label} className="relative flex flex-col items-center gap-1 group shrink-0 touch-manipulation" style={{ WebkitTapHighlightColor: "transparent" }}>
+      <div className={`w-11 h-11 lg:w-12 lg:h-12 rounded-full flex items-center justify-center transition-colors duration-150 ${
         danger
-          ? "bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-900/40"
+          ? "bg-red-500 active:bg-red-700 text-white shadow-lg shadow-red-900/40"
           : on
-          ? "bg-[#870BD6] text-white hover:bg-[#7009C0] shadow-lg shadow-purple-900/30"
-          : "bg-[#2D1B55]/80 text-white/60 hover:bg-[#3D2565] hover:text-white border border-white/5"
+          ? "bg-[#870BD6] active:bg-[#6B09B0] text-white shadow-lg shadow-purple-900/30"
+          : "bg-[#2D1B55]/80 text-white/60 active:bg-[#3D2565] active:text-white border border-white/5"
       }`}>
         <Ic size={18} />
       </div>
@@ -386,7 +392,8 @@ export default function RoomPage() {
           <div className="w-px h-8 bg-white/10 mx-1 shrink-0" />
 
           <button onClick={leave}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-full px-4 lg:px-6 py-2.5 transition-all shadow-lg shadow-red-900/40 shrink-0 text-sm">
+            className="flex items-center gap-2 bg-red-500 active:bg-red-700 text-white font-bold rounded-full px-4 lg:px-6 py-2.5 transition-colors duration-150 shadow-lg shadow-red-900/40 shrink-0 text-sm touch-manipulation"
+            style={{ WebkitTapHighlightColor: "transparent" }}>
             <Phone size={15} className="rotate-[135deg]" />
             <span className="hidden sm:inline">Leave</span>
           </button>

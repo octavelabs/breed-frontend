@@ -542,7 +542,14 @@ export function useMeeting(meetingId: string) {
     socketRef.current?.emit("meeting:leave", { meetingId });
     socketRef.current?.disconnect();
     peerMgrRef.current.closeAll();
-    router.back();
+    // router.back() silently does nothing when there is no history entry
+    // (e.g. the user opened the meeting link directly on mobile).
+    // Fall back to the home dashboard so the button always works.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.replace("/dashboard/home");
+    }
   }, [meetingId, router]);
 
   const setChatOpen = useCallback((open: boolean) => {
