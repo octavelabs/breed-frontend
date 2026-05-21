@@ -319,7 +319,7 @@ const MentorProfilePage = () => {
                   />
                   <Stat
                     label="Completed sessions"
-                    value={String(completedSessions.length || mentor.mentorProfile?.maxDisciples ?? 0)}
+                    value={String(completedSessions.length || (mentor.mentorProfile?.maxDisciples ?? 0))}
                     icon={<Zap stroke="#4287FB" className="w-5 h-5" />}
                     backgroundColor="#F0F5FF"
                   />
