@@ -268,8 +268,17 @@ export function useMeeting(meetingId: string) {
 
       // 2. Connect to signaling server
       const token   = getAccessToken() ?? "";
-      const apiUrl  = process.env.NEXT_PUBLIC_API_URL ?? "https://breed-api.onrender.com";
-      const socket  = io(apiUrl, {
+      // NEXT_PUBLIC_API_URL may include a path prefix (e.g. /api/v1).
+      // Socket.IO treats any path component as the namespace, so we must
+      // pass only the origin (scheme + host + port).
+      const rawUrl  = process.env.NEXT_PUBLIC_API_URL ?? "https://breed-api.onrender.com";
+      let socketUrl: string;
+      try {
+        socketUrl = new URL(rawUrl).origin; // strips /api/v1 etc.
+      } catch {
+        socketUrl = rawUrl;
+      }
+      const socket  = io(socketUrl, {
         auth: { token },
         transports: ["websocket"],
         reconnection: true,
