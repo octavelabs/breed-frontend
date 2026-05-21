@@ -1,21 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import Tabs from '@/app/components/Tabs';
 import TakeABreakModal from './components/TakeABreakModal';
-import EmptyMentorshipState from './components/EmptyMentorshipState';
 import DisciplesList from './components/DisciplesList';
 import RequestsList from './components/RequestsList';
 import { HelpCircle } from 'lucide-react';
 import SessionsList from './components/sessionList';
 import AssessmentList from './components/AssessmentList';
 import ReportList from './components/ReportList';
+import { mentorshipService } from '@/lib/api-services';
 
 const PreacherMentorship = () => {
   const [openModal, setOpenModal] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
-  const [breakDaysLeft, setBreakDaysLeft] = useState(12);
+  const [breakDaysLeft, setBreakDaysLeft] = useState(0);
+
+  useEffect(() => {
+    mentorshipService.getMentorProfile()
+      .then((profile: any) => {
+        setIsOnBreak(profile?.isOnBreak ?? false);
+        if (profile?.breakEndsAt) {
+          const days = Math.ceil((new Date(profile.breakEndsAt).getTime() - Date.now()) / 86400000);
+          setBreakDaysLeft(Math.max(0, days));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
 
   const tabs = [
@@ -52,7 +64,23 @@ const PreacherMentorship = () => {
       {openModal && (
         <TakeABreakModal
           isOpen={openModal}
-          onClose={() => setOpenModal(false)}
+          isCurrentlyOnBreak={isOnBreak}
+          onClose={(refreshNeeded) => {
+            setOpenModal(false);
+            if (refreshNeeded) {
+              mentorshipService.getMentorProfile()
+                .then((profile: any) => {
+                  setIsOnBreak(profile?.isOnBreak ?? false);
+                  if (profile?.breakEndsAt) {
+                    const days = Math.ceil((new Date(profile.breakEndsAt).getTime() - Date.now()) / 86400000);
+                    setBreakDaysLeft(Math.max(0, days));
+                  } else {
+                    setBreakDaysLeft(0);
+                  }
+                })
+                .catch(() => {});
+            }
+          }}
         />
       )}
       
@@ -63,45 +91,31 @@ const PreacherMentorship = () => {
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-4">
           {isOnBreak && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-[#E2E3E5] rounded-full">
-              <span className="text-sm font-medium text-purple-700">
-                {breakDaysLeft} days left
+            <div className="flex items-center gap-2 px-4 py-2 bg-[#F5EBFF] border border-[#D4A8F0] rounded-full">
+              <span className="w-2 h-2 rounded-full bg-[#870BD6] shrink-0" />
+              <span className="text-sm font-medium text-[#5B26B1]">
+                On Break{breakDaysLeft > 0 ? ` · ${breakDaysLeft}d left` : ''}
               </span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isOnBreak}
-                  onChange={() => setIsOnBreak(!isOnBreak)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-purple-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-              </label>
             </div>
           )}
-          
+
           <button
             onClick={() => setOpenModal(true)}
-            className="flex items-center gap-3 px-4 py-[10px] bg-[#E2E3E5] border border-[#D2D9DF] rounded-full  transition-colors"
+            className="flex items-center gap-3 px-4 py-2.5 bg-[#E2E3E5] border border-[#D2D9DF] rounded-full transition-colors hover:bg-[#D8DADC]"
           >
             <HelpCircle className="w-5 h-5 text-[#737D86]" />
-            <span className="text-sm font-medium text-[#330750]">Take a break</span>
+            <span className="text-sm font-medium text-[#330750]">{isOnBreak ? 'End Break' : 'Take a break'}</span>
             {!isOnBreak && (
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isOnBreak}
-                  onChange={() => setIsOnBreak(!isOnBreak)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-[#DCE4EB] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-              </label>
+              <div className="w-11 h-6 bg-[#DCE4EB] rounded-full relative pointer-events-none">
+                <div className="absolute top-0.5 left-0.5 bg-white border border-gray-300 rounded-full h-5 w-5" />
+              </div>
             )}
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white pt-[33px] ">
+      <div className="bg-white pt-8 ">
         <Tabs tabs={tabs} defaultTab={"disciples"} className="px-4 lg:px-10" customClass='!rounded-full'/>
       </div>
 

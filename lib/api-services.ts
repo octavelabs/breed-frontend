@@ -384,17 +384,61 @@ export const notificationService = {
 // ── Mentorship services ────────────────────────────────────────────────────────
 
 export const mentorshipService = {
+  // ── Discovery ────────────────────────────────────────────────────────────────
   getMentors: (params?: { page?: number; limit?: number }) =>
     api.get('/mentorship/mentors', { params }),
 
-  requestMentorship: (mentorId: string, message: string) =>
-    api.post('/mentorship/request', { mentorId, message }),
-
-  getMyMentorships: () => api.get('/mentorship/me/mentorships'),
-
+  // ── Mentor profile (preacher) ─────────────────────────────────────────────
   getMentorProfile: () => api.get('/mentorship/me/profile'),
+  createMentorProfile: (data: { bio?: string; specializations?: string[]; maxDisciples?: number; sessionRate?: number }) =>
+    api.post('/mentorship/me/profile', data),
+  updateMentorProfile: (data: { bio?: string; specializations?: string[]; maxDisciples?: number; isAccepting?: boolean }) =>
+    api.patch('/mentorship/me/profile', data),
+  toggleBreak: (breakEndsAt?: string) =>
+    api.post('/mentorship/me/break', { breakEndsAt }),
+  getMentorStats: () => api.get('/mentorship/me/stats'),
 
-  getDisciples: () => api.get('/mentorship/requests'),
+  // ── Requests & lifecycle ──────────────────────────────────────────────────
+  requestMentorship: (mentorId: string, message?: string) =>
+    api.post('/mentorship/request', { mentorId, message }),
+  getMyMentorships: (params?: { role?: 'mentor' | 'disciple'; status?: string; page?: number; limit?: number }) =>
+    api.get('/mentorship/me/mentorships', { params }),
+  getIncomingRequests: (params?: { status?: string; page?: number; limit?: number }) =>
+    api.get('/mentorship/requests', { params }),
+  getDisciples: (params?: { status?: string; page?: number; limit?: number }) =>
+    api.get('/mentorship/me/mentorships', { params: { role: 'mentor', ...params } }),
+  getMentorship: (id: string) => api.get(`/mentorship/${id}`),
+  respondToRequest: (id: string, action: 'accept' | 'reject', rejectionReason?: string) =>
+    api.post(`/mentorship/${id}/respond`, { action, rejectionReason }),
+  pauseMentorship: (id: string) => api.post(`/mentorship/${id}/pause`),
+  resumeMentorship: (id: string) => api.post(`/mentorship/${id}/resume`),
+  endMentorship: (id: string, reason?: string) => api.post(`/mentorship/${id}/end`, { reason }),
 
-  getSessions: () => api.get('/mentorship/sessions'),
+  // ── Sessions ──────────────────────────────────────────────────────────────
+  getMySessions: (params?: { page?: number; limit?: number }) =>
+    api.get('/mentorship/me/sessions', { params }),
+  createSession: (data: { mentorshipId: string; discipleId: string; title: string; scheduledAt: string; duration?: number; meetingLink?: string }) =>
+    api.post('/mentorship/sessions', data),
+  cancelSession: (id: string) => api.post(`/mentorship/sessions/${id}/cancel`),
+  completeSession: (id: string) => api.post(`/mentorship/sessions/${id}/complete`),
+
+  // ── Tasks ─────────────────────────────────────────────────────────────────
+  createTask: (data: { mentorshipId: string; discipleId: string; title: string; description?: string; dueDate?: string }) =>
+    api.post('/mentorship/tasks', data),
+  completeTask: (id: string) => api.post(`/mentorship/tasks/${id}/complete`),
+
+  // ── Assessments ───────────────────────────────────────────────────────────
+  getMyAssessments: (params?: { page?: number; limit?: number }) =>
+    api.get('/mentorship/me/assessments', { params }),
+  createAssessment: (data: { mentorshipId: string; discipleId: string; title: string; content: string; dueDate?: string }) =>
+    api.post('/mentorship/assessments', data),
+  submitAssessment: (id: string, response: string) =>
+    api.post(`/mentorship/assessments/${id}/submit`, { response }),
+  gradeAssessment: (id: string, grade: number, feedback?: string) =>
+    api.post(`/mentorship/assessments/${id}/grade`, { grade, feedback }),
+
+  // ── Reports ───────────────────────────────────────────────────────────────
+  getMyReports: (params?: { page?: number; limit?: number }) =>
+    api.get('/mentorship/me/reports', { params }),
+  generateReport: (mentorshipId: string) => api.post(`/mentorship/${mentorshipId}/report`),
 };

@@ -20,6 +20,7 @@ export const navItems = [
   { path: "/dashboard/learn", label: "Learn", icon: LearnIcon },
   { path: "/dashboard/buildup", label: "Buildup", icon: BuildupIcon },
   { path: "/dashboard/community", label: "Community", icon: CommunityIcon },
+  { path: "/dashboard/mentorship", label: "Mentorship", icon: MentorshipIcon },
   { path: "/dashboard/more", label: "More", icon: MoreIcon },
 ];
 
