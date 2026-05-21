@@ -387,6 +387,7 @@ export const mentorshipService = {
   // ── Discovery ────────────────────────────────────────────────────────────────
   getMentors: (params?: { page?: number; limit?: number }) =>
     api.get('/mentorship/mentors', { params }),
+  getMentorById: (id: string) => api.get(`/mentorship/mentors/${id}`),
 
   // ── Mentor profile (preacher) ─────────────────────────────────────────────
   getMentorProfile: () => api.get('/mentorship/me/profile'),
