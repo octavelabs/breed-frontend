@@ -16,18 +16,23 @@ import { setTokens, clearTokens, getAccessToken, getRefreshToken } from '../lib/
 // ── Cookie helpers (middleware-readable) ──────────────────────────────────────
 
 const LOGGED_IN_COOKIE = 'breed_logged_in';
+const ROLE_COOKIE = 'breed_user_role';
 
-function setLoggedInCookie(): void {
+function setSessionCookies(role: string): void {
   if (typeof document === 'undefined') return;
-  // Expires in 7 days; SameSite=Lax works for SSR redirects
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
   document.cookie = `${LOGGED_IN_COOKIE}=true; path=/; expires=${expires}; SameSite=Lax`;
+  document.cookie = `${ROLE_COOKIE}=${role}; path=/; expires=${expires}; SameSite=Lax`;
 }
 
-function clearLoggedInCookie(): void {
+function clearSessionCookies(): void {
   if (typeof document === 'undefined') return;
-  document.cookie = `${LOGGED_IN_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+  const past = 'Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = `${LOGGED_IN_COOKIE}=; path=/; expires=${past}; SameSite=Lax`;
+  document.cookie = `${ROLE_COOKIE}=; path=/; expires=${past}; SameSite=Lax`;
 }
+
+const clearLoggedInCookie = clearSessionCookies;
 
 // ── Context types ─────────────────────────────────────────────────────────────
 
@@ -66,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const fetchedUser = await authService.me<User>();
         setUser(fetchedUser);
-        setLoggedInCookie();
+        setSessionCookies(fetchedUser.role);
       } catch {
         // Token is invalid / expired and refresh already failed inside the
         // interceptor, so just clear everything here.
@@ -105,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }>({ emailOrUsername, password, rememberMe });
 
       setTokens(response.accessToken, response.refreshToken);
-      setLoggedInCookie();
+      setSessionCookies(response.user.role);
       setUser(response.user);
 
       if (response.user.role === 'PREACHER') {

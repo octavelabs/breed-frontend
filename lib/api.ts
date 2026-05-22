@@ -37,7 +37,9 @@ export const clearTokens = (): void => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   // Also clear the middleware-readable cookie so no redirect loop occurs
-  document.cookie = 'breed_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+  const past = 'Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = `breed_logged_in=; path=/; expires=${past}; SameSite=Lax`;
+  document.cookie = `breed_user_role=; path=/; expires=${past}; SameSite=Lax`;
 };
 
 export const getAccessToken = (): string | null => {

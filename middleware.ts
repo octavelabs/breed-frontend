@@ -11,27 +11,29 @@ const AUTH_ROUTES = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // We cannot read localStorage in middleware (Edge runtime), so we rely on
-  // the `breed_logged_in` cookie that AuthContext sets on login and clears on
-  // logout.
   const isLoggedIn = request.cookies.has('breed_logged_in');
+  const userRole = request.cookies.get('breed_user_role')?.value ?? '';
 
   const isDashboardRoute =
     pathname.startsWith('/dashboard') || pathname.startsWith('/onboard');
-
   const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));
 
-  // Protect dashboard/onboard routes — redirect unauthenticated visitors to login
+  // Redirect unauthenticated visitors to login
   if (isDashboardRoute && !isLoggedIn) {
     const loginUrl = new URL('/login', request.url);
-    // Preserve the originally requested URL so we can redirect back after login
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Role guard: /dashboard/preacher/* is PREACHER only
+  if (pathname.startsWith('/dashboard/preacher') && userRole !== 'PREACHER') {
+    return NextResponse.redirect(new URL('/dashboard/home', request.url));
+  }
+
   // Prevent logged-in users from hitting auth pages
   if (isAuthRoute && isLoggedIn) {
-    return NextResponse.redirect(new URL('/dashboard/home', request.url));
+    const home = userRole === 'PREACHER' ? '/dashboard/preacher/dashboard' : '/dashboard/home';
+    return NextResponse.redirect(new URL(home, request.url));
   }
 
   return NextResponse.next();
