@@ -1,8 +1,16 @@
 "use client";
 
 import {
-  ArrowLeft, BellOff, ChartAreaIcon, LogOut,
-  MoreVerticalIcon, Search, Send, Settings, Trash, Users,
+  ArrowLeft,
+  BellOff,
+  ChartAreaIcon,
+  LogOut,
+  MoreVerticalIcon,
+  Search,
+  Send,
+  Settings,
+  Trash,
+  Users,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
@@ -54,13 +62,18 @@ const DateDivider = ({ date }: { date: string }) => (
 );
 
 const formatDateLabel = (iso: string) => {
-  const d   = new Date(iso);
+  const d = new Date(iso);
   const now = new Date();
   if (d.toDateString() === now.toDateString()) return "Today";
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
   if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
-  return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 };
 
 // ── Chat view ─────────────────────────────────────────────────────────────────
@@ -72,17 +85,22 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
 }) => {
   const { user } = useAuth();
   const [messageText, setMessageText] = useState("");
-  const [messages, setMessages]       = useState<ApiMessage[]>([]);
-  const [sending, setSending]         = useState(false);
-  const [leaving, setLeaving]         = useState(false);
+  const [messages, setMessages] = useState<ApiMessage[]>([]);
+  const [sending, setSending] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const parentRef      = useRef<HTMLDivElement>(null);
-  const anchorRef      = useRef<HTMLButtonElement | null>(null);
-  const [popover, setPopover] = useState<PopoverState>({ visible: false, rowData: null });
+  const parentRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLButtonElement | null>(null);
+  const [popover, setPopover] = useState<PopoverState>({
+    visible: false,
+    rowData: null,
+  });
 
   // Group messages by day for dividers
   const messagesWithDividers = useMemo(() => {
-    const result: Array<{ type: "message"; data: ApiMessage } | { type: "divider"; label: string }> = [];
+    const result: Array<
+      { type: "message"; data: ApiMessage } | { type: "divider"; label: string }
+    > = [];
     let lastDate = "";
     for (const msg of messages) {
       const dateLabel = formatDateLabel(msg.createdAt);
@@ -96,7 +114,8 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   }, [messages]);
 
   const fetchMessages = useCallback(() => {
-    communityService.getMessages(community.id, { limit: 50 })
+    communityService
+      .getMessages(community.id, { limit: 50 })
       .then((res: unknown) => {
         const data = (res as any)?.data ?? res;
         const items: ApiMessage[] = Array.isArray(data) ? data : [];
@@ -136,7 +155,8 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   };
 
   const handleLeave = async () => {
-    if (!window.confirm(`Leave "${community.name}"? You can rejoin anytime.`)) return;
+    if (!window.confirm(`Leave "${community.name}"? You can rejoin anytime.`))
+      return;
     setLeaving(true);
     setPopover({ visible: false, rowData: null });
     try {
@@ -159,45 +179,64 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
     setPopover((prev) => ({ ...prev, visible: false, rowData: null }));
   }, []);
 
-  const popoverContent = useMemo(() => [
-    {
-      item: "Settings",
-      icon: <Settings className="w-3.5 h-3.5" />,
-      onClick: () => {},
-    },
-    {
-      item: "Mute",
-      icon: <BellOff className="w-3.5 h-3.5" />,
-      onClick: () => {},
-    },
-    {
-      item: "Leave Community",
-      icon: <LogOut className="w-3.5 h-3.5" />,
-      onClick: handleLeave,
-    },
-  ], [handleLeave]);
+  const popoverContent = useMemo(
+    () => [
+      {
+        item: "Settings",
+        icon: <Settings className="w-3.5 h-3.5" />,
+        onClick: () => {},
+      },
+      {
+        item: "Mute",
+        icon: <BellOff className="w-3.5 h-3.5" />,
+        onClick: () => {},
+      },
+      {
+        item: "Leave Community",
+        icon: <LogOut className="w-3.5 h-3.5" />,
+        onClick: handleLeave,
+      },
+    ],
+    [handleLeave],
+  );
 
   const formatTime = (iso: string) =>
-    new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).toLowerCase();
+    new Date(iso)
+      .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+      .toLowerCase();
 
   const memberCount = community.memberCount ?? community._count?.members ?? 0;
 
   return (
-    <div className="flex-1 flex flex-col h-[calc(100vh-150px)] relative overflow-hidden" ref={parentRef}>
+    <div
+      className="flex-1 flex flex-col h-[calc(100vh-150px)] relative overflow-hidden"
+      ref={parentRef}
+    >
       {/* Header */}
       <div className="h-14 px-5 py-3 border-b border-[#D2D9DF] flex items-center justify-between shrink-0 bg-white">
         <div className="flex items-center gap-2.5">
-          <button className="block lg:hidden" onClick={() => setSelectedCommunity(null)}>
+          <button
+            className="block lg:hidden"
+            onClick={() => setSelectedCommunity(null)}
+          >
             <ArrowLeft size={20} className="text-[#60666B]" />
           </button>
           <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
-            {community.coverImage
+            {community.coverImage ? (
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={community.coverImage} alt={community.name} className="w-full h-full object-cover rounded-full" />
-              : community.name.charAt(0).toUpperCase()}
+              <img
+                src={community.coverImage}
+                alt={community.name}
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              community.name.charAt(0).toUpperCase()
+            )}
           </div>
           <div>
-            <p className="font-semibold text-sm text-[#180426] leading-none">{community.name}</p>
+            <p className="font-semibold text-sm text-[#180426] leading-none">
+              {community.name}
+            </p>
             {memberCount > 0 && (
               <p className="text-[11px] text-[#60666B] mt-0.5 flex items-center gap-1">
                 <Users size={10} /> {memberCount.toLocaleString()} members
@@ -212,13 +251,16 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
           <Button
             customClass="!bg-transparent !p-1.5"
             buttonType="custom"
-            onClick={() => setPopover((prev) => ({ ...prev, visible: !prev.visible }))}
+            onClick={() =>
+              setPopover((prev) => ({ ...prev, visible: !prev.visible }))
+            }
             ref={anchorRef}
           >
-            {leaving
-              ? <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin" />
-              : <MoreVerticalIcon size={18} className="text-[#60666B]" />
-            }
+            {leaving ? (
+              <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin" />
+            ) : (
+              <MoreVerticalIcon size={18} className="text-[#60666B]" />
+            )}
           </Button>
         </div>
       </div>
@@ -230,7 +272,9 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
             <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center">
               <ChartAreaIcon size={26} className="text-[#870BD6]" />
             </div>
-            <p className="text-base font-semibold text-[#180426]">No conversations yet</p>
+            <p className="text-base font-semibold text-[#180426]">
+              No conversations yet
+            </p>
             <p className="text-sm text-[#60666B] max-w-xs">
               Be the first to encourage the community. Send a message below!
             </p>
@@ -253,7 +297,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
                 }}
                 isOwnMessage={item.data.senderId === user?.id}
               />
-            )
+            ),
           )
         )}
         <div ref={messagesEndRef} />
@@ -275,10 +319,11 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
             disabled={!messageText.trim() || sending}
             className="shrink-0 w-8 h-8 rounded-full bg-[#870BD6] flex items-center justify-center text-white disabled:opacity-30 hover:bg-[#6B09B0] transition-colors"
           >
-            {sending
-              ? <span className="inline-block w-3.5 h-3.5 rounded-full border-t-2 border-white animate-spin" />
-              : <Send size={14} />
-            }
+            {sending ? (
+              <span className="inline-block w-3.5 h-3.5 rounded-full border-t-2 border-white animate-spin" />
+            ) : (
+              <Send size={14} />
+            )}
           </button>
         </div>
       </div>

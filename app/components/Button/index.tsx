@@ -13,8 +13,17 @@ type Props = {
 };
 
 const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
-  { buttonType = "primary", customClass, children, loading, onClick, disabled, title, type },
-  ref: React.ForwardedRef<HTMLButtonElement>
+  {
+    buttonType = "primary",
+    customClass,
+    children,
+    loading,
+    onClick,
+    disabled,
+    title,
+    type,
+  },
+  ref: React.ForwardedRef<HTMLButtonElement>,
 ) => {
   let buttonStyleClass = "";
   if (buttonType === "primary") {
@@ -44,10 +53,11 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
           <span className="inline-block w-4 h-4 rounded-full border-t-2 border-white animate-spin flex-shrink-0" />
           {children}
         </span>
-      ) : children}
+      ) : (
+        children
+      )}
     </button>
   );
 };
-
 
 export default forwardRef(Button);
