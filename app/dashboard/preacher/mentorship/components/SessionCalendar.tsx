@@ -331,7 +331,7 @@ function SessionCard({ session: s, onClick }: { session: Session; onClick: () =>
 
 // ── Schedule Session Modal ─────────────────────────────────────────────────
 
-interface Mentee { mentorshipId: string; userId: string; firstName: string; lastName: string; }
+interface Mentee { mentorshipId: string; firstName: string; lastName: string; }
 
 function ScheduleSessionModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [mentees, setMentees] = useState<Mentee[]>([]);
@@ -352,7 +352,6 @@ function ScheduleSessionModal({ onClose, onCreated }: { onClose: () => void; onC
         const data = res?.data ?? res;
         const list: Mentee[] = (Array.isArray(data) ? data : []).map((m: any) => ({
           mentorshipId: m.id,
-          userId: m.disciple?.id ?? "",
           firstName: m.disciple?.firstName ?? "",
           lastName: m.disciple?.lastName ?? "",
         }));
@@ -382,7 +381,6 @@ function ScheduleSessionModal({ onClose, onCreated }: { onClose: () => void; onC
     try {
       await mentorshipService.createSession({
         mentorshipId,
-        discipleId: mentees.find((m) => m.mentorshipId === mentorshipId)?.userId ?? "",
         title,
         scheduledAt,
         duration,

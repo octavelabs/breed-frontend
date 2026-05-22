@@ -423,7 +423,7 @@ export const mentorshipService = {
   // ── Sessions ──────────────────────────────────────────────────────────────
   getMySessions: (params?: { page?: number; limit?: number }) =>
     api.get('/mentorship/me/sessions', { params }),
-  createSession: (data: { mentorshipId: string; discipleId: string; title: string; scheduledAt: string; duration?: number; meetingLink?: string }) =>
+  createSession: (data: { mentorshipId: string; title: string; scheduledAt: string; duration?: number; meetingLink?: string; description?: string }) =>
     api.post('/mentorship/sessions', data),
   updateSession: (id: string, data: { scheduledAt?: string; meetingLink?: string; title?: string; duration?: number }) =>
     api.patch(`/mentorship/sessions/${id}`, data),
