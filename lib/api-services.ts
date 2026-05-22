@@ -423,6 +423,7 @@ export const mentorshipService = {
   // ── Sessions ──────────────────────────────────────────────────────────────
   getMySessions: (params?: { page?: number; limit?: number }) =>
     api.get('/mentorship/me/sessions', { params }),
+  getSessionById: (id: string) => api.get(`/mentorship/sessions/${id}`),
   createSession: (data: { mentorshipId: string; title: string; scheduledAt: string; duration?: number; meetingLink?: string; description?: string }) =>
     api.post('/mentorship/sessions', data),
   updateSession: (id: string, data: { scheduledAt?: string; meetingLink?: string; title?: string; duration?: number }) =>

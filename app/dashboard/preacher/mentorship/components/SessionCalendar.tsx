@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays, Clock4, X, ExternalLink, Users, Video, Plus, Link } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight, CalendarDays, Clock4, X, ExternalLink, Plus, Link } from "lucide-react";
 import { mentorshipService } from "@/lib/api-services";
 import Button from "@/app/components/Button";
 
@@ -494,6 +495,7 @@ function ScheduleSessionModal({ onClose, onCreated }: { onClose: () => void; onC
 
 export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number }) => {
   const today = new Date();
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [weekStart, setWeekStart] = useState<Date>(() => {
     const d = new Date(today);
@@ -505,7 +507,6 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
   const [loadError, setLoadError] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
-  const [activeSession, setActiveSession] = useState<Session | null>(null);
 
   const weekDates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
@@ -558,13 +559,12 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
     .filter((s) => s.status !== 'CANCELLED' && s.status !== 'NO_SHOW')
     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
+  const goToSession = (s: Session) => router.push(`/dashboard/mentorship/sessions/${s.id}`);
+
   return (
     <>
       {showCalendar && (
-        <CalendarModal sessions={allSessions} onClose={() => setShowCalendar(false)} onSelectSession={setActiveSession} />
-      )}
-      {activeSession && (
-        <SessionDetailModal session={activeSession} onClose={() => setActiveSession(null)} onCancelled={load} />
+        <CalendarModal sessions={allSessions} onClose={() => setShowCalendar(false)} onSelectSession={goToSession} />
       )}
       {showSchedule && (
         <ScheduleSessionModal onClose={() => setShowSchedule(false)} onCreated={load} />
@@ -635,7 +635,7 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
             </div>
           ) : daySessions.length > 0 ? (
             <div className="flex flex-col gap-3">
-              {daySessions.map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
+              {daySessions.map((s) => <SessionCard key={s.id} session={s} onClick={() => goToSession(s)} />)}
             </div>
           ) : allSessions.length === 0 ? (
             <div className="flex flex-col items-center py-6 gap-1">
@@ -651,7 +651,7 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
               <div className="border-t border-[#E3E8EF] pt-4">
                 <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wider mb-3">All Sessions</p>
                 <div className="flex flex-col gap-2">
-                  {upcomingSessions.slice(0, 5).map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
+                  {upcomingSessions.slice(0, 5).map((s) => <SessionCard key={s.id} session={s} onClick={() => goToSession(s)} />)}
                 </div>
               </div>
             </div>

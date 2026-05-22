@@ -304,16 +304,18 @@ const MentorshipPage = () => {
                       {upcomingSessions.map((s) => {
                         const scheduledAt = new Date(s.scheduledAt);
                         return (
-                          <div key={s.id} className="bg-white border border-[#E3E8EF] rounded-2xl p-4">
+                          <button
+                            key={s.id}
+                            onClick={() => router.push(`/dashboard/mentorship/sessions/${s.id}`)}
+                            className="w-full bg-white border border-[#E3E8EF] rounded-2xl p-4 hover:border-[#870BD6] hover:bg-[#FBF6FF] transition-all text-left group"
+                          >
                             <div className="flex items-start gap-3">
                               <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] flex items-center justify-center shrink-0">
                                 <Calendar size={18} className="text-[#870BD6]" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-semibold text-sm text-[#180426]">{s.title}</p>
-                                <p className="text-xs text-[#60666B] mt-0.5">
-                                  with {s.mentor.firstName} {s.mentor.lastName}
-                                </p>
+                                <p className="text-xs text-[#60666B] mt-0.5">with {s.mentor.firstName} {s.mentor.lastName}</p>
                                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                                   <span className="flex items-center gap-1 text-xs text-[#60666B]">
                                     <Calendar size={11} />
@@ -326,20 +328,12 @@ const MentorshipPage = () => {
                                   <span className="text-xs text-[#60666B]">{s.duration} min</span>
                                 </div>
                               </div>
-                              {s.meetingLink && (
-                                <a
-                                  href={s.meetingLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-xs font-medium rounded-full shrink-0 hover:opacity-90 transition-opacity"
-                                >
-                                  <Video size={11} />
-                                  Join
-                                </a>
-                              )}
+                              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-xs font-medium rounded-full shrink-0 group-hover:opacity-90 transition-opacity">
+                                <Video size={11} />
+                                View
+                              </div>
                             </div>
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
