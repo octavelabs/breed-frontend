@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays, Clock4, X, ExternalLink, Users, Video } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Clock4, X, ExternalLink, Users, Video, Plus, Link } from "lucide-react";
 import { mentorshipService } from "@/lib/api-services";
 import Button from "@/app/components/Button";
 
@@ -329,6 +329,169 @@ function SessionCard({ session: s, onClick }: { session: Session; onClick: () =>
   );
 }
 
+// ── Schedule Session Modal ─────────────────────────────────────────────────
+
+interface Mentee { mentorshipId: string; userId: string; firstName: string; lastName: string; }
+
+function ScheduleSessionModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [loadingMentees, setLoadingMentees] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [mentorshipId, setMentorshipId] = useState("");
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("10:00");
+  const [duration, setDuration] = useState(60);
+  const [meetingLink, setMeetingLink] = useState("");
+
+  useEffect(() => {
+    mentorshipService.getDisciples({ status: "ACTIVE", limit: 50 })
+      .then((res: any) => {
+        const data = res?.data ?? res;
+        const list: Mentee[] = (Array.isArray(data) ? data : []).map((m: any) => ({
+          mentorshipId: m.id,
+          userId: m.disciple?.id ?? "",
+          firstName: m.disciple?.firstName ?? "",
+          lastName: m.disciple?.lastName ?? "",
+        }));
+        setMentees(list);
+        if (list.length === 1) setMentorshipId(list[0].mentorshipId);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingMentees(false));
+  }, []);
+
+  // Set default date to tomorrow
+  useEffect(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    setDate(d.toISOString().slice(0, 10));
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mentorshipId || !title || !date || !time) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+    const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+    setSubmitting(true);
+    setError(null);
+    try {
+      await mentorshipService.createSession({
+        mentorshipId,
+        discipleId: mentees.find((m) => m.mentorshipId === mentorshipId)?.userId ?? "",
+        title,
+        scheduledAt,
+        duration,
+        meetingLink: meetingLink || undefined,
+      });
+      onCreated();
+      onClose();
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to schedule session.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="w-full max-w-md bg-white rounded-[20px] shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-[#870BD6] px-6 py-5 flex items-center justify-between">
+          <h2 className="text-white font-bold text-lg">Schedule Session</h2>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-white/20 text-white/80"><X size={18} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-[#60666B] mb-1">Mentee <span className="text-red-500">*</span></label>
+            {loadingMentees ? (
+              <div className="h-10 bg-gray-100 rounded-lg animate-pulse" />
+            ) : mentees.length === 0 ? (
+              <p className="text-sm text-[#60666B] bg-[#F8FAFC] rounded-lg p-3">No active mentees yet.</p>
+            ) : (
+              <select
+                value={mentorshipId} onChange={(e) => setMentorshipId(e.target.value)} required
+                className="w-full h-10 border border-[#D2D9DF] rounded-lg px-3 text-sm text-[#180426] focus:outline-none focus:border-[#870BD6]"
+              >
+                <option value="">Select a mentee…</option>
+                {mentees.map((m) => (
+                  <option key={m.mentorshipId} value={m.mentorshipId}>{m.firstName} {m.lastName}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-[#60666B] mb-1">Session Title <span className="text-red-500">*</span></label>
+            <input
+              value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Weekly check-in"
+              className="w-full h-10 border border-[#D2D9DF] rounded-lg px-3 text-sm text-[#180426] focus:outline-none focus:border-[#870BD6]"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-[#60666B] mb-1">Date <span className="text-red-500">*</span></label>
+              <input
+                type="date" value={date} onChange={(e) => setDate(e.target.value)} required
+                min={new Date().toISOString().slice(0, 10)}
+                className="w-full h-10 border border-[#D2D9DF] rounded-lg px-3 text-sm text-[#180426] focus:outline-none focus:border-[#870BD6]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#60666B] mb-1">Time <span className="text-red-500">*</span></label>
+              <input
+                type="time" value={time} onChange={(e) => setTime(e.target.value)} required
+                className="w-full h-10 border border-[#D2D9DF] rounded-lg px-3 text-sm text-[#180426] focus:outline-none focus:border-[#870BD6]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-[#60666B] mb-1">Duration</label>
+            <select
+              value={duration} onChange={(e) => setDuration(Number(e.target.value))}
+              className="w-full h-10 border border-[#D2D9DF] rounded-lg px-3 text-sm text-[#180426] focus:outline-none focus:border-[#870BD6]"
+            >
+              {[15, 30, 45, 60, 90, 120].map((d) => (
+                <option key={d} value={d}>{d} minutes</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-[#60666B] mb-1">Meeting Link <span className="text-[#A0A8B0]">(optional)</span></label>
+            <div className="relative">
+              <Link size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A8B0]" />
+              <input
+                type="url" value={meetingLink} onChange={(e) => setMeetingLink(e.target.value)} placeholder="https://meet.google.com/..."
+                className="w-full h-10 border border-[#D2D9DF] rounded-lg pl-8 pr-3 text-sm text-[#180426] focus:outline-none focus:border-[#870BD6]"
+              />
+            </div>
+          </div>
+
+          {error && <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+
+          <div className="flex gap-2 pt-1">
+            <button type="button" onClick={onClose}
+              className="flex-1 h-10 border border-[#D2D9DF] rounded-full text-sm text-[#60666B] hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <Button buttonType="custom" customClass="flex-1 !h-10 !text-sm bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full"
+              loading={submitting} onClick={() => {}}>
+              Schedule
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ── SessionCalendar ────────────────────────────────────────────────────────
 
 export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number }) => {
@@ -341,7 +504,9 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
   });
   const [allSessions, setAllSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
 
   const weekDates = Array.from({ length: 7 }, (_, i) => {
@@ -354,25 +519,27 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
 
   const load = useCallback(() => {
     setLoading(true);
+    setLoadError(false);
     mentorshipService.getMySessions({ limit: 100 })
       .then((res: any) => {
-        const data = res?.data ?? res;
-        const sessions = Array.isArray(data) ? data : [];
+        // Unwrap paginated response: { data: [...], meta: {...} } OR plain array
+        const inner = res?.data ?? res;
+        const sessions: Session[] = Array.isArray(inner) ? inner : [];
         setAllSessions(sessions);
-        // Auto-navigate to the week of the next upcoming session
-        const now = new Date();
-        const next = sessions
-          .filter((s: Session) => new Date(s.scheduledAt) >= now && (s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS'))
-          .sort((a: Session, b: Session) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
-        if (next) {
-          const d = new Date(next.scheduledAt);
+        if (sessions.length > 0) {
+          // Navigate to the session closest to now (past or future)
+          const now = Date.now();
+          const nearest = [...sessions].sort(
+            (a, b) => Math.abs(new Date(a.scheduledAt).getTime() - now) - Math.abs(new Date(b.scheduledAt).getTime() - now),
+          )[0];
+          const d = new Date(nearest.scheduledAt);
           setSelectedDate(d);
           const ws = new Date(d);
           ws.setDate(d.getDate() - d.getDay());
           setWeekStart(ws);
         }
       })
-      .catch(() => setAllSessions([]))
+      .catch(() => { setAllSessions([]); setLoadError(true); })
       .finally(() => setLoading(false));
   }, [refreshSignal]);
 
@@ -388,8 +555,9 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
     : isSameDay(selectedDate, new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)) ? "Tomorrow"
     : selectedDate.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 
+  // Show all non-cancelled sessions sorted soonest first (includes past sessions)
   const upcomingSessions = allSessions
-    .filter((s) => new Date(s.scheduledAt) >= today && (s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS'))
+    .filter((s) => s.status !== 'CANCELLED' && s.status !== 'NO_SHOW')
     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
   return (
@@ -400,14 +568,25 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
       {activeSession && (
         <SessionDetailModal session={activeSession} onClose={() => setActiveSession(null)} onCancelled={load} />
       )}
+      {showSchedule && (
+        <ScheduleSessionModal onClose={() => setShowSchedule(false)} onCreated={load} />
+      )}
 
       <div className="bg-white border border-[#D2D9DF] rounded-[16px] w-full px-5 py-6">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Session Schedule</h2>
-            <button onClick={() => setShowCalendar(true)} className="flex items-center gap-1.5 text-xs text-[#870BD6] font-medium hover:underline">
-              <CalendarDays size={13} /> Full Calendar
-            </button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setShowCalendar(true)} className="flex items-center gap-1.5 text-xs text-[#870BD6] font-medium hover:underline">
+                <CalendarDays size={13} /> Full Calendar
+              </button>
+              <button
+                onClick={() => setShowSchedule(true)}
+                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-[#870BD6] text-white rounded-full hover:bg-[#6f09b3] transition-colors"
+              >
+                <Plus size={12} /> Schedule
+              </button>
+            </div>
           </div>
 
           {/* Week mini-calendar */}
@@ -451,24 +630,32 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
 
           {loading ? (
             <div className="space-y-2">{[1, 2].map((i) => <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />)}</div>
+          ) : loadError ? (
+            <div className="flex flex-col items-center py-6 gap-2">
+              <p className="text-sm text-red-500 font-medium">Failed to load sessions</p>
+              <button onClick={load} className="text-xs text-[#870BD6] underline">Retry</button>
+            </div>
           ) : daySessions.length > 0 ? (
             <div className="flex flex-col gap-3">
               {daySessions.map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
             </div>
+          ) : allSessions.length === 0 ? (
+            <div className="flex flex-col items-center py-6 gap-1">
+              <CalendarDays className="w-10 h-10 text-gray-200" strokeWidth={1.5} />
+              <p className="mt-2 text-sm font-medium text-[#180426]">No sessions yet</p>
+              <p className="text-xs text-[#60666B]">Sessions you schedule with mentees will appear here.</p>
+            </div>
           ) : (
             <div>
-              <div className="flex flex-col items-center py-4">
-                <CalendarDays className="w-10 h-10 text-gray-200" strokeWidth={1.5} />
-                <p className="mt-2 text-sm font-medium text-[#180426]">No sessions on this day</p>
+              <div className="flex flex-col items-center py-3">
+                <p className="text-sm text-[#60666B]">No sessions on this day</p>
               </div>
-              {upcomingSessions.length > 0 && (
-                <div className="mt-2 border-t border-[#E3E8EF] pt-4">
-                  <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wider mb-3">Upcoming Sessions</p>
-                  <div className="flex flex-col gap-2">
-                    {upcomingSessions.slice(0, 5).map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
-                  </div>
+              <div className="border-t border-[#E3E8EF] pt-4">
+                <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wider mb-3">All Sessions</p>
+                <div className="flex flex-col gap-2">
+                  {upcomingSessions.slice(0, 5).map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>
