@@ -165,23 +165,26 @@ const MentorshipPage = () => {
 
   const loadMyMentorships = useCallback(() => {
     setLoadingMy(true);
-    Promise.all([
-      mentorshipService.getMyMentorships({ role: 'disciple', limit: 50 }),
-      mentorshipService.getMySessions({ limit: 50 }),
-    ])
-      .then(([mRes, sRes]: any[]) => {
-        const mData = mRes?.data ?? mRes;
-        setMyMentorships(Array.isArray(mData) ? mData : []);
-        const sData = sRes?.data ?? sRes;
+    const mentorshipsCall = mentorshipService.getMyMentorships({ role: 'disciple', limit: 50 })
+      .then((res: any) => {
+        const data = res?.data ?? res;
+        setMyMentorships(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setMyMentorships([]));
+
+    const sessionsCall = mentorshipService.getMySessions({ limit: 50 })
+      .then((res: any) => {
+        const data = res?.data ?? res;
         const now = new Date();
-        const upcoming = (Array.isArray(sData) ? sData : []).filter(
+        const upcoming = (Array.isArray(data) ? data : []).filter(
           (s: any) => (s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS') && new Date(s.scheduledAt) >= now,
         );
         upcoming.sort((a: any, b: any) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
         setUpcomingSessions(upcoming);
       })
-      .catch(() => { setMyMentorships([]); setUpcomingSessions([]); })
-      .finally(() => setLoadingMy(false));
+      .catch(() => setUpcomingSessions([]));
+
+    Promise.all([mentorshipsCall, sessionsCall]).finally(() => setLoadingMy(false));
   }, []);
 
   useEffect(() => {
