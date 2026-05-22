@@ -45,7 +45,11 @@ const PreacherMentorship = () => {
     {
       label: "Sessions",
       value: "sessions",
-      content: <SessionCalendar />,
+      content: (
+        <div className="mx-4 lg:mx-10 pb-6">
+          <SessionCalendar />
+        </div>
+      ),
     },
     {
       label: "Assessments",

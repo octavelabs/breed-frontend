@@ -299,6 +299,36 @@ function CalendarModal({ sessions, onClose, onSelectSession }: {
   );
 }
 
+// ── Session Card ──────────────────────────────────────────────────────────
+
+function SessionCard({ session: s, onClick }: { session: Session; onClick: () => void }) {
+  const st = STATUS_CLASSES[s.status] ?? { bg: "bg-gray-100", text: "text-gray-600" };
+  return (
+    <button onClick={onClick}
+      className="flex items-center gap-3 p-3 bg-[#F8FAFC] border border-[#E3E8EF] rounded-xl hover:border-[#870BD6] hover:bg-[#FBF6FF] transition-all group text-left w-full"
+    >
+      <div className="w-10 h-10 rounded-[10px] bg-[#FBF6FF] border border-[#E3E8EF] flex items-center justify-center shrink-0">
+        <CalendarDays size={16} className="text-[#870BD6]" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-[#1D1B20] truncate">{s.title}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="flex items-center gap-1 text-[10px] text-[#60666B]">
+            <Clock4 className="w-3 h-3" />
+            {new Date(s.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+            {" · "}
+            {new Date(s.scheduledAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+          </span>
+          <span className="text-[10px] text-[#60666B] truncate">· {s.disciple.firstName} {s.disciple.lastName}</span>
+        </div>
+      </div>
+      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${st.bg} ${st.text}`}>
+        {s.status.toLowerCase().replace("_", " ")}
+      </span>
+    </button>
+  );
+}
+
 // ── SessionCalendar ────────────────────────────────────────────────────────
 
 export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number }) => {
@@ -327,7 +357,20 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
     mentorshipService.getMySessions({ limit: 100 })
       .then((res: any) => {
         const data = res?.data ?? res;
-        setAllSessions(Array.isArray(data) ? data : []);
+        const sessions = Array.isArray(data) ? data : [];
+        setAllSessions(sessions);
+        // Auto-navigate to the week of the next upcoming session
+        const now = new Date();
+        const next = sessions
+          .filter((s: Session) => new Date(s.scheduledAt) >= now && (s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS'))
+          .sort((a: Session, b: Session) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
+        if (next) {
+          const d = new Date(next.scheduledAt);
+          setSelectedDate(d);
+          const ws = new Date(d);
+          ws.setDate(d.getDate() - d.getDay());
+          setWeekStart(ws);
+        }
       })
       .catch(() => setAllSessions([]))
       .finally(() => setLoading(false));
@@ -344,6 +387,10 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
   const selectedLabel = isSameDay(selectedDate, today) ? "Today"
     : isSameDay(selectedDate, new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)) ? "Tomorrow"
     : selectedDate.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+
+  const upcomingSessions = allSessions
+    .filter((s) => new Date(s.scheduledAt) >= today && (s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS'))
+    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
 
   return (
     <>
@@ -406,39 +453,22 @@ export const SessionCalendar = ({ refreshSignal = 0 }: { refreshSignal?: number 
             <div className="space-y-2">{[1, 2].map((i) => <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />)}</div>
           ) : daySessions.length > 0 ? (
             <div className="flex flex-col gap-3">
-              {daySessions.map((s) => {
-                const st = STATUS_CLASSES[s.status] ?? { bg: "bg-gray-100", text: "text-gray-600" };
-                return (
-                  <button key={s.id} onClick={() => setActiveSession(s)}
-                    className="flex items-center gap-3 p-3 bg-[#F8FAFC] border border-[#E3E8EF] rounded-[12px] hover:border-[#870BD6] hover:bg-[#FBF6FF] transition-all group text-left"
-                  >
-                    <div className="w-[40px] h-[40px] rounded-[10px] bg-[#FBF6FF] border border-[#E3E8EF] flex items-center justify-center shrink-0">
-                      <CalendarDays size={16} className="text-[#870BD6]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1D1B20] truncate">{s.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="flex items-center gap-1 text-[10px] text-[#60666B]">
-                          <Clock4 className="w-3 h-3" />
-                          {new Date(s.scheduledAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                        </span>
-                        <span className="text-[10px] text-[#60666B] truncate">· {s.disciple.firstName} {s.disciple.lastName}</span>
-                      </div>
-                    </div>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${st.bg} ${st.text}`}>
-                      {s.status.toLowerCase().replace("_", " ")}
-                    </span>
-                  </button>
-                );
-              })}
+              {daySessions.map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
             </div>
           ) : (
-            <div className="flex flex-col items-center pt-4">
-              <CalendarDays className="w-12 h-12 text-gray-200" strokeWidth={1.5} />
-              <p className="mt-3 text-sm font-medium text-[#180426]">No sessions scheduled</p>
-              <p className="text-xs text-[#60666B] mt-1 text-center">
-                Nothing on {selectedDate.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" })}.
-              </p>
+            <div>
+              <div className="flex flex-col items-center py-4">
+                <CalendarDays className="w-10 h-10 text-gray-200" strokeWidth={1.5} />
+                <p className="mt-2 text-sm font-medium text-[#180426]">No sessions on this day</p>
+              </div>
+              {upcomingSessions.length > 0 && (
+                <div className="mt-2 border-t border-[#E3E8EF] pt-4">
+                  <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wider mb-3">Upcoming Sessions</p>
+                  <div className="flex flex-col gap-2">
+                    {upcomingSessions.slice(0, 5).map((s) => <SessionCard key={s.id} session={s} onClick={() => setActiveSession(s)} />)}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
