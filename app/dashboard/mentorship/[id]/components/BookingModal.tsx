@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DateSelectStep } from './DateSelectStep';
 import { TimeSelectStep } from './TimeSelectStep';
 import { ConfirmBookingStep, formatDate } from './ConfirmBookingStep';
@@ -31,6 +31,14 @@ export function BookingModal({ isOpen, onClose, onSuccess, mentorInfo }: Booking
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [succeeded, setSucceeded] = useState(false);
+  const [availability, setAvailability] = useState<{ schedule: any; bookedSlots: { start: string; duration: number }[] } | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    mentorshipService.getMentorAvailability(mentorInfo.id)
+      .then((res: any) => setAvailability(res))
+      .catch(() => {});
+  }, [isOpen, mentorInfo.id]);
 
   const canProceed =
     (currentStep === 1 && !!selectedDate) ||
@@ -43,23 +51,28 @@ export function BookingModal({ isOpen, onClose, onSuccess, mentorInfo }: Booking
     } else if (currentStep === 2 && selectedTime) {
       setCurrentStep(3);
     } else if (currentStep === 3 && selectedTopic) {
-      // Build a well-formed request message for the mentor
-      const lines = [
-        `Hi! I'd like to request a mentorship session with you.`,
-        ``,
-        `Preferred date: ${selectedDate ? formatDate(selectedDate) : 'Flexible'}`,
-        `Preferred time: ${selectedTime ?? 'Flexible'}`,
-        `Topic: ${selectedTopic}`,
-      ];
-      if (additionalMessage.trim()) {
-        lines.push(``, additionalMessage.trim());
+      // Build proposedSessionAt from selected date + time
+      let proposedSessionAt: string | undefined;
+      if (selectedDate && selectedTime) {
+        // selectedTime format: "10:00am" or "2:30pm"
+        const match = selectedTime.match(/^(\d+):(\d+)(am|pm)$/i);
+        if (match) {
+          let hours = parseInt(match[1], 10);
+          const minutes = parseInt(match[2], 10);
+          const ampm = match[3].toLowerCase();
+          if (ampm === 'pm' && hours !== 12) hours += 12;
+          if (ampm === 'am' && hours === 12) hours = 0;
+          const d = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), hours, minutes);
+          proposedSessionAt = d.toISOString();
+        }
       }
-      const message = lines.join('\n');
+
+      const message = additionalMessage.trim() || undefined;
 
       setSubmitting(true);
       setError(null);
       try {
-        await mentorshipService.requestMentorship(mentorInfo.id, message);
+        await mentorshipService.requestMentorship(mentorInfo.id, message, proposedSessionAt, selectedTopic);
         setSucceeded(true);
       } catch (err: any) {
         setError(err?.message ?? 'Failed to send request. Please try again.');
@@ -189,7 +202,7 @@ export function BookingModal({ isOpen, onClose, onSuccess, mentorInfo }: Booking
 
             <div className="mb-4">
               {currentStep === 1 && (
-                <DateSelectStep selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+                <DateSelectStep selectedDate={selectedDate} onSelectDate={setSelectedDate} availability={availability} />
               )}
               {currentStep === 2 && (
                 <TimeSelectStep
@@ -197,6 +210,7 @@ export function BookingModal({ isOpen, onClose, onSuccess, mentorInfo }: Booking
                   selectedTime={selectedTime}
                   onSelectTime={setSelectedTime}
                   onChangeDate={() => setCurrentStep(1)}
+                  availability={availability}
                 />
               )}
               {currentStep === 3 && (

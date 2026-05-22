@@ -10,6 +10,7 @@ import { HelpCircle } from 'lucide-react';
 import { SessionCalendar } from './components/SessionCalendar';
 import AssessmentList from './components/AssessmentList';
 import ReportList from './components/ReportList';
+import AvailabilitySettings from './components/AvailabilitySettings';
 import { mentorshipService } from '@/lib/api-services';
 
 const PreacherMentorship = () => {
@@ -60,6 +61,11 @@ const PreacherMentorship = () => {
       label: "Reports",
       value: "reports",
       content: <ReportList />,
+    },
+    {
+      label: "Availability",
+      value: "availability",
+      content: <AvailabilitySettings />,
     },
   ];
 

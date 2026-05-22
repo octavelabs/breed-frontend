@@ -393,15 +393,20 @@ export const mentorshipService = {
   getMentorProfile: () => api.get('/mentorship/me/profile'),
   createMentorProfile: (data: { bio?: string; specializations?: string[]; maxDisciples?: number; sessionRate?: number }) =>
     api.post('/mentorship/me/profile', data),
-  updateMentorProfile: (data: { bio?: string; specializations?: string[]; maxDisciples?: number; isAccepting?: boolean }) =>
-    api.patch('/mentorship/me/profile', data),
+  updateMentorProfile: (data: {
+    bio?: string; specializations?: string[]; maxDisciples?: number; isAccepting?: boolean;
+    availabilitySchedule?: { days: number[]; startHour: number; endHour: number; slotDuration?: number; blockedDates?: string[] } | null;
+  }) => api.patch('/mentorship/me/profile', data),
   toggleBreak: (breakEndsAt?: string) =>
     api.post('/mentorship/me/break', { breakEndsAt }),
   getMentorStats: () => api.get('/mentorship/me/stats'),
 
   // ── Requests & lifecycle ──────────────────────────────────────────────────
-  requestMentorship: (mentorId: string, message?: string) =>
-    api.post('/mentorship/request', { mentorId, message }),
+  requestMentorship: (mentorId: string, message?: string, proposedSessionAt?: string, proposedTopic?: string) =>
+    api.post('/mentorship/request', { mentorId, message, proposedSessionAt, proposedTopic }),
+
+  getMentorAvailability: (mentorId: string, month?: string) =>
+    api.get<{ schedule: any; bookedSlots: { start: string; duration: number }[] }>(`/mentorship/mentors/${mentorId}/availability`, { params: { month } }),
   getMyMentorships: (params?: { role?: 'mentor' | 'disciple'; status?: string; page?: number; limit?: number }) =>
     api.get('/mentorship/me/mentorships', { params }),
   getIncomingRequests: (params?: { status?: string; page?: number; limit?: number }) =>
