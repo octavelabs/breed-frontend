@@ -7,7 +7,7 @@ import TakeABreakModal from './components/TakeABreakModal';
 import DisciplesList from './components/DisciplesList';
 import RequestsList from './components/RequestsList';
 import { HelpCircle } from 'lucide-react';
-import SessionsList from './components/sessionList';
+import { SessionCalendar } from './components/SessionCalendar';
 import AssessmentList from './components/AssessmentList';
 import ReportList from './components/ReportList';
 import { mentorshipService } from '@/lib/api-services';
@@ -16,6 +16,7 @@ const PreacherMentorship = () => {
   const [openModal, setOpenModal] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
   const [breakDaysLeft, setBreakDaysLeft] = useState(0);
+  const [discipleRefreshSignal, setDiscipleRefreshSignal] = useState(0);
 
   useEffect(() => {
     mentorshipService.getMentorProfile()
@@ -32,19 +33,19 @@ const PreacherMentorship = () => {
 
   const tabs = [
     {
-      label: "Disciples",
+      label: "Mentees",
       value: "disciples",
-      content: <DisciplesList />,
+      content: <DisciplesList refreshSignal={discipleRefreshSignal} />,
     },
     {
       label: "Requests",
       value: "requests",
-      content: <RequestsList />,
+      content: <RequestsList onRequestHandled={() => setDiscipleRefreshSignal((n) => n + 1)} />,
     },
     {
       label: "Sessions",
       value: "sessions",
-      content: <SessionsList />,
+      content: <SessionCalendar />,
     },
     {
       label: "Assessments",

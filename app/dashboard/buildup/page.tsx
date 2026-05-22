@@ -56,19 +56,19 @@ const HomePage = () => {
           </Link>
         </div>
 
-        {/* Say a Prayer Today */}
+        {/* Mentorship */}
         <div>
-          <Link href='/dashboard/buildup/mentorshipHub'>
-          <div className="bg-white rounded-2xl px-[28px] py-4 shadow-sm">
+          <Link href='/dashboard/mentorship'>
+          <div className="bg-white rounded-2xl px-[28px] py-4 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex gap-10 items-center">
               <div className="flex-1">
-                <p className="text-[10px] lg:text-sm text-gray-500 mb-2">Mentorship Hub</p>
+                <p className="text-[10px] lg:text-sm text-gray-500 mb-2">Mentorship</p>
                 <p className="text-xs lg:text-base font-bold leading-tight">
 Connect with a trusted mentor, schedule check-ins, receive tailored tasks, and track your spiritual growth step by step.                </p>
               </div>
               <img
                 src="/buildup_dashboard2.png"
-                alt="Prayer"
+                alt="Mentorship"
                 className="w-[132px] h-[132px] lg:w-[173px] lg:h-[171px] object-cover rounded-[20px]"
               />
             </div>

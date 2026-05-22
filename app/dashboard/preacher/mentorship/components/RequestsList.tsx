@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { SearchIcon, SlidersHorizontal, RefreshCw, Inbox } from "lucide-react";
+import { SearchIcon, SlidersHorizontal, RefreshCw, Inbox, X, MessageSquare } from "lucide-react";
 import Input from "@/app/components/Input";
 import AcceptModal from "./AcceptModal";
 import RejectModal from "./RejectModal";
@@ -42,7 +42,7 @@ const STATUS_CLASSES: Record<string, string> = {
   COMPLETED: "bg-[#F2F4F7] text-[#344054] border border-[#D0D5DD]",
 };
 
-const RequestsList: React.FC = () => {
+const RequestsList: React.FC<{ onRequestHandled?: () => void }> = ({ onRequestHandled }) => {
   const [pending, setPending] = useState<MentorshipRequest[]>([]);
   const [past, setPast] = useState<MentorshipRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ const RequestsList: React.FC = () => {
   const [pastSearch, setPastSearch] = useState("");
   const [selected, setSelected] = useState<MentorshipRequest | null>(null);
   const [modal, setModal] = useState<"accept" | "reject" | null>(null);
+  const [viewingMessage, setViewingMessage] = useState<MentorshipRequest | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -77,7 +78,10 @@ const RequestsList: React.FC = () => {
   const onModalClose = (refreshNeeded?: boolean) => {
     setModal(null);
     setSelected(null);
-    if (refreshNeeded) load();
+    if (refreshNeeded) {
+      load();
+      onRequestHandled?.();
+    }
   };
 
   const filterList = (list: MentorshipRequest[], q: string) =>
@@ -100,8 +104,19 @@ const RequestsList: React.FC = () => {
           </div>
         </div>
       </td>
-      <td className="px-4 py-3 text-xs text-[#60666B] max-w-[200px]">
-        <p className="truncate">{req.message ?? "—"}</p>
+      <td className="px-4 py-3 text-xs text-[#60666B] max-w-[200px] overflow-hidden">
+        {req.message ? (
+          <button
+            onClick={() => setViewingMessage(req)}
+            className="flex items-center gap-1.5 text-left hover:text-[#870BD6] transition-colors group w-full min-w-0"
+            title="Click to read full message"
+          >
+            <p className="truncate min-w-0 group-hover:text-[#870BD6]">{req.message}</p>
+            <MessageSquare size={12} className="shrink-0 opacity-50 group-hover:opacity-100" />
+          </button>
+        ) : (
+          <span className="text-[#B9C2CA]">No message</span>
+        )}
       </td>
       <td className="px-4 py-3 text-xs text-[#60666B] whitespace-nowrap">
         {new Date(req.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
@@ -144,6 +159,70 @@ const RequestsList: React.FC = () => {
         <RejectModal isOpen onClose={onModalClose} selectedRequest={selected} />
       )}
 
+      {/* Full message viewer */}
+      {viewingMessage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setViewingMessage(null)}
+        >
+          <div
+            className="w-full max-w-md bg-white rounded-[20px] shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-5 border-b border-gray-200 flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
+                  {`${viewingMessage.disciple.firstName[0]}${viewingMessage.disciple.lastName[0]}`.toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-bold text-[#180426] text-sm leading-tight">
+                    {viewingMessage.disciple.firstName} {viewingMessage.disciple.lastName}
+                  </p>
+                  {viewingMessage.disciple.username && (
+                    <p className="text-xs text-[#60666B]">@{viewingMessage.disciple.username}</p>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => setViewingMessage(null)}
+                className="p-1 rounded-full hover:bg-gray-100 text-gray-400"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wide mb-3">Message</p>
+              <p className="text-sm text-[#292A2B] leading-relaxed whitespace-pre-wrap">
+                {viewingMessage.message}
+              </p>
+              <p className="text-xs text-[#60666B] mt-4">
+                Sent {new Date(viewingMessage.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric", month: "long", year: "numeric",
+                })}
+              </p>
+              {viewingMessage.status === "PENDING" && (
+                <div className="flex gap-3 mt-5">
+                  <Button
+                    buttonType="bordered"
+                    customClass="!w-1/2 !h-[40px] !text-xs !border-red-300 !text-red-600"
+                    onClick={() => { setViewingMessage(null); openModal(viewingMessage, "reject"); }}
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    buttonType="custom"
+                    customClass="!w-1/2 !h-[40px] !text-xs !bg-[#1FA564] text-white"
+                    onClick={() => { setViewingMessage(null); openModal(viewingMessage, "accept"); }}
+                  >
+                    Accept
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pending */}
       <div className="bg-white mx-4 lg:mx-10 border border-[#E3E8EF] rounded-2xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 justify-between my-5 mx-6">
@@ -171,7 +250,14 @@ const RequestsList: React.FC = () => {
           <EmptyState label="No pending requests" />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
+              <colgroup>
+                <col className="w-[30%]" />
+                <col className="w-[30%]" />
+                <col className="w-[15%]" />
+                <col className="w-[12%]" />
+                <col className="w-[13%]" />
+              </colgroup>
               <thead className="bg-[#F8FAFC] border-y border-[#E3E8EF]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#60666B]">Believer</th>
@@ -211,7 +297,13 @@ const RequestsList: React.FC = () => {
           <EmptyState label="No past requests" />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
+              <colgroup>
+                <col className="w-[30%]" />
+                <col className="w-[38%]" />
+                <col className="w-[17%]" />
+                <col className="w-[15%]" />
+              </colgroup>
               <thead className="bg-[#F8FAFC] border-y border-[#E3E8EF]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#60666B]">Believer</th>

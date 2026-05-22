@@ -37,7 +37,7 @@ function Avatar({ user }: { user: { firstName: string; lastName: string; avatarU
   );
 }
 
-const DisciplesList: React.FC = () => {
+const DisciplesList: React.FC<{ refreshSignal?: number }> = ({ refreshSignal }) => {
   const [disciples, setDisciples] = useState<Disciple[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -45,7 +45,7 @@ const DisciplesList: React.FC = () => {
 
   const load = useCallback(() => {
     setLoading(true);
-    mentorshipService.getDisciples({ limit: 50 })
+    mentorshipService.getDisciples({ status: "ACTIVE", limit: 50 })
       .then((res: any) => {
         const data = res?.data ?? res;
         setDisciples(Array.isArray(data) ? data : []);
@@ -55,7 +55,7 @@ const DisciplesList: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); }, [load, refreshSignal]);
 
   const filtered = disciples.filter((d) => {
     const name = `${d.disciple.firstName} ${d.disciple.lastName}`.toLowerCase();
@@ -66,7 +66,7 @@ const DisciplesList: React.FC = () => {
     <div className="bg-white mx-4 lg:mx-10 border border-[#E3E8EF] rounded-[16px]">
       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 justify-between my-[21px] mx-6">
         <h2 className="text-lg font-semibold text-gray-900">
-          Disciples
+          Mentees
           <span className="ml-2 text-[#60666B] font-normal text-sm">({total})</span>
         </h2>
         <div className="flex items-center gap-3">
@@ -98,15 +98,15 @@ const DisciplesList: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
             <Users size={22} className="text-[#870BD6]" />
           </div>
-          <p className="text-sm font-semibold text-gray-700">No disciples yet</p>
-          <p className="text-xs text-[#60666B]">Accept mentorship requests to start discipling believers.</p>
+          <p className="text-sm font-semibold text-gray-700">No mentees yet</p>
+          <p className="text-xs text-[#60666B]">Accept mentorship requests to start mentoring believers.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-[#F8FAFC] border-y border-[#E3E8EF]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-[#60666B]">Disciple</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-[#60666B]">Mentee</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#60666B]">Since</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#60666B]">Sessions</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[#60666B]">Tasks</th>

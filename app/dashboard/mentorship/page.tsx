@@ -1,10 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { mentorshipService } from '@/lib/api-services';
-import { Search, Users, Star, ChevronRight, Inbox, X, CheckCircle, RefreshCw } from 'lucide-react';
-import Button from '@/app/components/Button';
+import { Search, Users, Star, ChevronRight, Inbox, RefreshCw, Calendar, Clock, Video } from 'lucide-react';
 
 interface MentorProfile {
   bio?: string | null;
@@ -39,6 +39,16 @@ interface MyMentorship {
   };
 }
 
+interface UpcomingSession {
+  id: string;
+  title: string;
+  scheduledAt: string;
+  duration: number;
+  status: string;
+  meetingLink?: string | null;
+  mentor: { id: string; firstName: string; lastName: string };
+}
+
 const STATUS_CLASSES: Record<string, string> = {
   PENDING:   'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]',
   ACTIVE:    'bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]',
@@ -66,124 +76,15 @@ function Avatar({
   );
 }
 
-function RequestModal({
-  mentor,
-  onClose,
-  onSuccess,
-}: {
-  mentor: Mentor;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
-
-  const canSubmit = message.trim().length >= 10;
-
-  const handleSubmit = async () => {
-    if (!canSubmit) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await mentorshipService.requestMentorship(mentor.id, message.trim());
-      setSent(true);
-    } catch (err: any) {
-      setError(err?.message ?? 'Failed to send request. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => { if (sent) onSuccess(); else onClose(); }}>
-      <div className="w-full max-w-md bg-white rounded-[20px] shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="px-6 py-5 border-b border-gray-200 flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar user={mentor} size="md" />
-            <div>
-              <p className="font-bold text-[#180426] leading-tight">{mentor.firstName} {mentor.lastName}</p>
-              {mentor.username && <p className="text-xs text-[#60666B]">@{mentor.username}</p>}
-            </div>
-          </div>
-          <button onClick={() => { if (sent) onSuccess(); else onClose(); }} className="p-1 rounded-full hover:bg-gray-100 text-gray-400">
-            <X size={20} />
-          </button>
-        </div>
-
-        {sent ? (
-          <div className="p-8 flex flex-col items-center text-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#D6FBE9] border-[6px] border-[#ECFDF3] flex items-center justify-center">
-              <CheckCircle size={28} className="text-[#1A8454]" />
-            </div>
-            <h2 className="text-xl font-bold text-[#180426]">Request Sent!</h2>
-            <p className="text-sm text-[#60666B]">
-              Your mentorship request has been sent to{' '}
-              <span className="font-semibold text-[#180426]">{mentor.firstName}</span>.{' '}
-              You'll be notified once they respond.
-            </p>
-            {mentor.mentorProfile?.specializations?.length ? (
-              <div className="flex flex-wrap gap-1.5 justify-center mt-1">
-                {mentor.mentorProfile.specializations.slice(0, 4).map((s) => (
-                  <span key={s} className="text-xs bg-[#F5EBFF] text-[#870BD6] px-3 py-1 rounded-full">{s}</span>
-                ))}
-              </div>
-            ) : null}
-            <Button onClick={onSuccess} customClass="!w-full !text-white mt-2">Done</Button>
-          </div>
-        ) : (
-          <div className="p-6 space-y-4">
-            <div>
-              <p className="text-[17px] font-bold text-[#180426]">Request Mentorship</p>
-              <p className="text-sm text-[#60666B] mt-0.5">
-                Introduce yourself and tell {mentor.firstName} what you're hoping to grow in.
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#180426] mb-1.5">
-                Your message{' '}
-                <span className="text-[#60666B] font-normal">(10–500 characters)</span>
-              </label>
-              <textarea
-                rows={5}
-                value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, 500))}
-                placeholder={`e.g. "Hi ${mentor.firstName}, I'm looking for a mentor to help me grow in my prayer life and understanding of Scripture…"`}
-                className="w-full border border-[#B9C2CA] rounded-[10px] px-4 py-3 text-sm text-[#180426] placeholder:text-[#B9C2CA] resize-none focus:outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]"
-              />
-              <p className="text-xs text-[#60666B] text-right mt-1">{message.length}/500</p>
-            </div>
-            {error && <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-            <div className="flex gap-3 pt-1">
-              <Button buttonType="bordered" customClass="!w-1/2 !h-[48px] !border-[#60666B] !text-[#60666B]" onClick={onClose} disabled={loading}>
-                Cancel
-              </Button>
-              <Button customClass="!w-1/2 !h-[48px] !text-white" loading={loading} disabled={!canSubmit} onClick={handleSubmit}>
-                Send Request
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function MentorCard({
-  mentor,
-  alreadyRequested,
-  onRequest,
-}: {
-  mentor: Mentor;
-  alreadyRequested: boolean;
-  onRequest: () => void;
-}) {
+function MentorCard({ mentor, onClick }: { mentor: Mentor; onClick: () => void }) {
   const specs = mentor.mentorProfile?.specializations ?? [];
   const initials = `${mentor.firstName[0]}${mentor.lastName[0]}`.toUpperCase();
 
   return (
-    <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+    <div
+      onClick={onClick}
+      className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow cursor-pointer"
+    >
       <div className="flex items-start gap-3">
         {mentor.avatarUrl ? (
           <img src={mentor.avatarUrl} alt={mentor.firstName} className="w-14 h-14 rounded-full object-cover shrink-0" />
@@ -232,33 +133,24 @@ function MentorCard({
       )}
 
       <div className="mt-auto pt-1">
-        {alreadyRequested ? (
-          <div className="w-full h-10 flex items-center justify-center bg-[#F5EBFF] rounded-full text-sm font-medium text-[#870BD6]">
-            Request Sent
-          </div>
-        ) : (
-          <button
-            onClick={onRequest}
-            className="w-full h-10 flex items-center justify-center gap-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full hover:opacity-90 transition-opacity"
-          >
-            Request Mentorship
-            <ChevronRight size={14} />
-          </button>
-        )}
+        <div className="w-full h-10 flex items-center justify-center gap-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full">
+          View Profile
+          <ChevronRight size={14} />
+        </div>
       </div>
     </div>
   );
 }
 
 const MentorshipPage = () => {
+  const router = useRouter();
   const [tab, setTab] = useState<'discover' | 'my'>('discover');
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [myMentorships, setMyMentorships] = useState<MyMentorship[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>([]);
   const [loadingMentors, setLoadingMentors] = useState(true);
   const [loadingMy, setLoadingMy] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
-  const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set());
 
   const loadMentors = useCallback(() => {
     setLoadingMentors(true);
@@ -273,14 +165,22 @@ const MentorshipPage = () => {
 
   const loadMyMentorships = useCallback(() => {
     setLoadingMy(true);
-    mentorshipService.getMyMentorships({ role: 'disciple', limit: 50 })
-      .then((res: any) => {
-        const data = res?.data ?? res;
-        const list: MyMentorship[] = Array.isArray(data) ? data : [];
-        setMyMentorships(list);
-        setRequestedIds(new Set(list.map((m) => m.mentor.id)));
+    Promise.all([
+      mentorshipService.getMyMentorships({ role: 'disciple', limit: 50 }),
+      mentorshipService.getMySessions({ limit: 50 }),
+    ])
+      .then(([mRes, sRes]: any[]) => {
+        const mData = mRes?.data ?? mRes;
+        setMyMentorships(Array.isArray(mData) ? mData : []);
+        const sData = sRes?.data ?? sRes;
+        const now = new Date();
+        const upcoming = (Array.isArray(sData) ? sData : []).filter(
+          (s: any) => (s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS') && new Date(s.scheduledAt) >= now,
+        );
+        upcoming.sort((a: any, b: any) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+        setUpcomingSessions(upcoming);
       })
-      .catch(() => setMyMentorships([]))
+      .catch(() => { setMyMentorships([]); setUpcomingSessions([]); })
       .finally(() => setLoadingMy(false));
   }, []);
 
@@ -299,25 +199,8 @@ const MentorshipPage = () => {
     );
   });
 
-  const handleRequestSuccess = () => {
-    if (selectedMentor) {
-      setRequestedIds((prev) => new Set([...prev, selectedMentor.id]));
-    }
-    setSelectedMentor(null);
-    loadMyMentorships();
-    setTab('my');
-  };
-
   return (
     <DashboardLayout>
-      {selectedMentor && (
-        <RequestModal
-          mentor={selectedMentor}
-          onClose={() => setSelectedMentor(null)}
-          onSuccess={handleRequestSuccess}
-        />
-      )}
-
       <div className="pb-10">
         <div className="mb-6">
           <h1 className="text-2xl lg:text-[28px] font-bold text-[#180426]">Mentorship</h1>
@@ -373,8 +256,7 @@ const MentorshipPage = () => {
                   <MentorCard
                     key={mentor.id}
                     mentor={mentor}
-                    alreadyRequested={requestedIds.has(mentor.id)}
-                    onRequest={() => setSelectedMentor(mentor)}
+                    onClick={() => router.push(`/dashboard/mentorship/${mentor.id}`)}
                   />
                 ))}
               </div>
@@ -413,35 +295,94 @@ const MentorshipPage = () => {
                 </button>
               </div>
             ) : (
-              myMentorships.map((m) => (
-                <div key={m.id} className="bg-white border border-[#E3E8EF] rounded-2xl p-4 flex items-center gap-4">
-                  <Avatar user={m.mentor} size="lg" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-[#180426]">{m.mentor.firstName} {m.mentor.lastName}</p>
-                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${STATUS_CLASSES[m.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                        {m.status.toLowerCase()}
-                      </span>
-                    </div>
-                    {m.mentor.username && <p className="text-xs text-[#60666B]">@{m.mentor.username}</p>}
-                    {m.mentor.mentorProfile?.specializations?.length ? (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {m.mentor.mentorProfile.specializations.slice(0, 3).map((s) => (
-                          <span key={s} className="text-[10px] bg-[#F5EBFF] text-[#870BD6] px-2 py-0.5 rounded-full">{s}</span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="text-xs text-[#60666B] text-right shrink-0">
-                    <p>Since</p>
-                    <p className="font-medium text-[#180426]">
-                      {new Date(m.startedAt ?? m.createdAt).toLocaleDateString('en-GB', {
-                        day: 'numeric', month: 'short', year: 'numeric',
+              <>
+                {/* Upcoming sessions */}
+                {upcomingSessions.length > 0 && (
+                  <div className="mb-2">
+                    <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wide mb-2">Upcoming Sessions</p>
+                    <div className="space-y-2">
+                      {upcomingSessions.map((s) => {
+                        const scheduledAt = new Date(s.scheduledAt);
+                        return (
+                          <div key={s.id} className="bg-white border border-[#E3E8EF] rounded-2xl p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] flex items-center justify-center shrink-0">
+                                <Calendar size={18} className="text-[#870BD6]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm text-[#180426]">{s.title}</p>
+                                <p className="text-xs text-[#60666B] mt-0.5">
+                                  with {s.mentor.firstName} {s.mentor.lastName}
+                                </p>
+                                <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                                  <span className="flex items-center gap-1 text-xs text-[#60666B]">
+                                    <Calendar size={11} />
+                                    {scheduledAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  </span>
+                                  <span className="flex items-center gap-1 text-xs text-[#60666B]">
+                                    <Clock size={11} />
+                                    {scheduledAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                  <span className="text-xs text-[#60666B]">{s.duration} min</span>
+                                </div>
+                              </div>
+                              {s.meetingLink && (
+                                <a
+                                  href={s.meetingLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-xs font-medium rounded-full shrink-0 hover:opacity-90 transition-opacity"
+                                >
+                                  <Video size={11} />
+                                  Join
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        );
                       })}
-                    </p>
+                    </div>
+                    <hr className="my-4 border-[#E3E8EF]" />
                   </div>
-                </div>
-              ))
+                )}
+
+                {/* Mentorship relationships */}
+                <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wide mb-2">Mentors</p>
+                {myMentorships.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => router.push(`/dashboard/mentorship/${m.mentor.id}`)}
+                    className="w-full bg-white border border-[#E3E8EF] rounded-2xl p-4 flex items-center gap-4 hover:shadow-sm transition-shadow text-left"
+                  >
+                    <Avatar user={m.mentor} size="lg" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-[#180426]">{m.mentor.firstName} {m.mentor.lastName}</p>
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${STATUS_CLASSES[m.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                          {m.status.toLowerCase()}
+                        </span>
+                      </div>
+                      {m.mentor.username && <p className="text-xs text-[#60666B]">@{m.mentor.username}</p>}
+                      {m.mentor.mentorProfile?.specializations?.length ? (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {m.mentor.mentorProfile.specializations.slice(0, 3).map((s) => (
+                            <span key={s} className="text-[10px] bg-[#F5EBFF] text-[#870BD6] px-2 py-0.5 rounded-full">{s}</span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="text-xs text-[#60666B] text-right shrink-0">
+                      <p>Since</p>
+                      <p className="font-medium text-[#180426]">
+                        {new Date(m.startedAt ?? m.createdAt).toLocaleDateString('en-GB', {
+                          day: 'numeric', month: 'short', year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </>
             )}
           </div>
         )}

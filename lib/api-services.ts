@@ -407,7 +407,7 @@ export const mentorshipService = {
   getIncomingRequests: (params?: { status?: string; page?: number; limit?: number }) =>
     api.get('/mentorship/requests', { params }),
   getDisciples: (params?: { status?: string; page?: number; limit?: number }) =>
-    api.get('/mentorship/me/mentorships', { params: { role: 'mentor', ...params } }),
+    api.get('/mentorship/me/mentees', { params }),
   getMentorship: (id: string) => api.get(`/mentorship/${id}`),
   respondToRequest: (id: string, action: 'accept' | 'reject', rejectionReason?: string) =>
     api.post(`/mentorship/${id}/respond`, { action, rejectionReason }),
@@ -420,6 +420,8 @@ export const mentorshipService = {
     api.get('/mentorship/me/sessions', { params }),
   createSession: (data: { mentorshipId: string; discipleId: string; title: string; scheduledAt: string; duration?: number; meetingLink?: string }) =>
     api.post('/mentorship/sessions', data),
+  updateSession: (id: string, data: { scheduledAt?: string; meetingLink?: string; title?: string; duration?: number }) =>
+    api.patch(`/mentorship/sessions/${id}`, data),
   cancelSession: (id: string) => api.post(`/mentorship/sessions/${id}/cancel`),
   completeSession: (id: string) => api.post(`/mentorship/sessions/${id}/complete`),
 
