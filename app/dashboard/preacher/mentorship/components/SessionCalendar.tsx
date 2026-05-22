@@ -9,6 +9,8 @@ import {
   Clock4,
   X,
   ExternalLink,
+  Users,
+  Video,
   Plus,
   Link,
 } from "lucide-react";
