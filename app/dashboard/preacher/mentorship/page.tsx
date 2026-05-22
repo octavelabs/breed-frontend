@@ -48,7 +48,7 @@ const PreacherMentorship = () => {
       value: "sessions",
       content: (
         <div className="mx-4 lg:mx-10 pb-6">
-          <SessionCalendar />
+          <SessionCalendar refreshSignal={discipleRefreshSignal} />
         </div>
       ),
     },
