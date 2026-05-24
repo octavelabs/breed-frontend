@@ -502,47 +502,33 @@ export const mentorshipService = {
 // ── Accountability services ────────────────────────────────────────────────────
 
 export const accountabilityService = {
-  createGroup: (data: {
-    name: string;
-    description?: string;
+  createPartnership: (data: {
+    email?: string;
+    username?: string;
+    prayerDays: string[];
+    prayerTime: string;
     timezone?: string;
-    frequency?: string;
-    prayerDays?: string[];
-    prayerTime?: string;
-    focusTopics?: string[];
-  }) => api.post('/accountability/groups', data),
+  }) => api.post('/accountability/partnerships', data),
 
-  getMyGroups: () => api.get('/accountability/groups'),
+  getMyPartnerships: () => api.get('/accountability/partnerships'),
 
-  getGroupById: (id: string) => api.get(`/accountability/groups/${id}`),
+  getPartnershipById: (id: string) => api.get(`/accountability/partnerships/${id}`),
 
-  updateGroup: (id: string, data: Record<string, unknown>) =>
-    api.patch(`/accountability/groups/${id}`, data),
+  updatePartnership: (id: string, data: { prayerDays?: string[]; prayerTime?: string; timezone?: string }) =>
+    api.patch(`/accountability/partnerships/${id}`, data),
 
-  deleteGroup: (id: string) => api.delete(`/accountability/groups/${id}`),
-
-  inviteMember: (groupId: string, data: { email: string; username?: string }) =>
-    api.post(`/accountability/groups/${groupId}/invite`, data),
+  endPartnership: (id: string) => api.delete(`/accountability/partnerships/${id}`),
 
   getInviteInfo: (token: string) => api.get(`/accountability/join/${token}`),
 
   acceptInvite: (token: string) => api.post(`/accountability/join/${token}`),
 
-  checkin: (groupId: string, note?: string) =>
-    api.post(`/accountability/groups/${groupId}/checkin`, { note }),
+  startPrayerSession: (partnershipId: string) =>
+    api.post(`/accountability/partnerships/${partnershipId}/start-session`),
 
-  getCheckins: (groupId: string, params?: { page?: number; limit?: number }) =>
-    api.get(`/accountability/groups/${groupId}/checkins`, { params }),
+  leaveSession: (sessionId: string) =>
+    api.post(`/accountability/sessions/${sessionId}/leave`),
 
-  getStreaks: (groupId: string) =>
-    api.get(`/accountability/groups/${groupId}/streaks`),
-
-  createPrayerRequest: (groupId: string, content: string) =>
-    api.post(`/accountability/groups/${groupId}/prayer-requests`, { content }),
-
-  getPrayerRequests: (groupId: string, params?: { page?: number; limit?: number }) =>
-    api.get(`/accountability/groups/${groupId}/prayer-requests`, { params }),
-
-  markPrayerRequestAnswered: (requestId: string) =>
-    api.patch(`/accountability/prayer-requests/${requestId}/answered`),
+  getStreaks: (partnershipId: string) =>
+    api.get(`/accountability/partnerships/${partnershipId}/streaks`),
 };

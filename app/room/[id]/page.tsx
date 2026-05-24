@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { accountabilityService } from "@/lib/api-services";
 import {
   Mic, MicOff, Video, VideoOff, Monitor, MonitorOff,
   MessageSquare, Phone, Users, ArrowLeft, Send, X, Pin,
@@ -125,6 +126,8 @@ function CtrlBtn({
 
 export default function RoomPage() {
   const { id: meetingId } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const prayerSessionId = searchParams.get("session");
 
   const {
     participants, localStream, rawLocalStream,
@@ -140,6 +143,13 @@ export default function RoomPage() {
   const [pinnedId, setPinnedId]               = useState<string | null>(null);
   const [chatInput, setChatInput]             = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const handleLeave = useCallback(() => {
+    if (prayerSessionId) {
+      accountabilityService.leaveSession(prayerSessionId).catch(() => {});
+    }
+    leave();
+  }, [prayerSessionId, leave]);
 
   const openChat = (open: boolean) => {
     setShowChat(open);
@@ -178,7 +188,7 @@ export default function RoomPage() {
             <div key={i} className="w-2 h-2 rounded-full bg-[#870BD6] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </div>
-        <button onClick={leave} className="mt-4 text-white/40 text-sm hover:text-white/70 flex items-center gap-2 transition-colors">
+        <button onClick={handleLeave} className="mt-4 text-white/40 text-sm hover:text-white/70 flex items-center gap-2 transition-colors">
           <ArrowLeft size={14} /> Cancel
         </button>
       </div>
@@ -191,7 +201,7 @@ export default function RoomPage() {
         <WifiOff size={40} className="text-red-400" />
         <p className="text-white font-semibold text-lg">Connection failed</p>
         <p className="text-white/50 text-sm max-w-xs">{connectionError}</p>
-        <button onClick={leave} className="mt-4 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm transition-colors">
+        <button onClick={handleLeave} className="mt-4 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm transition-colors">
           Go back
         </button>
       </div>
@@ -204,7 +214,7 @@ export default function RoomPage() {
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <div className="h-14 px-3 lg:px-5 flex items-center justify-between shrink-0 border-b border-white/5 bg-[#100228]/80 backdrop-blur-sm gap-3">
         <div className="flex items-center gap-2 min-w-0">
-          <button onClick={leave} className="p-2 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-colors shrink-0">
+          <button onClick={handleLeave} className="p-2 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-colors shrink-0">
             <ArrowLeft size={16} />
           </button>
           <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#870BD6] to-[#5B26B1] flex items-center justify-center shrink-0">
@@ -391,7 +401,7 @@ export default function RoomPage() {
 
           <div className="w-px h-8 bg-white/10 mx-1 shrink-0" />
 
-          <button onClick={leave}
+          <button onClick={handleLeave}
             className="flex items-center gap-2 bg-red-500 active:bg-red-700 text-white font-bold rounded-full px-4 lg:px-6 py-2.5 transition-colors duration-150 shadow-lg shadow-red-900/40 shrink-0 text-sm touch-manipulation"
             style={{ WebkitTapHighlightColor: "transparent" }}>
             <Phone size={15} className="rotate-[135deg]" />

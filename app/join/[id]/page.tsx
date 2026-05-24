@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Video } from "lucide-react";
 
 export default function JoinRedirectPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    router.replace(`/room/${id}`);
-  }, [id, router]);
+    const session = searchParams.get("session");
+    const dest = session ? `/room/${id}?session=${session}` : `/room/${id}`;
+    router.replace(dest);
+  }, [id, router, searchParams]);
 
   return (
     <div className="fixed inset-0 bg-[#0d0d1a] flex flex-col items-center justify-center gap-4">
