@@ -220,6 +220,8 @@ export const devotionalService = {
     page?: number;
     limit?: number;
     categoryId?: string;
+    authorId?: string;
+    search?: string;
   }) => api.get('/devotionals', { params }),
 
   getToday: () => api.get('/devotionals/today'),
@@ -230,7 +232,8 @@ export const devotionalService = {
 
   toggleBookmark: (id: string) => api.post(`/devotionals/${id}/bookmark`),
 
-  getBookmarks: () => api.get('/devotionals/me/bookmarks'),
+  getBookmarks: (params?: { page?: number; limit?: number }) =>
+    api.get('/devotionals/me/bookmarks', { params }),
 
   react: (id: string, type: string) =>
     api.post(`/devotionals/${id}/react`, { type }),
@@ -239,6 +242,36 @@ export const devotionalService = {
 
   addComment: (id: string, content: string, parentId?: string) =>
     api.post(`/devotionals/${id}/comments`, { content, parentId }),
+
+  // Subscriptions
+  getFeed: (params?: { page?: number; limit?: number }) =>
+    api.get('/devotionals/me/feed', { params }),
+
+  getMySubscriptions: () => api.get('/devotionals/me/subscriptions'),
+
+  toggleSubscription: (authorId: string) =>
+    api.post(`/devotionals/authors/${authorId}/subscribe`),
+
+  getAuthorStats: (authorId: string) =>
+    api.get(`/devotionals/authors/${authorId}`),
+
+  // Preacher: create / update
+  create: (data: {
+    title: string;
+    content: string;
+    excerpt?: string;
+    categoryId?: string;
+    bibleReference?: string;
+    tags?: string[];
+    status?: string;
+    coverImageUrl?: string;
+    estimatedMinutes?: number;
+  }) => api.post('/devotionals', data),
+
+  update: (id: string, data: Record<string, unknown>) =>
+    api.patch(`/devotionals/${id}`, data),
+
+  getCategories: () => api.get('/devotionals/categories'),
 };
 
 // ── Community services ─────────────────────────────────────────────────────────
@@ -316,7 +349,21 @@ export const prayerService = {
 
   pray: (id: string) => api.post(`/prayer/requests/${id}/pray`),
 
-  getBulletins: () => api.get('/prayer/bulletins'),
+  getBulletins: (params?: { page?: number; limit?: number }) =>
+    api.get('/prayer/bulletins', { params }),
+
+  getTodaysBulletin: () => api.get('/prayer/bulletins/today'),
+
+  getBulletinById: (id: string) => api.get(`/prayer/bulletins/${id}`),
+
+  getBulletinsByCategory: (category: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/prayer/bulletins/category/${category}`, { params }),
+
+  toggleBulletinBookmark: (id: string) =>
+    api.post(`/prayer/bulletins/${id}/bookmark`),
+
+  getBulletinBookmarks: (params?: { page?: number; limit?: number }) =>
+    api.get('/prayer/bulletins/bookmarks', { params }),
 
   getStats: () => api.get('/prayer/stats'),
 };
@@ -450,4 +497,52 @@ export const mentorshipService = {
   getMyReports: (params?: { page?: number; limit?: number }) =>
     api.get('/mentorship/me/reports', { params }),
   generateReport: (mentorshipId: string) => api.post(`/mentorship/${mentorshipId}/report`),
+};
+
+// ── Accountability services ────────────────────────────────────────────────────
+
+export const accountabilityService = {
+  createGroup: (data: {
+    name: string;
+    description?: string;
+    timezone?: string;
+    frequency?: string;
+    prayerDays?: string[];
+    prayerTime?: string;
+    focusTopics?: string[];
+  }) => api.post('/accountability/groups', data),
+
+  getMyGroups: () => api.get('/accountability/groups'),
+
+  getGroupById: (id: string) => api.get(`/accountability/groups/${id}`),
+
+  updateGroup: (id: string, data: Record<string, unknown>) =>
+    api.patch(`/accountability/groups/${id}`, data),
+
+  deleteGroup: (id: string) => api.delete(`/accountability/groups/${id}`),
+
+  inviteMember: (groupId: string, data: { email: string; username?: string }) =>
+    api.post(`/accountability/groups/${groupId}/invite`, data),
+
+  getInviteInfo: (token: string) => api.get(`/accountability/join/${token}`),
+
+  acceptInvite: (token: string) => api.post(`/accountability/join/${token}`),
+
+  checkin: (groupId: string, note?: string) =>
+    api.post(`/accountability/groups/${groupId}/checkin`, { note }),
+
+  getCheckins: (groupId: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/accountability/groups/${groupId}/checkins`, { params }),
+
+  getStreaks: (groupId: string) =>
+    api.get(`/accountability/groups/${groupId}/streaks`),
+
+  createPrayerRequest: (groupId: string, content: string) =>
+    api.post(`/accountability/groups/${groupId}/prayer-requests`, { content }),
+
+  getPrayerRequests: (groupId: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/accountability/groups/${groupId}/prayer-requests`, { params }),
+
+  markPrayerRequestAnswered: (requestId: string) =>
+    api.patch(`/accountability/prayer-requests/${requestId}/answered`),
 };

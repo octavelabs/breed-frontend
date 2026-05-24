@@ -1,89 +1,62 @@
-import FlameIcon from "@/app/assets/icons/flame";
-import DashboardLayout from "@/app/layout/DashboardLayout"
-import { ChevronRight, Clock } from "lucide-react";
-import Link from "next/link";
+'use client';
 
+import { Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import DashboardLayout from '@/app/layout/DashboardLayout';
+import AccountabilityTab from './components/AccountabilityTab';
+import DevotionalsTab from './components/DevotionalsTab';
+import PrayerBullletinsTab from './components/PrayerBullletinsTab';
 
-const HomePage = () => {
-    return (
-        <DashboardLayout>
-            <div className="mx-auto">
-      <h1 className="text-[24px] lg:text-[32px] leading-none font-bold mb-8">Build Up</h1>
-<h3 className="text-xl font-bold text-gray-900 mb-2">For Today</h3>
-      <div 
-        className="relative rounded-2xl px-[30px] py-[23px] lg:py-[75px] shadow-lg cursor-pointer overflow-hidden h-64"
-        style={{
-          backgroundImage: `url('/dashboard-gratitude.png')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-        }}
-      >
-        <div className="text-white">
-          <h2 className="text-[20px] lg:text-[24px] font-bold mb-2 lg:mb-1 leading-tight">Strength to Endure: A Prayer for Perseverance</h2>
-          <p className="text-base lg:text-[20px] mb-4">
-            Lord, grant me the strength and steadfast spirit to persevere through trials, not giving up in the face of delay, difficulty, or discouragement. 
-          </p>
-        
-          <button className="flex items-center gap-2 font-semibold hover:gap-3 transition-all">
-            <span className="text-base lg:text-[20px] leading-none">James 1:12 (NIV)</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
-       
+const TABS = [
+  { id: 'accountability', label: 'Accountability' },
+  { id: 'devotionals', label: 'Devotionals' },
+  { id: 'bulletins', label: 'Prayer Bulletins' },
+];
+
+function BuildupContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const activeTab = searchParams.get('tab') ?? 'accountability';
+
+  const setTab = (tab: string) => {
+    router.push(`/dashboard/buildup?tab=${tab}`);
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="mx-auto">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold mb-6">Build Up</h1>
+
+        {/* Tab bar */}
+        <div className="flex gap-1 bg-gray-100 rounded-2xl p-1 mb-8 w-fit">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setTab(tab.id)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                activeTab === tab.id
+                  ? 'bg-white text-[#870BD6] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
+
+        {/* Tab content */}
+        {activeTab === 'accountability' && <AccountabilityTab />}
+        {activeTab === 'devotionals' && <DevotionalsTab />}
+        {activeTab === 'bulletins' && <PrayerBullletinsTab />}
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-[48px] mb-8">
-        {/* Suggested Course */}
-        <div>
-          <Link href='/dashboard/buildup/prayerBulletin'>
-          <div 
-            className="bg-white rounded-2xl px-[28px] py-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-          >
-            <div className="flex gap-10 items-center">
-              <div className="flex-1">
-                <p className="text-[10px] lg:text-sm text-gray-500 mb-2">Prayer Bulletin</p>
-                <p className="text-xs lg:text-base leading-tight font-bold">
-                  Your Prayer Bulletin is here filled with focused prayer points, scriptures, and spiritual prompts to guide your prayer time.
-                </p>
-              </div>
-              <img
-                src="/buildup_dashboard.jpg"
-                alt="Course"
-                className="w-[132px] h-[132px] lg:w-[173px] lg:h-[171px] object-cover rounded-[20px]"
-              />
-            </div>
-          </div>
-          </Link>
-        </div>
-
-        {/* Mentorship */}
-        <div>
-          <Link href='/dashboard/mentorship'>
-          <div className="bg-white rounded-2xl px-[28px] py-4 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex gap-10 items-center">
-              <div className="flex-1">
-                <p className="text-[10px] lg:text-sm text-gray-500 mb-2">Mentorship</p>
-                <p className="text-xs lg:text-base font-bold leading-tight">
-Connect with a trusted mentor, schedule check-ins, receive tailored tasks, and track your spiritual growth step by step.                </p>
-              </div>
-              <img
-                src="/buildup_dashboard2.png"
-                alt="Mentorship"
-                className="w-[132px] h-[132px] lg:w-[173px] lg:h-[171px] object-cover rounded-[20px]"
-              />
-            </div>
-          </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Featured Article */}
-      
-      
-      
-    </div>
-        </DashboardLayout>
-    )
+    </DashboardLayout>
+  );
 }
 
-export default HomePage
+export default function BuildupPage() {
+  return (
+    <Suspense fallback={<DashboardLayout><div className="animate-pulse h-8 bg-gray-100 rounded w-48 mb-6" /></DashboardLayout>}>
+      <BuildupContent />
+    </Suspense>
+  );
+}
