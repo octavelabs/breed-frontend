@@ -5,9 +5,10 @@ import {
   Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
   CheckCircle, Calendar, Trash2,
 } from 'lucide-react';
-import { accountabilityService } from '@/lib/api-services';
+import { accountabilityService, userService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import Button from '@/app/components/Button';
 
 const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 const DAY_LABELS: Record<string, string> = {
@@ -44,6 +45,14 @@ interface Partnership {
   createdAt: string;
 }
 
+interface UserSuggestion {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+}
+
 export default function AccountabilityTab() {
   const { user } = useAuth();
   const router = useRouter();
@@ -52,7 +61,6 @@ export default function AccountabilityTab() {
   const [selected, setSelected] = useState<Partnership | null>(null);
   const [showCreate, setShowCreate] = useState(false);
 
-  // suppress unused warning
   void user;
 
   const load = useCallback(async () => {
@@ -96,17 +104,10 @@ export default function AccountabilityTab() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Prayer Partners</h2>
-          <p className="text-sm text-gray-500 mt-1">1-on-1 live prayer sessions with your partner</p>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#870BD6] text-white rounded-full text-sm font-semibold hover:bg-[#7009b8] transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Partner
-        </button>
+        <p className="text-sm text-gray-500">1-on-1 live prayer sessions with your partner</p>
+        <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-5 !h-[44px] !text-white">
+          <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />Add Partner</p>
+        </Button>
       </div>
 
       {loading ? (
@@ -114,20 +115,17 @@ export default function AccountabilityTab() {
           <Loader2 className="w-8 h-8 animate-spin text-[#870BD6]" />
         </div>
       ) : partnerships.length === 0 ? (
-        <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
+        <div className="flex flex-col items-center py-20">
+          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center mb-4">
             <Users className="w-8 h-8 text-[#870BD6]" />
           </div>
           <h3 className="font-bold text-gray-900 mb-2">No prayer partners yet</h3>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 mb-6 text-center max-w-xs">
             Invite someone to pray with you at a set time each week.
           </p>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="px-6 py-2.5 bg-[#870BD6] text-white rounded-full text-sm font-semibold hover:bg-[#7009b8] transition-colors"
-          >
-            Invite a Prayer Partner
-          </button>
+          <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-6 !h-[44px] !text-white">
+            <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />Invite a Prayer Partner</p>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -216,7 +214,6 @@ function PartnershipDetail({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [streaks, setStreaks] = useState(p.streaks ?? []);
 
-  // suppress unused warning
   void onRefresh;
 
   useEffect(() => {
@@ -234,7 +231,6 @@ function PartnershipDetail({
         sessionId: string;
         meetingLink: string;
       };
-      // meetingLink is absolute; extract the path
       const url = new URL(result.meetingLink, window.location.origin);
       router.push(url.pathname + url.search);
     } catch (err: unknown) {
@@ -252,7 +248,7 @@ function PartnershipDetail({
 
   return (
     <div className="max-w-xl">
-      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700">
+      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
         <ChevronRight className="w-5 h-5 rotate-180" />
         <span className="text-sm">Back</span>
       </button>
@@ -290,20 +286,14 @@ function PartnershipDetail({
 
       {/* Start prayer button */}
       {p.status === 'ACTIVE' && (
-        <button
+        <Button
           onClick={handleStartPrayer}
           disabled={starting}
-          className="w-full py-3.5 bg-[#870BD6] text-white rounded-2xl font-bold text-base flex items-center justify-center gap-2 hover:bg-[#7009b8] transition-colors disabled:opacity-60 mb-5"
+          loading={starting}
+          customClass="w-full !h-[50px] !text-white mb-5"
         >
-          {starting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <>
-              <Video className="w-5 h-5" />
-              Start Prayer Session
-            </>
-          )}
-        </button>
+          <p className="flex items-center gap-2 font-bold text-base"><Video className="w-5 h-5" />Start Prayer Session</p>
+        </Button>
       )}
 
       {isPending && (
@@ -366,13 +356,13 @@ function PartnershipDetail({
                   try { await onEnd(); } finally { setEnding(false); }
                 }}
                 disabled={ending}
-                className="flex-1 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-60"
+                className="flex-1 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-60 cursor-pointer"
               >
                 {ending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, end it'}
               </button>
               <button
                 onClick={() => setShowEndConfirm(false)}
-                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
+                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -381,7 +371,7 @@ function PartnershipDetail({
         ) : (
           <button
             onClick={() => setShowEndConfirm(true)}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-500 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
             End partnership
@@ -395,6 +385,9 @@ function PartnershipDetail({
 function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [step, setStep] = useState<'partner' | 'schedule'>('partner');
   const [partnerInput, setPartnerInput] = useState('');
+  const [suggestions, setSuggestions] = useState<UserSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [prayerDays, setPrayerDays] = useState<string[]>([]);
   const [prayerTime, setPrayerTime] = useState('07:00');
   const [timezone] = useState(() => {
@@ -403,13 +396,39 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    const cleaned = partnerInput.trim().replace(/^@/, '');
+    const isUsername = !partnerInput.includes('@') || partnerInput.startsWith('@');
+    if (!isUsername || cleaned.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setSearchLoading(false);
+      return;
+    }
+    setSearchLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await userService.lookup(cleaned) as UserSuggestion[];
+        const results = Array.isArray(res) ? res : [];
+        setSuggestions(results.slice(0, 5));
+        setShowSuggestions(results.length > 0);
+      } catch {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [partnerInput]);
+
   const toggleDay = (day: string) => {
     setPrayerDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
   };
 
-  const isEmail = partnerInput.includes('@');
+  const isEmail = partnerInput.includes('@') && !partnerInput.startsWith('@');
 
   const handleSubmit = async () => {
     if (prayerDays.length === 0) { setError('Select at least one prayer day'); return; }
@@ -417,7 +436,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
     setError('');
     try {
       await accountabilityService.createPartnership({
-        ...(isEmail ? { email: partnerInput.trim() } : { username: partnerInput.trim().replace('@', '') }),
+        ...(isEmail ? { email: partnerInput.trim() } : { username: partnerInput.trim().replace(/^@/, '') }),
         prayerDays,
         prayerTime,
         timezone,
@@ -437,7 +456,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
           <h3 className="font-bold text-gray-900">
             {step === 'partner' ? 'Add Prayer Partner' : 'Set Schedule'}
           </h3>
-          <button onClick={onClose}><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="p-5 space-y-4">
@@ -447,28 +466,58 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                 <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                   Partner&apos;s email or username
                 </label>
-                <input
-                  type="text"
-                  value={partnerInput}
-                  onChange={(e) => setPartnerInput(e.target.value)}
-                  placeholder="name@email.com or @username"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={partnerInput}
+                    onChange={(e) => { setPartnerInput(e.target.value); setError(''); }}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                    onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                    placeholder="name@email.com or @username"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
+                  />
+                  {searchLoading && (
+                    <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-gray-400" />
+                  )}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
+                      {suggestions.map((s) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onMouseDown={() => {
+                            setPartnerInput(`@${s.username}`);
+                            setShowSuggestions(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+                        >
+                          <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0">
+                            {s.firstName[0]}{s.lastName[0]}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{s.firstName} {s.lastName}</p>
+                            <p className="text-xs text-gray-400">@{s.username}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <p className="text-xs text-gray-400 mt-1.5">
                   They&apos;ll receive an invite to join your prayer partnership.
                 </p>
               </div>
               {error && <p className="text-xs text-red-500">{error}</p>}
-              <button
+              <Button
                 onClick={() => {
                   if (!partnerInput.trim()) { setError('Enter your partner\'s email or username'); return; }
                   setError('');
                   setStep('schedule');
                 }}
-                className="w-full py-2.5 bg-[#870BD6] text-white rounded-xl font-semibold text-sm hover:bg-[#7009b8] transition-colors"
+                customClass="w-full !h-[42px] !text-white text-sm"
               >
                 Next: Set Schedule
-              </button>
+              </Button>
             </>
           ) : (
             <>
@@ -480,7 +529,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                       key={d}
                       type="button"
                       onClick={() => toggleDay(d)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                         prayerDays.includes(d)
                           ? 'bg-[#870BD6] text-white'
                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
@@ -510,17 +559,18 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => setStep('partner')}
-                  className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
                 >
                   Back
                 </button>
-                <button
+                <Button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="flex-1 py-2.5 bg-[#870BD6] text-white rounded-xl font-semibold text-sm hover:bg-[#7009b8] transition-colors disabled:opacity-60"
+                  loading={submitting}
+                  customClass="flex-1 !h-[42px] !text-white text-sm"
                 >
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Send Invite'}
-                </button>
+                  Send Invite
+                </Button>
               </div>
             </>
           )}

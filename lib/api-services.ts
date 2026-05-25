@@ -260,6 +260,7 @@ export const devotionalService = {
     title: string;
     content: string;
     excerpt?: string;
+    seriesId?: string;
     categoryId?: string;
     bibleReference?: string;
     tags?: string[];
@@ -272,6 +273,23 @@ export const devotionalService = {
     api.patch(`/devotionals/${id}`, data),
 
   getCategories: () => api.get('/devotionals/categories'),
+
+  // Series
+  getAllSeries: (params?: { page?: number; limit?: number; authorId?: string }) =>
+    api.get('/devotionals/series', { params }),
+
+  getSeriesById: (id: string) => api.get(`/devotionals/series/${id}`),
+
+  createSeries: (data: { title: string; description?: string; coverImageUrl?: string }) =>
+    api.post('/devotionals/series', data),
+
+  toggleSeriesSubscription: (seriesId: string) =>
+    api.post(`/devotionals/series/${seriesId}/subscribe`),
+
+  getSeriesFeed: (params?: { page?: number; limit?: number }) =>
+    api.get('/devotionals/me/series-feed', { params }),
+
+  getMySeriesSubscriptions: () => api.get('/devotionals/me/series-subscriptions'),
 };
 
 // ── Community services ─────────────────────────────────────────────────────────

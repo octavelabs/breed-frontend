@@ -18,25 +18,25 @@ function BuildupContent() {
   const router = useRouter();
   const activeTab = searchParams.get('tab') ?? 'accountability';
 
-  const setTab = (tab: string) => {
-    router.push(`/dashboard/buildup?tab=${tab}`);
-  };
-
   return (
-    <DashboardLayout>
-      <div className="mx-auto">
-        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold mb-6">Build Up</h1>
+    <DashboardLayout custom={true}>
+      {/* Header — sits on grey DashboardLayout background, matching Learn */}
+      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Build Up</h1>
+      </div>
 
-        {/* Tab bar */}
-        <div className="flex gap-1 bg-gray-100 rounded-2xl p-1 mb-8 w-fit">
+      {/* White content area */}
+      <div className="bg-white pt-5">
+        {/* Tab pills — same style as Learn's Discover / In Progress / Completed */}
+        <div className="flex gap-3 px-4 lg:px-12 overflow-x-auto">
           {TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setTab(tab.id)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              onClick={() => router.push(`/dashboard/buildup?tab=${tab.id}`)}
+              className={`border px-[18px] py-3 whitespace-nowrap rounded-[12px] font-medium text-sm transition-all duration-200 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-white text-[#870BD6] shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white border-black font-semibold text-[#180426]'
+                  : 'text-[#4E5255] border-[#D2D9DF] hover:border-gray-400'
               }`}
             >
               {tab.label}
@@ -45,9 +45,11 @@ function BuildupContent() {
         </div>
 
         {/* Tab content */}
-        {activeTab === 'accountability' && <AccountabilityTab />}
-        {activeTab === 'devotionals' && <DevotionalsTab />}
-        {activeTab === 'bulletins' && <PrayerBullletinsTab />}
+        <div className="border-t border-[#D2D9DF] mt-5 px-4 lg:px-12 py-6">
+          {activeTab === 'accountability' && <AccountabilityTab />}
+          {activeTab === 'devotionals' && <DevotionalsTab />}
+          {activeTab === 'bulletins' && <PrayerBullletinsTab />}
+        </div>
       </div>
     </DashboardLayout>
   );
@@ -55,7 +57,16 @@ function BuildupContent() {
 
 export default function BuildupPage() {
   return (
-    <Suspense fallback={<DashboardLayout><div className="animate-pulse h-8 bg-gray-100 rounded w-48 mb-6" /></DashboardLayout>}>
+    <Suspense fallback={
+      <DashboardLayout custom={true}>
+        <div className="pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
+          <div className="h-8 bg-gray-200 rounded w-32 animate-pulse" />
+        </div>
+        <div className="bg-white pt-5 px-4 lg:px-12">
+          <div className="h-10 bg-gray-100 rounded-xl w-72 animate-pulse" />
+        </div>
+      </DashboardLayout>
+    }>
       <BuildupContent />
     </Suspense>
   );

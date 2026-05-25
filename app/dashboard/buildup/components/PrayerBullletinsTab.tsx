@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { BookOpen, Bookmark, BookmarkCheck, ChevronRight, Loader2, Flame, X, Plus } from 'lucide-react';
 import { prayerService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
+import Button from '@/app/components/Button';
 
 const CATEGORIES = [
   { id: 'PERSONAL_DEVOTION', label: 'Personal Devotion', emoji: '🙏', color: 'from-purple-500 to-purple-700' },
@@ -122,18 +123,11 @@ export default function PrayerBullletinsTab() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Prayer Bulletins</h2>
-          <p className="text-sm text-gray-500 mt-1">Focused prayer points for every season</p>
-        </div>
+        <p className="text-sm text-gray-500">Focused prayer points for every season</p>
         {isAdmin && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#870BD6] text-white rounded-full text-sm font-semibold hover:bg-[#7009b8] transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            New Bulletin
-          </button>
+          <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-5 !h-[44px] !text-white">
+            <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />New Bulletin</p>
+          </Button>
         )}
       </div>
 
@@ -147,7 +141,7 @@ export default function PrayerBullletinsTab() {
           <button
             key={m.id}
             onClick={() => setMode(m.id)}
-            className={`px-4 py-1.5 rounded-lg font-medium transition-all ${mode === m.id ? 'bg-white text-[#870BD6] shadow-sm' : 'text-gray-500'}`}
+            className={`px-4 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${mode === m.id ? 'bg-white text-[#870BD6] shadow-sm' : 'text-gray-500'}`}
           >
             {m.label}
           </button>
@@ -174,7 +168,7 @@ export default function PrayerBullletinsTab() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`relative h-36 rounded-2xl overflow-hidden bg-gradient-to-br ${cat.color} group hover:scale-[1.02] transition-transform`}
+              className={`relative h-36 rounded-2xl overflow-hidden bg-linear-to-br ${cat.color} group hover:scale-[1.02] transition-transform cursor-pointer`}
             >
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 p-5 text-left h-full flex flex-col justify-end">
@@ -212,7 +206,7 @@ export default function PrayerBullletinsTab() {
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
             <div className="flex justify-between mb-4">
               <h3 className="font-bold">Create Bulletin (Admin)</h3>
-              <button onClick={() => setShowCreate(false)}><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowCreate(false)} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <p className="text-sm text-gray-500">Bulletin creation requires admin access through the admin panel.</p>
           </div>
@@ -225,14 +219,14 @@ export default function PrayerBullletinsTab() {
 function FeaturedBulletin({ bulletin: b, onSelect, onBookmark }: { bulletin: Bulletin; onSelect: () => void; onBookmark: () => void }) {
   const cat = CATEGORIES.find((c) => c.id === b.category);
   return (
-    <div className={`relative rounded-2xl overflow-hidden bg-gradient-to-br ${cat?.color ?? 'from-purple-600 to-purple-800'} p-6 md:p-8 mb-6 cursor-pointer`} onClick={onSelect}>
+    <div className={`relative rounded-2xl overflow-hidden bg-linear-to-br ${cat?.color ?? 'from-purple-600 to-purple-800'} p-6 md:p-8 mb-6 cursor-pointer`} onClick={onSelect}>
       <div className="absolute inset-0 bg-black/25" />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-bold uppercase tracking-widest text-white/70">Today's Prayer</span>
           <button
             onClick={(e) => { e.stopPropagation(); onBookmark(); }}
-            className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+            className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors cursor-pointer"
           >
             {b.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-white" /> : <Bookmark className="w-4 h-4 text-white" />}
           </button>
@@ -259,10 +253,10 @@ function BulletinCard({ bulletin: b, onSelect, onBookmark }: { bulletin: Bulleti
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer" onClick={onSelect}>
       <div className="flex items-start justify-between mb-3">
-        <span className={`text-xs font-bold uppercase tracking-wide text-white px-2 py-1 rounded-full bg-gradient-to-r ${cat?.color ?? 'from-purple-500 to-purple-700'}`}>
+        <span className={`text-xs font-bold uppercase tracking-wide text-white px-2 py-1 rounded-full bg-linear-to-r ${cat?.color ?? 'from-purple-500 to-purple-700'}`}>
           {cat?.emoji} {cat?.label ?? b.category}
         </span>
-        <button onClick={(e) => { e.stopPropagation(); onBookmark(); }} className="text-gray-400 hover:text-[#870BD6]">
+        <button onClick={(e) => { e.stopPropagation(); onBookmark(); }} className="text-gray-400 hover:text-[#870BD6] cursor-pointer">
           {b.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-[#870BD6]" /> : <Bookmark className="w-4 h-4" />}
         </button>
       </div>
@@ -285,7 +279,7 @@ function CategoryBulletins({
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full">
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full cursor-pointer">
           <ChevronRight className="w-5 h-5 text-gray-500 rotate-180" />
         </button>
         <h2 className="text-xl font-bold text-gray-900">{category.emoji} {category.label}</h2>
@@ -309,15 +303,15 @@ function BulletinDetail({ bulletin: b, onBack, onBookmark }: { bulletin: Bulleti
   const cat = CATEGORIES.find((c) => c.id === b.category);
   return (
     <div className="max-w-2xl">
-      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700">
+      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
         <ChevronRight className="w-5 h-5 rotate-180" />
         <span className="text-sm">Back</span>
       </button>
 
-      <div className={`rounded-2xl p-6 bg-gradient-to-br ${cat?.color ?? 'from-purple-600 to-purple-800'} mb-6`}>
+      <div className={`rounded-2xl p-6 bg-linear-to-br ${cat?.color ?? 'from-purple-600 to-purple-800'} mb-6`}>
         <div className="flex items-start justify-between">
           <span className="text-3xl">{cat?.emoji}</span>
-          <button onClick={onBookmark} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors">
+          <button onClick={onBookmark} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors cursor-pointer">
             {b.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-white" /> : <Bookmark className="w-4 h-4 text-white" />}
           </button>
         </div>
