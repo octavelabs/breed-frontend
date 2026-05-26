@@ -65,15 +65,22 @@ const MentorShipPage = () => {
   const router = useRouter();
 
   return (
-    <DashboardLayout>
-      <div className="lg:hidden">
-        {step === 1
-          ? <StepOne onNext={() => setStep(2)} />
-          : <StepTwo searchQuery={searchQuery} setSearchQuery={setSearchQuery} router={router} />
-        }
+    <DashboardLayout custom={true}>
+      {/* Page header — hidden on mobile step 1 (StepOne has its own banner) */}
+      <div className={`flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF] ${step === 1 ? "hidden lg:flex" : "flex"}`}>
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Mentorship Hub</h1>
       </div>
-      <div className="hidden lg:block">
-        <StepTwo searchQuery={searchQuery} setSearchQuery={setSearchQuery} router={router} />
+
+      <div className="bg-white pt-5 min-h-screen">
+        <div className="lg:hidden">
+          {step === 1
+            ? <StepOne onNext={() => setStep(2)} />
+            : <StepTwo searchQuery={searchQuery} setSearchQuery={setSearchQuery} router={router} />
+          }
+        </div>
+        <div className="hidden lg:block">
+          <StepTwo searchQuery={searchQuery} setSearchQuery={setSearchQuery} router={router} />
+        </div>
       </div>
     </DashboardLayout>
   );
@@ -82,13 +89,13 @@ const MentorShipPage = () => {
 const StepOne = ({ onNext }: { onNext: () => void }) => {
   const router = useRouter();
   return (
-    <div className="relative -mx-4 -mt-6 mb-6 min-h-[calc(100vh-68px)]">
-      <div className="h-[250px] flex flex-col bg-top" style={{ backgroundImage: "url('/mentorShipBanner.png')" }}>
+    <div className="min-h-[calc(100vh-68px)]">
+      <div className="h-62.5 flex flex-col bg-top" style={{ backgroundImage: "url('/mentorShipBanner.png')" }}>
         <button onClick={() => router.back()} className="flex items-center gap-2 cursor-pointer px-6 pt-16 relative z-20">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
       </div>
-      <div className="p-[18px] bg-white">
+      <div className="p-4.5 bg-white">
         <p className="font-bold text-sm mb-2">Description</p>
         <div className="space-y-2 text-sm text-[#3C3E40]">
           <p>Step into a space designed to help you grow with guidance, structure, and support.</p>
@@ -151,46 +158,48 @@ const StepTwo = ({
   });
 
   return (
-    <div className="mx-auto">
-      <h1 className="text-[28px] lg:text-[32px] leading-none font-bold mb-2">Mentorship Hub</h1>
-      <p className="text-sm text-[#60666B] leading-tight mb-6">
-        Connect with a trusted mentor who walks alongside you in your spiritual journey.
-      </p>
-
-      {/* Tabs */}
-      <div className="flex gap-1 bg-[#F6F8FA] p-1 rounded-full w-fit mb-6">
-        {(["discover", "mine"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setActiveTab(t)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-              activeTab === t ? "bg-white shadow text-[#180426]" : "text-[#60666B] hover:text-[#180426]"
-            }`}
-          >
-            {t === "discover" ? "Discover Mentors" : `My Mentorships${myMentorships.length > 0 ? ` (${myMentorships.length})` : ""}`}
-          </button>
-        ))}
+    <div>
+      {/* Tabs + Search row */}
+      <div className="flex items-center justify-between gap-4 px-4 lg:px-12">
+        <div className="flex gap-3 overflow-x-auto">
+          {(["discover", "mine"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setActiveTab(t)}
+              className={`border px-4.5 py-3 whitespace-nowrap rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer ${
+                activeTab === t
+                  ? "bg-white border-black font-semibold text-[#180426]"
+                  : "text-[#4E5255] border-[#D2D9DF] hover:border-gray-400"
+              }`}
+            >
+              {t === "discover" ? "Discover Mentors" : `My Mentorships${myMentorships.length > 0 ? ` (${myMentorships.length})` : ""}`}
+            </button>
+          ))}
+        </div>
+        {activeTab === "discover" && (
+          <div className="relative hidden sm:block w-56 lg:w-72 shrink-0">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name or specialty…"
+              className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white transition-colors"
+            />
+          </div>
+        )}
       </div>
+
+      <div className="border-t border-[#D2D9DF] mt-5 px-4 lg:px-12 py-6">
 
       {/* ── Discover tab ── */}
       {activeTab === "discover" && (
         <>
-          <Input
-            type="text"
-            id="mentor-search"
-            name="mentor-search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name or specialty…"
-            variant="outlined"
-            icon={<SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-50" />}
-            className="!bg-white !border-[#F2F2F7] !w-full !mb-6"
-          />
 
           {loadingMentors ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-48 bg-gray-100 rounded-[12px] animate-pulse" />
+                <div key={i} className="h-48 bg-gray-100 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : filteredMentors.length === 0 ? (
@@ -241,7 +250,7 @@ const StepTwo = ({
               </p>
               <button
                 onClick={() => setActiveTab("discover")}
-                className="mt-2 px-5 py-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full"
+                className="mt-2 px-5 py-2 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full"
               >
                 Find a Mentor
               </button>
@@ -280,6 +289,8 @@ const StepTwo = ({
           )}
         </div>
       )}
+
+      </div>
     </div>
   );
 };

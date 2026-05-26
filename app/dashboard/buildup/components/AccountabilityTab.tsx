@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
-  CheckCircle, Calendar, Trash2,
+  CheckCircle, Calendar, Trash2, Globe,
 } from 'lucide-react';
 import { accountabilityService, userService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
@@ -111,8 +111,8 @@ export default function AccountabilityTab() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-[#870BD6]" />
+        <div className="flex justify-center items-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
         </div>
       ) : partnerships.length === 0 ? (
         <div className="flex flex-col items-center py-20">
@@ -128,7 +128,7 @@ export default function AccountabilityTab() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {partnerships.map((p) => (
             <PartnershipCard
               key={p.id}
@@ -154,48 +154,65 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
   const partnerName = p.partner
     ? `${p.partner.firstName} ${p.partner.lastName}`
     : p.invite?.email ?? 'Pending invite';
+  const initials = p.partner
+    ? `${p.partner.firstName[0]}${p.partner.lastName[0]}`.toUpperCase()
+    : '?';
 
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer"
+      className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow cursor-pointer"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#870BD6] to-[#5B26B1] flex items-center justify-center text-white font-bold text-sm">
-            {p.partner ? `${p.partner.firstName[0]}${p.partner.lastName[0]}` : '?'}
+      <div className="flex items-start gap-3">
+        {p.partner?.avatarUrl ? (
+          <img src={p.partner.avatarUrl} alt={partnerName} className="w-14 h-14 rounded-full object-cover shrink-0" />
+        ) : (
+          <div className="w-14 h-14 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-base shrink-0">
+            {initials}
           </div>
-          <div>
-            <p className="font-bold text-gray-900 text-sm">{partnerName}</p>
-            {p.partner?.username && (
-              <p className="text-xs text-gray-400">@{p.partner.username}</p>
-            )}
+        )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <p className="font-bold text-[#180426] leading-tight">{partnerName}</p>
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+              isPending ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'
+            }`}>
+              {isPending ? 'Pending' : 'Active'}
+            </span>
+          </div>
+          {p.partner?.username && (
+            <p className="text-xs text-[#60666B] mt-0.5">@{p.partner.username}</p>
+          )}
+          <div className="flex items-center gap-1 mt-1 text-xs text-[#60666B]">
+            <Clock size={11} />
+            {p.prayerTime}
           </div>
         </div>
-        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-          isPending ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'
-        }`}>
-          {isPending ? 'Pending' : 'Active'}
-        </span>
       </div>
 
-      <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
-        <span className="flex items-center gap-1">
-          <Clock className="w-3.5 h-3.5" />
-          {p.prayerTime}
-        </span>
-        <span className="flex items-center gap-1">
-          <Calendar className="w-3.5 h-3.5" />
-          {p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ')}
-        </span>
-      </div>
-
-      {p.myStreak && p.myStreak.currentStreak > 0 && (
-        <div className="flex items-center gap-1 text-xs font-semibold text-orange-500">
-          <Flame className="w-3.5 h-3.5" />
-          {p.myStreak.currentStreak} day streak
+      {p.prayerDays.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {p.prayerDays.map((d) => (
+            <span key={d} className="text-[11px] bg-[#F5EBFF] text-[#870BD6] px-2.5 py-0.5 rounded-full font-medium">
+              {DAY_LABELS[d] ?? d}
+            </span>
+          ))}
         </div>
       )}
+
+      {p.myStreak && p.myStreak.currentStreak > 0 && (
+        <p className="flex items-center gap-1 text-xs font-semibold text-orange-500">
+          <Flame className="w-3.5 h-3.5" />
+          {p.myStreak.currentStreak} day streak
+        </p>
+      )}
+
+      <div className="mt-auto pt-1">
+        <div className="w-full h-10 flex items-center justify-center gap-1 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full">
+          View Details
+          <ChevronRight size={14} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -227,10 +244,7 @@ function PartnershipDetail({
   const handleStartPrayer = async () => {
     setStarting(true);
     try {
-      const result = await accountabilityService.startPrayerSession(p.id) as {
-        sessionId: string;
-        meetingLink: string;
-      };
+      const result = await accountabilityService.startPrayerSession(p.id) as { sessionId: string; meetingLink: string };
       const url = new URL(result.meetingLink, window.location.origin);
       router.push(url.pathname + url.search);
     } catch (err: unknown) {
@@ -243,140 +257,184 @@ function PartnershipDetail({
   const partnerName = p.partner
     ? `${p.partner.firstName} ${p.partner.lastName}`
     : p.invite?.email ?? 'Pending invite';
-
   const isPending = p.status === 'PENDING';
+  const initials = p.partner
+    ? `${p.partner.firstName[0]}${p.partner.lastName[0]}`.toUpperCase()
+    : '?';
 
   return (
-    <div className="max-w-xl">
-      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
-        <ChevronRight className="w-5 h-5 rotate-180" />
-        <span className="text-sm">Back</span>
-      </button>
-
-      {/* Partner header */}
-      <div className="bg-linear-to-br from-[#870BD6] to-[#5B26B1] rounded-2xl p-6 mb-5 text-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-base">
-              {p.partner ? `${p.partner.firstName[0]}${p.partner.lastName[0]}` : '?'}
-            </div>
-            <div>
-              <p className="font-bold text-lg">{partnerName}</p>
-              {p.partner?.username && <p className="text-sm text-white/70">@{p.partner.username}</p>}
-            </div>
-          </div>
-          <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-            isPending ? 'bg-amber-400/20 text-amber-200' : 'bg-white/20 text-white'
-          }`}>
-            {isPending ? 'Awaiting response' : 'Active'}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4 mt-4 text-sm text-white/80">
-          <span className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4" />
-            {p.prayerTime}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4" />
-            {p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ')}
-          </span>
-        </div>
+    <div>
+      {/* Page header */}
+      <div className="flex items-center gap-3 mb-6">
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
+          <ChevronRight className="w-5 h-5 text-gray-500 rotate-180" />
+        </button>
+        <h1 className="text-xl font-bold text-[#180426]">{partnerName}</h1>
+        <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+          isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
+        }`}>
+          {isPending ? 'Pending' : 'Active'}
+        </span>
       </div>
 
-      {/* Start prayer button */}
-      {p.status === 'ACTIVE' && (
-        <Button
-          onClick={handleStartPrayer}
-          disabled={starting}
-          loading={starting}
-          customClass="w-full !h-[50px] !text-white mb-5"
-        >
-          <p className="flex items-center gap-2 font-bold text-base"><Video className="w-5 h-5" />Start Prayer Session</p>
-        </Button>
-      )}
-
-      {isPending && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
-          <p className="text-sm text-amber-700 font-medium">
-            Waiting for {p.partner ? p.partner.firstName : 'your partner'} to accept the invitation.
-          </p>
-        </div>
-      )}
-
-      {/* Streak cards */}
-      {streaks.length > 0 && (
-        <div className="mb-5">
-          <h3 className="font-bold text-gray-900 mb-3">Prayer Streaks</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {streaks.map((s) => (
-              <div key={s.user.id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs">
-                    {s.user.firstName[0]}{s.user.lastName[0]}
-                  </div>
-                  <p className="text-sm font-semibold text-gray-900">{s.isMe ? 'You' : s.user.firstName}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left column — details */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
+            {/* Partner avatar + name */}
+            <div className="flex items-center gap-4 mb-5">
+              {p.partner?.avatarUrl ? (
+                <img src={p.partner.avatarUrl} alt={partnerName} className="w-14 h-14 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-lg shrink-0">
+                  {initials}
                 </div>
-                <div className="flex items-center gap-1.5 text-orange-500 mb-1">
-                  <Flame className="w-4 h-4" />
-                  <span className="font-bold text-lg">{s.currentStreak}</span>
-                  <span className="text-xs text-gray-400">day streak</span>
-                </div>
-                <p className="text-xs text-gray-400">Best: {s.longestStreak} days</p>
+              )}
+              <div>
+                <p className="font-bold text-[#180426] text-lg leading-tight">{partnerName}</p>
+                {p.partner?.username && <p className="text-sm text-[#60666B]">@{p.partner.username}</p>}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
 
-      {/* Last session */}
-      {p.lastSession && (
-        <div className="bg-green-50 rounded-2xl p-4 mb-5 flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-green-800">Last prayer session</p>
-            <p className="text-xs text-green-600">
-              {new Date(p.lastSession.startedAt).toLocaleDateString(undefined, {
-                weekday: 'long', month: 'short', day: 'numeric',
-              })}
-            </p>
-          </div>
-        </div>
-      )}
+            <div className="flex items-center gap-2 mb-5">
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
+              }`}>{isPending ? 'Pending' : 'Active'}</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Partnership</span>
+            </div>
 
-      {/* End partnership */}
-      <div className="pt-4 border-t border-gray-100">
-        {showEndConfirm ? (
-          <div className="bg-red-50 rounded-2xl p-4">
-            <p className="text-sm text-red-700 font-medium mb-3">End this prayer partnership?</p>
-            <div className="flex gap-2">
-              <button
-                onClick={async () => {
-                  setEnding(true);
-                  try { await onEnd(); } finally { setEnding(false); }
-                }}
-                disabled={ending}
-                className="flex-1 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-60 cursor-pointer"
-              >
-                {ending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, end it'}
-              </button>
-              <button
-                onClick={() => setShowEndConfirm(false)}
-                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
+            <div className="border-t border-gray-100 mb-5" />
+
+            <div className="space-y-4">
+              <DetailRow icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Prayer Days" value={p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ') || '—'} />
+              <DetailRow icon={<Clock className="w-4 h-4 text-gray-400" />} label="Prayer Time" value={p.prayerTime} />
+              <DetailRow icon={<Globe className="w-4 h-4 text-gray-400" />} label="Timezone" value={p.timezone} />
+              <DetailRow
+                icon={<Calendar className="w-4 h-4 text-gray-400" />}
+                label="Since"
+                value={new Date(p.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+              />
+              {p.lastSession && (
+                <DetailRow
+                  icon={<CheckCircle className="w-4 h-4 text-green-500" />}
+                  label="Last Session"
+                  value={new Date(p.lastSession.startedAt).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                />
+              )}
             </div>
           </div>
-        ) : (
-          <button
-            onClick={() => setShowEndConfirm(true)}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-          >
-            <Trash2 className="w-4 h-4" />
-            End partnership
-          </button>
-        )}
+
+          {/* Streak cards */}
+          {streaks.length > 0 && (
+            <div>
+              <h3 className="font-bold text-[#180426] mb-3">Prayer Streaks</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {streaks.map((s, i) => (
+                  <div key={s.user?.id ?? i} className="bg-white rounded-2xl p-4 border border-[#E3E8EF]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-7 h-7 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs">
+                        {s.user?.firstName?.[0] ?? '?'}{s.user?.lastName?.[0] ?? ''}
+                      </div>
+                      <p className="text-sm font-semibold text-[#180426]">{s.isMe ? 'You' : (s.user?.firstName ?? 'Partner')}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-orange-500 mb-1">
+                      <Flame className="w-4 h-4" />
+                      <span className="font-bold text-lg">{s.currentStreak}</span>
+                      <span className="text-xs text-gray-400">day streak</span>
+                    </div>
+                    <p className="text-xs text-gray-400">Best: {s.longestStreak} days</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right column — actions + stats */}
+        <div className="space-y-4">
+          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5">
+            <h3 className="font-semibold text-[#180426] mb-4">Actions</h3>
+            {p.status === 'ACTIVE' && (
+              <button
+                onClick={handleStartPrayer}
+                disabled={starting}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-xl font-semibold text-sm mb-3 hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
+              >
+                {starting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
+                Start Prayer Session
+              </button>
+            )}
+            {!showEndConfirm ? (
+              <button
+                onClick={() => setShowEndConfirm(true)}
+                className="w-full py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" /> End Partnership
+              </button>
+            ) : (
+              <div className="bg-red-50 rounded-xl p-4">
+                <p className="text-sm text-red-700 font-medium mb-3">End this partnership?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => { setEnding(true); try { await onEnd(); } finally { setEnding(false); } }}
+                    disabled={ending}
+                    className="flex-1 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                  >
+                    {ending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, end it'}
+                  </button>
+                  <button
+                    onClick={() => setShowEndConfirm(false)}
+                    className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-semibold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {isPending && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <p className="text-sm font-semibold text-amber-700 mb-1">Awaiting Response</p>
+              <p className="text-xs text-amber-600">
+                Waiting for {p.partner ? p.partner.firstName : 'your partner'} to accept the invitation.
+              </p>
+            </div>
+          )}
+
+          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 text-sm">
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-[#60666B]">Partner</span>
+                <span className="font-medium text-[#180426] text-right truncate ml-2 max-w-[120px]">{partnerName}</span>
+              </div>
+              <div className="flex justify-between border-t border-gray-100 pt-3">
+                <span className="text-[#60666B]">Days / week</span>
+                <span className="font-medium text-[#180426]">{p.prayerDays.length}</span>
+              </div>
+              {p.myStreak && (
+                <div className="flex justify-between border-t border-gray-100 pt-3">
+                  <span className="text-[#60666B]">My Streak</span>
+                  <span className="flex items-center gap-1 font-medium text-orange-500">
+                    <Flame className="w-3.5 h-3.5" />{p.myStreak.currentStreak} days
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 shrink-0">{icon}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-[#60666B] mb-0.5">{label}</p>
+        <p className="text-sm font-medium text-[#180426]">{value}</p>
       </div>
     </div>
   );

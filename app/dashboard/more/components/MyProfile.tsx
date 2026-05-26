@@ -3,6 +3,7 @@
 import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
 import { useAuth } from "@/context/AuthContext";
+import { userService } from "@/lib/api-services";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -19,6 +20,8 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
     location: ""
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Populate form with real user data once available
   useEffect(() => {
@@ -42,9 +45,21 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
     }));
   };
 
-  const handleSaveChanges = () => {
-    // Here you would typically save the changes to your backend
-    setIsEditing(false);
+  const handleSaveChanges = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await userService.updateProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        country: formData.location || undefined,
+      });
+      setIsEditing(false);
+    } catch (err: unknown) {
+      setSaveError((err as Error)?.message ?? 'Failed to save changes. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -175,10 +190,16 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
             </div>
           </div>
 
+          {saveError && (
+            <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{saveError}</p>
+          )}
+
           <div className="pt-4">
             {isEditing ? (
               <Button
                 onClick={handleSaveChanges}
+                loading={saving}
+                disabled={saving}
                 customClass="w-full h-[58px] text-white"
               >
                 Save Changes

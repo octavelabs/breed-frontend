@@ -26,7 +26,7 @@ function BuildupContent() {
       </div>
 
       {/* White content area */}
-      <div className="bg-white pt-5">
+      <div className="bg-white pt-5 min-h-screen">
         {/* Tab pills — same style as Learn's Discover / In Progress / Completed */}
         <div className="flex gap-3 px-4 lg:px-12 overflow-x-auto">
           {TABS.map((tab) => (

@@ -151,7 +151,7 @@ export default function PrayerBullletinsTab() {
       {/* Today */}
       {mode === 'today' && (
         loadingToday ? (
-          <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-[#870BD6]" /></div>
+          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
         ) : todayBulletin ? (
           <FeaturedBulletin bulletin={todayBulletin} onSelect={() => setSelected(todayBulletin)} onBookmark={() => toggleBookmark(todayBulletin)} />
         ) : (
@@ -183,7 +183,7 @@ export default function PrayerBullletinsTab() {
       {/* Bookmarks */}
       {mode === 'bookmarks' && (
         loadingBookmarks ? (
-          <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-[#870BD6]" /></div>
+          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
         ) : bookmarks.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
@@ -285,7 +285,7 @@ function CategoryBulletins({
         <h2 className="text-xl font-bold text-gray-900">{category.emoji} {category.label}</h2>
       </div>
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 animate-spin text-[#870BD6]" /></div>
+        <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
       ) : bulletins.length === 0 ? (
         <div className="text-center py-16 text-gray-400 text-sm">No bulletins in this category yet.</div>
       ) : (

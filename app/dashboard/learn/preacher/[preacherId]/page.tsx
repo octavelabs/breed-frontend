@@ -255,7 +255,7 @@ const PreacherProfilePage = () => {
               disabled={following}
               className={`flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all disabled:opacity-60 shrink-0 ${
                 preacher?.isFollowing
-                  ? "bg-white border border-[#D1D5DB] text-[#374151] hover:bg-gray-50"
+                  ? "bg-[#F5EBFF] border border-[#D49CFD] text-[#870BD6] hover:bg-[#EDD9FF]"
                   : "bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white"
               }`}
             >

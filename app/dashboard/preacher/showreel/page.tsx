@@ -16,6 +16,7 @@ const PreacherShowreel = () => {
     devotional: false
   });
   const [activeTab, setActiveTab] = useState("courses");
+  const [devotionalRefreshKey, setDevotionalRefreshKey] = useState(0);
   const tabs = [
     {
       label: "Courses",
@@ -25,7 +26,7 @@ const PreacherShowreel = () => {
     {
       label: "Devotionals",
       value: "devotionals",
-      content: <DevotionalList setOpenModal={setOpenModal} />,
+      content: <DevotionalList setOpenModal={setOpenModal} refreshKey={devotionalRefreshKey} />,
     },
     // {
     //   label: "Sessions",
@@ -46,7 +47,8 @@ const PreacherShowreel = () => {
         {openModal?.devotional && (
         <CreateDevotionalModal
           isOpen={openModal?.devotional}
-          onClose={() => (setOpenModal(prev => ({...prev, devotional: false })))}
+          onClose={() => setOpenModal(prev => ({ ...prev, devotional: false }))}
+          onCreated={() => setDevotionalRefreshKey(k => k + 1)}
         />
       )}
       
@@ -58,7 +60,7 @@ const PreacherShowreel = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white pt-[33px] ">
+      <div className="bg-white pt-8.25">
         <Tabs
           tabs={tabs}
           defaultTab={"courses"}
@@ -77,7 +79,7 @@ const PreacherShowreel = () => {
               }))
             }
           >
-            <p className="flex items-center gap-[6px] whitespace-nowrap">
+            <p className="flex items-center gap-1.5 whitespace-nowrap">
               <Plus stroke="white" />
               {activeTab === 'devotionals' ? 'Create devotional' : 'Create course'}
             </p>

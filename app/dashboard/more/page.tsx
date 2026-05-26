@@ -3,6 +3,8 @@
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { useState, useEffect } from "react";
 import MyProfile from "./components/MyProfile";
+import Security from "./components/Security";
+import InviteFriend from "./components/InviteFriend";
 import About from "./components/About";
 import Support from "./components/Support";
 import { ChevronRight, CircleUserRound, Info, MessageCircleQuestionMark, Settings2, Shield, User2, UsersRound } from "lucide-react";
@@ -61,10 +63,10 @@ const MorePage = () => {
           ))}
         </div>
       </div>
-      {isMobile && !showSelectedTab && <><div className="block lg:hidden flex flex-col gap-2">
+      {isMobile && !showSelectedTab && <><div className="lg:hidden flex flex-col gap-2">
         {
           mobileTabs.map((tab, idx) => (
-             <div className="p-[18px] flex justify-between items-center bg-white" key={idx}>
+             <div className="p-4.5 flex justify-between items-center bg-white" key={idx}>
               <div className="flex gap-4 items-center">
                 {tab.icon}
                 <div>
@@ -82,7 +84,7 @@ const MorePage = () => {
       </div>
       <div>
       <p className="mt-6 mb-2 text-sm text-[#60666B]">Support</p>
-      <div className="p-[18px] flex justify-between items-center bg-white">
+      <div className="p-4.5 flex justify-between items-center bg-white">
               <div className="flex gap-4 items-center">
                 <MessageCircleQuestionMark className="w-6 h-6" stroke="#60666B" />
                 <div>
@@ -106,17 +108,9 @@ const ActiveTabContent = ({ activeTab, setShowSelectedTab } : {activeTab : strin
    return (
     <div className="bg-[#F8F9FC] lg:bg-white rounded-lg p-0 lg:p-8 ">
         {activeTab === "myProfile" && <MyProfile setShowSelectedTab={setShowSelectedTab} />}
-        {activeTab === "security" && (
-          <div className="text-gray-500">
-            Security settings will be displayed here.
-          </div>
-        )}
+        {activeTab === "security" && <Security setShowSelectedTab={setShowSelectedTab} />}
 
-        {activeTab === "inviteFriend" && (
-          <div className="text-gray-500">
-            Invite a friend feature will be displayed here.
-          </div>
-        )}
+        {activeTab === "inviteFriend" && <InviteFriend setShowSelectedTab={setShowSelectedTab} />}
         {activeTab === "about" && <About />}
         {activeTab === "support" && <Support />}
       </div>

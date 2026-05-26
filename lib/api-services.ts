@@ -267,10 +267,13 @@ export const devotionalService = {
     status?: string;
     coverImageUrl?: string;
     estimatedMinutes?: number;
+    scheduledFor?: string;
   }) => api.post('/devotionals', data),
 
   update: (id: string, data: Record<string, unknown>) =>
     api.patch(`/devotionals/${id}`, data),
+
+  delete: (id: string) => api.delete(`/devotionals/${id}`),
 
   getCategories: () => api.get('/devotionals/categories'),
 
