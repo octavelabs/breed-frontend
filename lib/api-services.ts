@@ -21,6 +21,49 @@ export interface User {
   lastLoginAt?: string;
 }
 
+export type ActivityType =
+  | 'OVERALL'
+  | 'DEVOTIONAL_READ'
+  | 'PRAYER_PRAYED'
+  | 'LESSON_COMPLETED'
+  | 'COMMUNITY_ENGAGED'
+  | 'MENTORSHIP_TASK_COMPLETED'
+  | 'MENTORSHIP_SESSION_ATTENDED';
+
+export interface DayActivity {
+  date: string;
+  label: string;
+  activities: ActivityType[];
+  isToday: boolean;
+}
+
+export interface ActivityStreakStat {
+  current: number;
+  longest: number;
+  label: string;
+}
+
+export interface WeekStreakResult {
+  currentStreak: number;
+  longestStreak: number;
+  days: DayActivity[];
+  breakdown: Partial<Record<ActivityType, ActivityStreakStat>>;
+}
+
+export interface CalendarDay {
+  date: string;
+  activities: ActivityType[];
+  count: number;
+}
+
+export interface StreakStatsResult {
+  overall: { current: number; longest: number };
+  breakdown: Partial<Record<ActivityType, ActivityStreakStat>>;
+  calendar: CalendarDay[];
+  totalActiveDays: number;
+  mostActiveType: ActivityType | null;
+}
+
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
@@ -122,6 +165,12 @@ export const userService = {
       prayerCount: number;
       communitiesJoined: number;
     }>('/users/me/stats'),
+
+  getWeekStreak: () => api.get<WeekStreakResult>('/users/me/streak/week'),
+
+  getStreakStats: () => api.get<StreakStatsResult>('/users/me/streak/stats'),
+
+  activateStreakFreeze: () => api.post<{ message: string }>('/users/me/streak/freeze'),
 
   follow:   (id: string) => api.post(`/users/${id}/follow`),
   unfollow: (id: string) => api.delete(`/users/${id}/follow`),
@@ -500,6 +549,8 @@ export const mentorshipService = {
   completeSession: (id: string) => api.post(`/mentorship/sessions/${id}/complete`),
 
   // ── Tasks ─────────────────────────────────────────────────────────────────
+  getMyTasks: (params?: { mentorshipId?: string; page?: number; limit?: number }) =>
+    api.get('/mentorship/me/tasks', { params }),
   createTask: (data: { mentorshipId: string; discipleId: string; title: string; description?: string; dueDate?: string }) =>
     api.post('/mentorship/tasks', data),
   completeTask: (id: string) => api.post(`/mentorship/tasks/${id}/complete`),
