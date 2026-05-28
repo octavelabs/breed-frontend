@@ -31,9 +31,9 @@ const DashboardHeader: React.FC = () => {
     : '?';
 
   return (
-    <header className="h-[72px] bg-white border-b border-gray-200 px-6 flex items-center justify-between gap-4">
-      {/* Logo */}
-      <img src="/logo3.png" alt="Breed" className="h-8 w-auto" />
+    <header className="h-18 bg-white border-b border-gray-200 px-6 flex items-center justify-between gap-4">
+      {/* Logo — hidden on desktop where the sidebar already shows it */}
+      <img src="/logo3.png" alt="Breed" className="h-8 w-auto lg:hidden" />
 
       {/* Right side controls */}
       <div className="flex items-center gap-3">
