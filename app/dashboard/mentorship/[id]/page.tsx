@@ -1,11 +1,12 @@
 "use client";
 
 import DashboardLayout from "@/app/layout/DashboardLayout";
-import { ArrowLeft, Zap, Calendar, CheckSquare, Users, Clock } from "lucide-react";
+import { ArrowLeft, Zap, Calendar, CheckSquare, Users, Clock, CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { mentorshipService } from "@/lib/api-services";
 import { BookingModal } from "./components/BookingModal";
+import Link from "next/link";
 
 interface MentorProfile {
   bio?: string | null;
@@ -42,6 +43,14 @@ interface Session {
   status: string;
 }
 
+interface MentorshipTask {
+  id: string;
+  title: string;
+  description?: string | null;
+  isCompleted: boolean;
+  dueDate?: string | null;
+}
+
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   PENDING:   { label: "Request Pending",   cls: "bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]" },
   ACTIVE:    { label: "Active Mentorship", cls: "bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]" },
@@ -66,6 +75,8 @@ const MentorProfilePage = () => {
   const [mentor, setMentor] = useState<Mentor | null>(null);
   const [mentorship, setMentorship] = useState<Mentorship | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [tasks, setTasks] = useState<MentorshipTask[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
   const [loadingMentor, setLoadingMentor] = useState(true);
   const [loadingMentorship, setLoadingMentorship] = useState(true);
   const [isBookingOpen, setBookingOpen] = useState(false);
@@ -107,6 +118,18 @@ const MentorProfilePage = () => {
   }, [mentorId]);
 
   useEffect(() => { loadMentorshipStatus(); }, [loadMentorshipStatus]);
+
+  useEffect(() => {
+    if (activeTab !== "tasks" || !mentorship?.id) return;
+    setLoadingTasks(true);
+    mentorshipService.getMyTasks({ mentorshipId: mentorship.id, limit: 50 })
+      .then((res: any) => {
+        const data = res?.data ?? res;
+        setTasks(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setTasks([]))
+      .finally(() => setLoadingTasks(false));
+  }, [activeTab, mentorship?.id]);
 
   if (loadingMentor) {
     return (
@@ -267,7 +290,7 @@ const MentorProfilePage = () => {
           {/* Tabs */}
           <div className="px-4 md:px-12 pt-2">
             <div className="flex gap-8 border-b border-[#D2D9DF]">
-              {["overview", ...(isActive ? ["sessions"] : []), "reviews"].map((tab) => (
+              {["overview", ...(isActive ? ["sessions", "tasks"] : []), "reviews"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -362,6 +385,53 @@ const MentorProfilePage = () => {
               </div>
             )}
 
+            {/* Tasks */}
+            {activeTab === "tasks" && isActive && (
+              <div className="w-full">
+                {loadingTasks ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-gray-100 rounded-2xl animate-pulse" />)}
+                  </div>
+                ) : tasks.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                    <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                      <CheckSquare size={20} className="text-[#870BD6]" />
+                    </div>
+                    <p className="font-semibold text-gray-700">No tasks yet</p>
+                    <p className="text-sm text-[#60666B]">Tasks assigned by your mentor will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {tasks.map((t) => (
+                      <div key={t.id} className={`bg-white border rounded-2xl p-4 ${t.isCompleted ? "border-[#ABEFC6]" : "border-[#E3E8EF]"}`}>
+                        <div className="flex items-start gap-3">
+                          <div className={`w-5 h-5 rounded mt-0.5 flex items-center justify-center shrink-0 ${t.isCompleted ? "bg-[#1A8454]" : "border-2 border-[#B9C2CA]"}`}>
+                            {t.isCompleted && (
+                              <svg width="10" height="8" fill="none" viewBox="0 0 10 8">
+                                <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-semibold text-sm ${t.isCompleted ? "text-[#60666B] line-through" : "text-[#180426]"}`}>
+                              {t.title}
+                            </p>
+                            {t.description && <p className="text-xs text-[#60666B] mt-0.5">{t.description}</p>}
+                            {t.dueDate && (
+                              <p className="text-xs text-[#60666B] mt-1">
+                                Due: {new Date(t.dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                              </p>
+                            )}
+                          </div>
+                          {t.isCompleted && <CheckCircle2 size={16} className="text-[#1A8454] shrink-0 mt-0.5" />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Reviews */}
             {activeTab === "reviews" && (
               <div className="w-full text-[#60666B] py-10 text-center">
@@ -377,30 +447,33 @@ const MentorProfilePage = () => {
 
 function SessionCard({ session }: { session: Session }) {
   const statusCls = SESSION_STATUS_CLASSES[session.status] ?? "bg-gray-100 text-gray-600";
+  const isUpcoming = session.status === "SCHEDULED" || session.status === "IN_PROGRESS";
   return (
-    <div className="bg-white border border-[#E3E8EF] rounded-2xl p-4 flex items-center gap-4">
-      <div className="w-10 h-10 rounded-full bg-[#F5EBFF] flex items-center justify-center shrink-0">
-        <Calendar size={18} className="text-[#870BD6]" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm text-[#180426]">{session.title}</p>
-        <div className="flex items-center gap-3 mt-0.5">
-          <span className="text-xs text-[#60666B]">
-            {new Date(session.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-          </span>
-          <span className="text-xs text-[#60666B]">
-            {new Date(session.scheduledAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-          </span>
-          <span className="flex items-center gap-1 text-xs text-[#60666B]">
-            <Clock size={11} />
-            {session.duration} min
-          </span>
+    <Link href={`/dashboard/mentorship/sessions/${session.id}`}>
+      <div className="bg-white border border-[#E3E8EF] rounded-2xl p-4 flex items-center gap-4 hover:shadow-sm hover:border-[#D4A8F0] transition-all cursor-pointer group">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isUpcoming ? "bg-[#F5EBFF]" : "bg-[#F0F2F4]"}`}>
+          <Calendar size={18} className={isUpcoming ? "text-[#870BD6]" : "text-[#60666B]"} />
         </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm text-[#180426] group-hover:text-[#870BD6] transition-colors">{session.title}</p>
+          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+            <span className="text-xs text-[#60666B]">
+              {new Date(session.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+            <span className="text-xs text-[#60666B]">
+              {new Date(session.scheduledAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-[#60666B]">
+              <Clock size={11} />
+              {session.duration} min
+            </span>
+          </div>
+        </div>
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize shrink-0 ${statusCls}`}>
+          {session.status.toLowerCase().replace("_", " ")}
+        </span>
       </div>
-      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${statusCls}`}>
-        {session.status.toLowerCase().replace("_", " ")}
-      </span>
-    </div>
+    </Link>
   );
 }
 

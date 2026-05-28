@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Bell, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { useUser } from '@/app/context/UserContext';
+import NotificationBell from '@/app/components/notifications/NotificationBell';
 
 const DashboardHeader: React.FC = () => {
   const { userType, toggleUserType } = useUser();
@@ -26,11 +27,7 @@ const DashboardHeader: React.FC = () => {
       )}
 
       {/* Notification Bell */}
-      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-        <Bell className="w-5 h-5 text-gray-600" />
-        {/* Optional notification badge */}
-        {/* <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span> */}
-      </button>
+      <NotificationBell />
 
       {/* User Avatar */}
       <button className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded-lg transition-colors">

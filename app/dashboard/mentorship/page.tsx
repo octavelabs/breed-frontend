@@ -6,14 +6,12 @@ import DashboardLayout from "@/app/layout/DashboardLayout";
 import { mentorshipService } from "@/lib/api-services";
 import {
   Search,
-  Users,
-  Star,
-  ChevronRight,
   Inbox,
   RefreshCw,
   Calendar,
   Clock,
   Video,
+  Users,
 } from "lucide-react";
 
 interface MentorProfile {
@@ -30,8 +28,11 @@ interface Mentor {
   username?: string;
   avatarUrl?: string | null;
   bio?: string | null;
-  mentorProfile?: MentorProfile | null;
+  role?: string | null;
   discipleCount: number;
+  sessionCount?: number;
+  reviewCount?: number;
+  mentorProfile?: MentorProfile | null;
 }
 
 interface MyMentorship {
@@ -96,84 +97,52 @@ function Avatar({
   );
 }
 
-function MentorCard({
-  mentor,
-  onClick,
-}: {
-  mentor: Mentor;
-  onClick: () => void;
-}) {
-  const specs = mentor.mentorProfile?.specializations ?? [];
+function MentorCard({ mentor, onClick }: { mentor: Mentor; onClick: () => void }) {
   const initials = `${mentor.firstName[0]}${mentor.lastName[0]}`.toUpperCase();
+  const roleText = mentor.role ?? mentor.mentorProfile?.specializations?.[0] ?? null;
+  const sessions = mentor.sessionCount ?? 0;
+  const reviews = mentor.reviewCount ?? 0;
 
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-white border border-[#E3E8EF] rounded-2xl p-4 flex flex-col items-center gap-3 hover:shadow-md transition-shadow cursor-pointer text-center"
     >
-      <div className="flex items-start gap-3">
-        {mentor.avatarUrl ? (
-          <img
-            src={mentor.avatarUrl}
-            alt={mentor.firstName}
-            className="w-14 h-14 rounded-full object-cover shrink-0"
-          />
-        ) : (
-          <div className="w-14 h-14 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-base shrink-0">
-            {initials}
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[#180426] truncate">
-            {mentor.firstName} {mentor.lastName}
-          </p>
-          {mentor.username && (
-            <p className="text-xs text-[#60666B]">@{mentor.username}</p>
-          )}
-          <div className="flex items-center gap-3 mt-1">
-            <span className="flex items-center gap-1 text-xs text-[#60666B]">
-              <Users size={11} />
-              {mentor.discipleCount} disciple
-              {mentor.discipleCount !== 1 ? "s" : ""}
-            </span>
-            {mentor.mentorProfile?.sessionRate != null && (
-              <span className="flex items-center gap-1 text-xs text-[#60666B]">
-                <Star size={11} />
-                {mentor.mentorProfile.sessionRate}/session
-              </span>
-            )}
-          </div>
+      {/* Avatar */}
+      {mentor.avatarUrl ? (
+        <img src={mentor.avatarUrl} alt={mentor.firstName} className="w-[100px] h-[100px] rounded-full object-cover" />
+      ) : (
+        <div className="w-[100px] h-[100px] rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-2xl">
+          {initials}
         </div>
+      )}
+
+      {/* Name · username · role */}
+      <div>
+        <p className="font-bold text-[#180426] text-[15px] leading-snug">
+          {mentor.firstName} {mentor.lastName}
+        </p>
+        {mentor.username && (
+          <p className="text-xs text-[#870BD6] font-medium mt-0.5">@{mentor.username}</p>
+        )}
+        {roleText && (
+          <p className="text-[13px] text-[#60666B] mt-0.5 line-clamp-1">{roleText}</p>
+        )}
       </div>
 
-      {(mentor.mentorProfile?.bio ?? mentor.bio) && (
-        <p className="text-xs text-[#60666B] line-clamp-2 leading-relaxed">
-          {mentor.mentorProfile?.bio ?? mentor.bio}
-        </p>
-      )}
-
-      {specs.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {specs.slice(0, 4).map((s) => (
-            <span
-              key={s}
-              className="text-[11px] bg-[#F5EBFF] text-[#870BD6] px-2.5 py-0.5 rounded-full font-medium"
-            >
-              {s}
-            </span>
-          ))}
-          {specs.length > 4 && (
-            <span className="text-[11px] bg-gray-100 text-[#60666B] px-2.5 py-0.5 rounded-full">
-              +{specs.length - 4}
-            </span>
-          )}
+      {/* Stats */}
+      <div className="w-full border-t border-[#F0F1F3] pt-3 grid grid-cols-3 gap-1">
+        <div>
+          <p className="font-bold text-[#180426] text-sm">{mentor.discipleCount}</p>
+          <p className="text-[11px] text-[#60666B]">disciples</p>
         </div>
-      )}
-
-      <div className="mt-auto pt-1">
-        <div className="w-full h-10 flex items-center justify-center gap-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full">
-          View Profile
-          <ChevronRight size={14} />
+        <div className="border-x border-[#F0F1F3]">
+          <p className="font-bold text-[#180426] text-sm">{sessions}</p>
+          <p className="text-[11px] text-[#60666B]">sessions</p>
+        </div>
+        <div>
+          <p className="font-bold text-[#180426] text-sm">{reviews}</p>
+          <p className="text-[11px] text-[#60666B]">reviews</p>
         </div>
       </div>
     </div>
@@ -256,52 +225,49 @@ const MentorshipPage = () => {
   });
 
   return (
-    <DashboardLayout>
-      <div className="pb-10">
-        <div className="mb-6">
-          <h1 className="text-2xl lg:text-[28px] font-bold text-[#180426]">
-            Mentorship
-          </h1>
-          <p className="text-sm text-[#60666B] mt-1">
-            Find a spiritual mentor or track your mentorship journey.
-          </p>
-        </div>
+    <DashboardLayout custom={true}>
+      {/* Header */}
+      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Mentorship</h1>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 bg-[#F6F8FA] p-1 rounded-full w-fit mb-6">
-          {(["discover", "my"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                tab === t
-                  ? "bg-white shadow text-[#180426]"
-                  : "text-[#60666B] hover:text-[#180426]"
-              }`}
-            >
-              {t === "discover"
-                ? "Discover Mentors"
-                : `My Mentorships${myMentorships.length > 0 ? ` (${myMentorships.length})` : ""}`}
-            </button>
-          ))}
+      <div className="bg-white min-h-screen">
+        {/* Tab pills + search row */}
+        <div className="px-4 lg:px-12 py-5 flex items-center justify-between gap-4">
+          <div className="flex gap-3 overflow-x-auto">
+            {(["discover", "my"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`border px-4.5 py-3 rounded-xl font-medium text-sm transition-all whitespace-nowrap cursor-pointer ${
+                  tab === t
+                    ? "bg-white border-black font-semibold text-[#180426]"
+                    : "text-[#4E5255] border-[#D2D9DF] hover:border-gray-400"
+                }`}
+              >
+                {t === "discover"
+                  ? "Discover Mentors"
+                  : `My Mentorships${myMentorships.length > 0 ? ` (${myMentorships.length})` : ""}`}
+              </button>
+            ))}
+          </div>
+          <div className="relative hidden sm:block w-56 lg:w-72 shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={tab === "discover" ? "Search by name or specialty…" : "Search mentorships…"}
+              className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white transition-colors"
+            />
+          </div>
         </div>
 
         {/* ── Discover ── */}
         {tab === "discover" && (
-          <div>
-            <div className="relative mb-6 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B9C2CA]" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, specialty…"
-                className="w-full pl-10 pr-4 py-2.5 border border-[#B9C2CA] rounded-full text-sm bg-white focus:outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]"
-              />
-            </div>
-
+          <div className="border-t border-[#D2D9DF] px-4 lg:px-12 py-6">
             {loadingMentors ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
@@ -320,7 +286,7 @@ const MentorshipPage = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {filteredMentors.map((mentor) => (
                   <MentorCard
                     key={mentor.id}
@@ -337,7 +303,7 @@ const MentorshipPage = () => {
 
         {/* ── My Mentorships ── */}
         {tab === "my" && (
-          <div className="space-y-3">
+          <div className="border-t border-[#D2D9DF] px-4 lg:px-12 py-6 space-y-3">
             <div className="flex items-center justify-between mb-1">
               <p className="text-sm text-[#60666B]">
                 Your active and past mentorship relationships.

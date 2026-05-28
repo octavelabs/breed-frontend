@@ -1,14 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ArrowLeft, Copy, Check, Share2 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useState } from "react";
+import { ArrowLeft, Copy, Check, Share2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
-const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) => void }) => {
+const InviteFriend = ({
+  setShowSelectedTab,
+}: {
+  setShowSelectedTab: (val: boolean) => void;
+}) => {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
 
-  const referralCode = user?.username ?? user?.id ?? 'breed';
+  const referralCode = user?.username ?? user?.id ?? "breed";
   const inviteLink = `https://joinbreed.com/signup?ref=${referralCode}`;
 
   const handleCopy = async () => {
@@ -18,11 +22,11 @@ const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolea
       setTimeout(() => setCopied(false), 2500);
     } catch {
       // fallback for older browsers
-      const el = document.createElement('input');
+      const el = document.createElement("input");
       el.value = inviteLink;
       document.body.appendChild(el);
       el.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(el);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
@@ -32,8 +36,8 @@ const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolea
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: 'Join Breed',
-        text: 'Come grow in faith with me on Breed — a platform for spiritual growth, courses, and community.',
+        title: "Join Breed",
+        text: "Come grow in faith with me on Breed — a platform for spiritual growth, courses, and community.",
         url: inviteLink,
       });
     } else {
@@ -43,7 +47,11 @@ const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolea
 
   return (
     <>
-      <ArrowLeft className="lg:hidden mb-4 cursor-pointer" stroke="#60666B" onClick={() => setShowSelectedTab(false)} />
+      <ArrowLeft
+        className="lg:hidden mb-4 cursor-pointer"
+        stroke="#60666B"
+        onClick={() => setShowSelectedTab(false)}
+      />
       <h2 className="text-2xl font-bold mb-2">Invite a Friend</h2>
       <p className="text-sm text-[#60666B] mb-8">
         Share Breed with someone you care about and grow in faith together.
@@ -63,7 +71,9 @@ const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolea
 
         {/* Referral link */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Your invite link</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Your invite link
+          </label>
           <div className="flex items-center gap-2">
             <div className="flex-1 border border-[#E2E3E5] rounded-xl px-4 py-3 text-sm text-[#60666B] bg-gray-50 truncate select-all">
               {inviteLink}
@@ -73,7 +83,7 @@ const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolea
               className="shrink-0 flex items-center gap-2 px-4 py-3 rounded-xl border border-[#D49CFD] bg-[#F5EBFF] text-[#870BD6] text-sm font-semibold hover:bg-[#EDD9FF] transition-colors cursor-pointer"
             >
               {copied ? <Check size={15} /> : <Copy size={15} />}
-              {copied ? 'Copied!' : 'Copy'}
+              {copied ? "Copied!" : "Copy"}
             </button>
           </div>
         </div>
@@ -81,15 +91,11 @@ const InviteFriend = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolea
         {/* Share button */}
         <button
           onClick={handleShare}
-          className="w-full h-14 rounded-xl font-semibold text-sm text-white bg-linear-to-b from-[#A967F1] to-[#5B26B1] hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2"
+          className="w-full h-14 rounded-full font-semibold text-sm text-white bg-linear-to-b from-[#A967F1] to-[#5B26B1] hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-2"
         >
           <Share2 size={16} />
           Share Invite
         </button>
-
-        <p className="text-xs text-center text-[#60666B]">
-          When your friends sign up using your link, you&apos;ll both be connected on Breed.
-        </p>
       </div>
     </>
   );
