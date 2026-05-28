@@ -11,6 +11,7 @@ export interface Participant {
   socketId: string;
   userId: string;
   name: string;
+  avatarUrl?: string;
   stream?: MediaStream;
   videoEnabled: boolean;
   audioEnabled: boolean;
@@ -301,7 +302,7 @@ export function useMeeting(meetingId: string) {
         socket.emit("meeting:join", { meetingId }, (raw: any) => {
           if (!mountedRef.current) return;
           const res     = raw?.data ?? raw;  // handle both ack formats
-          const peers: Array<{ socketId: string; userId: string }> = res?.participants ?? [];
+          const peers: Array<{ socketId: string; userId: string; displayName?: string; avatarUrl?: string | null }> = res?.participants ?? [];
           console.log(`[Join] ${peers.length} existing participant(s)`, peers);
 
           setConnecting(false);
@@ -311,10 +312,11 @@ export function useMeeting(meetingId: string) {
           // Populate participant tiles BEFORE creating offers
           // so ontrack can always find its tile
           setParticipants(
-            peers.map(({ socketId, userId }) => ({
+            peers.map(({ socketId, userId, displayName, avatarUrl }) => ({
               socketId,
               userId,
-              name: userId ? `User ${userId.slice(0, 6)}` : "Participant",
+              name: displayName || (userId ? `User ${userId.slice(0, 6)}` : "Participant"),
+              avatarUrl: avatarUrl ?? undefined,
               videoEnabled: true,
               audioEnabled: true,
               connectionState: "connecting" as RTCPeerConnectionState,
@@ -355,13 +357,14 @@ export function useMeeting(meetingId: string) {
       });
 
       // ── New participant joined ─────────────────────────────────────
-      socket.on("meeting:participant-joined", ({ userId, socketId }: { userId: string; socketId: string }) => {
+      socket.on("meeting:participant-joined", ({ userId, socketId, displayName, avatarUrl }: { userId: string; socketId: string; displayName?: string; avatarUrl?: string | null }) => {
         if (!mountedRef.current) return;
-        console.log(`[Joined] ${userId.slice(0, 6)} (${socketId.slice(0, 8)})`);
+        console.log(`[Joined] ${displayName ?? userId.slice(0, 6)} (${socketId.slice(0, 8)})`);
 
         upsertParticipant({
           socketId, userId,
-          name: userId ? `User ${userId.slice(0, 6)}` : "Participant",
+          name: displayName || (userId ? `User ${userId.slice(0, 6)}` : "Participant"),
+          avatarUrl: avatarUrl ?? undefined,
           videoEnabled: true, audioEnabled: true,
           connectionState: "connecting",
           stream: undefined,
@@ -380,15 +383,15 @@ export function useMeeting(meetingId: string) {
       });
 
       // ── Offer received (we are non-initiator) ────────────────────
-      socket.on("meeting:offer", async ({ from, sdp }: { from: string; sdp: RTCSessionDescriptionInit }) => {
+      socket.on("meeting:offer", async ({ from, fromUserId, sdp }: { from: string; fromUserId?: string; sdp: RTCSessionDescriptionInit }) => {
         if (!mountedRef.current) return;
         console.log(`[Offer ← ${from.slice(0, 8)}]`);
 
-        // Ensure participant tile exists
+        // Ensure participant tile exists (fallback if participant-joined wasn't processed yet)
         setParticipants((prev) => {
           if (prev.some((p) => p.socketId === from)) return prev;
           return [...prev, {
-            socketId: from, userId: from, name: "Participant",
+            socketId: from, userId: fromUserId ?? from, name: "Participant",
             videoEnabled: true, audioEnabled: true,
             connectionState: "connecting", stream: undefined,
           }];

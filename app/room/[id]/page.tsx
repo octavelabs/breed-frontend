@@ -9,15 +9,16 @@ import {
   Wifi, WifiOff, Loader2,
 } from "lucide-react";
 import { useMeeting, type Participant } from "./hooks/useMeeting";
+import { useAuth } from "@/context/AuthContext";
 
 // ── Video Tile ──────────────────────────────────────────────────────────────
 
 function VideoTile({
-  stream, name, muted = false, isMe = false,
+  stream, name, avatarUrl, muted = false, isMe = false,
   videoEnabled = true, audioEnabled = true,
   connectionState,
 }: {
-  stream?: MediaStream; name: string; muted?: boolean;
+  stream?: MediaStream; name: string; avatarUrl?: string; muted?: boolean;
   isMe?: boolean; videoEnabled?: boolean; audioEnabled?: boolean;
   connectionState?: RTCPeerConnectionState;
 }) {
@@ -51,9 +52,13 @@ function VideoTile({
         />
       ) : (
         <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#870BD6] to-[#5B26B1] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-purple-900/50">
-            {initials}
-          </div>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={name} className="w-16 h-16 rounded-full object-cover shadow-lg shadow-purple-900/50" />
+          ) : (
+            <div className="w-16 h-16 rounded-full bg-linear-to-br from-[#870BD6] to-[#5B26B1] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-purple-900/50">
+              {initials}
+            </div>
+          )}
           <p className="text-white/40 text-xs">
             {isConnecting && !isMe ? "Connecting…" : videoEnabled ? "No video" : "Camera off"}
           </p>
@@ -127,6 +132,7 @@ function CtrlBtn({
 export default function RoomPage() {
   const { id: meetingId } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const prayerSessionId = searchParams.get("session");
 
   const {
@@ -156,11 +162,14 @@ export default function RoomPage() {
     setChatOpen(open);
   };
 
+  const myName = user ? `${user.firstName} ${user.lastName}`.trim() : "Me";
+
   const allParticipants: Participant[] = [
     {
       socketId: "me",
       userId: myUserId,
-      name: "Me",
+      name: myName,
+      avatarUrl: user?.avatarUrl ?? undefined,
       stream: localStream ?? undefined,
       videoEnabled: camOn,
       audioEnabled: micOn,
@@ -260,7 +269,7 @@ export default function RoomPage() {
             <div className="flex gap-2 h-full">
               <div className="flex-1">
                 <VideoTile
-                  stream={pinned.stream} name={pinned.name}
+                  stream={pinned.stream} name={pinned.name} avatarUrl={pinned.avatarUrl}
                   muted={pinned.socketId === "me"} isMe={pinned.socketId === "me"}
                   videoEnabled={pinned.videoEnabled} audioEnabled={pinned.audioEnabled}
                   connectionState={pinned.connectionState}
@@ -269,7 +278,7 @@ export default function RoomPage() {
               <div className="w-28 lg:w-36 flex flex-col gap-2 overflow-y-auto">
                 {allParticipants.filter((p) => p.socketId !== pinnedId).map((p) => (
                   <div key={p.socketId} onClick={() => setPinnedId(p.socketId)} className="cursor-pointer rounded-xl overflow-hidden aspect-video">
-                    <VideoTile stream={p.stream} name={p.name} muted={p.socketId === "me"} isMe={p.socketId === "me"}
+                    <VideoTile stream={p.stream} name={p.name} avatarUrl={p.avatarUrl} muted={p.socketId === "me"} isMe={p.socketId === "me"}
                       videoEnabled={p.videoEnabled} audioEnabled={p.audioEnabled} connectionState={p.connectionState} />
                   </div>
                 ))}
@@ -281,7 +290,7 @@ export default function RoomPage() {
                 <div key={p.socketId} className="cursor-pointer"
                   onDoubleClick={() => setPinnedId(p.socketId === pinnedId ? null : p.socketId)}>
                   <VideoTile
-                    stream={p.stream} name={p.name}
+                    stream={p.stream} name={p.name} avatarUrl={p.avatarUrl}
                     muted={p.socketId === "me"} isMe={p.socketId === "me"}
                     videoEnabled={p.videoEnabled} audioEnabled={p.audioEnabled}
                     connectionState={p.connectionState}
@@ -363,9 +372,13 @@ export default function RoomPage() {
               <div className="flex-1 overflow-y-auto p-3 space-y-1">
                 {allParticipants.map((p) => (
                   <div key={p.socketId} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 group transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#870BD6] to-[#5B26B1] flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      {p.name.slice(0, 2).toUpperCase()}
-                    </div>
+                    {p.avatarUrl ? (
+                      <img src={p.avatarUrl} alt={p.name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-linear-to-b from-[#870BD6] to-[#5B26B1] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {p.name.split(" ").map((n) => n[0] ?? "").join("").toUpperCase().slice(0, 2) || "?"}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-medium truncate">{p.socketId === "me" ? `${p.name} (You)` : p.name}</p>
                       {p.connectionState && p.connectionState !== "connected" && p.socketId !== "me" && (
