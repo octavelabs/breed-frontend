@@ -446,7 +446,7 @@ const CommunityPage = () => {
           {isMobile && (
             <button
               onClick={() => setOpenModal(true)}
-              className="w-10 h-10 rounded-full bg-[#870BD6] flex items-center justify-center text-white"
+              className="w-10 h-10 rounded-full bg-linear-to-b from-[#A967F1] to-[#5B26B1] flex items-center justify-center text-white"
             >
               <Plus size={20} />
             </button>
