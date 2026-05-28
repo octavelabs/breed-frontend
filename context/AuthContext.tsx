@@ -45,6 +45,7 @@ interface AuthContextValue {
     emailOrUsername: string,
     password: string,
     rememberMe?: boolean,
+    redirectUrl?: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -100,9 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       emailOrUsername: string,
       password: string,
       rememberMe = false,
+      redirectUrl?: string,
     ): Promise<void> => {
-      // The response interceptor unwraps response.data, so the resolved value
-      // IS the login payload directly.
       const response = await authService.login<{
         accessToken: string;
         refreshToken: string;
@@ -113,7 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionCookies(response.user.role);
       setUser(response.user);
 
-      if (response.user.role === 'PREACHER') {
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else if (response.user.role === 'PREACHER') {
         router.push('/dashboard/preacher/dashboard');
       } else {
         router.push('/dashboard/home');

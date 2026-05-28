@@ -23,6 +23,7 @@ const LoginForm: React.FC = () => {
   const registered = searchParams.get("registered");
   const reset = searchParams.get("reset");
   const verified = searchParams.get("verified");
+  const redirect = searchParams.get("redirect") ?? undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +40,7 @@ const LoginForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await login(emailOrUsername.trim(), password, rememberMe);
+      await login(emailOrUsername.trim(), password, rememberMe, redirect);
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : "";
       // Map backend messages to user-friendly copy

@@ -269,7 +269,9 @@ function PartnershipDetail({
   const handleAccept = async () => {
     setAccepting(true);
     try {
-      await (accountabilityService as any).acceptInvite(p.invite?.token ?? p.id);
+      const token = p.invite?.token;
+      if (!token) throw new Error('Invite token not available. Please refresh and try again.');
+      await accountabilityService.acceptInvite(token);
       onAccepted();
     } catch (err: unknown) {
       alert((err as Error)?.message ?? 'Could not accept partnership');
