@@ -36,7 +36,7 @@ const DashboardHeader: React.FC = () => {
       <img src="/logo3.png" alt="Breed" className="h-8 w-auto lg:hidden" />
 
       {/* Right side controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 ml-auto">
         {/* Notification Bell */}
         <NotificationBell />
 
