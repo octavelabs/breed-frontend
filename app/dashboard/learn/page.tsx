@@ -321,14 +321,14 @@ const Learn: React.FC = () => {
           className="px-4 lg:px-12"
           customButton={(activeTab) =>
             activeTab === 'discover' ? (
-              <div className="relative ml-3 shrink-0">
+              <div className="relative w-full lg:w-auto lg:ml-3 lg:shrink-0">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search courses…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-[200px] lg:w-[240px] pl-9 pr-4 h-[42px] border border-[#B9C2CA] rounded-full text-sm outline-none focus:border-purple-400 bg-white"
+                  className="w-full lg:w-60 pl-9 pr-4 h-10.5 border border-[#B9C2CA] rounded-full text-sm outline-none focus:border-purple-400 bg-white"
                 />
               </div>
             ) : null

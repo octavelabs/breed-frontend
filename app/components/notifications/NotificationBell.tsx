@@ -163,9 +163,17 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Panel */}
+      {/* Mobile backdrop */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-[360px] bg-white rounded-2xl shadow-[0px_8px_32px_rgba(0,0,0,0.12)] border border-[#E3E8EF] z-50 overflow-hidden">
+        <div
+          className="fixed inset-0 bg-black/30 z-40 sm:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Panel — bottom sheet on mobile, dropdown on sm+ */}
+      {open && (
+        <div className="fixed bottom-0 left-0 right-0 sm:absolute sm:bottom-auto sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-90 w-full bg-white rounded-t-2xl sm:rounded-2xl shadow-[0px_8px_32px_rgba(0,0,0,0.16)] border border-[#E3E8EF] z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#F0F2F4]">
             <div className="flex items-center gap-2">
@@ -197,7 +205,7 @@ export default function NotificationBell() {
           </div>
 
           {/* List */}
-          <div className="max-h-[400px] overflow-y-auto divide-y divide-[#F5F6F7]">
+          <div className="max-h-[60vh] sm:max-h-100 overflow-y-auto divide-y divide-[#F5F6F7]">
             {loading ? (
               <div className="space-y-0 divide-y divide-[#F5F6F7]">
                 {[1, 2, 3].map((i) => (

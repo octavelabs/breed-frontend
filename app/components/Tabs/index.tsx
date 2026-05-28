@@ -38,8 +38,8 @@ const Tabs: React.FC<TabsProps> = ({
 
   return (
     <div>
-      <div className={`flex w-full justify-between items-center ${className}`}>
-        <div className={`flex gap-3 w-full max-w-full overflow-auto`}>
+      <div className={`flex flex-wrap gap-y-3 w-full justify-between items-center ${className}`}>
+        <div className={`flex gap-3 overflow-x-auto max-w-full`}>
           {tabs.map((tab) => (
             <button
               key={tab.value}

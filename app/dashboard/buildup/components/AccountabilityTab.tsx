@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
   CheckCircle, Calendar, Trash2, Globe,
@@ -38,7 +38,7 @@ interface Partnership {
   timezone: string;
   status: 'PENDING' | 'ACTIVE' | 'ENDED';
   isCreator: boolean;
-  invite?: { status: string; email: string };
+  invite?: { status: string; email: string; token?: string };
   myStreak?: Streak;
   streaks?: Array<{ user: Partner; currentStreak: number; longestStreak: number; lastPrayedAt?: string; isMe: boolean }>;
   lastSession?: { startedAt: string };
@@ -53,15 +53,26 @@ interface UserSuggestion {
   avatarUrl?: string;
 }
 
-export default function AccountabilityTab() {
+interface AccountabilityTabProps {
+  externalShowCreate?: boolean;
+  onExternalShowCreateChange?: (val: boolean) => void;
+}
+
+export default function AccountabilityTab({ externalShowCreate, onExternalShowCreateChange }: AccountabilityTabProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Partnership | null>(null);
-  const [showCreate, setShowCreate] = useState(false);
+  const [internalShowCreate, setInternalShowCreate] = useState(false);
 
   void user;
+
+  const showCreate = externalShowCreate ?? internalShowCreate;
+  const setShowCreate = (val: boolean) => {
+    onExternalShowCreateChange?.(val);
+    setInternalShowCreate(val);
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -96,6 +107,7 @@ export default function AccountabilityTab() {
           setSelected(null);
           load();
         }}
+        onAccepted={() => { refreshSelected(selected.id); }}
         router={router}
       />
     );
@@ -103,11 +115,8 @@ export default function AccountabilityTab() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6">
         <p className="text-sm text-gray-500">1-on-1 live prayer sessions with your partner</p>
-        <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-5 !h-[44px] !text-white">
-          <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />Add Partner</p>
-        </Button>
       </div>
 
       {loading ? (
@@ -218,16 +227,19 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
 }
 
 function PartnershipDetail({
-  partnership: p, onBack, onRefresh, onEnd, router,
+  partnership: p, onBack, onRefresh, onEnd, onAccepted, router,
 }: {
   partnership: Partnership;
   onBack: () => void;
   onRefresh: () => void;
   onEnd: () => void;
+  onAccepted: () => void;
   router: ReturnType<typeof useRouter>;
 }) {
   const [starting, setStarting] = useState(false);
   const [ending, setEnding] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const [declining, setDeclining] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [streaks, setStreaks] = useState(p.streaks ?? []);
 
@@ -251,6 +263,30 @@ function PartnershipDetail({
       alert((err as Error)?.message ?? 'Could not start session');
     } finally {
       setStarting(false);
+    }
+  };
+
+  const handleAccept = async () => {
+    setAccepting(true);
+    try {
+      await (accountabilityService as any).acceptInvite(p.invite?.token ?? p.id);
+      onAccepted();
+    } catch (err: unknown) {
+      alert((err as Error)?.message ?? 'Could not accept partnership');
+    } finally {
+      setAccepting(false);
+    }
+  };
+
+  const handleDecline = async () => {
+    setDeclining(true);
+    try {
+      await accountabilityService.endPartnership(p.id);
+      onBack();
+    } catch (err: unknown) {
+      alert((err as Error)?.message ?? 'Could not decline partnership');
+    } finally {
+      setDeclining(false);
     }
   };
 
@@ -354,6 +390,29 @@ function PartnershipDetail({
         <div className="space-y-4">
           <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5">
             <h3 className="font-semibold text-[#180426] mb-4">Actions</h3>
+
+            {/* Recipient: accept / decline */}
+            {isPending && !p.isCreator && (
+              <div className="space-y-2 mb-3">
+                <button
+                  onClick={handleAccept}
+                  disabled={accepting}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
+                >
+                  {accepting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  Accept Request
+                </button>
+                <button
+                  onClick={handleDecline}
+                  disabled={declining}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  {declining ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                  Decline
+                </button>
+              </div>
+            )}
+
             {p.status === 'ACTIVE' && (
               <button
                 onClick={handleStartPrayer}
@@ -364,6 +423,7 @@ function PartnershipDetail({
                 Start Prayer Session
               </button>
             )}
+
             {!showEndConfirm ? (
               <button
                 onClick={() => setShowEndConfirm(true)}
@@ -393,7 +453,8 @@ function PartnershipDetail({
             )}
           </div>
 
-          {isPending && (
+          {/* Creator awaiting response */}
+          {isPending && p.isCreator && (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
               <p className="text-sm font-semibold text-amber-700 mb-1">Awaiting Response</p>
               <p className="text-xs text-amber-600">
@@ -453,8 +514,13 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const justSelected = useRef(false);
 
   useEffect(() => {
+    if (justSelected.current) {
+      justSelected.current = false;
+      return;
+    }
     const cleaned = partnerInput.trim().replace(/^@/, '');
     const isUsername = !partnerInput.includes('@') || partnerInput.startsWith('@');
     if (!isUsername || cleaned.length < 2) {
@@ -508,16 +574,16 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0 sm:max-h-[90vh] sm:flex sm:flex-col">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
           <h3 className="font-bold text-gray-900">
             {step === 'partner' ? 'Add Prayer Partner' : 'Set Schedule'}
           </h3>
           <button onClick={onClose} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 sm:overflow-y-auto sm:flex-1">
           {step === 'partner' ? (
             <>
               <div>
@@ -538,12 +604,14 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                     <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-gray-400" />
                   )}
                   {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
                       {suggestions.map((s) => (
                         <button
                           key={s.id}
                           type="button"
-                          onMouseDown={() => {
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            justSelected.current = true;
                             setPartnerInput(`@${s.username}`);
                             setShowSuggestions(false);
                           }}
