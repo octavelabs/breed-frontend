@@ -4,10 +4,9 @@ import React, {
   useState, useEffect, useRef, useCallback, useMemo,
 } from 'react';
 import {
-  GripVertical, Plus, Trash2, Pencil, Image as ImageIcon, Code, Check, Loader2,
+  GripVertical, Plus, Trash2, Pencil, Image as ImageIcon, Video, Code, Check, Loader2,
 } from 'lucide-react';
 import { useUpload } from '@/app/hooks/useUpload';
-import VideoUpload from '@/app/components/upload/VideoUpload';
 import VideoPlayer from '@/app/components/upload/VideoPlayer';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
@@ -250,10 +249,38 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
 
   const editorHandleRef = useRef<RichTextEditorHandle>(null);
   const imageInputRef   = useRef<HTMLInputElement>(null);
+  const videoInputRef   = useRef<HTMLInputElement>(null);
   const { upload, uploading: imageUploading } = useUpload();
+  const { upload: uploadVideo, uploading: videoUploading, pollVideoStatus } = useUpload();
 
-  // Per-lesson video state: keyed by lessonId
+  // Per-lesson video: keyed by lessonId
   const [lessonVideos, setLessonVideos] = useState<Record<string, { hlsUrl: string; thumbnailUrl?: string; durationSeconds?: number }>>({});
+  const [videoProcessing, setVideoProcessing] = useState<Record<string, boolean>>({});
+
+  const handleVideoFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeLessonId) return;
+    e.target.value = '';
+    try {
+      const result = await uploadVideo(file, 'video') as { jobId: string; status: string };
+      setVideoProcessing((prev) => ({ ...prev, [activeLessonId]: true }));
+      // Poll until ready
+      const lessonId = activeLessonId;
+      const poll = setInterval(async () => {
+        try {
+          const status = await pollVideoStatus(result.jobId);
+          if (status.status === 'READY') {
+            clearInterval(poll);
+            setVideoProcessing((prev) => ({ ...prev, [lessonId]: false }));
+            setLessonVideos((prev) => ({ ...prev, [lessonId]: { hlsUrl: status.hlsUrl!, thumbnailUrl: status.thumbnailUrl, durationSeconds: status.durationSeconds } }));
+          } else if (status.status === 'FAILED') {
+            clearInterval(poll);
+            setVideoProcessing((prev) => ({ ...prev, [lessonId]: false }));
+          }
+        } catch {}
+      }, 5000);
+    } catch {}
+  };
 
   // Suppress the debounce trigger that fires after patchLessonIds updates state.
   const isPatchingRef    = useRef(false);
@@ -593,28 +620,27 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                 </div>
               </div>
 
-              {/* Lesson video */}
-              <div className="px-6 pb-3 shrink-0">
-                {lessonVideos[activeLesson.id] ? (
-                  <div className="space-y-1.5">
-                    <p className="text-xs font-semibold text-gray-600">Lesson Video</p>
-                    <VideoPlayer
-                      src={lessonVideos[activeLesson.id].hlsUrl}
-                      poster={lessonVideos[activeLesson.id].thumbnailUrl}
-                    />
-                    <button
-                      onClick={() => setLessonVideos((prev) => { const n = { ...prev }; delete n[activeLesson.id]; return n; })}
-                      className="text-xs text-red-500 hover:text-red-600"
-                    >
-                      Remove video
-                    </button>
-                  </div>
-                ) : (
-                  <VideoUpload
-                    onReady={(data) => setLessonVideos((prev) => ({ ...prev, [activeLesson.id]: data }))}
-                  />
-                )}
-              </div>
+              {/* Lesson video — compact status/player */}
+              {(lessonVideos[activeLesson.id] || videoProcessing[activeLesson.id] || videoUploading) && (
+                <div className="px-6 pb-2 shrink-0">
+                  {videoUploading && (
+                    <div className="flex items-center gap-2 text-xs text-[#870BD6]">
+                      <Loader2 size={12} className="animate-spin" />Uploading video…
+                    </div>
+                  )}
+                  {videoProcessing[activeLesson.id] && !videoUploading && (
+                    <div className="flex items-center gap-2 text-xs text-[#60666B]">
+                      <Loader2 size={12} className="animate-spin" />Processing video (1–3 min)…
+                    </div>
+                  )}
+                  {lessonVideos[activeLesson.id] && (
+                    <div className="space-y-1">
+                      <VideoPlayer src={lessonVideos[activeLesson.id].hlsUrl} poster={lessonVideos[activeLesson.id].thumbnailUrl} />
+                      <button onClick={() => setLessonVideos((p) => { const n={...p}; delete n[activeLesson.id]; return n; })} className="text-[10px] text-red-400 hover:text-red-500">Remove video</button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Formatting toolbar */}
               <div className="flex items-center gap-1 px-5 pb-2 border-b border-[#E3E8EF] shrink-0">
@@ -664,19 +690,17 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
 
                 {/* Right-side media insert buttons */}
                 <div className="flex flex-col gap-5 pt-1 w-10 shrink-0">
-                  <button
-                    title="Image"
-                    onClick={handleInsertImage}
-                    disabled={imageUploading}
-                    className="flex flex-col items-center disabled:opacity-50"
-                  >
+                  <button title="Image" onClick={handleInsertImage} disabled={imageUploading} className="flex flex-col items-center disabled:opacity-50">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      {imageUploading
-                        ? <Loader2 size={18} className="text-gray-500 animate-spin" />
-                        : <ImageIcon size={18} className="text-gray-500" />
-                      }
+                      {imageUploading ? <Loader2 size={18} className="text-gray-500 animate-spin" /> : <ImageIcon size={18} className="text-gray-500" />}
                     </div>
                     <span className="text-[10px] text-gray-400 mt-1.5">Image</span>
+                  </button>
+                  <button title="Video" onClick={() => videoInputRef.current?.click()} disabled={videoUploading || videoProcessing[activeLesson.id]} className="flex flex-col items-center disabled:opacity-50">
+                    <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
+                      {(videoUploading || videoProcessing[activeLesson.id]) ? <Loader2 size={18} className="text-gray-500 animate-spin" /> : <Video size={18} className="text-gray-500" />}
+                    </div>
+                    <span className="text-[10px] text-gray-400 mt-1.5">Video</span>
                   </button>
                   <button title="Embed" onClick={handleInsertCode} className="flex flex-col items-center">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
@@ -685,6 +709,7 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                     <span className="text-[10px] text-gray-400 mt-1.5">Embed</span>
                   </button>
                 </div>
+                <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoFileSelected} />
               </div>
             </>
           ) : (

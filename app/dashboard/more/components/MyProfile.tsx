@@ -2,6 +2,7 @@
 
 import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
+import Toast from "@/app/components/Toast";
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/lib/api-services";
 import { ArrowLeft, Camera, Loader2 } from "lucide-react";
@@ -14,6 +15,7 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const { upload, uploading: avatarUploading } = useUpload();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -25,9 +27,11 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
     try {
       const result = await upload(file, 'avatar') as { url: string };
       await userService.updateProfile({ avatarUrl: result.url });
-      await refreshUser();
+      await refreshUser(); // updates header, sidebar, and all avatar uses
+      setToast({ message: 'Profile picture updated!', type: 'success' });
     } catch {
       setAvatarPreview(null);
+      setToast({ message: 'Failed to upload picture. Please try again.', type: 'error' });
     }
   };
 
@@ -84,6 +88,7 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
 
   return (
     <>
+      {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
       <ArrowLeft className="lg:hidden mb-4" stroke='#60666B' onClick={() => setShowSelectedTab(false)} />
       <h2 className="text-[24px] font-bold mb-8">Profile</h2>
 

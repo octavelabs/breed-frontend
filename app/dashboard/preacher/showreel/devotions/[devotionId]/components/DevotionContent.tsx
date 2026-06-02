@@ -4,7 +4,7 @@ import React, {
   useState, useEffect, useRef, useCallback,
 } from 'react';
 import {
-  Plus, Trash2, Image as ImageIcon, Code, Check, Loader2, X, BookOpen,
+  Plus, Trash2, Image as ImageIcon, Video, Code, Check, Loader2, X, BookOpen,
 } from 'lucide-react';
 
 // ── Publish Success Modal ─────────────────────────────────────────────────────
@@ -56,8 +56,7 @@ const PublishSuccessModal = ({ onClose }: { onClose: () => void }) => (
 );
 import { devotionalService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
-import { useUpload, VideoUploadResult } from '@/app/hooks/useUpload';
-import VideoUpload from '@/app/components/upload/VideoUpload';
+import { useUpload } from '@/app/hooks/useUpload';
 import VideoPlayer from '@/app/components/upload/VideoPlayer';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -228,6 +227,8 @@ export interface DevotionContentHandle {
 const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: string }>(({ seriesId }, ref) => {
   const { user } = useAuth();
   const { upload, uploading: imageUploading } = useUpload();
+  const { upload: uploadVideo, uploading: videoUploading, pollVideoStatus } = useUpload();
+  const [videoProcessing, setVideoProcessing] = useState(false);
   const [articles, setArticles]       = useState<DevArticle[]>([]);
   const [loading, setLoading]         = useState(true);
   const [activeId, setActiveId]       = useState<string | null>(null);
@@ -240,6 +241,30 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
 
   const rteRef      = useRef<RteHandle>(null);
   const imageRef    = useRef<HTMLInputElement>(null);
+  const videoRef    = useRef<HTMLInputElement>(null);
+
+  const handleVideoFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    try {
+      const result = await uploadVideo(file, 'video') as { jobId: string };
+      setVideoProcessing(true);
+      const poll = setInterval(async () => {
+        try {
+          const status = await pollVideoStatus(result.jobId);
+          if (status.status === 'READY') {
+            clearInterval(poll);
+            setVideoProcessing(false);
+            setForm((f) => ({ ...f, videoUrl: status.hlsUrl!, videoThumbnailUrl: status.thumbnailUrl ?? '', videoDuration: status.durationSeconds ?? 0 }));
+          } else if (status.status === 'FAILED') {
+            clearInterval(poll);
+            setVideoProcessing(false);
+          }
+        } catch {}
+      }, 5000);
+    } catch {}
+  };
 
   // ── Load articles ──────────────────────────────────────────────────────────
 
@@ -580,27 +605,28 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
                 </div>
               </div>
 
-              {/* Article video */}
-              <div className="px-6 pb-3 shrink-0">
-                {form.videoUrl ? (
-                  <div className="space-y-1.5">
-                    <p className="text-xs font-semibold text-gray-600">Article Video</p>
-                    <VideoPlayer src={form.videoUrl} poster={form.videoThumbnailUrl || undefined} />
-                    <button
-                      onClick={() => setForm((f) => ({ ...f, videoUrl: '', videoThumbnailUrl: '', videoDuration: 0 }))}
-                      className="text-xs text-red-500 hover:text-red-600"
-                    >
-                      Remove video
-                    </button>
-                  </div>
-                ) : (
-                  <VideoUpload
-                    onReady={({ hlsUrl, thumbnailUrl, durationSeconds }) =>
-                      setForm((f) => ({ ...f, videoUrl: hlsUrl, videoThumbnailUrl: thumbnailUrl ?? '', videoDuration: durationSeconds ?? 0 }))
-                    }
-                  />
-                )}
-              </div>
+              {/* Article video — compact status/player */}
+              {(form.videoUrl || videoProcessing || videoUploading) && (
+                <div className="px-6 pb-2 shrink-0">
+                  {videoUploading && (
+                    <div className="flex items-center gap-2 text-xs text-[#870BD6]">
+                      <Loader2 size={12} className="animate-spin" />Uploading video…
+                    </div>
+                  )}
+                  {videoProcessing && !videoUploading && (
+                    <div className="flex items-center gap-2 text-xs text-[#60666B]">
+                      <Loader2 size={12} className="animate-spin" />Processing video (1–3 min)…
+                    </div>
+                  )}
+                  {form.videoUrl && (
+                    <div className="space-y-1">
+                      <VideoPlayer src={form.videoUrl} poster={form.videoThumbnailUrl || undefined} />
+                      <button onClick={() => setForm((f) => ({ ...f, videoUrl: '', videoThumbnailUrl: '', videoDuration: 0 }))} className="text-[10px] text-red-400 hover:text-red-500">Remove video</button>
+                    </div>
+                  )}
+                </div>
+              )}
+              <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={handleVideoFileSelected} />
 
               {/* BIU toolbar */}
               <div className="flex items-center gap-1 px-5 pb-2 border-t border-[#E3E8EF] pt-2 shrink-0">
@@ -647,19 +673,17 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
                 </div>
 
                 <div className="flex flex-col gap-5 pt-1 w-10 shrink-0">
-                  <button
-                    title="Image"
-                    onClick={() => imageRef.current?.click()}
-                    disabled={imageUploading}
-                    className="flex flex-col items-center cursor-pointer disabled:opacity-50"
-                  >
+                  <button title="Image" onClick={() => imageRef.current?.click()} disabled={imageUploading} className="flex flex-col items-center cursor-pointer disabled:opacity-50">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      {imageUploading
-                        ? <Loader2 size={18} className="text-gray-500 animate-spin" />
-                        : <ImageIcon size={18} className="text-gray-500" />
-                      }
+                      {imageUploading ? <Loader2 size={18} className="text-gray-500 animate-spin" /> : <ImageIcon size={18} className="text-gray-500" />}
                     </div>
                     <span className="text-[10px] text-gray-400 mt-1.5">Image</span>
+                  </button>
+                  <button title="Video" onClick={() => videoRef.current?.click()} disabled={videoUploading || videoProcessing} className="flex flex-col items-center cursor-pointer disabled:opacity-50">
+                    <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
+                      {(videoUploading || videoProcessing) ? <Loader2 size={18} className="text-gray-500 animate-spin" /> : <Video size={18} className="text-gray-500" />}
+                    </div>
+                    <span className="text-[10px] text-gray-400 mt-1.5">Video</span>
                   </button>
                   <button title="Embed" onClick={() => rteRef.current?.insertCodeBlock()} className="flex flex-col items-center cursor-pointer">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
