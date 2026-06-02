@@ -4,8 +4,11 @@ import React, {
   useState, useEffect, useRef, useCallback, useMemo,
 } from 'react';
 import {
-  GripVertical, Plus, Trash2, Pencil, Image as ImageIcon, Video, Code, Check,
+  GripVertical, Plus, Trash2, Pencil, Image as ImageIcon, Code, Check, Loader2,
 } from 'lucide-react';
+import { useUpload } from '@/app/hooks/useUpload';
+import VideoUpload from '@/app/components/upload/VideoUpload';
+import VideoPlayer from '@/app/components/upload/VideoPlayer';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
   useSensor, useSensors, DragEndEvent,
@@ -74,7 +77,7 @@ const SortableLessonItem = React.memo(({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing flex-shrink-0">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing shrink-0">
         <GripVertical size={16} className="text-gray-400" />
       </div>
       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -92,7 +95,7 @@ const SortableLessonItem = React.memo(({
       {isActive && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
+          className="p-1 hover:bg-gray-200 rounded shrink-0"
           title="Delete Lesson"
         >
           <Trash2 size={14} className="text-gray-500" />
@@ -101,7 +104,7 @@ const SortableLessonItem = React.memo(({
       {hovered && !isActive && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
+          className="p-1 hover:bg-gray-200 rounded shrink-0"
           title="Delete Lesson"
         >
           <Trash2 size={14} className="text-gray-500" />
@@ -115,8 +118,7 @@ SortableLessonItem.displayName = 'SortableLessonItem';
 // ── RichTextEditor ────────────────────────────────────────────────────────────
 
 interface RichTextEditorHandle {
-  insertImage:    (file: File)   => void;
-  insertVideo:    (url: string)  => void;
+  insertImageUrl: (url: string) => void;
   insertCodeBlock:()             => void;
 }
 
@@ -171,26 +173,12 @@ const RichTextEditor = React.forwardRef<
   }, [onChange]);
 
   React.useImperativeHandle(ref, () => ({
-    insertImage: (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const src = e.target?.result as string;
-        insertHtmlAtCursor(
-          `<div contenteditable="false" style="margin:12px 0;text-align:center;">` +
-          `<img src="${src}" alt="${file.name}" style="max-width:100%;height:auto;border-radius:8px;display:inline-block;"/>` +
-          `<p style="font-size:12px;color:#9ca3af;margin-top:4px;">${file.name}</p></div><p><br/></p>`
-        );
-      };
-      reader.readAsDataURL(file);
-    },
-    insertVideo: (url: string) => {
-      const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-      const vm = url.match(/vimeo\.com\/(\d+)/);
-      let html: string;
-      if (yt)      html = `<div contenteditable="false" style="margin:12px 0;text-align:center;"><iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen style="max-width:100%;border-radius:8px;"></iframe></div><p><br/></p>`;
-      else if (vm) html = `<div contenteditable="false" style="margin:12px 0;text-align:center;"><iframe src="https://player.vimeo.com/video/${vm[1]}" width="560" height="315" frameborder="0" allowfullscreen style="max-width:100%;border-radius:8px;"></iframe></div><p><br/></p>`;
-      else         html = `<div contenteditable="false" style="margin:12px 0;text-align:center;"><video controls src="${url}" style="max-width:100%;border-radius:8px;">Your browser does not support video.</video></div><p><br/></p>`;
-      insertHtmlAtCursor(html);
+    insertImageUrl: (url: string) => {
+      insertHtmlAtCursor(
+        `<div contenteditable="false" style="margin:12px 0;text-align:center;">` +
+        `<img src="${url}" style="max-width:100%;height:auto;border-radius:8px;display:inline-block;"/>` +
+        `</div><p><br/></p>`
+      );
     },
     insertCodeBlock: () => {
       insertHtmlAtCursor(
@@ -205,7 +193,7 @@ const RichTextEditor = React.forwardRef<
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        className="w-full min-h-[400px] pl-6 pr-2 pt-2 focus:outline-none prose prose-sm max-w-none"
+        className="w-full min-h-100 pl-6 pr-2 pt-2 focus:outline-none prose prose-sm max-w-none"
         onInput={handleInput}
         data-placeholder={placeholder}
       />
@@ -262,6 +250,10 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
 
   const editorHandleRef = useRef<RichTextEditorHandle>(null);
   const imageInputRef   = useRef<HTMLInputElement>(null);
+  const { upload, uploading: imageUploading } = useUpload();
+
+  // Per-lesson video state: keyed by lessonId
+  const [lessonVideos, setLessonVideos] = useState<Record<string, { hlsUrl: string; thumbnailUrl?: string; durationSeconds?: number }>>({});
 
   // Suppress the debounce trigger that fires after patchLessonIds updates state.
   const isPatchingRef    = useRef(false);
@@ -468,11 +460,6 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
     imageInputRef.current?.click();
   }, []);
 
-  const handleInsertVideo = useCallback(() => {
-    const url = prompt('Enter video URL (YouTube, Vimeo, or direct link):');
-    if (url) editorHandleRef.current?.insertVideo(url);
-  }, []);
-
   const handleInsertCode = useCallback(() => {
     editorHandleRef.current?.insertCodeBlock();
   }, []);
@@ -481,10 +468,10 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
 
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="w-full flex h-[calc(100vh-200px)] border border-[#E3E8EF] rounded-[16px]">
+      <div className="w-full flex h-[calc(100vh-200px)] border border-[#E3E8EF] rounded-2xl">
 
         {/* ── Left sidebar ────────────────────────────────────────────────── */}
-        <div className="w-[35%] border-r border-[#E3E8EF] p-4 overflow-y-auto flex-shrink-0">
+        <div className="w-[35%] border-r border-[#E3E8EF] p-4 overflow-y-auto shrink-0">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Chapters</h2>
             <button
@@ -500,7 +487,7 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
             <div key={chapter.id} className="mb-6">
               {/* Chapter header */}
               <div className="flex items-center gap-2 mb-2 group/chapter">
-                <span className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-sm font-medium flex-shrink-0">
+                <span className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-sm font-medium shrink-0">
                   {chapterIndex + 1}
                 </span>
 
@@ -525,7 +512,7 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
 
                 <button
                   onClick={() => setEditingChapterId(chapter.id)}
-                  className="p-1 hover:bg-gray-200 rounded opacity-0 group-hover/chapter:opacity-100 transition-opacity flex-shrink-0"
+                  className="p-1 hover:bg-gray-200 rounded opacity-0 group-hover/chapter:opacity-100 transition-opacity shrink-0"
                   title="Rename Chapter"
                 >
                   <Pencil size={14} className="text-gray-500" />
@@ -568,11 +555,11 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
         </div>
 
         {/* ── Right: editor panel ─────────────────────────────────────────── */}
-        <div className="flex-1 overflow-hidden flex flex-col rounded-r-[16px]">
+        <div className="flex-1 overflow-hidden flex flex-col rounded-r-2xl">
           {activeLesson ? (
             <>
               {/* Header: lesson title + save indicator */}
-              <div className="flex justify-between items-center px-6 pt-5 pb-3 flex-shrink-0">
+              <div className="flex justify-between items-center px-6 pt-5 pb-3 shrink-0">
                 <input
                   type="text"
                   value={activeLesson.name}
@@ -580,7 +567,7 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                   className="text-xl font-medium border-none focus:outline-none focus:ring-0 flex-1"
                   placeholder="Lesson title"
                 />
-                <div className="flex items-center gap-2 min-w-[140px] justify-end">
+                <div className="flex items-center gap-2 min-w-35 justify-end">
                   {saveStatus === 'saving' && (
                     <span className="text-xs text-gray-400 flex items-center gap-1.5">
                       <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
@@ -606,8 +593,31 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                 </div>
               </div>
 
+              {/* Lesson video */}
+              <div className="px-6 pb-3 shrink-0">
+                {lessonVideos[activeLesson.id] ? (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-semibold text-gray-600">Lesson Video</p>
+                    <VideoPlayer
+                      src={lessonVideos[activeLesson.id].hlsUrl}
+                      poster={lessonVideos[activeLesson.id].thumbnailUrl}
+                    />
+                    <button
+                      onClick={() => setLessonVideos((prev) => { const n = { ...prev }; delete n[activeLesson.id]; return n; })}
+                      className="text-xs text-red-500 hover:text-red-600"
+                    >
+                      Remove video
+                    </button>
+                  </div>
+                ) : (
+                  <VideoUpload
+                    onReady={(data) => setLessonVideos((prev) => ({ ...prev, [activeLesson.id]: data }))}
+                  />
+                )}
+              </div>
+
               {/* Formatting toolbar */}
-              <div className="flex items-center gap-1 px-5 pb-2 border-b border-[#E3E8EF] flex-shrink-0">
+              <div className="flex items-center gap-1 px-5 pb-2 border-b border-[#E3E8EF] shrink-0">
                 {([
                   { label: 'B', cmd: 'bold',      cls: 'font-bold',            title: 'Bold' },
                   { label: 'I', cmd: 'italic',    cls: 'italic',               title: 'Italic' },
@@ -639,27 +649,34 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
-                      if (file && editorHandleRef.current) editorHandleRef.current.insertImage(file);
+                      if (file) {
+                        try {
+                          const result = await upload(file, 'content') as { url: string };
+                          editorHandleRef.current?.insertImageUrl(result.url);
+                        } catch {}
+                      }
                       e.target.value = '';
                     }}
                   />
                 </div>
 
                 {/* Right-side media insert buttons */}
-                <div className="flex flex-col gap-5 pt-1 w-10 flex-shrink-0">
-                  <button title="Image" onClick={handleInsertImage} className="flex flex-col items-center">
+                <div className="flex flex-col gap-5 pt-1 w-10 shrink-0">
+                  <button
+                    title="Image"
+                    onClick={handleInsertImage}
+                    disabled={imageUploading}
+                    className="flex flex-col items-center disabled:opacity-50"
+                  >
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      <ImageIcon size={18} className="text-gray-500" aria-hidden="true" />
+                      {imageUploading
+                        ? <Loader2 size={18} className="text-gray-500 animate-spin" />
+                        : <ImageIcon size={18} className="text-gray-500" />
+                      }
                     </div>
                     <span className="text-[10px] text-gray-400 mt-1.5">Image</span>
-                  </button>
-                  <button title="Video" onClick={handleInsertVideo} className="flex flex-col items-center">
-                    <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      <Video size={18} className="text-gray-500" />
-                    </div>
-                    <span className="text-[10px] text-gray-400 mt-1.5">Video</span>
                   </button>
                   <button title="Embed" onClick={handleInsertCode} className="flex flex-col items-center">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">

@@ -4,7 +4,7 @@ import React, {
   useState, useEffect, useRef, useCallback,
 } from 'react';
 import {
-  Plus, Trash2, Image as ImageIcon, Video, Code, Check, Loader2, X, BookOpen,
+  Plus, Trash2, Image as ImageIcon, Code, Check, Loader2, X, BookOpen,
 } from 'lucide-react';
 
 // ── Publish Success Modal ─────────────────────────────────────────────────────
@@ -56,6 +56,9 @@ const PublishSuccessModal = ({ onClose }: { onClose: () => void }) => (
 );
 import { devotionalService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
+import { useUpload, VideoUploadResult } from '@/app/hooks/useUpload';
+import VideoUpload from '@/app/components/upload/VideoUpload';
+import VideoPlayer from '@/app/components/upload/VideoPlayer';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -79,6 +82,9 @@ interface EditForm {
   tags: string[];
   tagInput: string;
   publishedTime: string;
+  videoUrl: string;
+  videoThumbnailUrl: string;
+  videoDuration: number;
 }
 
 const BLANK_FORM: EditForm = {
@@ -90,6 +96,9 @@ const BLANK_FORM: EditForm = {
   status: 'DRAFT',
   tags: [],
   tagInput: '',
+  videoUrl: '',
+  videoThumbnailUrl: '',
+  videoDuration: 0,
 };
 
 function articleToForm(a: DevArticle): EditForm {
@@ -103,6 +112,9 @@ function articleToForm(a: DevArticle): EditForm {
     status: a.status,
     tags: a.tags ?? [],
     tagInput: '',
+    videoUrl: (a as any).videoUrl ?? '',
+    videoThumbnailUrl: (a as any).videoThumbnailUrl ?? '',
+    videoDuration: (a as any).videoDuration ?? 0,
   };
 }
 
@@ -115,8 +127,7 @@ function formatDate(iso?: string) {
 // ── Rich Text Editor ──────────────────────────────────────────────────────────
 
 interface RteHandle {
-  insertImage: (file: File) => void;
-  insertVideo: (url: string) => void;
+  insertImageUrl: (url: string) => void;
   insertCodeBlock: () => void;
 }
 
@@ -168,26 +179,12 @@ const RichTextEditor = React.forwardRef<
   }, [onChange]);
 
   React.useImperativeHandle(ref, () => ({
-    insertImage: (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const src = e.target?.result as string;
-        insertAt(
-          `<div contenteditable="false" style="margin:12px 0;text-align:center;">` +
-          `<img src="${src}" alt="${file.name}" style="max-width:100%;height:auto;border-radius:8px;display:inline-block;"/>` +
-          `</div><p><br/></p>`,
-        );
-      };
-      reader.readAsDataURL(file);
-    },
-    insertVideo: (url: string) => {
-      const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-      const vm = url.match(/vimeo\.com\/(\d+)/);
-      let html: string;
-      if (yt)      html = `<div contenteditable="false" style="margin:12px 0;text-align:center;"><iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen style="max-width:100%;border-radius:8px;"></iframe></div><p><br/></p>`;
-      else if (vm) html = `<div contenteditable="false" style="margin:12px 0;text-align:center;"><iframe src="https://player.vimeo.com/video/${vm[1]}" width="560" height="315" frameborder="0" allowfullscreen style="max-width:100%;border-radius:8px;"></iframe></div><p><br/></p>`;
-      else         html = `<div contenteditable="false" style="margin:12px 0;text-align:center;"><video controls src="${url}" style="max-width:100%;border-radius:8px;">Your browser does not support video.</video></div><p><br/></p>`;
-      insertAt(html);
+    insertImageUrl: (url: string) => {
+      insertAt(
+        `<div contenteditable="false" style="margin:12px 0;text-align:center;">` +
+        `<img src="${url}" style="max-width:100%;height:auto;border-radius:8px;display:inline-block;"/>` +
+        `</div><p><br/></p>`,
+      );
     },
     insertCodeBlock: () => {
       insertAt(
@@ -230,6 +227,7 @@ export interface DevotionContentHandle {
 
 const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: string }>(({ seriesId }, ref) => {
   const { user } = useAuth();
+  const { upload, uploading: imageUploading } = useUpload();
   const [articles, setArticles]       = useState<DevArticle[]>([]);
   const [loading, setLoading]         = useState(true);
   const [activeId, setActiveId]       = useState<string | null>(null);
@@ -296,6 +294,8 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
         status: form.status,
         tags: form.tags,
         seriesId,
+        videoUrl: form.videoUrl || undefined,
+        videoThumbnailUrl: form.videoThumbnailUrl || undefined,
       };
 
       if (isNew) {
@@ -353,6 +353,8 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
         status: 'PUBLISHED' as const,
         tags: form.tags,
         seriesId,
+        videoUrl: form.videoUrl || undefined,
+        videoThumbnailUrl: form.videoThumbnailUrl || undefined,
       };
       if (isNew) {
         const created = await devotionalService.create(payload) as DevArticle;
@@ -578,6 +580,28 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
                 </div>
               </div>
 
+              {/* Article video */}
+              <div className="px-6 pb-3 shrink-0">
+                {form.videoUrl ? (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-semibold text-gray-600">Article Video</p>
+                    <VideoPlayer src={form.videoUrl} poster={form.videoThumbnailUrl || undefined} />
+                    <button
+                      onClick={() => setForm((f) => ({ ...f, videoUrl: '', videoThumbnailUrl: '', videoDuration: 0 }))}
+                      className="text-xs text-red-500 hover:text-red-600"
+                    >
+                      Remove video
+                    </button>
+                  </div>
+                ) : (
+                  <VideoUpload
+                    onReady={({ hlsUrl, thumbnailUrl, durationSeconds }) =>
+                      setForm((f) => ({ ...f, videoUrl: hlsUrl, videoThumbnailUrl: thumbnailUrl ?? '', videoDuration: durationSeconds ?? 0 }))
+                    }
+                  />
+                )}
+              </div>
+
               {/* BIU toolbar */}
               <div className="flex items-center gap-1 px-5 pb-2 border-t border-[#E3E8EF] pt-2 shrink-0">
                 {([
@@ -609,26 +633,33 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
-                      if (file) rteRef.current?.insertImage(file);
+                      if (file) {
+                        try {
+                          const result = await upload(file, 'content') as { url: string };
+                          rteRef.current?.insertImageUrl(result.url);
+                        } catch {}
+                      }
                       e.target.value = '';
                     }}
                   />
                 </div>
 
                 <div className="flex flex-col gap-5 pt-1 w-10 shrink-0">
-                  <button title="Image" onClick={() => imageRef.current?.click()} className="flex flex-col items-center cursor-pointer">
+                  <button
+                    title="Image"
+                    onClick={() => imageRef.current?.click()}
+                    disabled={imageUploading}
+                    className="flex flex-col items-center cursor-pointer disabled:opacity-50"
+                  >
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      <ImageIcon size={18} className="text-gray-500" />
+                      {imageUploading
+                        ? <Loader2 size={18} className="text-gray-500 animate-spin" />
+                        : <ImageIcon size={18} className="text-gray-500" />
+                      }
                     </div>
                     <span className="text-[10px] text-gray-400 mt-1.5">Image</span>
-                  </button>
-                  <button title="Video" onClick={() => { const u = prompt('Enter video URL:'); if (u) rteRef.current?.insertVideo(u); }} className="flex flex-col items-center cursor-pointer">
-                    <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      <Video size={18} className="text-gray-500" />
-                    </div>
-                    <span className="text-[10px] text-gray-400 mt-1.5">Video</span>
                   </button>
                   <button title="Embed" onClick={() => rteRef.current?.insertCodeBlock()} className="flex flex-col items-center cursor-pointer">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
