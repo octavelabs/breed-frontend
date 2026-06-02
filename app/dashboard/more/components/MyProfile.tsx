@@ -4,12 +4,32 @@ import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/lib/api-services";
-import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, Camera, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useUpload } from "@/app/hooks/useUpload";
 
 
 const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => void}) => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const { upload, uploading: avatarUploading } = useUpload();
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Optimistic local preview
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    try {
+      const result = await upload(file, 'avatar') as { url: string };
+      await userService.updateProfile({ avatarUrl: result.url });
+      await refreshUser();
+    } catch {
+      setAvatarPreview(null);
+    }
+  };
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -69,20 +89,39 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
 
       <div className="w-full lg:w-[40%]">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-24 h-24 rounded-full border border-gray-300 flex items-center justify-center mb-2 overflow-hidden">
-            {user?.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.firstName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 20C24.1421 20 27.5 16.6421 27.5 12.5C27.5 8.35786 24.1421 5 20 5C15.8579 5 12.5 8.35786 12.5 12.5C12.5 16.6421 15.8579 20 20 20Z" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M33.75 35C33.75 28.7868 27.7132 23.75 20 23.75C12.2868 23.75 6.25 28.7868 6.25 35" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
+          <div
+            className="relative w-24 h-24 rounded-full mb-2 cursor-pointer group"
+            onClick={() => avatarInputRef.current?.click()}
+          >
+            {/* Avatar image or placeholder */}
+            <div className="w-full h-full rounded-full border border-gray-300 overflow-hidden flex items-center justify-center bg-[#F5EBFF]">
+              {avatarPreview || user?.avatarUrl ? (
+                <img
+                  src={avatarPreview ?? user!.avatarUrl!}
+                  alt={user?.firstName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 20C24.1421 20 27.5 16.6421 27.5 12.5C27.5 8.35786 24.1421 5 20 5C15.8579 5 12.5 8.35786 12.5 12.5C12.5 16.6421 15.8579 20 20 20Z" stroke="#870BD6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M33.75 35C33.75 28.7868 27.7132 23.75 20 23.75C12.2868 23.75 6.25 28.7868 6.25 35" stroke="#870BD6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+            {/* Camera overlay */}
+            <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+              {avatarUploading ? (
+                <Loader2 size={20} className="text-white animate-spin" />
+              ) : (
+                <Camera size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              )}
+            </div>
+            {/* Camera badge */}
+            <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#870BD6] border-2 border-white flex items-center justify-center">
+              <Camera size={13} className="text-white" />
+            </div>
           </div>
+          <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
           {!isEditing && (
             <p className="text-lg font-medium">
               {formData.firstName || formData.lastName

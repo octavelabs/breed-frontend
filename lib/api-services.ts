@@ -361,6 +361,7 @@ export const communityService = {
     name: string;
     description?: string;
     privacy?: string;
+    coverImage?: string;
   }) => api.post('/communities', data),
 
   join: (id: string) => api.post(`/communities/${id}/join`),

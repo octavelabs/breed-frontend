@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useId, ChangeEvent, useEffect } from "react";
-import { X, Upload } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import ImageUpload from "@/app/components/upload/ImageUpload";
 import { useRouter } from "next/navigation";
 
 import DropdownWithMultipleSelect from "@/app/components/Dropdown/DropdownWithMultipleSelect";
@@ -24,7 +25,6 @@ export const CreateCourseModal = ({
   onClose,
   onCreated,
 }: CreateCourseModalProps) => {
-  const bannerInputId = useId();
   const router = useRouter();
 
   const [step, setStep] = useState(1);
@@ -36,7 +36,7 @@ export const CreateCourseModal = ({
   const debouncedSearchValueCategory = useDebounce(searchValueCategory, 300) ?? "";
   const [title, setTitle] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState("");
   const [level, setLevel] = useState<"BEGINNER" | "INTERMEDIATE" | "ADVANCED">("BEGINNER");
 
   // Step 2 state
@@ -73,14 +73,6 @@ export const CreateCourseModal = ({
     return matchesSearch && notSelected;
   });
 
-  const handleBannerUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setBannerPreview(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
   const handleRemoveCategory = (cat: CourseCategory) => {
     setSelectedCategories((prev) => prev.filter((v) => v.id !== cat.id));
   };
@@ -110,6 +102,7 @@ export const CreateCourseModal = ({
         title: title.trim(),
         description: courseDescription.trim(),
         categoryId: selectedCategories[0]?.id,
+        coverImageUrl: coverImageUrl || undefined,
         level,
         isFree: true,
       })) as { id: string };
@@ -237,31 +230,13 @@ export const CreateCourseModal = ({
                 />
               </div>
 
-              <div className="mx-auto w-fit">
-                <label
-                  htmlFor={bannerInputId}
-                  className="mx-auto w-[116px] h-[116px] rounded-[19px] border-2 border-dashed border-[#D49CFD] bg-[#FBF6FF] flex items-center justify-center cursor-pointer transition-colors overflow-hidden"
-                >
-                  {bannerPreview ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={bannerPreview}
-                      alt="Banner preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Upload className="w-5 h-5" stroke="#B144F9" />
-                  )}
-                </label>
-                <input
-                  id={bannerInputId}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleBannerUpload}
-                />
-                <p className="text-sm mt-3 text-center">Upload Course Thumbnail</p>
-              </div>
+              <ImageUpload
+                type="cover"
+                value={coverImageUrl}
+                onUpload={setCoverImageUrl}
+                label="Course Thumbnail (optional)"
+                aspectRatio="cover"
+              />
 
               <button
                 onClick={handleProceed}

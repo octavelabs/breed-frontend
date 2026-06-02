@@ -372,12 +372,14 @@ const CommunityPage = () => {
     name: string;
     description: string;
     isPrivate: boolean;
+    banner: string;
     friends: Array<{ id: string; role?: "admin" | "member" | "added" }>;
   }) => {
     const created = (await communityService.create({
       name: formData.name,
       description: formData.description || undefined,
       privacy: formData.isPrivate ? "PRIVATE" : "PUBLIC",
+      coverImage: formData.banner || undefined,
     })) as { id: string };
 
     const toInvite = formData.friends.filter(

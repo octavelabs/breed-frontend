@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, ChangeEvent, useEffect } from 'react';
-import { X, Upload, Search, Check, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Search, Check, Plus } from 'lucide-react';
+import ImageUpload from '@/app/components/upload/ImageUpload';
 import { StepProgress } from './StepProgress';
 import Button from '@/app/components/Button';
 import { useAuth } from '@/context/AuthContext';
@@ -16,7 +17,7 @@ interface Friend {
 }
 
 interface CommunityFormData {
-  banner: File | null;
+  banner: string;
   name: string;
   description: string;
   isPrivate: boolean;
@@ -48,7 +49,7 @@ export const CreateCommunityModal = ({
   const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<CommunityFormData>({
-    banner: null,
+    banner: '',
     name: '',
     description: '',
     isPrivate: false,
@@ -57,7 +58,6 @@ export const CreateCommunityModal = ({
     friends: [],
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
@@ -86,16 +86,6 @@ export const CreateCommunityModal = ({
   }, [step, user?.id]);
 
   if (!isOpen) return null;
-
-  const handleBannerUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData({ ...formData, banner: file });
-      const reader = new FileReader();
-      reader.onloadend = () => setBannerPreview(reader.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleToggleFriend = (friendId: string, role: 'admin' | 'member' | 'added') => {
     setFormData({
@@ -170,21 +160,13 @@ export const CreateCommunityModal = ({
           {/* Step 1: Basic Info */}
           {step === 1 && (
             <div className="space-y-6">
-              <div className="flex flex-col items-center">
-                <label
-                  htmlFor="banner-upload"
-                  className="w-24 h-24 rounded-full border-2 border-dashed border-[#D49CFD] bg-[#FBF6FF] flex items-center justify-center cursor-pointer transition-colors overflow-hidden"
-                >
-                  {bannerPreview ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={bannerPreview} alt="Banner preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <Upload className="w-8 h-8 text-purple-400" />
-                  )}
-                </label>
-                <input id="banner-upload" type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
-                <p className="text-xs text-gray-500 mt-2">Upload Banner</p>
-              </div>
+              <ImageUpload
+                type="community"
+                value={formData.banner}
+                onUpload={(url) => setFormData({ ...formData, banner: url })}
+                label="Community Banner (optional)"
+                aspectRatio="banner"
+              />
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Community name</label>
@@ -228,7 +210,7 @@ export const CreateCommunityModal = ({
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" checked={formData.isPrivate} onChange={(e) => setFormData({ ...formData, isPrivate: e.target.checked })} />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600" />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600" />
                 </label>
               </div>
 
@@ -236,11 +218,11 @@ export const CreateCommunityModal = ({
                 <p className="text-sm font-medium text-gray-900">Only admins can send a message</p>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" checked={formData.onlyAdminsCanMessage} onChange={(e) => setFormData({ ...formData, onlyAdminsCanMessage: e.target.checked })} />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600" />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600" />
                 </label>
               </div>
 
-              <div className="bg-[#F6F8FA] rounded-[16px] p-5">
+              <div className="bg-[#F6F8FA] rounded-2xl p-5">
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <label htmlFor="guidelines" className="text-sm font-medium text-gray-900 cursor-pointer">

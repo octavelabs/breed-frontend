@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, ChangeEvent } from 'react';
-import { Upload } from 'lucide-react';
+import { useState } from 'react';
 import Button from '@/app/components/Button';
 import { CustomModal } from '@/app/components/Modal/customModal';
 import Input from '@/app/components/Input';
 import TextArea from '@/app/components/TextArea';
 import { devotionalService } from '@/lib/api-services';
+import ImageUpload from '@/app/components/upload/ImageUpload';
 
 interface CreateDevotionalModalProps {
   isOpen: boolean;
@@ -21,18 +21,10 @@ export const CreateDevotionalModal = ({
 }: CreateDevotionalModalProps) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   if (!isOpen) return null;
-
-  const handleBannerUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setBannerPreview(reader.result as string);
-    reader.readAsDataURL(file);
-  };
 
   const handleCreate = async () => {
     if (!title.trim() || submitting) return;
@@ -41,11 +33,11 @@ export const CreateDevotionalModal = ({
       await devotionalService.createSeries({
         title: title.trim(),
         description: description.trim() || undefined,
-        coverImageUrl: bannerPreview ?? undefined,
+        coverImageUrl: coverImageUrl || undefined,
       });
       setTitle('');
       setDescription('');
-      setBannerPreview(null);
+      setCoverImageUrl('');
       onCreated?.();
       onClose();
     } finally {
@@ -85,26 +77,14 @@ export const CreateDevotionalModal = ({
           />
         </div>
 
-        <div className="mx-auto w-fit">
-          <label
-            htmlFor="devotional-banner-upload"
-            className="mx-auto w-29 h-29 rounded-[19px] border-2 border-dashed border-[#D49CFD] bg-[#FBF6FF] flex items-center justify-center cursor-pointer transition-colors overflow-hidden"
-          >
-            {bannerPreview ? (
-              <img src={bannerPreview} alt="Cover preview" className="w-full h-full object-cover" />
-            ) : (
-              <Upload className="w-5 h-5" stroke="#B144F9" />
-            )}
-          </label>
-          <input
-            id="devotional-banner-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleBannerUpload}
-          />
-          <p className="text-sm mt-3 text-center">Upload Cover Image</p>
-        </div>
+        <ImageUpload
+          type="cover"
+          value={coverImageUrl}
+          onUpload={setCoverImageUrl}
+          label="Cover Image (optional)"
+          hint="Recommended: 1200×675px"
+          aspectRatio="cover"
+        />
 
         <Button
           onClick={handleCreate}
