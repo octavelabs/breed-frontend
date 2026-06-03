@@ -144,6 +144,8 @@ export const userService = {
 
   getPublicProfile: (id: string) => api.get(`/users/${id}`),
 
+  setAvatarUrl: (url: string) => api.patch('/users/me/avatar', { url }),
+
   updateProfile: (
     data: Partial<User> & {
       interests?: string[];

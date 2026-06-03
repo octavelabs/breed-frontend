@@ -19,7 +19,7 @@ export default function Toast({ message, type = 'success', onDismiss, duration =
   }, [onDismiss, duration]);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium animate-fade-in-up bg-white border border-[#E3E8EF] max-w-xs w-full">
+    <div className="fixed top-6 right-6 z-9999 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium animate-fade-in-up bg-white border border-[#E3E8EF] max-w-xs w-full">
       {type === 'success'
         ? <CheckCircle size={18} className="text-green-500 shrink-0" />
         : <XCircle size={18} className="text-red-400 shrink-0" />

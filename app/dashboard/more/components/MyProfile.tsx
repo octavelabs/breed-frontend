@@ -26,7 +26,7 @@ const MyProfile = ({setShowSelectedTab}: {setShowSelectedTab: (val: boolean) => 
     reader.readAsDataURL(file);
     try {
       const result = await upload(file, 'avatar') as { url: string };
-      await userService.updateProfile({ avatarUrl: result.url });
+      await userService.setAvatarUrl(result.url);
       await refreshUser(); // updates header, sidebar, and all avatar uses
       setToast({ message: 'Profile picture updated!', type: 'success' });
     } catch {
