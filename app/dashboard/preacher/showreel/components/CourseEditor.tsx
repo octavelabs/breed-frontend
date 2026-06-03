@@ -262,13 +262,18 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
     if (!file || !activeLessonId) return;
     e.target.value = '';
     try {
-      const result = await uploadVideo(file, 'video') as { jobId: string; status: string };
+      const result = await uploadVideo(file, 'video') as { jobId?: string; status: string; hlsUrl?: string; thumbnailUrl?: string };
+      if (result.status === 'READY' && result.hlsUrl) {
+        // MediaConvert unavailable — raw video served directly, already ready
+        setLessonVideos((prev) => ({ ...prev, [activeLessonId]: { hlsUrl: result.hlsUrl!, thumbnailUrl: result.thumbnailUrl } }));
+        return;
+      }
+      if (!result.jobId) return;
       setVideoProcessing((prev) => ({ ...prev, [activeLessonId]: true }));
-      // Poll until ready
       const lessonId = activeLessonId;
       const poll = setInterval(async () => {
         try {
-          const status = await pollVideoStatus(result.jobId);
+          const status = await pollVideoStatus(result.jobId!);
           if (status.status === 'READY') {
             clearInterval(poll);
             setVideoProcessing((prev) => ({ ...prev, [lessonId]: false }));

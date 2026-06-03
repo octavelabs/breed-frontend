@@ -73,9 +73,18 @@ export default function VideoUpload({
 
     try {
       const result = await upload(file, 'video') as VideoUploadResult;
-      setJobId(result.jobId);
-      setStage('processing');
-      startPolling(result.jobId);
+      if (result.status === 'READY' && result.hlsUrl) {
+        // MediaConvert unavailable — raw video served directly
+        setStage('ready');
+        setReady({ jobId: '', status: 'READY', hlsUrl: result.hlsUrl, thumbnailUrl: result.thumbnailUrl });
+        onReady({ hlsUrl: result.hlsUrl, thumbnailUrl: result.thumbnailUrl });
+        return;
+      }
+      if (result.jobId) {
+        setJobId(result.jobId);
+        setStage('processing');
+        startPolling(result.jobId);
+      }
     } catch {
       setStage('failed');
     }

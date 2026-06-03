@@ -33,13 +33,15 @@ export default function VideoPlayer({ src, poster, className = '' }: VideoPlayer
     const video = videoRef.current;
     if (!video || !src) return;
 
-    if (Hls.isSupported()) {
-      const hls = new Hls({ startLevel: -1 }); // auto quality
+    const isHls = src.includes('.m3u8');
+
+    if (isHls && Hls.isSupported()) {
+      const hls = new Hls({ startLevel: -1 });
       hlsRef.current = hls;
       hls.loadSource(src);
       hls.attachMedia(video);
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Native HLS (Safari)
+    } else {
+      // Direct video URL (raw mp4/mov) or native HLS (Safari)
       video.src = src;
     }
 

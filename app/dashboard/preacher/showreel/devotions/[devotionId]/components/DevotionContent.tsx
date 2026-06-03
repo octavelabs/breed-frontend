@@ -248,11 +248,17 @@ const DevotionContent = React.forwardRef<DevotionContentHandle, { seriesId: stri
     if (!file) return;
     e.target.value = '';
     try {
-      const result = await uploadVideo(file, 'video') as { jobId: string };
+      const result = await uploadVideo(file, 'video') as { jobId?: string; status: string; hlsUrl?: string; thumbnailUrl?: string };
+      if (result.status === 'READY' && result.hlsUrl) {
+        // MediaConvert unavailable — raw video ready immediately
+        setForm((f) => ({ ...f, videoUrl: result.hlsUrl!, videoThumbnailUrl: result.thumbnailUrl ?? '' }));
+        return;
+      }
+      if (!result.jobId) return;
       setVideoProcessing(true);
       const poll = setInterval(async () => {
         try {
-          const status = await pollVideoStatus(result.jobId);
+          const status = await pollVideoStatus(result.jobId!);
           if (status.status === 'READY') {
             clearInterval(poll);
             setVideoProcessing(false);

@@ -14,9 +14,12 @@ export interface UploadResult {
 }
 
 export interface VideoUploadResult {
-  jobId: string;
+  jobId?: string;
   rawKey: string;
-  status: 'PROCESSING';
+  rawUrl?: string;
+  status: 'PROCESSING' | 'READY';
+  hlsUrl?: string;
+  thumbnailUrl?: string;
 }
 
 export interface VideoJobStatus {
