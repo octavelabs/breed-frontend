@@ -222,8 +222,9 @@ const CourseDetail: React.FC = () => {
   }, [courseId]);
 
   const handleEnroll = async (lessonId?: string) => {
-    if (enrolled && lessonId) {
-      router.push(`/dashboard/learn/materials/${lessonId}`);
+    const target = `/dashboard/learn/materials/${courseId}${lessonId ? `?lesson=${lessonId}` : ''}`;
+    if (enrolled) {
+      router.push(target);
       return;
     }
     setEnrolling(true);
@@ -231,7 +232,7 @@ const CourseDetail: React.FC = () => {
     try {
       await courseService.enroll(courseId);
       setEnrolled(true);
-      if (lessonId) router.push(`/dashboard/learn/materials/${lessonId}`);
+      router.push(target);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
       if (
@@ -239,7 +240,7 @@ const CourseDetail: React.FC = () => {
         (err as { response?: { status?: number } })?.response?.status === 409
       ) {
         setEnrolled(true);
-        if (lessonId) router.push(`/dashboard/learn/materials/${lessonId}`);
+        router.push(target);
       } else {
         setEnrollError("Failed to enrol. Please try again.");
       }

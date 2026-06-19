@@ -51,7 +51,7 @@ const CourseCard = ({
   search?: string;
 }) => {
   const level = course.level ?? 'BEGINNER';
-  const progress = course.progressPercent ?? 0;
+  const progress = Math.round(course.progressPercent ?? 0);
 
   return (
     <Link href={`/dashboard/learn/${course.id}/chapters/${course.id}`}>

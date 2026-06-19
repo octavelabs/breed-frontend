@@ -1,111 +1,178 @@
-"use client"
+'use client';
 
-import StepProgress from '@/app/components/StepProgress';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import StepProgress from '@/app/components/StepProgress';
+import VideoPlayer from '@/app/components/upload/VideoPlayer';
+import { courseService } from '@/lib/api-services';
 
-import React from 'react';
+// ── Types ─────────────────────────────────────────────────────────────────────
 
+interface Lesson {
+  id: string;
+  title: string;
+  description?: string | null;
+  content?: string | null;
+  videoUrl?: string | null;
+  videoThumbnailUrl?: string | null;
+  sortOrder: number;
+  isPublished: boolean;
+  chapterTitle?: string;
+}
 
-const CourseMaterials: React.FC = () => {
-  const router = useRouter()
-  const { id } = useParams();
+interface Chapter {
+  id: string;
+  title: string;
+  sortOrder: number;
+  lessons: Omit<Lesson, 'chapterTitle'>[];
+}
 
-  const exampleSteps = [
-    {
-      subtitle: 'Chapter 1',
-      title: 'The Fall That Made Grace Necessary',
-      content: (
-        <div className="flex flex-col l:flex-row gap-6 min-h-[calc(100vh-400px)]">
-          <img 
-            src="/dashboard-gratitude.png" 
-            alt="Devotional" 
-            className="w-full lg:w-72 h-48 object-cover rounded-lg"
-          />
-          <div className="flex-1 text-gray-700 space-y-4">
-            <p>
-              Gratitude is more than a momentary feeling, it’s a perspective that transforms how we experience life and relate to God. It shifts our attention from what’s lacking to what’s already been given, reminding us that even in difficult seasons, there is always something to be thankful for. 
-When we choose to give thanks, we’re not denying hardship; rather, we’re acknowledging God’s goodness in the midst of it. Gratitude is a spiritual discipline that grounds us in trust that God is at work even when the path is unclear. It is the lens that brings clarity to our chaos and peace to our pressure.
-In Scripture, gratitude is not just encouraged it’s commanded, because it opens the door to deeper communion with God. “Give thanks in all circumstances,” Paul writes in 1 Thessalonians 5:18, “for this is God’s will for you in Christ Jesus.” This verse reminds us that thanksgiving isn’t situational, it’s spiritual. 
-Whether in plenty or in lack, gratitude becomes a declaration of faith: that God is still good, still present, and still worthy of praise. It also softens our hearts and silences entitlement. When we’re grateful, we’re less likely to compare, complain, or control and more likely to rejoice, release, and rest.
-Gratitude also fuels humility. It helps us remember that everything we have is a gift from the breath in our lungs to the people in our lives and the grace that saves us. As we grow in gratitude, we become more generous with encouragement, more patient in process, and more aware of God’s hand in the details. In a culture that often pulls us toward discontentment and striving, practicing gratitude keeps our hearts anchored in truth. 
-It becomes a quiet, powerful resistance to fear and frustration reminding us that, in Christ, we have more than enough
-            </p>
-          
-          </div>
+interface Course {
+  id: string;
+  title: string;
+  chapters?: Chapter[];
+  lessons?: Omit<Lesson, 'chapterTitle'>[];
+}
+
+// ── Lesson content renderer ───────────────────────────────────────────────────
+
+function LessonContent({ lesson }: { lesson: Lesson }) {
+  return (
+    <div className="flex flex-col gap-6">
+      {lesson.videoUrl && (
+        <VideoPlayer
+          src={lesson.videoUrl}
+          poster={lesson.videoThumbnailUrl ?? undefined}
+          className="w-full max-w-3xl"
+        />
+      )}
+
+      {lesson.description && !lesson.content && (
+        <p className="text-[#60666B] text-sm leading-relaxed">{lesson.description}</p>
+      )}
+
+      {lesson.content ? (
+        <div
+          className="prose prose-sm max-w-none text-[#1A1A2E] leading-relaxed"
+          // Content is preacher-authored rich text stored server-side
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: lesson.content }}
+        />
+      ) : !lesson.videoUrl ? (
+        <p className="text-[#B0B7C3] text-sm italic">This lesson has no content yet.</p>
+      ) : null}
+    </div>
+  );
+}
+
+// ── Inner page (needs useSearchParams inside Suspense) ────────────────────────
+
+function CourseMaterialsInner() {
+  const router       = useRouter();
+  const { id }       = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const startLessonId = searchParams.get('lesson');
+
+  const [course,  setCourse]  = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    courseService
+      .getById(id)
+      .then((res: unknown) => {
+        const r = res as { data?: Course };
+        setCourse(r.data ?? (res as Course));
+      })
+      .catch(() => setCourse(null))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  // Flatten all lessons across chapters, preserving chapter title
+  const allLessons: Lesson[] = useMemo(() => {
+    if (!course) return [];
+    if (course.chapters && course.chapters.length > 0) {
+      return course.chapters
+        .slice()
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .flatMap((ch) =>
+          (ch.lessons ?? [])
+            .slice()
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map((l) => ({ ...l, chapterTitle: ch.title })),
+        );
+    }
+    return (course.lessons ?? []).map((l) => ({ ...l, chapterTitle: undefined }));
+  }, [course]);
+
+  const initialStep = useMemo(() => {
+    if (!startLessonId) return 0;
+    const idx = allLessons.findIndex((l) => l.id === startLessonId);
+    return idx >= 0 ? idx : 0;
+  }, [startLessonId, allLessons]);
+
+  const steps = useMemo(
+    () =>
+      allLessons.map((lesson) => ({
+        subtitle: lesson.chapterTitle,
+        title: lesson.title,
+        content: <LessonContent lesson={lesson} />,
+      })),
+    [allLessons],
+  );
+
+  const handleNextClick = async (stepIndex: number) => {
+    const lesson = allLessons[stepIndex];
+    if (lesson) {
+      try { await courseService.markLessonComplete(id, lesson.id); } catch {}
+    }
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="animate-pulse space-y-6 max-w-3xl mx-auto pt-8">
+          <div className="h-2 bg-gray-200 rounded-full w-full" />
+          <div className="h-8 bg-gray-200 rounded w-2/3" />
+          <div className="h-4 bg-gray-200 rounded w-full" />
+          <div className="h-4 bg-gray-200 rounded w-5/6" />
+          <div className="h-4 bg-gray-200 rounded w-4/6" />
         </div>
-      )
-    },
-     {
-      subtitle: 'Chapter 1',
-      title: 'The Fall That Made Grace Necessary',
-      content: (
-           <video
-      className="rounded-[16px] h-[600px]"
-      src='/test.mp4'
-      width="100%"
-      controls
-      controlsList="nodownload"
-    />
-      )
-    },
-         {
-       subtitle: 'Chapter 1',
-      title: 'The Fall That Made Grace Necessary',
-      content: (
-        <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-400px)]">
-          <img 
-            src="/dashboard-gratitude.png" 
-            alt="Devotional" 
-            className="w-full lg:w-72 h-48 object-cover rounded-lg"
-          />
-          <div className="flex-1 text-gray-700 space-y-4">
-            <p>
-             Lord, help me to develop and sustain a consistent time of fellowship with You, no matter how busy life gets.
-<br /><b>Scripture:</b><br />
-“Very early in the morning, while it was still dark, Jesus got up, left the house and went off to a solitary place, where he prayed.”
-Mark 1:35 (NIV)
-            </p>
-          
-          </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!course || steps.length === 0) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center py-24 gap-3">
+          <p className="text-sm font-semibold text-gray-600">No lessons found for this course.</p>
+          <button onClick={() => router.back()} className="text-[#870BD6] text-sm underline">Go back</button>
         </div>
-      )
-    },
-         {
-           subtitle: 'Chapter 1',
-      title: 'The Fall That Made Grace Necessary',
-      content: (
-        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-400px)]">
-          <img 
-            src="/dashboard-gratitude.png" 
-            alt="Devotional" 
-            className="w-full lg:w-72 h-48 object-cover rounded-lg"
-          />
-          <div className="flex-1 text-gray-700 space-y-4">
-            <p>
-            Prayer for God’s Prescence in Daily Life
-            </p>
-          
-          </div>
-        </div>
-      )
-    },
-]
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-    <div className="">
- 
-     <StepProgress
-      steps={exampleSteps}
-      onComplete={() => router.push(`/dashboard/learn/quiz/${id}`)}
-      completeButtonText="Take Assessment"
-    />
-    
-    </div>
+      <StepProgress
+        steps={steps}
+        initialStep={initialStep}
+        onComplete={() => router.push(`/dashboard/learn/quiz/${id}`)}
+        completeButtonText="Take Assessment"
+        handleNextClick={handleNextClick}
+        primaryColor="#870BD6"
+      />
     </DashboardLayout>
   );
-};
+}
 
-export default CourseMaterials
+// ── Page export (Suspense boundary for useSearchParams) ───────────────────────
+
+export default function CourseMaterials() {
+  return (
+    <Suspense>
+      <CourseMaterialsInner />
+    </Suspense>
+  );
+}

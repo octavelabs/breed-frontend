@@ -21,7 +21,7 @@ import BookOpenIcon from '@/app/assets/icons/BookOpenIcon';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export interface Lesson  { id: string; name: string; content: string; isValid: boolean; }
+export interface Lesson  { id: string; name: string; content: string; isValid: boolean; videoUrl?: string; videoThumbnailUrl?: string; }
 export interface Chapter { id: string; name: string; lessons: Lesson[]; }
 export interface CourseData { id: string; title: string; chapters: Chapter[]; }
 
@@ -253,8 +253,16 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
   const { upload, uploading: imageUploading } = useUpload();
   const { upload: uploadVideo, uploading: videoUploading, pollVideoStatus } = useUpload();
 
-  // Per-lesson video: keyed by lessonId
-  const [lessonVideos, setLessonVideos] = useState<Record<string, { hlsUrl: string; thumbnailUrl?: string; durationSeconds?: number }>>({});
+  // Per-lesson video: keyed by lessonId. Seeded from initialCourse so saved videos display immediately.
+  const [lessonVideos, setLessonVideos] = useState<Record<string, { hlsUrl: string; thumbnailUrl?: string; durationSeconds?: number }>>(() => {
+    const seed: Record<string, { hlsUrl: string; thumbnailUrl?: string }> = {};
+    (initialCourse ?? DEFAULT_COURSE).chapters.forEach((ch) => {
+      ch.lessons.forEach((l) => {
+        if (l.videoUrl) seed[l.id] = { hlsUrl: l.videoUrl, thumbnailUrl: l.videoThumbnailUrl };
+      });
+    });
+    return seed;
+  });
   const [videoProcessing, setVideoProcessing] = useState<Record<string, boolean>>({});
 
   const handleVideoFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,9 +271,21 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
     e.target.value = '';
     try {
       const result = await uploadVideo(file, 'video') as { jobId?: string; status: string; hlsUrl?: string; thumbnailUrl?: string };
+      const applyVideo = (lessonId: string, hlsUrl: string, thumbnailUrl?: string) => {
+        setLessonVideos((prev) => ({ ...prev, [lessonId]: { hlsUrl, thumbnailUrl } }));
+        setCourse((prev) => ({
+          ...prev,
+          chapters: prev.chapters.map((ch) => ({
+            ...ch,
+            lessons: ch.lessons.map((l) =>
+              l.id !== lessonId ? l : { ...l, videoUrl: hlsUrl, videoThumbnailUrl: thumbnailUrl }
+            ),
+          })),
+        }));
+      };
+
       if (result.status === 'READY' && result.hlsUrl) {
-        // MediaConvert unavailable — raw video served directly, already ready
-        setLessonVideos((prev) => ({ ...prev, [activeLessonId]: { hlsUrl: result.hlsUrl!, thumbnailUrl: result.thumbnailUrl } }));
+        applyVideo(activeLessonId, result.hlsUrl, result.thumbnailUrl);
         return;
       }
       if (!result.jobId) return;
@@ -277,7 +297,7 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
           if (status.status === 'READY') {
             clearInterval(poll);
             setVideoProcessing((prev) => ({ ...prev, [lessonId]: false }));
-            setLessonVideos((prev) => ({ ...prev, [lessonId]: { hlsUrl: status.hlsUrl!, thumbnailUrl: status.thumbnailUrl, durationSeconds: status.durationSeconds } }));
+            applyVideo(lessonId, status.hlsUrl!, status.thumbnailUrl);
           } else if (status.status === 'FAILED') {
             clearInterval(poll);
             setVideoProcessing((prev) => ({ ...prev, [lessonId]: false }));

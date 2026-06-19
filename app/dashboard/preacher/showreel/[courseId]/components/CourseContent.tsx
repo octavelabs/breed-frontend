@@ -11,6 +11,8 @@ interface ApiLesson {
   id: string;
   title: string;
   content?: string | null;
+  videoUrl?: string | null;
+  videoThumbnailUrl?: string | null;
   sortOrder?: number;
   chapterId?: string | null;
 }
@@ -32,7 +34,7 @@ interface ApiCourse {
 
 // ── Editor types (mirror CourseEditor internals) ──────────────────────────────
 
-interface EditorLesson  { id: string; name: string; content: string; isValid: boolean; }
+interface EditorLesson  { id: string; name: string; content: string; isValid: boolean; videoUrl?: string; videoThumbnailUrl?: string; }
 interface EditorChapter { id: string; name: string; lessons: EditorLesson[]; }
 interface EditorCourse  { id: string; title: string; chapters: EditorChapter[]; }
 
@@ -58,10 +60,12 @@ function mapApiToEditor(
       id:   ch.editorId || ch.id,   // editor uses editorId as its stable chapter key
       name: ch.title,
       lessons: (ch.lessons ?? []).map((l) => ({
-        id:      l.id,
-        name:    l.title,
-        content: l.content ?? "",
-        isValid: !!l.content,
+        id:               l.id,
+        name:             l.title,
+        content:          l.content ?? "",
+        isValid:          !!l.content,
+        videoUrl:         l.videoUrl ?? undefined,
+        videoThumbnailUrl: l.videoThumbnailUrl ?? undefined,
       })),
     }));
     return { id: course.id, title: course.title, chapters };
@@ -69,10 +73,12 @@ function mapApiToEditor(
 
   // 2. No backend chapters — use flat lessons (fallback / backwards compat)
   const lessons: EditorLesson[] = (course.lessons ?? []).map((l) => ({
-    id:      l.id,
-    name:    l.title,
-    content: l.content ?? "",
-    isValid: !!l.content,
+    id:               l.id,
+    name:             l.title,
+    content:          l.content ?? "",
+    isValid:          !!l.content,
+    videoUrl:         l.videoUrl ?? undefined,
+    videoThumbnailUrl: l.videoThumbnailUrl ?? undefined,
   }));
 
   if (lessons.length === 0 && addFallback) {
@@ -114,14 +120,14 @@ function restoreStructure(apiCourse: ApiCourse): EditorCourse | null {
         .filter((id) => byId.has(id))
         .map((id) => {
           const l = byId.get(id)!;
-          return { id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content };
+          return { id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content, videoUrl: l.videoUrl ?? undefined, videoThumbnailUrl: l.videoThumbnailUrl ?? undefined };
         }),
     }));
 
     const knownIds = new Set(saved.chapters.flatMap((ch) => ch.lessonIds ?? []));
     const orphans: EditorLesson[] = (apiCourse.lessons ?? [])
       .filter((l) => !knownIds.has(l.id))
-      .map((l) => ({ id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content }));
+      .map((l) => ({ id: l.id, name: l.title, content: l.content ?? "", isValid: !!l.content, videoUrl: l.videoUrl ?? undefined, videoThumbnailUrl: l.videoThumbnailUrl ?? undefined }));
 
     if (orphans.length > 0) {
       if (chapters.length > 0) chapters[0].lessons.push(...orphans);
@@ -223,23 +229,27 @@ const CourseContent = ({ onCourseUpdate }: CourseContentProps) => {
         Promise.all(
           newLessons.map((l) =>
             courseService.createLesson(courseId, {
-              title:       l.name || "Untitled Lesson",
-              content:     l.content,
-              type:        "TEXT",
-              sortOrder:   l.sortOrder,
-              chapterId:   l.backendChapterId,
-              isPublished: true,
+              title:             l.name || "Untitled Lesson",
+              content:           l.content,
+              type:              "TEXT",
+              sortOrder:         l.sortOrder,
+              chapterId:         l.backendChapterId,
+              isPublished:       true,
+              ...(l.videoUrl         && { videoUrl:         l.videoUrl }),
+              ...(l.videoThumbnailUrl && { videoThumbnailUrl: l.videoThumbnailUrl }),
             }) as Promise<{ id: string }>,
           ),
         ),
         Promise.all(
           existing.map((l) =>
             courseService.updateLesson(courseId, l.id, {
-              title:       l.name || "Untitled Lesson",
-              content:     l.content,
-              sortOrder:   l.sortOrder,
-              chapterId:   l.backendChapterId,
-              isPublished: true,
+              title:             l.name || "Untitled Lesson",
+              content:           l.content,
+              sortOrder:         l.sortOrder,
+              chapterId:         l.backendChapterId,
+              isPublished:       true,
+              ...(l.videoUrl         && { videoUrl:         l.videoUrl }),
+              ...(l.videoThumbnailUrl && { videoThumbnailUrl: l.videoThumbnailUrl }),
             }),
           ),
         ),

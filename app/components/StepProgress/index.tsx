@@ -15,30 +15,30 @@ interface StepProgressProps {
   nextButtonText?: string;
   previousButtonText?: string;
   completeButtonText?: string;
-  handleNextClick?: () => void;
+  handleNextClick?: (stepIndex: number) => void;
+  initialStep?: number;
 }
 
-const StepProgress:React.FC<StepProgressProps> = ({ 
-  steps = [], 
+const StepProgress:React.FC<StepProgressProps> = ({
+  steps = [],
   onComplete,
   primaryColor = '#7c3aed',
   showStepCounter = true,
   nextButtonText = 'Proceed',
   previousButtonText = 'Previous',
   completeButtonText,
-  handleNextClick
+  handleNextClick,
+  initialStep = 0,
 }) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const totalSteps = steps.length;
   const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
   const router = useRouter();
 
   const handleNext = () => {
+    if (handleNextClick) handleNextClick(currentStep);
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
-      if (handleNextClick) {
-        handleNextClick();
-      }
     } else {
       onComplete();
     }
