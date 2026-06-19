@@ -102,7 +102,8 @@ export function useUpload() {
     });
     if (!res.ok) throw new Error('Failed to fetch video status');
     const json = await res.json();
-    return json.data as VideoJobStatus;
+    // Global interceptor wraps as { data: ... }; the actual status is in json.data
+    return (json.data ?? json) as VideoJobStatus;
   }, []);
 
   return { upload, pollVideoStatus, uploading, progress, error, setError };

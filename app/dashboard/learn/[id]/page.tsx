@@ -1,79 +1,77 @@
-"use client";
+'use client';
 
-import {
-  ArrowLeft,
-  Clock,
-  MessageSquareText,
-  User,
-  UserRound,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
-import DashboardLayout from "@/app/layout/DashboardLayout";
+import { ArrowLeft, BookOpen, MessageSquareText, UserRound } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useParams } from 'next/navigation';
+import DashboardLayout from '@/app/layout/DashboardLayout';
+import { courseService } from '@/lib/api-services';
+import { useEffect, useState } from 'react';
 
-const CategoryDetail: React.FC = () => {
+interface Lesson {
+  id: string;
+  title: string;
+  type?: string;
+  isPublished?: boolean;
+}
+
+interface Chapter {
+  id: string;
+  title: string;
+  sortOrder: number;
+  lessons: Lesson[];
+}
+
+interface CourseDetail {
+  id: string;
+  title: string;
+  coverImageUrl?: string | null;
+  description?: string;
+  enrollmentCount?: number;
+  chapters: Chapter[];
+  author?: { firstName?: string; lastName?: string } | null;
+  createdAt?: string;
+}
+
+const Skeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className="border border-[#E2E3E5] rounded-2xl animate-pulse">
+        <div className="bg-gray-100 rounded-t-2xl p-3.5">
+          <div className="bg-gray-200 rounded-xl h-47" />
+        </div>
+        <div className="px-4 py-4.5 space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-3/4" />
+          <div className="h-3 bg-gray-200 rounded w-1/2" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const CourseDetail: React.FC = () => {
   const router = useRouter();
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
+  const [course, setCourse] = useState<CourseDetail | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const courses = [
-    {
-      image: "/courseImage.jpg",
-      id: "1",
-      title: "Understanding Gods grace",
-      date: "Apr 24, 2025",
-      chapters: 3,
-      lessons: 6,
-      participants: 45,
-      comments: 3,
-    },
-   {
-      image: "/courseImage.jpg",
-      id: "2",
-      title: "Understanding Gods grace",
-      date: "Apr 24, 2025",
-      chapters: 3,
-      lessons: 6,
-      participants: 45,
-      comments: 3,
-    },
-    {
-      image: "/courseImage.jpg",
-      id: "3",
-      title: "Understanding Gods grace",
-      date: "Apr 24, 2025",
-      chapters: 3,
-      lessons: 6,
-      participants: 45,
-      comments: 3,
-    },
-    {
-      image: "/courseImage.jpg",
-      id: "4",
-      title: "Understanding Gods grace",
-      date: "Apr 24, 2025",
-      chapters: 3,
-      lessons: 6,
-      participants: 45,
-      comments: 3,
-    },
-    {
-      image: "/courseImage.jpg",
-      id: "5",
-      title: "Understanding Gods grace",
-      date: "Apr 24, 2025",
-      chapters: 3,
-      lessons: 6,
-      participants: 45,
-      comments: 3,
-    }
+  useEffect(() => {
+    if (!id) return;
+    courseService
+      .getById(id as string)
+      .then((res: unknown) => {
+        const r = res as { data?: CourseDetail };
+        setCourse(Array.isArray(res) ? null : (r.data ?? (res as CourseDetail)));
+      })
+      .catch(() => setCourse(null))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-
-  ];
+  const chapters = course?.chapters ?? [];
+  const totalLessons = chapters.reduce((sum, ch) => sum + ch.lessons.length, 0);
 
   return (
     <DashboardLayout>
-      <div className="">
-        {/* Back Button */}
+      <div>
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-5 cursor-pointer"
@@ -81,90 +79,96 @@ const CategoryDetail: React.FC = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <h1 className="text-[18px] md:text-[24px] lg:text-[32px] leading-none font-bold mb-8">
-          Knowing Jesus
-        </h1>
-
-        {/* Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course, index) => (
-            <Link
-              href={`/dashboard/learn/${id}/chapters/${course.id}`}
-              key={index}
-            >
-              <div className="border border-[#E2E3E5] shadow-[0px_1px_2px_0px_#1018280D] cursor-pointer rounded-[16px]">
-                <div className="bg-gray-100  rounded-t-[16px] w-full p-[14px]">
-                  {/* Image Section */}
-                  <div className="relative bg-[#180426] rounded-[12px] h-[188px] overflow-hidden">
-                    {course?.image ? (
-                      <img
-                        src={course?.image}
-                        alt={course?.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full" />
-                    )}
-                  </div>
-                </div>
-
-                {/* Content Section */}
-                <div className="bg-white rounded-b-[16px] px-4 py-[18px]">
-                  <h3 className="text-sm font-semibold  mb-2 leading-tight line-clamp-2">
-                    {course?.title}
-                  </h3>
-
-                  <div className="flex items-center gap-2 mb-3 text-gray-600 text-sm flex-wrap">
-                    <span>{course?.date}</span>
-                    <span>•</span>
-                    <span>{course?.chapters} chapters</span>
-                    <span>•</span>
-                    <span>{course?.lessons} lessons</span>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-gray-600">
-                    <div className="flex items-center gap-[5.57px]">
-                      <UserRound size={20} strokeWidth={1.5} />
-                      <span className="text-[15px] font-medium">
-                        {course?.participants}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-[5.57px]">
-                      <MessageSquareText size={20} strokeWidth={1.5} />
-                      <span className="text-[15px] font-medium">
-                        {course?.comments}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* <div
-            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-          >
-            <img
-              src={course.image}
-              alt={course.title}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold text-sm lg:text-[20px] mb-[5.78px]">{course.title}</h3>
-              <p className="text-[12px] lg:text-[18px] leading-tight text-[#60666B] mb-2 lg:mb-3">{course.description}</p>
-              <div className='flex mb-2 lg:mb-3 items-center gap-2 text-[#60666B]'>
-                <User className="w-4 h-4" />
-                <p className='text-sm'>Chibuike Amadi</p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-[#60666B]">
-                <Clock className="w-4 h-4" />
-                <span className='leading-none text-[#60666B]'>{course.duration} . {course.chapters}</span>
-              </div>
+        {loading ? (
+          <>
+            <div className="h-8 bg-gray-200 rounded w-48 mb-8 animate-pulse" />
+            <Skeleton />
+          </>
+        ) : !course ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+              <BookOpen size={24} color="#870BD6" />
             </div>
-          </div> */}
-            </Link>
-          ))}
-        </div>
+            <p className="text-sm font-semibold text-gray-700">Course not found</p>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-[18px] md:text-[24px] lg:text-[32px] leading-none font-bold mb-2">
+              {course.title}
+            </h1>
+            {course.description && (
+              <p className="text-[#60666B] text-sm mb-2 max-w-2xl">{course.description}</p>
+            )}
+            <p className="text-[13px] text-[#60666B] mb-8">
+              {chapters.length} chapter{chapters.length !== 1 ? 's' : ''} · {totalLessons} lesson{totalLessons !== 1 ? 's' : ''}
+              {course.author && ` · ${course.author.firstName} ${course.author.lastName}`}
+            </p>
+
+            {chapters.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 gap-3">
+                <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                  <BookOpen size={24} color="#870BD6" />
+                </div>
+                <p className="text-sm font-semibold text-gray-700">No chapters yet</p>
+                <p className="text-[13px] text-[#60666B]">This course has no published content yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {chapters.map((chapter, index) => (
+                  <Link
+                    key={chapter.id}
+                    href={`/dashboard/learn/${id}/chapters/${chapter.id}`}
+                  >
+                    <div className="border border-[#E2E3E5] shadow-[0px_1px_2px_0px_#1018280D] cursor-pointer rounded-2xl h-full">
+                      <div className="bg-gray-100 rounded-t-2xl w-full p-3.5">
+                        <div className="relative bg-[#180426] rounded-xl h-47 overflow-hidden flex items-center justify-center">
+                          {course.coverImageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={course.coverImageUrl}
+                              alt={chapter.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <BookOpen size={40} className="text-white opacity-20" />
+                          )}
+                          <span className="absolute top-3 left-3 w-7 h-7 flex items-center justify-center rounded-full bg-white/20 text-white text-xs font-bold">
+                            {index + 1}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-b-2xl px-4 py-4.5">
+                        <h3 className="text-sm font-semibold mb-2 leading-tight line-clamp-2">
+                          {chapter.title}
+                        </h3>
+
+                        <div className="flex items-center gap-2 mb-3 text-gray-600 text-sm flex-wrap">
+                          <span className="flex items-center gap-1">
+                            <BookOpen size={13} />
+                            {chapter.lessons.length} lesson{chapter.lessons.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-4 text-gray-600">
+                          <div className="flex items-center gap-[5.57px]">
+                            <UserRound size={20} strokeWidth={1.5} />
+                            <span className="text-[15px] font-medium">
+                              {course.enrollmentCount ?? 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </DashboardLayout>
   );
 };
 
-export default CategoryDetail;
+export default CourseDetail;
