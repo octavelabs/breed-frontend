@@ -144,10 +144,17 @@ api.interceptors.response.use(
       try {
         // Use a bare axios call so this request does NOT go through the
         // interceptors again (avoids infinite loops).
+        // The backend's JwtRefreshStrategy extracts the token from the
+        // Authorization header, not the request body.
         const refreshResponse = await axios.post(
           `${BASE_URL}/auth/refresh`,
-          { refreshToken },
-          { headers: { 'Content-Type': 'application/json' } },
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${refreshToken}`,
+            },
+          },
         );
 
         const responseData = refreshResponse.data;
