@@ -46,7 +46,7 @@ interface SeriesDetail {
 
 // ── Article Card ──────────────────────────────────────────────────────────────
 
-const ArticleCard = ({ article }: { article: Article }) => {
+const ArticleCard = ({ article, onClick }: { article: Article; onClick: () => void }) => {
   const date = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString("en-US", {
         month: "short",
@@ -56,7 +56,7 @@ const ArticleCard = ({ article }: { article: Article }) => {
     : null;
 
   return (
-    <div className="border border-[#E2E3E5] rounded-2xl bg-white hover:shadow-md transition-all duration-200 flex flex-col group cursor-pointer">
+    <div className="border border-[#E2E3E5] rounded-2xl bg-white hover:shadow-md transition-all duration-200 flex flex-col group cursor-pointer" onClick={onClick}>
       <div className="bg-gray-100 rounded-t-2xl p-3">
         <div className="relative bg-[#180426] rounded-xl h-36 overflow-hidden flex items-center justify-center">
           {article.coverImageUrl ? (
@@ -360,7 +360,7 @@ const DevotionalSeriesPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {publishedArticles.map((article) => (
-                  <ArticleCard key={article.id} article={article} />
+                  <ArticleCard key={article.id} article={article} onClick={() => router.push(`/dashboard/home/article/${article.id}`)} />
                 ))}
               </div>
             )
