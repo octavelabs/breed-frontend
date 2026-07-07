@@ -24,10 +24,6 @@ function VideoTile({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Only update srcObject when stream or videoEnabled actually changes.
-  // Using a stable ref + effect avoids the "callback ref recreated on every
-  // render → React nulls then re-attaches → srcObject briefly reset → flash"
-  // issue that caused the visible glitch on Mute / Camera toggles.
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
@@ -42,16 +38,27 @@ function VideoTile({
 
   return (
     <div className="relative bg-[#1a0835] rounded-2xl overflow-hidden w-full h-full flex items-center justify-center group">
-      {stream && videoEnabled ? (
+      {/*
+        Always keep the <video> element in the DOM when we have a stream.
+        Removing it when the camera is off also kills audio playback, because
+        the audio track lives on the same MediaStream. We hide it visually
+        instead — display:none preserves audio in all major browsers.
+        Mirror the local feed so it feels like a selfie view.
+      */}
+      {stream && (
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted={muted}
-          className="w-full h-full object-cover"
+          style={isMe ? { transform: "scaleX(-1)" } : undefined}
+          className={`w-full h-full object-cover${videoEnabled ? "" : " hidden"}`}
         />
-      ) : (
-        <div className="flex flex-col items-center gap-3">
+      )}
+
+      {/* Avatar overlay — shown when camera is off or no stream yet */}
+      {(!stream || !videoEnabled) && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
           {avatarUrl ? (
             <img src={avatarUrl} alt={name} className="w-16 h-16 rounded-full object-cover shadow-lg shadow-purple-900/50" />
           ) : (
@@ -149,6 +156,10 @@ export default function RoomPage() {
   const [pinnedId, setPinnedId]               = useState<string | null>(null);
   const [chatInput, setChatInput]             = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (showChat) chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, showChat]);
 
   const handleLeave = useCallback(() => {
     if (prayerSessionId) {
