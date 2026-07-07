@@ -2,14 +2,22 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { io, Socket } from "socket.io-client";
+import {
+  Room,
+  RoomEvent,
+  Track,
+  RemoteParticipant,
+  VideoPresets,
+  type RoomOptions,
+  type RemoteTrackPublication,
+} from "livekit-client";
 import { getAccessToken } from "@/lib/api";
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Types (same interface as before — page.tsx is unchanged) ──────────────────
 
 export interface Participant {
-  socketId: string;
-  userId: string;
+  socketId: string;        // LiveKit participant.sid
+  userId: string;          // LiveKit participant.identity (our userId)
   name: string;
   avatarUrl?: string;
   stream?: MediaStream;
@@ -26,547 +34,298 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// ── ICE configuration ──────────────────────────────────────────────────────
-// STUN: discovers public IP for direct P2P
-// TURN: relays media when direct P2P fails (symmetric NAT / CGNAT on mobile)
+// ── Token fetch ───────────────────────────────────────────────────────────────
 
-const ICE_CONFIG: RTCConfiguration = {
-  iceServers: [
-    {
-      urls: [
-        "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302",
-        "stun:stun2.l.google.com:19302",
-        "stun:stun3.l.google.com:19302",
-      ],
-    },
-    {
-      // Open Relay — free TURN relay, covers UDP/TCP/TLS for all NAT types
-      urls: [
-        "turn:openrelay.metered.ca:80",
-        "turn:openrelay.metered.ca:80?transport=tcp",
-        "turn:openrelay.metered.ca:443",
-        "turn:openrelay.metered.ca:443?transport=tcp",
-      ],
-      username: "openrelayproject",
-      credential: "openrelayproject",
-    },
-  ],
-  iceTransportPolicy: "all",
-  bundlePolicy: "max-bundle",
-  rtcpMuxPolicy: "require",
-};
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
-// ── PeerManager ────────────────────────────────────────────────────────────
-// Owns all RTCPeerConnection instances and ICE candidate queues.
-// Completely decoupled from React — no state or hooks here.
-
-class PeerManager {
-  private peers = new Map<string, RTCPeerConnection>();
-  private iceQueue = new Map<string, RTCIceCandidateInit[]>();
-
-  create(id: string): RTCPeerConnection {
-    this.close(id); // ensure no leftover
-    const pc = new RTCPeerConnection(ICE_CONFIG);
-    this.peers.set(id, pc);
-    return pc;
-  }
-
-  get(id: string) { return this.peers.get(id); }
-  has(id: string) { return this.peers.has(id); }
-
-  close(id: string) {
-    const pc = this.peers.get(id);
-    if (pc) { try { pc.close(); } catch {} this.peers.delete(id); }
-    this.iceQueue.delete(id);
-  }
-
-  closeAll() {
-    this.peers.forEach((pc) => { try { pc.close(); } catch {} });
-    this.peers.clear();
-    this.iceQueue.clear();
-  }
-
-  replaceVideoTrack(track: MediaStreamTrack) {
-    this.peers.forEach((pc) => {
-      const sender = pc.getSenders().find((s) => s.track?.kind === "video");
-      if (sender) sender.replaceTrack(track).catch(() => {});
-    });
-  }
-
-  queueCandidate(id: string, c: RTCIceCandidateInit) {
-    const q = this.iceQueue.get(id) ?? [];
-    q.push(c);
-    this.iceQueue.set(id, q);
-  }
-
-  async flushCandidates(id: string, pc: RTCPeerConnection) {
-    const q = this.iceQueue.get(id) ?? [];
-    this.iceQueue.delete(id);
-    for (const c of q) {
-      try { await pc.addIceCandidate(new RTCIceCandidate(c)); }
-      catch (e) { console.warn(`[ICE] Buffered candidate failed (${id}):`, e); }
-    }
-  }
+async function fetchLiveKitToken(
+  roomName: string,
+): Promise<{ token: string; url: string }> {
+  const jwt = getAccessToken();
+  const res = await fetch(
+    `${API_BASE}/meetings/${encodeURIComponent(roomName)}/token`,
+    { headers: { Authorization: `Bearer ${jwt}` } },
+  );
+  if (!res.ok) throw new Error(`Token request failed (${res.status})`);
+  const body = await res.json();
+  return body?.data ?? body;
 }
 
-// ── useMeeting hook ────────────────────────────────────────────────────────
+// ── Stream helpers ────────────────────────────────────────────────────────────
+
+// Build or update a stable MediaStream from a remote participant's subscribed
+// tracks. We mutate an existing stream object rather than creating a new one
+// each time so the <video> element's srcObject reference stays stable.
+function syncParticipantStream(
+  p: RemoteParticipant,
+  cache: Map<string, MediaStream>,
+): MediaStream | undefined {
+  const tracks: MediaStreamTrack[] = [];
+  p.trackPublications.forEach((pub) => {
+    const rtp = pub as RemoteTrackPublication;
+    // Skip screen-share tracks — they're shown in the sharer's local tile
+    if (pub.source === Track.Source.ScreenShare) return;
+    if (rtp.isSubscribed && pub.track?.mediaStreamTrack) {
+      tracks.push(pub.track.mediaStreamTrack);
+    }
+  });
+
+  if (tracks.length === 0) {
+    cache.delete(p.sid);
+    return undefined;
+  }
+
+  let stream = cache.get(p.sid);
+  if (!stream) {
+    stream = new MediaStream(tracks);
+    cache.set(p.sid, stream);
+    return stream;
+  }
+
+  // Mutate the existing stream — add new tracks, drop stale ones
+  const existing = new Set(stream.getTracks());
+  const incoming = new Set(tracks);
+  existing.forEach((t) => { if (!incoming.has(t)) stream!.removeTrack(t); });
+  tracks.forEach((t) => { if (!existing.has(t)) stream!.addTrack(t); });
+  return stream;
+}
+
+function toParticipant(
+  p: RemoteParticipant,
+  cache: Map<string, MediaStream>,
+): Participant {
+  return {
+    socketId: p.sid,
+    userId: p.identity,
+    name: p.name || p.identity,
+    avatarUrl: undefined,
+    stream: syncParticipantStream(p, cache),
+    videoEnabled: p.isCameraEnabled,
+    audioEnabled: p.isMicrophoneEnabled,
+    connectionState: "connected",
+  };
+}
+
+// ── useMeeting hook ───────────────────────────────────────────────────────────
 
 export function useMeeting(meetingId: string) {
   const router = useRouter();
 
-  // ── React state (UI-facing only) ─────────────────────────────────────
-  const [participants, setParticipants]     = useState<Participant[]>([]);
-  const [localStream, setLocalStream]       = useState<MediaStream | null>(null);
-  const [connecting, setConnecting]         = useState(true);
+  // React state — drives the UI
+  const [participants,    setParticipants]    = useState<Participant[]>([]);
+  const [localStream,     setLocalStream]     = useState<MediaStream | null>(null);
+  const [connecting,      setConnecting]      = useState(true);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [micOn, setMicOn]                   = useState(true);
-  const [camOn, setCamOn]                   = useState(true);
-  const [sharing, setSharing]               = useState(false);
-  const [messages, setMessages]             = useState<ChatMessage[]>([]);
-  const [unread, setUnread]                 = useState(0);
-  const [myUserId, setMyUserId]             = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
+  const [micOn,           setMicOn]           = useState(true);
+  const [camOn,           setCamOn]           = useState(true);
+  const [sharing,         setSharing]         = useState(false);
+  const [messages,        setMessages]        = useState<ChatMessage[]>([]);
+  const [unread,          setUnread]          = useState(0);
+  const [myUserId,        setMyUserId]        = useState("");
 
-  // ── Mutable refs (never stale in callbacks) ──────────────────────────
-  const socketRef       = useRef<Socket | null>(null);
-  const localStreamRef  = useRef<MediaStream | null>(null);
-  const screenStreamRef = useRef<MediaStream | null>(null);
-  const peerMgrRef      = useRef(new PeerManager());
-  const chatOpenRef     = useRef(false);
-  const mountedRef      = useRef(true);
+  // Stable refs — never stale in callbacks
+  const roomRef        = useRef<Room | null>(null);
+  const streamCacheRef = useRef<Map<string, MediaStream>>(new Map());
+  const localCamStream = useRef<MediaStream | null>(null); // always the camera
+  const screenStream   = useRef<MediaStream | null>(null); // screen share only
+  const chatOpenRef    = useRef(false);
+  const mountedRef     = useRef(true);
 
-  // ── Participant helpers (always read fresh from closure via setState) ─
+  // ── Sync helpers ────────────────────────────────────────────────────────────
 
-  const upsertParticipant = (p: Participant) => {
-    setParticipants((prev) => {
-      const idx = prev.findIndex((x) => x.socketId === p.socketId);
-      if (idx === -1) return [...prev, p];
-      return prev.map((x) => (x.socketId === p.socketId ? { ...x, ...p } : x));
-    });
-  };
-
-  const patchParticipant = (socketId: string, patch: Partial<Participant>) => {
-    setParticipants((prev) =>
-      prev.map((p) => (p.socketId === socketId ? { ...p, ...patch } : p)),
+  const syncRemoteParticipants = useCallback(() => {
+    const room = roomRef.current;
+    if (!room || !mountedRef.current) return;
+    setParticipants(
+      Array.from(room.remoteParticipants.values()).map((p) =>
+        toParticipant(p, streamCacheRef.current),
+      ),
     );
-  };
+  }, []);
 
-  const removeParticipant = (socketId: string) => {
-    setParticipants((prev) => prev.filter((p) => p.socketId !== socketId));
-  };
+  // Rebuild the camera/mic stream from the local participant's current tracks.
+  // Also captures the screen-share track reference when screen sharing.
+  const syncLocalStream = useCallback(() => {
+    const room = roomRef.current;
+    if (!room || !mountedRef.current) return;
 
-  // ── Build a peer connection with all event wiring ────────────────────
-  // Uses refs for socket + streams so no stale closures.
+    const camTracks: MediaStreamTrack[]    = [];
+    const screenTracks: MediaStreamTrack[] = [];
 
-  const buildPeer = useCallback(
-    (socketId: string, isInitiator: boolean): RTCPeerConnection => {
-      const peerMgr = peerMgrRef.current;
-      const existing = peerMgr.get(socketId);
-      if (existing && existing.connectionState !== "closed" && existing.connectionState !== "failed") {
-        return existing;
+    room.localParticipant.trackPublications.forEach((pub) => {
+      if (!pub.track?.mediaStreamTrack) return;
+      if (pub.source === Track.Source.ScreenShare) {
+        screenTracks.push(pub.track.mediaStreamTrack);
+      } else {
+        camTracks.push(pub.track.mediaStreamTrack);
       }
+    });
 
-      const pc = peerMgr.create(socketId);
+    const cam = camTracks.length > 0 ? new MediaStream(camTracks) : null;
+    localCamStream.current = cam;
+    setLocalStream(cam);
 
-      // Add local media tracks (always via ref, never stale)
-      const stream = localStreamRef.current;
-      if (stream) {
-        stream.getTracks().forEach((t) => {
-          try { pc.addTrack(t, stream); } catch {}
-        });
-      }
+    screenStream.current =
+      screenTracks.length > 0 ? new MediaStream(screenTracks) : null;
+  }, []);
 
-      // ICE candidate → emit to signaling server
-      pc.onicecandidate = ({ candidate }) => {
-        if (!candidate) { console.log(`[ICE ${socketId.slice(0,8)}] Gathering complete`); return; }
-        console.log(`[ICE ${socketId.slice(0,8)}] Candidate type=${candidate.type} proto=${candidate.protocol}`);
-        socketRef.current?.emit("meeting:ice-candidate", {
-          meetingId, targetSocketId: socketId,
-          candidate: candidate.toJSON(),
-        });
-      };
-
-      // Remote track → attach stream to participant tile
-      pc.ontrack = ({ streams, track }) => {
-        console.log(`[Track ${socketId.slice(0,8)}] kind=${track.kind} streams=${streams.length}`);
-        const remoteStream = streams[0] ?? new MediaStream([track]);
-        // Ensure tile exists then attach stream
-        setParticipants((prev) => {
-          const exists = prev.some((p) => p.socketId === socketId);
-          if (!exists) return prev; // tile will be created by participant-joined
-          return prev.map((p) => p.socketId === socketId ? { ...p, stream: remoteStream } : p);
-        });
-      };
-
-      // Connection state monitoring + ICE restart
-      pc.onconnectionstatechange = () => {
-        const state = pc.connectionState;
-        console.log(`[Peer ${socketId.slice(0,8)}] connectionState → ${state}`);
-        patchParticipant(socketId, { connectionState: state });
-
-        if (state === "failed" && isInitiator) {
-          console.warn(`[Peer ${socketId.slice(0,8)}] Connection failed — restarting ICE`);
-          pc.restartIce();
-          pc.createOffer({ iceRestart: true })
-            .then((o) => pc.setLocalDescription(o))
-            .then(() => {
-              socketRef.current?.emit("meeting:offer", {
-                meetingId, targetSocketId: socketId, sdp: pc.localDescription,
-              });
-            }).catch(console.warn);
-        }
-      };
-
-      pc.oniceconnectionstatechange = () => {
-        const s = pc.iceConnectionState;
-        console.log(`[ICE ${socketId.slice(0,8)}] iceConnectionState → ${s}`);
-        if (s === "failed") { pc.restartIce(); console.warn(`[ICE] Restart triggered for ${socketId.slice(0,8)}`); }
-        if (s === "connected" || s === "completed") console.log(`[ICE ${socketId.slice(0,8)}] ✓ Connected`);
-      };
-
-      pc.onicegatheringstatechange = () =>
-        console.log(`[ICE ${socketId.slice(0,8)}] gatheringState → ${pc.iceGatheringState}`);
-
-      // Initiator creates and sends offer
-      if (isInitiator) {
-        pc.createOffer()
-          .then((o) => pc.setLocalDescription(o))
-          .then(() => {
-            console.log(`[Offer → ${socketId.slice(0,8)}]`);
-            socketRef.current?.emit("meeting:offer", {
-              meetingId, targetSocketId: socketId, sdp: pc.localDescription,
-            });
-          }).catch((e) => console.error(`[Offer] Failed for ${socketId.slice(0,8)}:`, e));
-      }
-
-      return pc;
-    },
-    [meetingId],
-  );
-
-  // ── Core effect: media → socket → room ───────────────────────────────
+  // ── Core effect ─────────────────────────────────────────────────────────────
 
   useEffect(() => {
     mountedRef.current = true;
 
-    const run = async () => {
-      // 1. Acquire media before connecting socket (tracks must exist before addTrack)
-      let stream: MediaStream | null = null;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      } catch {
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          if (mountedRef.current) setCamOn(false);
-        } catch {
-          if (mountedRef.current) { setCamOn(false); setMicOn(false); }
-          console.warn("[Media] No camera/mic permission");
-        }
-      }
-      if (!mountedRef.current) { stream?.getTracks().forEach((t) => t.stop()); return; }
-      if (stream) { localStreamRef.current = stream; setLocalStream(stream); }
-
-      // 2. Connect to signaling server
-      const token   = getAccessToken() ?? "";
-      // NEXT_PUBLIC_API_URL may include a path prefix (e.g. /api/v1).
-      // Socket.IO treats any path component as the namespace, so we must
-      // pass only the origin (scheme + host + port).
-      const rawUrl  = process.env.NEXT_PUBLIC_API_URL ?? "https://breed-api.onrender.com";
-      let socketUrl: string;
-      try {
-        socketUrl = new URL(rawUrl).origin; // strips /api/v1 etc.
-      } catch {
-        socketUrl = rawUrl;
-      }
-      const socket  = io(socketUrl, {
-        auth: { token },
-        transports: ["websocket"],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-      });
-      socketRef.current = socket;
-
-      const joinTimeout = setTimeout(() => {
-        if (mountedRef.current) { setConnecting(false); setConnectionError("Connection timed out"); }
-      }, 15000);
-
-      // ── Socket connection established ─────────────────────────────
-      socket.on("connect", () => {
-        clearTimeout(joinTimeout);
-        console.log(`[Socket] Connected (${socket.id})`);
-        if (mountedRef.current) setSocketConnected(true);
-
-        socket.emit("meeting:join", { meetingId }, (raw: any) => {
-          if (!mountedRef.current) return;
-          const res     = raw?.data ?? raw;  // handle both ack formats
-          const peers: Array<{ socketId: string; userId: string; displayName?: string; avatarUrl?: string | null }> = res?.participants ?? [];
-          console.log(`[Join] ${peers.length} existing participant(s)`, peers);
-
-          setConnecting(false);
-
-          if (peers.length === 0) return;
-
-          // Populate participant tiles BEFORE creating offers
-          // so ontrack can always find its tile
-          setParticipants(
-            peers.map(({ socketId, userId, displayName, avatarUrl }) => ({
-              socketId,
-              userId,
-              name: displayName || (userId ? `User ${userId.slice(0, 6)}` : "Participant"),
-              avatarUrl: avatarUrl ?? undefined,
-              videoEnabled: true,
-              audioEnabled: true,
-              connectionState: "connecting" as RTCPeerConnectionState,
-              stream: undefined,
-            })),
-          );
-
-          // Wait one tick for state to flush, then build initiator peers
-          setTimeout(() => {
-            if (!mountedRef.current) return;
-            peers.forEach(({ socketId }) => {
-              console.log(`[Peer] Creating initiator peer → ${socketId.slice(0, 8)}`);
-              buildPeer(socketId, true);
-            });
-          }, 0);
-        });
-      });
-
-      socket.on("connect_error", (err) => {
-        clearTimeout(joinTimeout);
-        console.error("[Socket] connect_error:", err.message);
-        if (mountedRef.current) { setConnecting(false); setConnectionError(err.message); }
-      });
-
-      socket.on("disconnect", (reason) => {
-        console.log("[Socket] Disconnected:", reason);
-        if (mountedRef.current) setSocketConnected(false);
-      });
-
-      socket.on("reconnect", () => {
-        console.log("[Socket] Reconnected — rejoining meeting");
-        if (mountedRef.current) setSocketConnected(true);
-        socket.emit("meeting:join", { meetingId }, () => {});
-      });
-
-      socket.on("connection:established", ({ userId }: { userId: string }) => {
-        if (mountedRef.current) setMyUserId(userId);
-      });
-
-      // ── New participant joined ─────────────────────────────────────
-      socket.on("meeting:participant-joined", ({ userId, socketId, displayName, avatarUrl }: { userId: string; socketId: string; displayName?: string; avatarUrl?: string | null }) => {
-        if (!mountedRef.current) return;
-        console.log(`[Joined] ${displayName ?? userId.slice(0, 6)} (${socketId.slice(0, 8)})`);
-
-        upsertParticipant({
-          socketId, userId,
-          name: displayName || (userId ? `User ${userId.slice(0, 6)}` : "Participant"),
-          avatarUrl: avatarUrl ?? undefined,
-          videoEnabled: true, audioEnabled: true,
-          connectionState: "connecting",
-          stream: undefined,
-        });
-
-        // We are the non-initiator — we wait for their offer
-        if (!peerMgrRef.current.has(socketId)) buildPeer(socketId, false);
-      });
-
-      // ── Participant left ──────────────────────────────────────────
-      socket.on("meeting:participant-left", ({ socketId }: { socketId: string }) => {
-        if (!mountedRef.current) return;
-        console.log(`[Left] ${socketId.slice(0, 8)}`);
-        removeParticipant(socketId);
-        peerMgrRef.current.close(socketId);
-      });
-
-      // ── Offer received (we are non-initiator) ────────────────────
-      socket.on("meeting:offer", async ({ from, fromUserId, sdp }: { from: string; fromUserId?: string; sdp: RTCSessionDescriptionInit }) => {
-        if (!mountedRef.current) return;
-        console.log(`[Offer ← ${from.slice(0, 8)}]`);
-
-        // Ensure participant tile exists (fallback if participant-joined wasn't processed yet)
-        setParticipants((prev) => {
-          if (prev.some((p) => p.socketId === from)) return prev;
-          return [...prev, {
-            socketId: from, userId: fromUserId ?? from, name: "Participant",
-            videoEnabled: true, audioEnabled: true,
-            connectionState: "connecting", stream: undefined,
-          }];
-        });
-
-        const peerMgr = peerMgrRef.current;
-        let pc = peerMgr.get(from);
-
-        // Recreate if needed
-        if (!pc || pc.signalingState === "closed") {
-          pc = peerMgr.create(from);
-          const ls = localStreamRef.current;
-          if (ls) ls.getTracks().forEach((t) => { try { pc!.addTrack(t, ls); } catch {} });
-
-          pc.onicecandidate = ({ candidate }) => {
-            if (candidate) socket.emit("meeting:ice-candidate", {
-              meetingId, targetSocketId: from, candidate: candidate.toJSON(),
-            });
-          };
-          pc.ontrack = ({ streams, track }) => {
-            const rs = streams[0] ?? new MediaStream([track]);
-            console.log(`[Track ← ${from.slice(0, 8)}] kind=${track.kind}`);
-            setParticipants((prev) =>
-              prev.map((p) => p.socketId === from ? { ...p, stream: rs } : p),
-            );
-          };
-          pc.onconnectionstatechange = () =>
-            setParticipants((prev) =>
-              prev.map((p) => p.socketId === from ? { ...p, connectionState: pc!.connectionState } : p),
-            );
-          pc.oniceconnectionstatechange = () => {
-            if (pc!.iceConnectionState === "failed") pc!.restartIce();
-          };
-        }
-
-        try {
-          await pc.setRemoteDescription(new RTCSessionDescription(sdp));
-          await peerMgr.flushCandidates(from, pc);
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          console.log(`[Answer → ${from.slice(0, 8)}]`);
-          socket.emit("meeting:answer", {
-            meetingId, targetSocketId: from, sdp: pc.localDescription,
-          });
-        } catch (e) { console.error(`[Offer] Processing failed:`, e); }
-      });
-
-      // ── Answer received ───────────────────────────────────────────
-      socket.on("meeting:answer", async ({ from, sdp }: { from: string; sdp: RTCSessionDescriptionInit }) => {
-        if (!mountedRef.current) return;
-        console.log(`[Answer ← ${from.slice(0, 8)}]`);
-        const pc = peerMgrRef.current.get(from);
-        if (!pc) { console.warn(`[Answer] No peer for ${from.slice(0, 8)}`); return; }
-        try {
-          await pc.setRemoteDescription(new RTCSessionDescription(sdp));
-          await peerMgrRef.current.flushCandidates(from, pc);
-        } catch (e) { console.error(`[Answer] Processing failed:`, e); }
-      });
-
-      // ── ICE candidate received ─────────────────────────────────────
-      socket.on("meeting:ice-candidate", async ({ from, candidate }: { from: string; candidate: RTCIceCandidateInit }) => {
-        if (!mountedRef.current) return;
-        const peerMgr = peerMgrRef.current;
-        const pc = peerMgr.get(from);
-        if (pc?.remoteDescription) {
-          try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); }
-          catch (e) { console.warn(`[ICE ← ${from.slice(0,8)}] Failed:`, e); }
-        } else {
-          peerMgr.queueCandidate(from, candidate);
-        }
-      });
-
-      // ── Media state ───────────────────────────────────────────────
-      socket.on("meeting:participant-media", ({ socketId, video, audio }: any) => {
-        if (!mountedRef.current) return;
-        patchParticipant(socketId, { videoEnabled: video, audioEnabled: audio });
-      });
-
-      // ── Chat ──────────────────────────────────────────────────────
-      socket.on("meeting:chat-message", (msg: ChatMessage) => {
-        if (!mountedRef.current) return;
-        setMessages((prev) => [...prev, msg]);
-        if (!chatOpenRef.current) setUnread((c) => c + 1);
-      });
+    const roomOptions: RoomOptions = {
+      adaptiveStream: true,   // auto-adjust quality based on viewport / bandwidth
+      dynacast: true,         // only publish at quality levels actually consumed
+      videoCaptureDefaults: { resolution: VideoPresets.h720.resolution },
+      audioCaptureDefaults: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
     };
 
-    run();
+    const room = new Room(roomOptions);
+    roomRef.current = room;
+
+    room
+      .on(RoomEvent.Connected, () => {
+        if (!mountedRef.current) return;
+        setSocketConnected(true);
+        setConnecting(false);
+        setMyUserId(room.localParticipant.identity);
+        syncRemoteParticipants();
+      })
+      .on(RoomEvent.Disconnected, () => {
+        if (mountedRef.current) setSocketConnected(false);
+      })
+      .on(RoomEvent.Reconnecting, () => {
+        if (mountedRef.current) setSocketConnected(false);
+      })
+      .on(RoomEvent.Reconnected, () => {
+        if (!mountedRef.current) return;
+        setSocketConnected(true);
+        syncRemoteParticipants();
+      })
+      // Remote participant lifecycle
+      .on(RoomEvent.ParticipantConnected,    syncRemoteParticipants)
+      .on(RoomEvent.ParticipantDisconnected, syncRemoteParticipants)
+      // Track lifecycle — re-sync so stream caches are up to date
+      .on(RoomEvent.TrackSubscribed,   syncRemoteParticipants)
+      .on(RoomEvent.TrackUnsubscribed, syncRemoteParticipants)
+      .on(RoomEvent.TrackMuted,        syncRemoteParticipants)
+      .on(RoomEvent.TrackUnmuted,      syncRemoteParticipants)
+      // Local track lifecycle
+      .on(RoomEvent.LocalTrackPublished,   syncLocalStream)
+      .on(RoomEvent.LocalTrackUnpublished, syncLocalStream)
+      // In-room chat via LiveKit data channel
+      .on(RoomEvent.DataReceived, (payload) => {
+        if (!mountedRef.current) return;
+        try {
+          const msg: ChatMessage = JSON.parse(new TextDecoder().decode(payload));
+          setMessages((prev) => [...prev, msg]);
+          if (!chatOpenRef.current) setUnread((c) => c + 1);
+        } catch {}
+      });
+
+    const connect = async () => {
+      try {
+        const { token, url } = await fetchLiveKitToken(meetingId);
+        await room.connect(url, token);
+        // Publish camera + mic immediately after connecting
+        await room.localParticipant.enableCameraAndMicrophone();
+        syncLocalStream();
+      } catch (err: unknown) {
+        if (!mountedRef.current) return;
+        setConnecting(false);
+        setConnectionError(
+          err instanceof Error ? err.message : "Failed to connect",
+        );
+      }
+    };
+
+    connect();
 
     return () => {
       mountedRef.current = false;
-      localStreamRef.current?.getTracks().forEach((t) => t.stop());
-      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
-      socketRef.current?.emit("meeting:leave", { meetingId });
-      socketRef.current?.disconnect();
-      peerMgrRef.current.closeAll();
+      room.disconnect();
+      roomRef.current = null;
     };
-  }, [meetingId, buildPeer]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [meetingId, syncRemoteParticipants, syncLocalStream]);
 
-  // ── Controls ────────────────────────────────────────────────────────
+  // ── Controls ─────────────────────────────────────────────────────────────────
 
-  const toggleMic = useCallback(() => {
-    const stream = localStreamRef.current;
-    if (!stream) return;
+  const toggleMic = useCallback(async () => {
+    const room = roomRef.current;
+    if (!room) return;
     const next = !micOn;
-    stream.getAudioTracks().forEach((t) => { t.enabled = next; });
+    await room.localParticipant.setMicrophoneEnabled(next).catch(() => {});
     setMicOn(next);
-    socketRef.current?.emit("meeting:media-state", { meetingId, video: camOn, audio: next });
-  }, [micOn, camOn, meetingId]);
+  }, [micOn]);
 
-  const toggleCamera = useCallback(() => {
-    const stream = localStreamRef.current;
-    if (!stream) return;
+  const toggleCamera = useCallback(async () => {
+    const room = roomRef.current;
+    if (!room) return;
     const next = !camOn;
-    stream.getVideoTracks().forEach((t) => { t.enabled = next; });
+    await room.localParticipant.setCameraEnabled(next).catch(() => {});
     setCamOn(next);
-    socketRef.current?.emit("meeting:media-state", { meetingId, video: next, audio: micOn });
-  }, [camOn, micOn, meetingId]);
+    syncLocalStream();
+  }, [camOn, syncLocalStream]);
 
   const toggleScreenShare = useCallback(async () => {
-    if (sharing) {
-      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
-      screenStreamRef.current = null;
-      setSharing(false);
-      const videoTrack = localStreamRef.current?.getVideoTracks()[0];
-      if (videoTrack) peerMgrRef.current.replaceVideoTrack(videoTrack);
-    } else {
-      try {
-        const disp = await navigator.mediaDevices.getDisplayMedia({ video: true });
-        screenStreamRef.current = disp;
-        setSharing(true);
-        const screenTrack = disp.getVideoTracks()[0];
-        peerMgrRef.current.replaceVideoTrack(screenTrack);
-        screenTrack.onended = () => toggleScreenShare();
-      } catch { /* user cancelled */ }
-    }
-  }, [sharing]);
+    const room = roomRef.current;
+    if (!room) return;
+    const next = !sharing;
+    // LiveKit handles getDisplayMedia, track replacement, and cleanup internally.
+    // The stale-closure / re-open bug from the old P2P implementation is gone.
+    await room.localParticipant.setScreenShareEnabled(next).catch(() => {});
+    setSharing(next);
+    syncLocalStream();
+  }, [sharing, syncLocalStream]);
 
   const sendMessage = useCallback((content: string) => {
-    if (!content.trim()) return;
-    socketRef.current?.emit("meeting:chat", { meetingId, content: content.trim() });
-    setMessages((prev) => [
-      ...prev,
-      { id: `local-${Date.now()}`, senderId: myUserId, senderName: "You", content: content.trim(), timestamp: new Date().toISOString() },
-    ]);
-  }, [meetingId, myUserId]);
+    const room = roomRef.current;
+    if (!content.trim() || !room) return;
+    const msg: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      senderId: room.localParticipant.identity,
+      senderName: room.localParticipant.name || "You",
+      content: content.trim(),
+      timestamp: new Date().toISOString(),
+    };
+    // Optimistic local add — DataReceived does NOT fire for own messages
+    setMessages((prev) => [...prev, msg]);
+    const encoded = new TextEncoder().encode(JSON.stringify(msg));
+    room.localParticipant
+      .publishData(encoded, { reliable: true })
+      .catch(() => {});
+  }, []);
 
   const leave = useCallback(() => {
-    localStreamRef.current?.getTracks().forEach((t) => t.stop());
-    screenStreamRef.current?.getTracks().forEach((t) => t.stop());
-    setLocalStream(null);
-    socketRef.current?.emit("meeting:leave", { meetingId });
-    socketRef.current?.disconnect();
-    peerMgrRef.current.closeAll();
-    // router.back() silently does nothing when there is no history entry
-    // (e.g. the user opened the meeting link directly on mobile).
-    // Fall back to the home dashboard so the button always works.
+    roomRef.current?.disconnect();
+    roomRef.current = null;
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.back();
     } else {
       router.replace("/dashboard/home");
     }
-  }, [meetingId, router]);
+  }, [router]);
 
   const setChatOpen = useCallback((open: boolean) => {
     chatOpenRef.current = open;
     if (open) setUnread(0);
   }, []);
 
-  const screenStream = screenStreamRef.current;
+  // ── Return ───────────────────────────────────────────────────────────────────
+  // localStream switches to screen capture while sharing;
+  // rawLocalStream is always the camera (for PiP overlays etc.)
 
   return {
-    // State
     participants,
-    localStream: sharing ? screenStream : localStream,
-    rawLocalStream: localStream,
+    localStream: sharing && screenStream.current ? screenStream.current : localStream,
+    rawLocalStream: localCamStream.current,
     connecting,
     connectionError,
     socketConnected,
@@ -576,7 +335,6 @@ export function useMeeting(meetingId: string) {
     messages,
     unread,
     myUserId,
-    // Actions
     toggleMic,
     toggleCamera,
     toggleScreenShare,
