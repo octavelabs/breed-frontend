@@ -79,6 +79,11 @@ function SessionDetailModal({
   };
   const canCancel =
     session.status === "SCHEDULED" || session.status === "IN_PROGRESS";
+  const sessionEnd  = scheduledAt.getTime() + session.duration * 60 * 1000;
+  const openAt     = scheduledAt.getTime() - 15 * 60 * 1000;
+  const canJoinNow =
+    (session.status === "SCHEDULED" || session.status === "IN_PROGRESS") &&
+    Date.now() >= openAt && Date.now() <= sessionEnd;
 
   const handleCancel = async () => {
     setCancelling(true);
@@ -204,15 +209,23 @@ function SessionDetailModal({
           {/* Actions */}
           <div className="flex flex-col gap-2 pt-1">
             {session.meetingLink && (
-              <a
-                href={session.meetingLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full h-[44px] flex items-center justify-center gap-2 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full hover:opacity-90 transition-opacity"
-              >
-                <Video size={15} />
-                Join Session
-              </a>
+              canJoinNow ? (
+                <a
+                  href={session.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full h-[44px] flex items-center justify-center gap-2 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full hover:opacity-90 transition-opacity"
+                >
+                  <Video size={15} />
+                  Join Session
+                </a>
+              ) : (session.status === "SCHEDULED" || session.status === "IN_PROGRESS") ? (
+                <div className="w-full h-[44px] flex items-center justify-center text-sm font-medium rounded-full bg-[#F8F9FC] text-[#60666B] border border-[#E3E8EF]">
+                  {Date.now() < openAt
+                    ? `Opens at ${scheduledAt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
+                    : "Session has ended"}
+                </div>
+              ) : null
             )}
 
             {canCancel && !confirmCancel && (

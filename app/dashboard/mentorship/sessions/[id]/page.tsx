@@ -192,7 +192,11 @@ export default function SessionDetailPage() {
   const statusCfg = STATUS_CONFIG[session.status] ?? STATUS_CONFIG.SCHEDULED;
   const scheduledDate = new Date(session.scheduledAt);
   const endTime = new Date(scheduledDate.getTime() + session.duration * 60000);
-  const canJoin = session.status === "SCHEDULED" || session.status === "IN_PROGRESS";
+  const now = Date.now();
+  const sessionStart = scheduledDate.getTime() - 15 * 60 * 1000; // allow 15 min early
+  const sessionEnd   = endTime.getTime();
+  const withinWindow = now >= sessionStart && now <= sessionEnd;
+  const canJoin = (session.status === "SCHEDULED" || session.status === "IN_PROGRESS") && withinWindow;
   const canCancel = session.status === "SCHEDULED" || session.status === "IN_PROGRESS";
 
   return (
@@ -268,13 +272,21 @@ export default function SessionDetailPage() {
                 <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 space-y-3">
                   <h3 className="font-semibold text-[#180426] text-sm mb-1">Actions</h3>
 
-                  {canJoin && (
-                    <Link
-                      href={`/room/${id}`}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full py-3 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
-                    >
-                      <Video size={16} /> Join Session
-                    </Link>
+                  {(session.status === "SCHEDULED" || session.status === "IN_PROGRESS") && (
+                    canJoin ? (
+                      <Link
+                        href={`/room/${id}`}
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full py-3 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
+                      >
+                        <Video size={16} /> Join Session
+                      </Link>
+                    ) : (
+                      <div className="w-full text-center py-3 rounded-full text-sm font-medium bg-[#F8F9FC] text-[#60666B] border border-[#E3E8EF]">
+                        {now < sessionStart
+                          ? `Opens at ${scheduledDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
+                          : "Session has ended"}
+                      </div>
+                    )
                   )}
 
                   <button

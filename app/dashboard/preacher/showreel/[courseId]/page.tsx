@@ -10,6 +10,7 @@ import Tabs from '@/app/components/Tabs';
 import CourseContent from './components/CourseContent';
 import MetricsContent from './components/MetricsContent';
 import CommentsContent from './components/CommentsContent';
+import SettingsContent from './components/SettingsContent';
 import { courseService } from '@/lib/api-services';
 
 interface ApiCourse {
@@ -117,6 +118,11 @@ const UpdateCourse = () => {
       label: 'Comments',
       value: 'comments',
       content: <CommentsContent />,
+    },
+    {
+      label: 'Settings',
+      value: 'settings',
+      content: <SettingsContent course={course} onUpdate={loadCourse} />,
     },
   ];
 

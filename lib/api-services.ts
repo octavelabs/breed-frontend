@@ -337,6 +337,9 @@ export const devotionalService = {
   createSeries: (data: { title: string; description?: string; coverImageUrl?: string }) =>
     api.post('/devotionals/series', data),
 
+  updateSeries: (id: string, data: { title?: string; description?: string; coverImageUrl?: string }) =>
+    api.patch(`/devotionals/series/${id}`, data),
+
   toggleSeriesSubscription: (seriesId: string) =>
     api.post(`/devotionals/series/${seriesId}/subscribe`),
 

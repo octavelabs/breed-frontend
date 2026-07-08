@@ -337,8 +337,13 @@ export default function MeetingDetailPage() {
     joinTimes.length > 0 && leaveTimes.length > 0
       ? Math.round((Math.max(...leaveTimes) - Math.min(...joinTimes)) / 60000)
       : null;
+  // Allow joining 15 minutes before the scheduled start, up to the scheduled end time
+  const now = Date.now();
+  const meetingStart = scheduledDate.getTime() - 15 * 60 * 1000;
+  const meetingEnd   = endTime.getTime();
+  const withinWindow = now >= meetingStart && now <= meetingEnd;
   const canJoin =
-    meeting.status === "SCHEDULED" || meeting.status === "IN_PROGRESS";
+    (meeting.status === "SCHEDULED" || meeting.status === "IN_PROGRESS") && withinWindow;
   const canCancel = meeting.status === "SCHEDULED";
 
   return (
@@ -554,13 +559,21 @@ export default function MeetingDetailPage() {
                     Actions
                   </h3>
 
-                  {canJoin && (
-                    <Link
-                      href={`/dashboard/preacher/meetings/${id}/room`}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full py-3 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
-                    >
-                      <Video size={16} /> Join Meeting
-                    </Link>
+                  {(meeting.status === "SCHEDULED" || meeting.status === "IN_PROGRESS") && (
+                    canJoin ? (
+                      <Link
+                        href={`/dashboard/preacher/meetings/${id}/room`}
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full py-3 text-sm font-bold hover:shadow-lg hover:scale-[1.01] transition-all"
+                      >
+                        <Video size={16} /> Join Meeting
+                      </Link>
+                    ) : (
+                      <div className="w-full text-center py-3 rounded-full text-sm font-medium bg-[#F8F9FC] text-[#60666B] border border-[#E3E8EF]">
+                        {now < meetingStart
+                          ? `Opens at ${scheduledDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
+                          : "Meeting has ended"}
+                      </div>
+                    )
                   )}
 
                   <button

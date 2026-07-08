@@ -10,6 +10,7 @@ import Tabs from '@/app/components/Tabs';
 import { devotionalService } from '@/lib/api-services';
 import DevotionContent, { DevotionContentHandle } from './components/DevotionContent';
 import DevotionMetrics from './components/DevotionMetrics';
+import DevotionSettings from './components/DevotionSettings';
 
 const UpdateDevotion = () => {
   const params = useParams();
@@ -47,6 +48,11 @@ const UpdateDevotion = () => {
           Comments across all articles will appear here.
         </div>
       ),
+    },
+    {
+      label: 'Settings',
+      value: 'settings',
+      content: <DevotionSettings seriesId={devotionId} />,
     },
   ];
 
