@@ -8,6 +8,7 @@ interface ImageUploadProps {
   type: UploadType;
   value?: string;               // current image URL (for preview)
   onUpload: (url: string) => void;
+  onUploadingChange?: (uploading: boolean) => void;
   label?: string;
   hint?: string;
   aspectRatio?: 'square' | 'cover' | 'banner'; // square=1:1, cover=16:9, banner=3:1
@@ -25,6 +26,7 @@ export default function ImageUpload({
   type,
   value,
   onUpload,
+  onUploadingChange,
   label,
   hint,
   aspectRatio = 'cover',
@@ -52,11 +54,14 @@ export default function ImageUpload({
     reader.onload = (e) => setPreview(e.target?.result as string);
     reader.readAsDataURL(file);
 
+    onUploadingChange?.(true);
     try {
       const result = await upload(file, type) as { url: string };
       onUpload(result.url);
     } catch (e: unknown) {
       setPreview(value ?? null);
+    } finally {
+      onUploadingChange?.(false);
     }
   };
 

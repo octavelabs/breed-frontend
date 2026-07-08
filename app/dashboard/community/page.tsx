@@ -27,6 +27,7 @@ interface Community {
   coverImage?: string | null;
   privacy: "PUBLIC" | "PRIVATE" | "INVITE_ONLY";
   memberCount?: number;
+  myRole?: string | null;
   _count?: { members: number; messages: number };
 }
 
@@ -323,6 +324,10 @@ const MyCommunitiesTab = ({
             community={selectedCommunity}
             setSelectedCommunity={setSelectedCommunity}
             onLeave={handleLeave}
+            onCoverUpdated={(id, url) => {
+              setCommunities((prev) => prev.map((c) => c.id === id ? { ...c, coverImage: url } : c));
+              setSelectedCommunity((prev) => prev?.id === id ? { ...prev, coverImage: url } : prev);
+            }}
           />
         ) : null
       ) : selectedCommunity ? (
@@ -330,6 +335,10 @@ const MyCommunitiesTab = ({
           community={selectedCommunity}
           setSelectedCommunity={setSelectedCommunity}
           onLeave={handleLeave}
+          onCoverUpdated={(id, url) => {
+            setCommunities((prev) => prev.map((c) => c.id === id ? { ...c, coverImage: url } : c));
+            setSelectedCommunity((prev) => prev?.id === id ? { ...prev, coverImage: url } : prev);
+          }}
         />
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-8">

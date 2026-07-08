@@ -329,6 +329,14 @@ export default function MeetingDetailPage() {
   const endTime = new Date(
     scheduledDate.getTime() + (meeting.duration ?? 60) * 60000,
   );
+
+  // Compute actual duration from attendance records (earliest join → latest leave)
+  const joinTimes = meeting.attendances.map((a) => a.joinedAt ? new Date(a.joinedAt).getTime() : null).filter(Boolean) as number[];
+  const leaveTimes = meeting.attendances.map((a) => a.leftAt ? new Date(a.leftAt).getTime() : null).filter(Boolean) as number[];
+  const actualDurationMins =
+    joinTimes.length > 0 && leaveTimes.length > 0
+      ? Math.round((Math.max(...leaveTimes) - Math.min(...joinTimes)) / 60000)
+      : null;
   const canJoin =
     meeting.status === "SCHEDULED" || meeting.status === "IN_PROGRESS";
   const canCancel = meeting.status === "SCHEDULED";
@@ -432,7 +440,11 @@ export default function MeetingDetailPage() {
                   <InfoRow
                     icon={Clock}
                     label="Duration"
-                    value={`${meeting.duration ?? 60} minutes`}
+                    value={
+                      actualDurationMins != null
+                        ? `${actualDurationMins} min (actual) · ${meeting.duration ?? 60} min scheduled`
+                        : `${meeting.duration ?? 60} minutes`
+                    }
                   />
                   {meeting.community && (
                     <InfoRow
@@ -506,17 +518,25 @@ export default function MeetingDetailPage() {
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {a.attended && (
-                              <span className="text-xs bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6] px-2 py-0.5 rounded-full">
-                                Attended
-                              </span>
-                            )}
-                            {a.joinedAt && !a.leftAt && (
-                              <span className="flex items-center gap-1 text-xs bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF] px-2 py-0.5 rounded-full">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#175CD3] animate-pulse" />{" "}
-                                Live
-                              </span>
+                          <div className="flex flex-col items-end gap-1">
+                            <div className="flex items-center gap-1.5">
+                              {a.attended && (
+                                <span className="text-xs bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6] px-2 py-0.5 rounded-full">
+                                  Attended
+                                </span>
+                              )}
+                              {a.joinedAt && !a.leftAt && (
+                                <span className="flex items-center gap-1 text-xs bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF] px-2 py-0.5 rounded-full">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#175CD3] animate-pulse" />{" "}
+                                  Live
+                                </span>
+                              )}
+                            </div>
+                            {a.joinedAt && (
+                              <p className="text-[10px] text-[#60666B]">
+                                Joined {new Date(a.joinedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                                {a.leftAt && ` · Left ${new Date(a.leftAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`}
+                              </p>
                             )}
                           </div>
                         </div>

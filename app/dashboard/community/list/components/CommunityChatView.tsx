@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   BellOff,
   ChartAreaIcon,
+  ImageIcon,
   LogOut,
   MoreVerticalIcon,
   Search,
@@ -11,7 +12,9 @@ import {
   Settings,
   Trash,
   Users,
+  X,
 } from "lucide-react";
+import ImageUpload from "@/app/components/upload/ImageUpload";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
 import Button from "@/app/components/Button";
@@ -40,10 +43,12 @@ type CommunityChatViewProps = {
     name: string;
     coverImage?: string | null;
     memberCount?: number;
+    myRole?: string | null;
     _count?: { members?: number; messages?: number };
   };
   setSelectedCommunity: (community: any) => void;
   onLeave?: (communityId: string) => void;
+  onCoverUpdated?: (communityId: string, url: string) => void;
 };
 
 type PopoverState = { visible: boolean; rowData: null | any };
@@ -82,12 +87,16 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   community,
   setSelectedCommunity,
   onLeave,
+  onCoverUpdated,
 }) => {
   const { user } = useAuth();
   const [messageText, setMessageText] = useState("");
   const [messages, setMessages] = useState<ApiMessage[]>([]);
   const [sending, setSending] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [showEditCover, setShowEditCover] = useState(false);
+  const [coverSaving, setCoverSaving] = useState(false);
+  const [localCoverImage, setLocalCoverImage] = useState<string | null | undefined>(community.coverImage);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<HTMLButtonElement | null>(null);
@@ -95,6 +104,8 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
     visible: false,
     rowData: null,
   });
+
+  const isOwnerOrAdmin = community.myRole === 'OWNER' || community.myRole === 'ADMIN';
 
   // Group messages by day for dividers
   const messagesWithDividers = useMemo(() => {
@@ -179,13 +190,32 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
     setPopover((prev) => ({ ...prev, visible: false, rowData: null }));
   }, []);
 
+  const handleSaveCover = async (url: string) => {
+    setCoverSaving(true);
+    try {
+      await communityService.updateCommunity(community.id, { coverImage: url });
+      setLocalCoverImage(url);
+      onCoverUpdated?.(community.id, url);
+      setShowEditCover(false);
+    } catch {
+      // error already shown by ImageUpload
+    } finally {
+      setCoverSaving(false);
+    }
+  };
+
   const popoverContent = useMemo(
     () => [
-      {
-        item: "Settings",
-        icon: <Settings className="w-3.5 h-3.5" />,
-        onClick: () => {},
-      },
+      ...(isOwnerOrAdmin
+        ? [{
+            item: "Edit Cover Image",
+            icon: <ImageIcon className="w-3.5 h-3.5" />,
+            onClick: () => {
+              setPopover({ visible: false, rowData: null });
+              setShowEditCover(true);
+            },
+          }]
+        : []),
       {
         item: "Mute",
         icon: <BellOff className="w-3.5 h-3.5" />,
@@ -197,7 +227,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
         onClick: handleLeave,
       },
     ],
-    [handleLeave],
+    [handleLeave, isOwnerOrAdmin],
   );
 
   const formatTime = (iso: string) =>
@@ -222,10 +252,10 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
             <ArrowLeft size={20} className="text-[#60666B]" />
           </button>
           <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
-            {community.coverImage ? (
+            {localCoverImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={community.coverImage}
+                src={localCoverImage}
                 alt={community.name}
                 className="w-full h-full object-cover rounded-full"
               />
@@ -337,6 +367,39 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
           hasIcon={true}
           leftOffset={80}
         />
+      )}
+
+      {/* Edit Cover Image Modal */}
+      {showEditCover && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => !coverSaving && setShowEditCover(false)}
+        >
+          <div
+            className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-[#180426]">Edit Cover Image</h3>
+              <button
+                onClick={() => setShowEditCover(false)}
+                className="p-1 rounded-full hover:bg-gray-100 text-gray-400"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <ImageUpload
+              type="community"
+              value={localCoverImage ?? undefined}
+              onUpload={handleSaveCover}
+              aspectRatio="banner"
+              hint="Upload a banner image for your community"
+            />
+            {coverSaving && (
+              <p className="text-xs text-center text-[#870BD6]">Saving…</p>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

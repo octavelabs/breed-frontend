@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { accountabilityService } from "@/lib/api-services";
+import { accountabilityService, meetingsService } from "@/lib/api-services";
 import {
   Mic, MicOff, Video, VideoOff, Monitor, MonitorOff,
   MessageSquare, Phone, Users, ArrowLeft, Send, X, Pin,
@@ -161,12 +161,19 @@ export default function RoomPage() {
     if (showChat) chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, showChat]);
 
+  // Mark attendance when connected; silently no-ops for non-meeting rooms (mentorship/accountability).
+  useEffect(() => {
+    if (!socketConnected) return;
+    meetingsService.markAttendance(meetingId).catch(() => {});
+  }, [socketConnected, meetingId]);
+
   const handleLeave = useCallback(() => {
+    meetingsService.markLeft(meetingId).catch(() => {});
     if (prayerSessionId) {
       accountabilityService.leaveSession(prayerSessionId).catch(() => {});
     }
     leave();
-  }, [prayerSessionId, leave]);
+  }, [meetingId, prayerSessionId, leave]);
 
   const openChat = (open: boolean) => {
     setShowChat(open);

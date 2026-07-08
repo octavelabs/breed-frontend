@@ -386,6 +386,7 @@ export const communityService = {
     description?: string;
     privacy?: string;
     maxMembers?: number;
+    coverImage?: string;
   }) => api.patch(`/communities/${id}`, data),
 
   deleteCommunity: (id: string) => api.delete(`/communities/${id}`),
@@ -485,6 +486,10 @@ export const meetingsService = {
 
   addAttendee: (id: string, userId: string) =>
     api.post(`/meetings/${id}/attendees`, { userId }),
+
+  markAttendance: (id: string) => api.post(`/meetings/${id}/attend`),
+
+  markLeft: (id: string) => api.post(`/meetings/${id}/leave`),
 };
 
 // ── Notification services ──────────────────────────────────────────────────────

@@ -61,6 +61,7 @@ export const CreateCommunityModal = ({
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
+  const [bannerUploading, setBannerUploading] = useState(false);
 
   // Load followers when reaching Step 3
   useEffect(() => {
@@ -105,7 +106,7 @@ export const CreateCommunityModal = ({
     });
   };
 
-  const canProceedStep1 = formData.name.trim() !== '' && formData.description.trim() !== '';
+  const canProceedStep1 = formData.name.trim() !== '' && formData.description.trim() !== '' && !bannerUploading;
   const canProceedStep2 = formData.guidelinesAccepted;
 
   const filteredFriends = formData.friends.filter((f) =>
@@ -163,9 +164,11 @@ export const CreateCommunityModal = ({
               <ImageUpload
                 type="community"
                 value={formData.banner}
-                onUpload={(url) => setFormData({ ...formData, banner: url })}
+                onUpload={(url) => setFormData((prev) => ({ ...prev, banner: url }))}
+                onUploadingChange={setBannerUploading}
                 label="Community Banner (optional)"
                 aspectRatio="banner"
+                hint={bannerUploading ? "Uploading banner…" : undefined}
               />
 
               <div>
