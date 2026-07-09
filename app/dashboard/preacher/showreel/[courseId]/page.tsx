@@ -11,6 +11,7 @@ import CourseContent from './components/CourseContent';
 import MetricsContent from './components/MetricsContent';
 import CommentsContent from './components/CommentsContent';
 import SettingsContent from './components/SettingsContent';
+import AssessmentContent from './components/AssessmentContent';
 import { courseService } from '@/lib/api-services';
 import Toast from '@/app/components/Toast';
 
@@ -118,6 +119,11 @@ const UpdateCourse = () => {
       label: 'Comments',
       value: 'comments',
       content: <CommentsContent />,
+    },
+    {
+      label: 'Assessment',
+      value: 'assessment',
+      content: <AssessmentContent courseId={courseId} />,
     },
     {
       label: 'Settings',

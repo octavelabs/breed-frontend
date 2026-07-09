@@ -82,12 +82,14 @@ const LessonItem = ({
   globalIdx,
   enrolled,
   enrolling,
+  completed,
   onEnroll,
 }: {
   lesson: ApiLesson;
   globalIdx: number;
   enrolled: boolean;
   enrolling: boolean;
+  completed: boolean;
   onEnroll: (id: string) => void;
 }) => {
   const isFirst   = globalIdx === 0;
@@ -97,10 +99,10 @@ const LessonItem = ({
     <div className="flex items-start gap-4 py-4 border-b border-[#F0F2F4] last:border-0 transition-colors">
       <div
         className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 ${
-          canAccess ? "bg-[#F5EBFF] text-[#870BD6]" : "bg-[#F0F2F4] text-[#B0B7C3]"
+          completed ? "bg-[#ECFDF3] text-[#067647]" : canAccess ? "bg-[#F5EBFF] text-[#870BD6]" : "bg-[#F0F2F4] text-[#B0B7C3]"
         }`}
       >
-        {globalIdx + 1}
+        {completed ? <CheckCircle size={18} /> : globalIdx + 1}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-[#B0B7C3] mb-0.5">
@@ -139,6 +141,7 @@ const ChapterSection = ({
   chapterIndex,
   enrolled,
   enrolling,
+  completedLessonIds,
   globalLessonOffset,
   onEnroll,
 }: {
@@ -146,6 +149,7 @@ const ChapterSection = ({
   chapterIndex: number;
   enrolled: boolean;
   enrolling: boolean;
+  completedLessonIds: string[];
   globalLessonOffset: number;
   onEnroll: (id: string) => void;
 }) => {
@@ -186,6 +190,7 @@ const ChapterSection = ({
                 globalIdx={globalLessonOffset + i}
                 enrolled={enrolled}
                 enrolling={enrolling}
+                completed={completedLessonIds.includes(lesson.id)}
                 onEnroll={onEnroll}
               />
             ))
@@ -203,11 +208,12 @@ const CourseDetail: React.FC = () => {
   const params   = useParams();
   const courseId = params.courseId as string;
 
-  const [course,      setCourse]      = useState<Course | null>(null);
-  const [loading,     setLoading]     = useState(true);
-  const [enrolling,   setEnrolling]   = useState(false);
-  const [enrolled,    setEnrolled]    = useState(false);
-  const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [course,              setCourse]              = useState<Course | null>(null);
+  const [loading,             setLoading]             = useState(true);
+  const [enrolling,           setEnrolling]           = useState(false);
+  const [enrolled,            setEnrolled]            = useState(false);
+  const [enrollError,         setEnrollError]         = useState<string | null>(null);
+  const [completedLessonIds,  setCompletedLessonIds]  = useState<string[]>([]);
 
   useEffect(() => {
     courseService
@@ -215,7 +221,14 @@ const CourseDetail: React.FC = () => {
       .then((res: unknown) => {
         const data = res as Course;
         setCourse(data);
-        setEnrolled(data.isEnrolled ?? false);
+        const isEnrolled = data.isEnrolled ?? false;
+        setEnrolled(isEnrolled);
+        if (isEnrolled) {
+          courseService.getProgress(courseId).then((pr: unknown) => {
+            const p = pr as { completedLessonIds?: string[] };
+            setCompletedLessonIds(p?.completedLessonIds ?? []);
+          }).catch(() => {});
+        }
       })
       .catch(() => setCourse(null))
       .finally(() => setLoading(false));
@@ -428,6 +441,7 @@ const CourseDetail: React.FC = () => {
                   globalIdx={i}
                   enrolled={enrolled}
                   enrolling={enrolling}
+                  completed={completedLessonIds.includes(lesson.id)}
                   onEnroll={handleEnroll}
                 />
               ))}
@@ -444,6 +458,7 @@ const CourseDetail: React.FC = () => {
                   chapterIndex={chapterIndex}
                   enrolled={enrolled}
                   enrolling={enrolling}
+                  completedLessonIds={completedLessonIds}
                   globalLessonOffset={offset}
                   onEnroll={handleEnroll}
                 />

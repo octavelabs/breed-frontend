@@ -33,6 +33,7 @@ interface Course {
   title: string;
   chapters?: Chapter[];
   lessons?: Omit<Lesson, 'chapterTitle'>[];
+  quizzes?: { id: string }[];
 }
 
 // ── Lesson content renderer ───────────────────────────────────────────────────
@@ -153,13 +154,18 @@ function CourseMaterialsInner() {
     );
   }
 
+  const hasQuiz = (course.quizzes?.length ?? 0) > 0;
+
   return (
     <DashboardLayout>
       <StepProgress
         steps={steps}
         initialStep={initialStep}
-        onComplete={() => router.push(`/dashboard/learn/quiz/${id}`)}
-        completeButtonText="Take Assessment"
+        onComplete={() => hasQuiz
+          ? router.push(`/dashboard/learn/quiz/${id}`)
+          : router.push(`/dashboard/learn/${id}/chapters/${id}`)
+        }
+        completeButtonText={hasQuiz ? "Take Assessment" : "Complete Course"}
         handleNextClick={handleNextClick}
         primaryColor="#870BD6"
       />

@@ -262,6 +262,28 @@ export const courseService = {
 
   markLessonComplete: (courseId: string, lessonId: string) =>
     api.post(`/courses/${courseId}/lessons/${lessonId}/complete`),
+
+  getCourseQuiz: (courseId: string) =>
+    api.get(`/courses/${courseId}/quizzes/author`),
+
+  createQuiz: (courseId: string, data: {
+    title: string;
+    description?: string;
+    passMark: number;
+    timeLimit?: number;
+    questions: {
+      question: string;
+      type: string;
+      options?: string[];
+      correctAnswer: unknown;
+      explanation?: string;
+      points?: number;
+      sortOrder?: number;
+    }[];
+  }) => api.post(`/courses/${courseId}/quizzes`, data),
+
+  deleteQuiz: (courseId: string, quizId: string) =>
+    api.delete(`/courses/${courseId}/quizzes/${quizId}`),
 };
 
 // ── Devotional services ────────────────────────────────────────────────────────
