@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Plus, Trash2, CheckCircle, AlertCircle, Loader2, ClipboardList,
-  ChevronDown, ChevronRight, BookOpen,
+  Plus, Trash2, CheckCircle, AlertCircle, ClipboardList, BookOpen,
 } from 'lucide-react';
 import { courseService } from '@/lib/api-services';
 import Toast from '@/app/components/Toast';
+import Button from '@/app/components/Button';
 
 // ── Shared types ──────────────────────────────────────────────────────────────
 
@@ -40,6 +40,10 @@ interface ApiLesson {
   title: string;
   sortOrder: number;
   quiz?: { id: string } | null;
+}
+
+interface LessonWithStatus extends ApiLesson {
+  hasQuiz: boolean;
 }
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const;
@@ -132,46 +136,46 @@ const QuizViewer = ({
 }) => {
   const questions = quiz.questions ?? [];
   return (
-  <div>
-    <div className="flex items-start justify-between mb-4">
-      <div>
-        <h4 className="font-semibold text-[#180426] text-sm">{quiz.title}</h4>
-        <div className="flex items-center gap-3 mt-1 text-xs text-[#60666B]">
-          <span className="flex items-center gap-1"><CheckCircle size={11} className="text-green-500" />Pass: {quiz.passMark}%</span>
-          {quiz.timeLimit && <span>{quiz.timeLimit} min</span>}
-          <span>{questions.length} question{questions.length !== 1 ? 's' : ''}</span>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <button onClick={onReplace} className="text-xs font-semibold text-[#870BD6] border border-[#D49CFD] px-3 py-1.5 rounded-lg hover:bg-[#F5EBFF] transition-colors">Replace</button>
-        <button onClick={onDelete} disabled={deleting} className="text-xs font-semibold text-red-500 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors">
-          {deleting ? <Loader2 size={12} className="animate-spin" /> : 'Delete'}
-        </button>
-      </div>
-    </div>
-    <div className="space-y-2">
-      {questions.map((q, i) => (
-        <div key={q.id} className="border border-[#E3E8EF] rounded-xl p-4 bg-white">
-          <p className="text-xs font-semibold text-[#870BD6] uppercase tracking-widest mb-1.5">Q{i + 1}</p>
-          <p className="text-sm font-medium text-[#180426] mb-2">{q.question}</p>
-          <div className="space-y-1">
-            {(q.options ?? []).map((opt, oi) => {
-              const label = OPTION_LABELS[oi];
-              const isCorrect = q.correctAnswer === opt || q.correctAnswer === label;
-              return (
-                <div key={oi} className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg ${isCorrect ? 'bg-[#ECFDF3] text-[#067647]' : 'bg-[#F9FAFB] text-[#374151]'}`}>
-                  <span className={`font-bold w-4 flex-shrink-0 ${isCorrect ? 'text-[#067647]' : 'text-[#6B7280]'}`}>{label}</span>
-                  {opt}
-                  {isCorrect && <CheckCircle size={11} className="ml-auto text-[#067647]" />}
-                </div>
-              );
-            })}
+    <div>
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h4 className="font-semibold text-[#180426] text-sm">{quiz.title}</h4>
+          <div className="flex items-center gap-3 mt-1 text-xs text-[#60666B]">
+            <span className="flex items-center gap-1"><CheckCircle size={11} className="text-green-500" />Pass: {quiz.passMark}%</span>
+            {quiz.timeLimit && <span>{quiz.timeLimit} min</span>}
+            <span>{questions.length} question{questions.length !== 1 ? 's' : ''}</span>
           </div>
-          {q.explanation && <p className="text-xs text-[#6B7280] mt-2 italic">💡 {q.explanation}</p>}
         </div>
-      ))}
+        <div className="flex gap-2">
+          <button onClick={onReplace} className="text-xs font-semibold text-[#870BD6] border border-[#D49CFD] px-3 py-1.5 rounded-lg hover:bg-[#F5EBFF] transition-colors">Replace</button>
+          <button onClick={onDelete} disabled={deleting} className="text-xs font-semibold text-red-500 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors">
+            {deleting ? <span className="inline-block w-3 h-3 rounded-full border-t-2 border-red-400 animate-spin" /> : 'Delete'}
+          </button>
+        </div>
+      </div>
+      <div className="space-y-2">
+        {questions.map((q, i) => (
+          <div key={q.id} className="border border-[#E3E8EF] rounded-xl p-4 bg-white">
+            <p className="text-xs font-semibold text-[#870BD6] uppercase tracking-widest mb-1.5">Q{i + 1}</p>
+            <p className="text-sm font-medium text-[#180426] mb-2">{q.question}</p>
+            <div className="space-y-1">
+              {(q.options ?? []).map((opt, oi) => {
+                const label = OPTION_LABELS[oi];
+                const isCorrect = q.correctAnswer === opt || q.correctAnswer === label;
+                return (
+                  <div key={oi} className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg ${isCorrect ? 'bg-[#ECFDF3] text-[#067647]' : 'bg-[#F9FAFB] text-[#374151]'}`}>
+                    <span className={`font-bold w-4 flex-shrink-0 ${isCorrect ? 'text-[#067647]' : 'text-[#6B7280]'}`}>{label}</span>
+                    {opt}
+                    {isCorrect && <CheckCircle size={11} className="ml-auto text-[#067647]" />}
+                  </div>
+                );
+              })}
+            </div>
+            {q.explanation && <p className="text-xs text-[#6B7280] mt-2 italic">💡 {q.explanation}</p>}
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
   );
 };
 
@@ -255,48 +259,86 @@ const QuizBuilder = ({
           className="flex-1 border border-[#E3E8EF] text-[#60666B] py-2.5 rounded-full text-sm font-semibold hover:bg-[#F9FAFB] transition-colors">
           Cancel
         </button>
-        <button
-          onClick={() => onSave({ title, description: desc || undefined, passMark, timeLimit: timeLimit !== '' ? Number(timeLimit) : undefined, questions })}
-          disabled={saving}
-          className="flex-1 bg-[#870BD6] text-white py-2.5 rounded-full font-semibold text-sm hover:bg-[#6A09AA] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-          {saving ? <><Loader2 size={14} className="animate-spin" /> Saving…</> : 'Save Assessment'}
-        </button>
+        <Button
+          loading={saving}
+          onClick={() => onSave({
+            title,
+            description: desc || undefined,
+            passMark,
+            timeLimit: timeLimit !== '' ? Number(timeLimit) : undefined,
+            questions,
+          })}
+          customClass="flex-1"
+        >
+          Save Assessment
+        </Button>
       </div>
     </>
   );
 };
 
-// ── Lesson quiz row ────────────────────────────────────────────────────────────
+// ── Lesson list item (left column) ────────────────────────────────────────────
 
-const LessonQuizRow = ({
-  courseId, lesson, onToast,
+const LessonListItem = ({
+  lesson, isSelected, onClick,
+}: {
+  lesson: LessonWithStatus;
+  isSelected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-colors ${
+      isSelected
+        ? 'bg-[#F5EBFF] border border-[#D49CFD]'
+        : 'border border-transparent hover:bg-[#F0F0F5]'
+    }`}
+  >
+    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+      isSelected ? 'bg-[#870BD6] text-white' : 'bg-[#E7C8FF] text-[#870BD6]'
+    }`}>
+      {lesson.sortOrder + 1}
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-semibold text-[#180426] truncate">{lesson.title}</p>
+      {lesson.hasQuiz ? (
+        <span className="text-[10px] font-semibold text-[#067647]">Has quiz</span>
+      ) : (
+        <span className="text-[10px] text-[#B0B7C3]">No quiz</span>
+      )}
+    </div>
+  </button>
+);
+
+// ── Lesson quiz panel (right column) ──────────────────────────────────────────
+
+const LessonQuizPanel = ({
+  courseId, lesson, onToast, onQuizChanged,
 }: {
   courseId: string;
-  lesson: ApiLesson;
+  lesson: LessonWithStatus;
   onToast: (msg: string, type: 'success' | 'error') => void;
+  onQuizChanged: (lessonId: string, hasQuiz: boolean) => void;
 }) => {
-  const [expanded,   setExpanded]   = useState(false);
-  const [quiz,       setQuiz]       = useState<Quiz | null | undefined>(undefined); // undefined = not loaded
-  const [mode,       setMode]       = useState<'view' | 'build'>('view');
-  const [saving,     setSaving]     = useState(false);
-  const [deleting,   setDeleting]   = useState(false);
-
-  const hasQuiz = !!lesson.quiz?.id;
+  const [quiz,     setQuiz]     = useState<Quiz | null | undefined>(undefined);
+  const [mode,     setMode]     = useState<'view' | 'build'>('view');
+  const [saving,   setSaving]   = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const loadQuiz = useCallback(async () => {
-    if (!hasQuiz) { setQuiz(null); return; }
     try {
       const res = await courseService.getLessonQuizForAuthor(courseId, lesson.id) as Quiz | null;
-      setQuiz(res);
+      setQuiz(res ?? null);
     } catch {
       setQuiz(null);
     }
-  }, [courseId, lesson.id, hasQuiz]);
+  }, [courseId, lesson.id]);
 
-  const handleExpand = () => {
-    setExpanded((o) => !o);
-    if (!expanded && quiz === undefined) loadQuiz();
-  };
+  useEffect(() => {
+    setQuiz(undefined);
+    setMode('view');
+    loadQuiz();
+  }, [lesson.id, loadQuiz]);
 
   const handleSave = async (data: {
     title: string; description?: string; passMark: number; timeLimit?: number; questions: DraftQuestion[];
@@ -327,6 +369,7 @@ const LessonQuizRow = ({
       await loadQuiz();
       setMode('view');
       onToast('Lesson assessment saved.', 'success');
+      onQuizChanged(lesson.id, true);
     } catch {
       onToast('Failed to save assessment.', 'error');
     } finally {
@@ -343,6 +386,7 @@ const LessonQuizRow = ({
       setQuiz(null);
       setMode('view');
       onToast('Lesson assessment deleted.', 'success');
+      onQuizChanged(lesson.id, false);
     } catch {
       onToast('Failed to delete assessment.', 'error');
     } finally {
@@ -350,65 +394,46 @@ const LessonQuizRow = ({
     }
   };
 
-  return (
-    <div className="border border-[#E3E8EF] rounded-xl overflow-hidden mb-3">
-      {/* Header row */}
-      <button
-        onClick={handleExpand}
-        className="w-full flex items-center justify-between px-5 py-3.5 bg-[#FAFAFA] hover:bg-[#F5F0FF] transition-colors text-left"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-xs font-bold flex-shrink-0">
-            {lesson.sortOrder + 1}
-          </div>
-          <span className="text-sm font-semibold text-[#180426]">{lesson.title}</span>
-          {hasQuiz ? (
-            <span className="text-[10px] font-semibold bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6] px-2 py-0.5 rounded-full">
-              Has quiz
-            </span>
-          ) : (
-            <span className="text-[10px] font-semibold bg-[#F9FAFB] text-[#B0B7C3] border border-[#E3E8EF] px-2 py-0.5 rounded-full">
-              No quiz
-            </span>
-          )}
-        </div>
-        {expanded
-          ? <ChevronDown size={16} className="text-[#870BD6] flex-shrink-0" />
-          : <ChevronRight size={16} className="text-[#60666B] flex-shrink-0" />
-        }
-      </button>
+  if (quiz === undefined) {
+    return (
+      <div className="flex items-center justify-center py-16 gap-2 text-sm text-[#60666B]">
+        <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin flex-shrink-0" />
+        Loading…
+      </div>
+    );
+  }
 
-      {/* Expanded content */}
-      {expanded && (
-        <div className="px-5 py-4 border-t border-[#E3E8EF]">
-          {quiz === undefined ? (
-            <div className="flex items-center gap-2 text-sm text-[#60666B] py-2"><Loader2 size={14} className="animate-spin" /> Loading…</div>
-          ) : mode === 'view' && quiz ? (
-            <QuizViewer quiz={quiz} onReplace={() => setMode('build')} onDelete={handleDelete} deleting={deleting} />
-          ) : mode === 'view' ? (
-            <div className="flex flex-col items-center py-6 gap-3 text-center">
-              <div className="w-10 h-10 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                <BookOpen size={18} className="text-[#870BD6]" />
-              </div>
-              <p className="text-sm text-[#60666B]">No assessment for this lesson yet.</p>
-              <button
-                onClick={() => setMode('build')}
-                className="flex items-center gap-2 bg-[#870BD6] text-white px-4 py-2 rounded-full text-xs font-semibold hover:bg-[#6A09AA] transition-colors"
-              >
-                <Plus size={13} /> Add Assessment
-              </button>
-            </div>
-          ) : (
-            <QuizBuilder
-              existingQuiz={quiz}
-              onSave={handleSave}
-              onCancel={() => setMode('view')}
-              saving={saving}
-            />
-          )}
+  if (mode === 'view' && quiz) {
+    return <QuizViewer quiz={quiz} onReplace={() => setMode('build')} onDelete={handleDelete} deleting={deleting} />;
+  }
+
+  if (mode === 'view') {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+        <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+          <BookOpen size={20} className="text-[#870BD6]" />
         </div>
-      )}
-    </div>
+        <div>
+          <p className="font-semibold text-[#180426] mb-1">No assessment for this lesson yet.</p>
+          <p className="text-xs text-[#60666B] max-w-xs">Add a quiz learners must pass before moving on.</p>
+        </div>
+        <button
+          onClick={() => setMode('build')}
+          className="flex items-center gap-2 bg-[#870BD6] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#6A09AA] transition-colors"
+        >
+          <Plus size={14} /> Add Assessment
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <QuizBuilder
+      existingQuiz={quiz}
+      onSave={handleSave}
+      onCancel={() => setMode('view')}
+      saving={saving}
+    />
   );
 };
 
@@ -483,7 +508,12 @@ const CourseQuizSection = ({ courseId, onToast }: { courseId: string; onToast: (
   };
 
   if (quiz === undefined) {
-    return <div className="flex items-center gap-2 text-sm text-[#60666B] py-4"><Loader2 size={14} className="animate-spin" /> Loading…</div>;
+    return (
+      <div className="flex items-center gap-2 text-sm text-[#60666B] py-4">
+        <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin flex-shrink-0" />
+        Loading…
+      </div>
+    );
   }
 
   if (mode === 'view' && quiz) {
@@ -521,9 +551,11 @@ const CourseQuizSection = ({ courseId, onToast }: { courseId: string; onToast: (
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function AssessmentContent({ courseId }: { courseId: string }) {
-  const [lessons,     setLessons]     = useState<ApiLesson[]>([]);
+  const [lessons,        setLessons]        = useState<ApiLesson[]>([]);
   const [loadingLessons, setLoadingLessons] = useState(true);
-  const [toast,       setToast]       = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [selectedId,     setSelectedId]     = useState<string | null>(null);
+  const [quizStatusMap,  setQuizStatusMap]  = useState<Record<string, boolean>>({});
+  const [toast,          setToast]          = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     courseService.getById(courseId).then((res: unknown) => {
@@ -531,15 +563,31 @@ export default function AssessmentContent({ courseId }: { courseId: string }) {
       const flat: ApiLesson[] = r.chapters
         ? r.chapters.flatMap((ch) => ch.lessons ?? [])
         : (r.lessons ?? []);
-      // Assign sequential sortOrder for display numbering
-      setLessons(flat.map((l, i) => ({ ...l, sortOrder: i })));
+      const mapped = flat.map((l, i) => ({ ...l, sortOrder: i }));
+      setLessons(mapped);
+
+      const statusMap: Record<string, boolean> = {};
+      mapped.forEach((l) => { statusMap[l.id] = !!l.quiz?.id; });
+      setQuizStatusMap(statusMap);
+
+      if (mapped.length > 0) setSelectedId(mapped[0].id);
     }).catch(() => {}).finally(() => setLoadingLessons(false));
   }, [courseId]);
 
+  const handleQuizChanged = (lessonId: string, hasQuiz: boolean) => {
+    setQuizStatusMap((prev) => ({ ...prev, [lessonId]: hasQuiz }));
+  };
+
   const showToast = (msg: string, type: 'success' | 'error') => setToast({ message: msg, type });
 
+  const lessonsWithStatus: LessonWithStatus[] = lessons.map((l) => ({
+    ...l,
+    hasQuiz: quizStatusMap[l.id] ?? !!l.quiz?.id,
+  }));
+  const selectedLesson = lessonsWithStatus.find((l) => l.id === selectedId);
+
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="space-y-10">
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
       {/* ── Lesson assessments ───────────────────────────────────────────── */}
@@ -553,16 +601,44 @@ export default function AssessmentContent({ courseId }: { courseId: string }) {
 
         {loadingLessons ? (
           <div className="flex items-center gap-2 text-sm text-[#60666B] py-4">
-            <Loader2 size={14} className="animate-spin" /> Loading lessons…
+            <span className="inline-block w-4 h-4 rounded-full border-t-2 border-[#870BD6] animate-spin flex-shrink-0" />
+            Loading lessons…
           </div>
         ) : lessons.length === 0 ? (
           <div className="border-2 border-dashed border-[#E3E8EF] rounded-2xl py-10 text-center">
             <p className="text-sm text-[#60666B]">No lessons in this course yet. Add lessons from the Content tab first.</p>
           </div>
         ) : (
-          lessons.map((lesson) => (
-            <LessonQuizRow key={lesson.id} courseId={courseId} lesson={lesson} onToast={showToast} />
-          ))
+          <div className="flex border border-[#E3E8EF] rounded-2xl overflow-hidden">
+            {/* Left: lesson list */}
+            <div className="w-64 flex-shrink-0 border-r border-[#E3E8EF] bg-[#FAFAFA] p-3 space-y-1 overflow-y-auto max-h-[600px]">
+              {lessonsWithStatus.map((lesson) => (
+                <LessonListItem
+                  key={lesson.id}
+                  lesson={lesson}
+                  isSelected={lesson.id === selectedId}
+                  onClick={() => setSelectedId(lesson.id)}
+                />
+              ))}
+            </div>
+
+            {/* Right: quiz editor/viewer */}
+            <div className="flex-1 min-w-0 p-6 overflow-y-auto max-h-[600px]">
+              {selectedLesson ? (
+                <LessonQuizPanel
+                  courseId={courseId}
+                  lesson={selectedLesson}
+                  onToast={showToast}
+                  onQuizChanged={handleQuizChanged}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-48 gap-2">
+                  <BookOpen size={28} className="text-[#D1D5DB]" />
+                  <p className="text-sm text-[#60666B]">Select a lesson to manage its assessment.</p>
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </section>
 
