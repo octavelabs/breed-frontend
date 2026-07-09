@@ -91,8 +91,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = user !== null;
 
+  const PREACHER_ROLES = ['PREACHER', 'ADMIN', 'SUPER_ADMIN'];
   const userType: 'believer' | 'preacher' =
-    user?.role === 'PREACHER' ? 'preacher' : 'believer';
+    PREACHER_ROLES.includes(user?.role ?? '') ? 'preacher' : 'believer';
 
   // ── Actions ──────────────────────────────────────────────────────────────────
 
@@ -113,9 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionCookies(response.user.role);
       setUser(response.user);
 
+      const isPreachers = ['PREACHER', 'ADMIN', 'SUPER_ADMIN'].includes(response.user.role);
       if (redirectUrl) {
         router.push(redirectUrl);
-      } else if (response.user.role === 'PREACHER') {
+      } else if (isPreachers) {
         router.push('/dashboard/preacher/dashboard');
       } else {
         router.push('/dashboard/home');

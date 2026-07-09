@@ -25,14 +25,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Role guard: /dashboard/preacher/* is PREACHER only
-  if (pathname.startsWith('/dashboard/preacher') && userRole !== 'PREACHER') {
+  // Role guard: /dashboard/preacher/* requires PREACHER, ADMIN, or SUPER_ADMIN
+  const isPreachers = ['PREACHER', 'ADMIN', 'SUPER_ADMIN'].includes(userRole);
+  if (pathname.startsWith('/dashboard/preacher') && !isPreachers) {
     return NextResponse.redirect(new URL('/dashboard/home', request.url));
   }
 
   // Prevent logged-in users from hitting auth pages
   if (isAuthRoute && isLoggedIn) {
-    const home = userRole === 'PREACHER' ? '/dashboard/preacher/dashboard' : '/dashboard/home';
+    const home = isPreachers ? '/dashboard/preacher/dashboard' : '/dashboard/home';
     return NextResponse.redirect(new URL(home, request.url));
   }
 
