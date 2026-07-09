@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, ShieldCheck } from 'lucide-react';
+import { LogOut, LayoutDashboard, Users } from 'lucide-react';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
 import BuildupIcon from '@/app/assets/icons/buildupIcon';
@@ -13,7 +13,6 @@ import MentorshipIcon from "@/app/assets/icons/MentorshipIcon";
 import PreacherCommunityIcon from "@/app/assets/icons/preacherCommunityIcon";
 import MeetingIcon from "@/app/assets/icons/meetingIcon";
 import ShowReelIcon from "@/app/assets/icons/showreelIcon";
-import SettingsIcon from "@/app/assets/icons/SettingsIcon";
 
 export const navItems = [
   { path: "/dashboard/home", label: "Home", icon: HomeIcon },
@@ -27,13 +26,15 @@ export const navItems = [
 export const preacherNavItems = [
   { path: '/dashboard/preacher/dashboard', label: 'Dashboard', icon: DashboardIcon },
   { path: '/dashboard/preacher/mentorship', label: 'Mentorship', icon: MentorshipIcon },
-  { path: '/dashboard/preacher/community', label: 'Community', icon: PreacherCommunityIcon},
+  { path: '/dashboard/preacher/community', label: 'Community', icon: PreacherCommunityIcon },
   { path: '/dashboard/preacher/meetings', label: 'Meetings', icon: MeetingIcon },
   { path: '/dashboard/preacher/showreel', label: 'Showreel', icon: ShowReelIcon },
-  // { path: '/dashboard/preacher/settings', label: 'Settings', icon: SettingsIcon },
 ];
 
-const adminNavItem = { path: '/dashboard/admin', label: 'Admin', icon: ShieldCheck };
+export const adminNavItems = [
+  { path: '/dashboard/admin/overview', label: 'Overview', icon: LayoutDashboard },
+  { path: '/dashboard/admin/users', label: 'Users', icon: Users },
+];
 
 const SideBar = () => {
   const pathname = usePathname();
@@ -42,13 +43,11 @@ const SideBar = () => {
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
+  const isAdminRoute   = pathname?.startsWith('/dashboard/admin');
   const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
-  const isAdminRoute = pathname?.startsWith('/dashboard/admin');
   const isPreacher = userType === 'preacher' || isPreacherRoute || isAdminRoute;
-  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
-  const currentNavItems = isPreacher
-    ? isAdminUser ? [...preacherNavItems, adminNavItem] : preacherNavItems
-    : navItems;
+
+  const currentNavItems = isAdminRoute ? adminNavItems : isPreacher ? preacherNavItems : navItems;
 
   return (
     <>
@@ -60,7 +59,7 @@ const SideBar = () => {
         }`}
       >
         {/* Logo */}
-        <div className="px-[26px] pt-[44px] pb-[32px]">
+        <div className="px-[26px] pt-[44px] pb-[28px]">
           <img
             src={isPreacher ? "/logo3.svg" : "/logo3.png"}
             alt="logo"
@@ -68,21 +67,24 @@ const SideBar = () => {
           />
         </div>
 
+        {/* Admin context label */}
+        {isAdminRoute && (
+          <div className="px-[26px] pb-4">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-[#870BD6] bg-[#2D1B4E] px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#870BD6] inline-block" />
+              Admin Panel
+            </span>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav className="flex-1 px-[26px] space-y-1">
           {currentNavItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
             const iconColor = isPreacher
-              ? active
-                ? "#FFFFFF"
-                : "#D1D5DB"
-              : active
-                ? "#870BD6"
-                : "#60666B";
-
-            // Check if it's a Lucide icon or custom icon
-            const isLucideIcon = "isLucide" in item ? item.isLucide : false;
+              ? active ? "#FFFFFF" : "#D1D5DB"
+              : active ? "#870BD6" : "#60666B";
 
             return (
               <Link
@@ -99,7 +101,6 @@ const SideBar = () => {
                 }`}
               >
                 <Icon color={iconColor} size={26} />
-
                 <span className="font-medium">{item.label}</span>
               </Link>
             );
@@ -168,17 +169,14 @@ const SideBar = () => {
 export const MobileNav = () => {
   const pathname = usePathname();
   const { userType } = useUser();
-  const { user } = useAuth();
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
+  const isAdminRoute    = pathname?.startsWith('/dashboard/admin');
   const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
-  const isAdminRoute = pathname?.startsWith('/dashboard/admin');
   const isPreacher = userType === 'preacher' || isPreacherRoute || isAdminRoute;
-  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
-  const currentNavItems = isPreacher
-    ? isAdminUser ? [...preacherNavItems, adminNavItem] : preacherNavItems
-    : navItems;
+
+  const currentNavItems = isAdminRoute ? adminNavItems : isPreacher ? preacherNavItems : navItems;
 
   return (
     <section className="fixed w-screen bottom-0 left-0 right-0 h-[68px] z-[99] px-6 bg-white md:hidden">
