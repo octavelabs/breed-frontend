@@ -268,7 +268,7 @@ const QuizBuilder = ({
             timeLimit: timeLimit !== '' ? Number(timeLimit) : undefined,
             questions,
           })}
-          customClass="flex-1"
+          customClass="flex-1 text-white"
         >
           Save Assessment
         </Button>
@@ -329,8 +329,10 @@ const LessonQuizPanel = ({
     try {
       const res = await courseService.getLessonQuizForAuthor(courseId, lesson.id) as Quiz | null;
       setQuiz(res ?? null);
+      if (!res) setMode('build');
     } catch {
       setQuiz(null);
+      setMode('build');
     }
   }, [courseId, lesson.id]);
 
@@ -587,7 +589,7 @@ export default function AssessmentContent({ courseId }: { courseId: string }) {
   const selectedLesson = lessonsWithStatus.find((l) => l.id === selectedId);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 px-4 lg:px-12">
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
       {/* ── Lesson assessments ───────────────────────────────────────────── */}
@@ -611,7 +613,7 @@ export default function AssessmentContent({ courseId }: { courseId: string }) {
         ) : (
           <div className="flex border border-[#E3E8EF] rounded-2xl overflow-hidden">
             {/* Left: lesson list */}
-            <div className="w-64 flex-shrink-0 border-r border-[#E3E8EF] bg-[#FAFAFA] p-3 space-y-1 overflow-y-auto max-h-[600px]">
+            <div className="w-64 flex-shrink-0 border-r border-[#E3E8EF] p-3 space-y-1 overflow-y-auto max-h-[600px]">
               {lessonsWithStatus.map((lesson) => (
                 <LessonListItem
                   key={lesson.id}
