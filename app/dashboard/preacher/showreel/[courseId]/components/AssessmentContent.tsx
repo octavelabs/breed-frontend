@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Plus, Trash2, CheckCircle, AlertCircle, ClipboardList, BookOpen,
+  Plus, Trash2, CheckCircle, AlertCircle, ClipboardList,
 } from 'lucide-react';
 import { courseService } from '@/lib/api-services';
 import Toast from '@/app/components/Toast';
 import Button from '@/app/components/Button';
+import BookOpenIcon from '@/app/assets/icons/BookOpenIcon';
 
 // ── Shared types ──────────────────────────────────────────────────────────────
 
@@ -288,23 +289,23 @@ const LessonListItem = ({
 }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-colors ${
+    className={`w-full flex items-center gap-2 py-2 px-3 mb-1 rounded-lg text-left cursor-pointer transition-colors ${
       isSelected
         ? 'bg-[#F5EBFF] border border-[#D49CFD]'
-        : 'border border-transparent hover:bg-[#F0F0F5]'
+        : 'border border-transparent hover:bg-gray-50'
     }`}
   >
-    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-      isSelected ? 'bg-[#870BD6] text-white' : 'bg-[#E7C8FF] text-[#870BD6]'
-    }`}>
-      {lesson.sortOrder + 1}
-    </div>
+    <BookOpenIcon stroke={isSelected ? '#B144F9' : '#667085'} />
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-[#180426] truncate">{lesson.title}</p>
+      <span className={`block text-sm truncate select-none ${
+        isSelected ? 'font-medium text-[#B144F9]' : 'text-gray-700'
+      }`}>
+        {lesson.title}
+      </span>
       {lesson.hasQuiz ? (
         <span className="text-[10px] font-semibold text-[#067647]">Has quiz</span>
       ) : (
-        <span className="text-[10px] text-[#B0B7C3]">No quiz</span>
+        <span className="text-[10px] text-[#9CA3AF]">No quiz</span>
       )}
     </div>
   </button>
@@ -329,7 +330,7 @@ const LessonQuizPanel = ({
     try {
       const res = await courseService.getLessonQuizForAuthor(courseId, lesson.id) as Quiz | null;
       setQuiz(res ?? null);
-      if (!res) setMode('build');
+      if (!res || (res.questions ?? []).length === 0) setMode('build');
     } catch {
       setQuiz(null);
       setMode('build');
@@ -613,7 +614,7 @@ export default function AssessmentContent({ courseId }: { courseId: string }) {
         ) : (
           <div className="flex border border-[#E3E8EF] rounded-2xl overflow-hidden">
             {/* Left: lesson list */}
-            <div className="w-64 flex-shrink-0 border-r border-[#E3E8EF] p-3 space-y-1 overflow-y-auto max-h-[600px]">
+            <div className="w-64 flex-shrink-0 border-r border-[#E3E8EF] p-3 overflow-y-auto max-h-[600px]">
               {lessonsWithStatus.map((lesson) => (
                 <LessonListItem
                   key={lesson.id}
