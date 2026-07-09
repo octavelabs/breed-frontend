@@ -129,7 +129,9 @@ const QuizViewer = ({
   onReplace: () => void;
   onDelete: () => void;
   deleting: boolean;
-}) => (
+}) => {
+  const questions = quiz.questions ?? [];
+  return (
   <div>
     <div className="flex items-start justify-between mb-4">
       <div>
@@ -137,7 +139,7 @@ const QuizViewer = ({
         <div className="flex items-center gap-3 mt-1 text-xs text-[#60666B]">
           <span className="flex items-center gap-1"><CheckCircle size={11} className="text-green-500" />Pass: {quiz.passMark}%</span>
           {quiz.timeLimit && <span>{quiz.timeLimit} min</span>}
-          <span>{quiz.questions.length} question{quiz.questions.length !== 1 ? 's' : ''}</span>
+          <span>{questions.length} question{questions.length !== 1 ? 's' : ''}</span>
         </div>
       </div>
       <div className="flex gap-2">
@@ -148,12 +150,12 @@ const QuizViewer = ({
       </div>
     </div>
     <div className="space-y-2">
-      {quiz.questions.map((q, i) => (
+      {questions.map((q, i) => (
         <div key={q.id} className="border border-[#E3E8EF] rounded-xl p-4 bg-white">
           <p className="text-xs font-semibold text-[#870BD6] uppercase tracking-widest mb-1.5">Q{i + 1}</p>
           <p className="text-sm font-medium text-[#180426] mb-2">{q.question}</p>
           <div className="space-y-1">
-            {q.options.map((opt, oi) => {
+            {(q.options ?? []).map((opt, oi) => {
               const label = OPTION_LABELS[oi];
               const isCorrect = q.correctAnswer === opt || q.correctAnswer === label;
               return (
@@ -170,7 +172,8 @@ const QuizViewer = ({
       ))}
     </div>
   </div>
-);
+  );
+};
 
 // ── Quiz builder form ─────────────────────────────────────────────────────────
 
