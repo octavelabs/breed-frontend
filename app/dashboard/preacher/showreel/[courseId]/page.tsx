@@ -12,6 +12,7 @@ import MetricsContent from './components/MetricsContent';
 import CommentsContent from './components/CommentsContent';
 import SettingsContent from './components/SettingsContent';
 import { courseService } from '@/lib/api-services';
+import Toast from '@/app/components/Toast';
 
 interface ApiCourse {
   id: string;
@@ -32,7 +33,7 @@ const UpdateCourse = () => {
   const [course, setCourse] = useState<ApiCourse | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<'publish' | 'archive' | 'delete' | null>(null);
-  const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const loadCourse = useCallback(async () => {
     setLoading(true);
@@ -51,8 +52,7 @@ const UpdateCourse = () => {
   }, [loadCourse]);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
-    setActionMessage({ type, text });
-    setTimeout(() => setActionMessage(null), 3000);
+    setToast({ message: text, type });
   };
 
   const handlePublish = async () => {
@@ -129,18 +129,7 @@ const UpdateCourse = () => {
   return (
     <DashboardLayout custom={true}>
       <div className="bg-white">
-        {/* Action feedback banner */}
-        {actionMessage && (
-          <div
-            className={`mx-4 lg:mx-10 mt-4 px-4 py-2 rounded-lg text-sm font-medium ${
-              actionMessage.type === 'success'
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
-            }`}
-          >
-            {actionMessage.text}
-          </div>
-        )}
+        {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 px-4 lg:px-10 pt-6">
           <div className="flex items-center gap-4">

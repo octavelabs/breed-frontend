@@ -282,7 +282,7 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
   const audioInputRef   = useRef<HTMLInputElement>(null);
   const { upload, uploading: imageUploading } = useUpload();
   const { upload: uploadVideo, uploading: videoUploading, pollVideoStatus } = useUpload();
-  const { upload: uploadAudio, uploading: audioUploading } = useUpload();
+  const { upload: uploadAudio, uploading: audioUploading, progress: audioProgress } = useUpload();
 
   // Per-lesson video: keyed by lessonId. Seeded from initialCourse so saved videos display immediately.
   const [lessonVideos, setLessonVideos] = useState<Record<string, { hlsUrl: string; thumbnailUrl?: string; durationSeconds?: number }>>(() => {
@@ -732,6 +732,20 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
               {/* Editor + media buttons */}
               <div className="flex gap-4 flex-1 min-h-0 overflow-hidden pr-4 py-4">
                 <div className="flex-1 overflow-y-auto pl-6">
+                  {audioUploading && (
+                    <div className="sticky top-0 z-10 mb-3 bg-white pb-1">
+                      <div className="flex items-center gap-2 text-xs text-[#870BD6] mb-1.5">
+                        <Headphones size={13} className="shrink-0" />
+                        <span>Uploading audio{audioProgress < 100 ? `… ${audioProgress}%` : ' — inserting…'}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-[#F5EBFF] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#870BD6] rounded-full transition-all duration-200"
+                          style={{ width: `${audioProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <RichTextEditor
                     ref={editorHandleRef}
                     lessonId={activeLesson.id}
