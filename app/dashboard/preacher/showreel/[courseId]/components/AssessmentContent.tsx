@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Plus, Trash2, CheckCircle, AlertCircle, ClipboardList,
+  Plus, Trash2, CheckCircle, AlertCircle, ClipboardList, BookOpen,
 } from 'lucide-react';
 import { courseService } from '@/lib/api-services';
 import Toast from '@/app/components/Toast';
