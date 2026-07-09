@@ -46,9 +46,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   // Derive current userType from the URL (same logic as before) but fall back
   // to the authenticated role.
-  const urlDerivedType: UserType = pathname.startsWith('/dashboard/preacher')
-    ? 'preacher'
-    : 'believer';
+  const urlDerivedType: UserType =
+    pathname.startsWith('/dashboard/preacher') || pathname.startsWith('/dashboard/admin')
+      ? 'preacher'
+      : 'believer';
 
   const userType: UserType = urlDerivedType ?? authUserType;
 
