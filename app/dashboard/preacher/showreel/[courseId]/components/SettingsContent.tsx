@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Save, Tag, X } from "lucide-react";
 import ImageUpload from "@/app/components/upload/ImageUpload";
 import Button from "@/app/components/Button";
+import Toast from "@/app/components/Toast";
 import { courseService } from "@/lib/api-services";
 
 interface CourseSettings {
@@ -98,15 +99,7 @@ const SettingsContent = ({
       <h2 className="text-lg font-semibold text-[#180426] mb-6">Course Settings</h2>
 
       {message && (
-        <div
-          className={`mb-5 px-4 py-2.5 rounded-lg text-sm font-medium ${
-            message.type === "success"
-              ? "bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]"
-              : "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]"
-          }`}
-        >
-          {message.text}
-        </div>
+        <Toast message={message.text} type={message.type} onDismiss={() => setMessage(null)} />
       )}
 
       <div className="space-y-6">
