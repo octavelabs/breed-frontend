@@ -12,7 +12,7 @@ interface StepProgressProps {
   onComplete: () => void;
   primaryColor?: string;
   showStepCounter?: boolean;
-  nextButtonText?: string;
+  nextButtonText?: string | ((stepIndex: number) => string);
   previousButtonText?: string;
   completeButtonText?: string;
   handleNextClick?: (stepIndex: number) => Promise<boolean | void> | boolean | void;
@@ -145,7 +145,9 @@ const StepProgress:React.FC<StepProgressProps> = ({
               {nextPending ? (
                 <span className="inline-block w-4 h-4 rounded-full border-t-2 border-white animate-spin" />
               ) : (
-                isLastStep ? completeButtonText : nextButtonText
+                isLastStep
+                  ? completeButtonText
+                  : (typeof nextButtonText === 'function' ? nextButtonText(currentStep) : (nextButtonText ?? 'Proceed'))
               )}
             </button>
           </div>
