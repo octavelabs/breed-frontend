@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {  LogOut } from 'lucide-react';
+import { LogOut, ShieldCheck } from 'lucide-react';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
 import BuildupIcon from '@/app/assets/icons/buildupIcon';
@@ -33,16 +33,22 @@ export const preacherNavItems = [
   // { path: '/dashboard/preacher/settings', label: 'Settings', icon: SettingsIcon },
 ];
 
+const adminNavItem = { path: '/dashboard/admin', label: 'Admin', icon: ShieldCheck };
+
 const SideBar = () => {
   const pathname = usePathname();
   const { userType } = useUser();
   const { user, logout } = useAuth();
-  
+
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
-  
+
   const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
-  const isPreacher = userType === 'preacher' || isPreacherRoute;
-  const currentNavItems = isPreacher ? preacherNavItems : navItems;
+  const isAdminRoute = pathname?.startsWith('/dashboard/admin');
+  const isPreacher = userType === 'preacher' || isPreacherRoute || isAdminRoute;
+  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const currentNavItems = isPreacher
+    ? isAdminUser ? [...preacherNavItems, adminNavItem] : preacherNavItems
+    : navItems;
 
   return (
     <>
@@ -162,12 +168,17 @@ const SideBar = () => {
 export const MobileNav = () => {
   const pathname = usePathname();
   const { userType } = useUser();
-  
+  const { user } = useAuth();
+
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
-  
+
   const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
-  const isPreacher = userType === 'preacher' || isPreacherRoute;
-  const currentNavItems = isPreacher ? preacherNavItems : navItems;
+  const isAdminRoute = pathname?.startsWith('/dashboard/admin');
+  const isPreacher = userType === 'preacher' || isPreacherRoute || isAdminRoute;
+  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const currentNavItems = isPreacher
+    ? isAdminUser ? [...preacherNavItems, adminNavItem] : preacherNavItems
+    : navItems;
 
   return (
     <section className="fixed w-screen bottom-0 left-0 right-0 h-[68px] z-[99] px-6 bg-white md:hidden">

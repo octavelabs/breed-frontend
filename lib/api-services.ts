@@ -615,3 +615,25 @@ export const accountabilityService = {
   getStreaks: (partnershipId: string) =>
     api.get(`/accountability/partnerships/${partnershipId}/streaks`),
 };
+
+// ── Admin services ─────────────────────────────────────────────────────────────
+
+export const adminService = {
+  getDashboardStats: () => api.get('/admin/dashboard'),
+
+  getUsers: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    status?: string;
+  }) => api.get('/admin/users', { params }),
+
+  updateUserStatus: (id: string, status: string) =>
+    api.patch(`/admin/users/${id}/status`, { status }),
+
+  updateUserRole: (id: string, role: string) =>
+    api.patch(`/admin/users/${id}/role`, { role }),
+
+  deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
+};

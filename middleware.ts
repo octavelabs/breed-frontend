@@ -31,6 +31,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard/home', request.url));
   }
 
+  // Role guard: /dashboard/admin/* requires ADMIN or SUPER_ADMIN only
+  const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(userRole);
+  if (pathname.startsWith('/dashboard/admin') && !isAdmin) {
+    const fallback = isPreachers ? '/dashboard/preacher/dashboard' : '/dashboard/home';
+    return NextResponse.redirect(new URL(fallback, request.url));
+  }
+
   // Prevent logged-in users from hitting auth pages
   if (isAuthRoute && isLoggedIn) {
     const home = isPreachers ? '/dashboard/preacher/dashboard' : '/dashboard/home';
