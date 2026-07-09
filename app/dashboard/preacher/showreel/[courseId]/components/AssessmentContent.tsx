@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Plus, Trash2, CheckCircle, AlertCircle, ClipboardList, BookOpen,
+  Plus, Trash2, Pencil, CheckCircle, AlertCircle, ClipboardList, BookOpen,
 } from 'lucide-react';
 import { courseService } from '@/lib/api-services';
 import Toast from '@/app/components/Toast';
@@ -46,6 +46,16 @@ interface ApiLesson {
 interface LessonWithStatus extends ApiLesson {
   hasQuiz: boolean;
 }
+
+type ApiQuestion = {
+  question: string;
+  type: string;
+  options: string[];
+  correctAnswer: unknown;
+  explanation?: string;
+  points: number;
+  sortOrder: number;
+};
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const;
 
@@ -125,19 +135,85 @@ const QuestionEditor = ({
   </div>
 );
 
-// ── Quiz viewer (read-only) ────────────────────────────────────────────────────
+// ── Quiz viewer (interactive) ─────────────────────────────────────────────────
 
 const QuizViewer = ({
-  quiz, onReplace, onDelete, deleting,
+  quiz, onReplace, onDelete, deleting, onSaveQuestions, saving,
 }: {
   quiz: Quiz;
   onReplace: () => void;
   onDelete: () => void;
   deleting: boolean;
+  onSaveQuestions: (questions: ApiQuestion[]) => Promise<void>;
+  saving: boolean;
 }) => {
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [draftQ,     setDraftQ]     = useState<DraftQuestion | null>(null);
+  const [addingNew,  setAddingNew]  = useState(false);
+  const [newQ,       setNewQ]       = useState<DraftQuestion>(emptyQuestion);
+
   const questions = quiz.questions ?? [];
+  const replaceLabel = questions.length === 0 ? 'Add Assessment' : 'Replace';
+
+  const questionToDraft = (q: QuizQuestion): DraftQuestion => {
+    const correctIdx = (q.options ?? []).indexOf(q.correctAnswer);
+    return {
+      question: q.question,
+      options: [...(q.options ?? []), '', '', '', ''].slice(0, 4) as [string, string, string, string],
+      correctAnswer: correctIdx >= 0 ? OPTION_LABELS[correctIdx] : 'A',
+      explanation: q.explanation ?? '',
+    };
+  };
+
+  const draftToApi = (d: DraftQuestion, sortOrder: number): ApiQuestion => ({
+    question: d.question.trim(),
+    type: 'MULTIPLE_CHOICE',
+    options: d.options,
+    correctAnswer: d.options[OPTION_LABELS.indexOf(d.correctAnswer as typeof OPTION_LABELS[number])],
+    explanation: d.explanation.trim() || undefined,
+    points: 1,
+    sortOrder,
+  });
+
+  const startEdit = (i: number) => {
+    setDraftQ(questionToDraft(questions[i]));
+    setEditingIdx(i);
+    setAddingNew(false);
+  };
+
+  const cancelEdit = () => { setEditingIdx(null); setDraftQ(null); };
+
+  const handleSaveEdit = async () => {
+    if (editingIdx === null || !draftQ) return;
+    const updated = questions.map((q, i) =>
+      i === editingIdx ? draftToApi(draftQ, i) : draftToApi(questionToDraft(q), i),
+    );
+    await onSaveQuestions(updated);
+    setEditingIdx(null);
+    setDraftQ(null);
+  };
+
+  const handleDeleteQuestion = async (i: number) => {
+    if (!window.confirm('Delete this question?')) return;
+    const updated = questions
+      .filter((_, idx) => idx !== i)
+      .map((q, newIdx) => draftToApi(questionToDraft(q), newIdx));
+    await onSaveQuestions(updated);
+  };
+
+  const handleSaveNew = async () => {
+    const updated = [
+      ...questions.map((q, i) => draftToApi(questionToDraft(q), i)),
+      draftToApi(newQ, questions.length),
+    ];
+    await onSaveQuestions(updated);
+    setAddingNew(false);
+    setNewQ(emptyQuestion());
+  };
+
   return (
     <div>
+      {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
           <h4 className="font-semibold text-[#180426] text-sm">{quiz.title}</h4>
@@ -148,34 +224,110 @@ const QuizViewer = ({
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={onReplace} className="text-xs font-semibold text-[#870BD6] border border-[#D49CFD] px-3 py-1.5 rounded-lg hover:bg-[#F5EBFF] transition-colors">Replace</button>
+          <button onClick={onReplace} className="text-xs font-semibold text-[#870BD6] border border-[#D49CFD] px-3 py-1.5 rounded-lg hover:bg-[#F5EBFF] transition-colors">
+            {replaceLabel}
+          </button>
           <button onClick={onDelete} disabled={deleting} className="text-xs font-semibold text-red-500 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors">
             {deleting ? <span className="inline-block w-3 h-3 rounded-full border-t-2 border-red-400 animate-spin" /> : 'Delete'}
           </button>
         </div>
       </div>
+
+      {/* Question list */}
       <div className="space-y-2">
-        {questions.map((q, i) => (
-          <div key={q.id} className="border border-[#E3E8EF] rounded-xl p-4 bg-white">
-            <p className="text-xs font-semibold text-[#870BD6] uppercase tracking-widest mb-1.5">Q{i + 1}</p>
-            <p className="text-sm font-medium text-[#180426] mb-2">{q.question}</p>
-            <div className="space-y-1">
-              {(q.options ?? []).map((opt, oi) => {
-                const label = OPTION_LABELS[oi];
-                const isCorrect = q.correctAnswer === opt || q.correctAnswer === label;
-                return (
-                  <div key={oi} className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg ${isCorrect ? 'bg-[#ECFDF3] text-[#067647]' : 'bg-[#F9FAFB] text-[#374151]'}`}>
-                    <span className={`font-bold w-4 flex-shrink-0 ${isCorrect ? 'text-[#067647]' : 'text-[#6B7280]'}`}>{label}</span>
-                    {opt}
-                    {isCorrect && <CheckCircle size={11} className="ml-auto text-[#067647]" />}
-                  </div>
-                );
-              })}
+        {questions.map((q, i) =>
+          editingIdx === i ? (
+            <div key={q.id || i}>
+              <QuestionEditor
+                q={draftQ!}
+                idx={i}
+                onChange={(updated) => setDraftQ(updated)}
+                onDelete={() => {}}
+                canDelete={false}
+              />
+              <div className="flex gap-3 -mt-2 mb-4">
+                <button
+                  onClick={cancelEdit}
+                  className="flex-1 border border-[#E3E8EF] text-[#60666B] py-2 rounded-full text-sm font-semibold hover:bg-[#F9FAFB] transition-colors"
+                >
+                  Cancel
+                </button>
+                <Button loading={saving} onClick={handleSaveEdit} customClass="flex-1 text-white">
+                  Save Question
+                </Button>
+              </div>
             </div>
-            {q.explanation && <p className="text-xs text-[#6B7280] mt-2 italic">💡 {q.explanation}</p>}
-          </div>
-        ))}
+          ) : (
+            <div key={q.id || i} className="group border border-[#E3E8EF] rounded-xl p-4 bg-white">
+              <div className="flex items-start justify-between mb-1.5">
+                <p className="text-xs font-semibold text-[#870BD6] uppercase tracking-widest">Q{i + 1}</p>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => startEdit(i)}
+                    className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Edit question"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteQuestion(i)}
+                    className="p-1 hover:bg-red-50 rounded text-red-400 hover:text-red-500 transition-colors"
+                    title="Delete question"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm font-medium text-[#180426] mb-2">{q.question}</p>
+              <div className="space-y-1">
+                {(q.options ?? []).map((opt, oi) => {
+                  const label = OPTION_LABELS[oi];
+                  const isCorrect = q.correctAnswer === opt || q.correctAnswer === label;
+                  return (
+                    <div key={oi} className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg ${isCorrect ? 'bg-[#ECFDF3] text-[#067647]' : 'bg-[#F9FAFB] text-[#374151]'}`}>
+                      <span className={`font-bold w-4 flex-shrink-0 ${isCorrect ? 'text-[#067647]' : 'text-[#6B7280]'}`}>{label}</span>
+                      {opt}
+                      {isCorrect && <CheckCircle size={11} className="ml-auto text-[#067647]" />}
+                    </div>
+                  );
+                })}
+              </div>
+              {q.explanation && <p className="text-xs text-[#6B7280] mt-2 italic">💡 {q.explanation}</p>}
+            </div>
+          ),
+        )}
       </div>
+
+      {/* Add new question */}
+      {addingNew ? (
+        <div className="mt-3">
+          <QuestionEditor
+            q={newQ}
+            idx={questions.length}
+            onChange={setNewQ}
+            onDelete={() => {}}
+            canDelete={false}
+          />
+          <div className="flex gap-3 -mt-2">
+            <button
+              onClick={() => { setAddingNew(false); setNewQ(emptyQuestion()); }}
+              className="flex-1 border border-[#E3E8EF] text-[#60666B] py-2 rounded-full text-sm font-semibold hover:bg-[#F9FAFB] transition-colors"
+            >
+              Cancel
+            </button>
+            <Button loading={saving} onClick={handleSaveNew} customClass="flex-1 text-white">
+              Add Question
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => { setAddingNew(true); setEditingIdx(null); setDraftQ(null); }}
+          className="flex items-center gap-2 text-sm text-[#870BD6] font-semibold mt-3 hover:text-[#6A09AA] transition-colors"
+        >
+          <Plus size={15} /> Add question
+        </button>
+      )}
     </div>
   );
 };
@@ -247,13 +399,6 @@ const QuizBuilder = ({
         className="flex items-center gap-2 text-sm text-[#870BD6] font-semibold mb-4 hover:text-[#6A09AA] transition-colors">
         <Plus size={15} /> Add question
       </button>
-
-      {existingQuiz && (
-        <div className="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4">
-          <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
-          Saving will replace the current quiz.
-        </div>
-      )}
 
       <div className="flex gap-3">
         <button onClick={onCancel}
@@ -397,6 +542,28 @@ const LessonQuizPanel = ({
     }
   };
 
+  const handleSaveQuestions = async (updatedQuestions: ApiQuestion[]) => {
+    if (!quiz) return;
+    setSaving(true);
+    try {
+      await courseService.deleteLessonQuiz(courseId, lesson.id, quiz.id);
+      await courseService.createLessonQuiz(courseId, lesson.id, {
+        title: quiz.title,
+        description: quiz.description,
+        passMark: quiz.passMark,
+        timeLimit: quiz.timeLimit,
+        questions: updatedQuestions,
+      });
+      await loadQuiz();
+      onToast('Assessment updated.', 'success');
+      onQuizChanged(lesson.id, updatedQuestions.length > 0);
+    } catch {
+      onToast('Failed to update assessment.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (quiz === undefined) {
     return (
       <div className="flex items-center justify-center py-16 gap-2 text-sm text-[#60666B]">
@@ -407,7 +574,7 @@ const LessonQuizPanel = ({
   }
 
   if (mode === 'view' && quiz) {
-    return <QuizViewer quiz={quiz} onReplace={() => setMode('build')} onDelete={handleDelete} deleting={deleting} />;
+    return <QuizViewer quiz={quiz} onReplace={() => setMode('build')} onDelete={handleDelete} deleting={deleting} onSaveQuestions={handleSaveQuestions} saving={saving} />;
   }
 
   if (mode === 'view') {
@@ -510,6 +677,27 @@ const CourseQuizSection = ({ courseId, onToast }: { courseId: string; onToast: (
     }
   };
 
+  const handleSaveQuestions = async (updatedQuestions: ApiQuestion[]) => {
+    if (!quiz) return;
+    setSaving(true);
+    try {
+      await courseService.deleteQuiz(courseId, quiz.id);
+      await courseService.createQuiz(courseId, {
+        title: quiz.title,
+        description: quiz.description,
+        passMark: quiz.passMark,
+        timeLimit: quiz.timeLimit,
+        questions: updatedQuestions,
+      });
+      await loadQuiz();
+      onToast('Assessment updated.', 'success');
+    } catch {
+      onToast('Failed to update assessment.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (quiz === undefined) {
     return (
       <div className="flex items-center gap-2 text-sm text-[#60666B] py-4">
@@ -520,7 +708,7 @@ const CourseQuizSection = ({ courseId, onToast }: { courseId: string; onToast: (
   }
 
   if (mode === 'view' && quiz) {
-    return <QuizViewer quiz={quiz} onReplace={() => setMode('build')} onDelete={handleDelete} deleting={deleting} />;
+    return <QuizViewer quiz={quiz} onReplace={() => setMode('build')} onDelete={handleDelete} deleting={deleting} onSaveQuestions={handleSaveQuestions} saving={saving} />;
   }
 
   if (mode === 'view') {
@@ -646,7 +834,7 @@ export default function AssessmentContent({ courseId }: { courseId: string }) {
       </section>
 
       {/* ── Final / course-level assessment ──────────────────────────────── */}
-      <section>
+      <section className="mb-12">
         <div className="mb-4">
           <h3 className="font-semibold text-[#180426]">Final Assessment</h3>
           <p className="text-xs text-[#60666B] mt-0.5">
