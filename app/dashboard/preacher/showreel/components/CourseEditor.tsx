@@ -145,6 +145,7 @@ SortableLessonItem.displayName = 'SortableLessonItem';
 
 interface RichTextEditorHandle {
   insertImageUrl: (url: string) => void;
+  insertAudioUrl: (url: string) => void;
 }
 
 const RichTextEditor = React.forwardRef<
@@ -202,6 +203,13 @@ const RichTextEditor = React.forwardRef<
       insertHtmlAtCursor(
         `<div contenteditable="false" style="margin:12px 0;text-align:center;">` +
         `<img src="${url}" style="max-width:100%;height:auto;border-radius:8px;display:inline-block;"/>` +
+        `</div><p><br/></p>`
+      );
+    },
+    insertAudioUrl: (url: string) => {
+      insertHtmlAtCursor(
+        `<div contenteditable="false" style="margin:12px 0;">` +
+        `<audio controls src="${url}" style="width:100%;border-radius:8px;"></audio>` +
         `</div><p><br/></p>`
       );
     },
@@ -288,15 +296,6 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
   });
   const [videoProcessing, setVideoProcessing] = useState<Record<string, boolean>>({});
 
-  const [lessonAudios, setLessonAudios] = useState<Record<string, string>>(() => {
-    const seed: Record<string, string> = {};
-    (initialCourse ?? DEFAULT_COURSE).chapters.forEach((ch) => {
-      ch.lessons.forEach((l) => {
-        if (l.audioUrl) seed[l.id] = l.audioUrl;
-      });
-    });
-    return seed;
-  });
 
   const handleVideoFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -344,20 +343,10 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
     const file = e.target.files?.[0];
     if (!file || !activeLessonId) return;
     e.target.value = '';
-    const lessonId = activeLessonId;
     try {
       const result = await uploadAudio(file, 'attachment') as { url: string };
       if (result.url) {
-        setLessonAudios((prev) => ({ ...prev, [lessonId]: result.url }));
-        setCourse((prev) => ({
-          ...prev,
-          chapters: prev.chapters.map((ch) => ({
-            ...ch,
-            lessons: ch.lessons.map((l) =>
-              l.id !== lessonId ? l : { ...l, audioUrl: result.url }
-            ),
-          })),
-        }));
+        editorHandleRef.current?.insertAudioUrl(result.url);
       }
     } catch {}
   };
@@ -717,41 +706,6 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                     <div className="space-y-1">
                       <VideoPlayer src={lessonVideos[activeLesson.id].hlsUrl} poster={lessonVideos[activeLesson.id].thumbnailUrl} />
                       <button onClick={() => setLessonVideos((p) => { const n={...p}; delete n[activeLesson.id]; return n; })} className="text-[10px] text-red-400 hover:text-red-500">Remove video</button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Lesson audio */}
-              {(lessonAudios[activeLesson.id] || audioUploading) && (
-                <div className="px-6 pb-2 shrink-0">
-                  {audioUploading && (
-                    <div className="flex items-center gap-2 text-xs text-[#870BD6]">
-                      <Loader2 size={12} className="animate-spin" />Uploading audio…
-                    </div>
-                  )}
-                  {lessonAudios[activeLesson.id] && (
-                    <div className="flex items-center gap-3 bg-[#F5EBFF] rounded-xl px-4 py-2.5">
-                      <Headphones size={16} className="text-[#870BD6] flex-shrink-0" />
-                      <audio controls src={lessonAudios[activeLesson.id]} className="flex-1" style={{ height: '32px' }} />
-                      <button
-                        onClick={() => {
-                          const lessonId = activeLesson.id;
-                          setLessonAudios((p) => { const n = { ...p }; delete n[lessonId]; return n; });
-                          setCourse((prev) => ({
-                            ...prev,
-                            chapters: prev.chapters.map((ch) => ({
-                              ...ch,
-                              lessons: ch.lessons.map((l) =>
-                                l.id !== lessonId ? l : { ...l, audioUrl: undefined }
-                              ),
-                            })),
-                          }));
-                        }}
-                        className="text-[10px] text-red-400 hover:text-red-500 flex-shrink-0"
-                      >
-                        Remove
-                      </button>
                     </div>
                   )}
                 </div>
