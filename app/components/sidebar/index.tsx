@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, LayoutDashboard, Users } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import AdminOverviewIcon from '@/app/assets/icons/adminOverviewIcon';
+import AdminUsersIcon from '@/app/assets/icons/adminUsersIcon';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
 import BuildupIcon from '@/app/assets/icons/buildupIcon';
@@ -32,8 +34,8 @@ export const preacherNavItems = [
 ];
 
 export const adminNavItems = [
-  { path: '/dashboard/admin/overview', label: 'Overview', icon: LayoutDashboard },
-  { path: '/dashboard/admin/users', label: 'Users', icon: Users },
+  { path: '/dashboard/admin/overview', label: 'Overview', icon: AdminOverviewIcon },
+  { path: '/dashboard/admin/users', label: 'Users', icon: AdminUsersIcon },
 ];
 
 const SideBar = () => {
@@ -66,16 +68,6 @@ const SideBar = () => {
             className="h-[44px] w-auto"
           />
         </div>
-
-        {/* Admin context label */}
-        {isAdminRoute && (
-          <div className="px-[26px] pb-4">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-[#870BD6] bg-[#2D1B4E] px-3 py-1.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#870BD6] inline-block" />
-              Admin Panel
-            </span>
-          </div>
-        )}
 
         {/* Navigation */}
         <nav className="flex-1 px-[26px] space-y-1">

@@ -621,6 +621,14 @@ export const accountabilityService = {
 export const adminService = {
   getDashboardStats: () => api.get('/admin/dashboard'),
 
+  getUserGrowth: (days?: number) =>
+    api.get('/admin/analytics/user-growth', { params: { days } }),
+
+  getActivityAnalytics: (days?: number) =>
+    api.get('/admin/analytics/activity', { params: { days } }),
+
+  getContentAnalytics: () => api.get('/admin/analytics/content'),
+
   getUsers: (params?: {
     page?: number;
     limit?: number;
