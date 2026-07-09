@@ -4,7 +4,7 @@ import React, {
   useState, useEffect, useRef, useCallback, useMemo,
 } from 'react';
 import {
-  GripVertical, Plus, Trash2, Pencil, Image as ImageIcon, Video, Code, Check, Loader2,
+  GripVertical, Plus, Trash2, Pencil, Image as ImageIcon, Video, Headphones, Check, Loader2,
 } from 'lucide-react';
 import { useUpload } from '@/app/hooks/useUpload';
 import VideoPlayer from '@/app/components/upload/VideoPlayer';
@@ -21,7 +21,7 @@ import BookOpenIcon from '@/app/assets/icons/BookOpenIcon';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export interface Lesson  { id: string; name: string; content: string; isValid: boolean; videoUrl?: string; videoThumbnailUrl?: string; }
+export interface Lesson  { id: string; name: string; content: string; isValid: boolean; videoUrl?: string; videoThumbnailUrl?: string; audioUrl?: string; }
 export interface Chapter { id: string; name: string; lessons: Lesson[]; }
 export interface CourseData { id: string; title: string; chapters: Chapter[]; }
 
@@ -60,6 +60,19 @@ const SortableLessonItem = React.memo(({
 
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const [hovered, setHovered] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [draftName, setDraftName] = useState(lesson.name);
+
+  useEffect(() => {
+    if (!editingName) setDraftName(lesson.name);
+  }, [lesson.name, editingName]);
+
+  const commitName = () => {
+    const trimmed = draftName.trim();
+    if (trimmed && trimmed !== lesson.name) onNameChange(trimmed);
+    else setDraftName(lesson.name);
+    setEditingName(false);
+  };
 
   return (
     <div
@@ -72,7 +85,7 @@ const SortableLessonItem = React.memo(({
           ? 'border border-red-300 bg-red-50'
           : 'hover:bg-gray-50 border border-transparent'
       }`}
-      onClick={onSelect}
+      onClick={() => { if (!editingName) onSelect(); }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -81,33 +94,47 @@ const SortableLessonItem = React.memo(({
       </div>
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <BookOpenIcon stroke={isActive ? '#B144F9' : '#667085'} />
-        <input
-          type="text"
-          value={lesson.name}
-          onChange={(e) => { e.stopPropagation(); onNameChange(e.target.value); }}
-          className={`flex-1 min-w-0 bg-transparent border-none focus:outline-none focus:ring-0 text-sm truncate ${
+        {editingName ? (
+          <input
+            autoFocus
+            type="text"
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onBlur={commitName}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { e.preventDefault(); commitName(); }
+              if (e.key === 'Escape') { setDraftName(lesson.name); setEditingName(false); }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className={`flex-1 min-w-0 bg-transparent border-b border-[#870BD6] focus:outline-none focus:ring-0 text-sm ${
+              isActive ? 'font-medium text-[#B144F9]' : 'text-gray-700'
+            }`}
+          />
+        ) : (
+          <span className={`flex-1 min-w-0 text-sm truncate select-none ${
             isActive ? 'font-medium text-[#B144F9]' : 'text-gray-700'
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        />
+          }`}>
+            {lesson.name}
+          </span>
+        )}
       </div>
-      {isActive && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="p-1 hover:bg-gray-200 rounded shrink-0"
-          title="Delete Lesson"
-        >
-          <Trash2 size={14} className="text-gray-500" />
-        </button>
-      )}
-      {hovered && !isActive && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="p-1 hover:bg-gray-200 rounded shrink-0"
-          title="Delete Lesson"
-        >
-          <Trash2 size={14} className="text-gray-500" />
-        </button>
+      {(hovered || isActive) && !editingName && (
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
+            onClick={(e) => { e.stopPropagation(); setEditingName(true); }}
+            className="p-1 hover:bg-gray-200 rounded"
+            title="Rename lesson"
+          >
+            <Pencil size={13} className="text-gray-400" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="p-1 hover:bg-gray-200 rounded"
+            title="Delete lesson"
+          >
+            <Trash2 size={13} className="text-gray-500" />
+          </button>
+        </div>
       )}
     </div>
   );
@@ -118,7 +145,6 @@ SortableLessonItem.displayName = 'SortableLessonItem';
 
 interface RichTextEditorHandle {
   insertImageUrl: (url: string) => void;
-  insertCodeBlock:()             => void;
 }
 
 const RichTextEditor = React.forwardRef<
@@ -177,11 +203,6 @@ const RichTextEditor = React.forwardRef<
         `<div contenteditable="false" style="margin:12px 0;text-align:center;">` +
         `<img src="${url}" style="max-width:100%;height:auto;border-radius:8px;display:inline-block;"/>` +
         `</div><p><br/></p>`
-      );
-    },
-    insertCodeBlock: () => {
-      insertHtmlAtCursor(
-        `<div contenteditable="false" style="margin:12px 0;"><pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:8px;overflow-x:auto;font-family:'Fira Code','Courier New',monospace;font-size:14px;line-height:1.5;"><code contenteditable="true">// Write your code here</code></pre></div><p><br/></p>`
       );
     },
   }), [insertHtmlAtCursor]);
@@ -250,8 +271,10 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
   const editorHandleRef = useRef<RichTextEditorHandle>(null);
   const imageInputRef   = useRef<HTMLInputElement>(null);
   const videoInputRef   = useRef<HTMLInputElement>(null);
+  const audioInputRef   = useRef<HTMLInputElement>(null);
   const { upload, uploading: imageUploading } = useUpload();
   const { upload: uploadVideo, uploading: videoUploading, pollVideoStatus } = useUpload();
+  const { upload: uploadAudio, uploading: audioUploading } = useUpload();
 
   // Per-lesson video: keyed by lessonId. Seeded from initialCourse so saved videos display immediately.
   const [lessonVideos, setLessonVideos] = useState<Record<string, { hlsUrl: string; thumbnailUrl?: string; durationSeconds?: number }>>(() => {
@@ -264,6 +287,16 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
     return seed;
   });
   const [videoProcessing, setVideoProcessing] = useState<Record<string, boolean>>({});
+
+  const [lessonAudios, setLessonAudios] = useState<Record<string, string>>(() => {
+    const seed: Record<string, string> = {};
+    (initialCourse ?? DEFAULT_COURSE).chapters.forEach((ch) => {
+      ch.lessons.forEach((l) => {
+        if (l.audioUrl) seed[l.id] = l.audioUrl;
+      });
+    });
+    return seed;
+  });
 
   const handleVideoFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -304,6 +337,28 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
           }
         } catch {}
       }, 5000);
+    } catch {}
+  };
+
+  const handleAudioFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeLessonId) return;
+    e.target.value = '';
+    const lessonId = activeLessonId;
+    try {
+      const result = await uploadAudio(file, 'attachment') as { url: string };
+      if (result.url) {
+        setLessonAudios((prev) => ({ ...prev, [lessonId]: result.url }));
+        setCourse((prev) => ({
+          ...prev,
+          chapters: prev.chapters.map((ch) => ({
+            ...ch,
+            lessons: ch.lessons.map((l) =>
+              l.id !== lessonId ? l : { ...l, audioUrl: result.url }
+            ),
+          })),
+        }));
+      }
     } catch {}
   };
 
@@ -512,8 +567,8 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
     imageInputRef.current?.click();
   }, []);
 
-  const handleInsertCode = useCallback(() => {
-    editorHandleRef.current?.insertCodeBlock();
+  const handleInsertAudio = useCallback(() => {
+    audioInputRef.current?.click();
   }, []);
 
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -667,6 +722,41 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                 </div>
               )}
 
+              {/* Lesson audio */}
+              {(lessonAudios[activeLesson.id] || audioUploading) && (
+                <div className="px-6 pb-2 shrink-0">
+                  {audioUploading && (
+                    <div className="flex items-center gap-2 text-xs text-[#870BD6]">
+                      <Loader2 size={12} className="animate-spin" />Uploading audio…
+                    </div>
+                  )}
+                  {lessonAudios[activeLesson.id] && (
+                    <div className="flex items-center gap-3 bg-[#F5EBFF] rounded-xl px-4 py-2.5">
+                      <Headphones size={16} className="text-[#870BD6] flex-shrink-0" />
+                      <audio controls src={lessonAudios[activeLesson.id]} className="flex-1" style={{ height: '32px' }} />
+                      <button
+                        onClick={() => {
+                          const lessonId = activeLesson.id;
+                          setLessonAudios((p) => { const n = { ...p }; delete n[lessonId]; return n; });
+                          setCourse((prev) => ({
+                            ...prev,
+                            chapters: prev.chapters.map((ch) => ({
+                              ...ch,
+                              lessons: ch.lessons.map((l) =>
+                                l.id !== lessonId ? l : { ...l, audioUrl: undefined }
+                              ),
+                            })),
+                          }));
+                        }}
+                        className="text-[10px] text-red-400 hover:text-red-500 flex-shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Formatting toolbar */}
               <div className="flex items-center gap-1 px-5 pb-2 border-b border-[#E3E8EF] shrink-0">
                 {([
@@ -727,14 +817,15 @@ const CourseEditor = React.forwardRef<CourseEditorHandle, CourseEditorProps>(({
                     </div>
                     <span className="text-[10px] text-gray-400 mt-1.5">Video</span>
                   </button>
-                  <button title="Embed" onClick={handleInsertCode} className="flex flex-col items-center">
+                  <button title="Audio" onClick={handleInsertAudio} disabled={audioUploading} className="flex flex-col items-center disabled:opacity-50">
                     <div className="w-9 h-9 flex justify-center items-center rounded-full border border-[#D1D5DB] bg-[#E2E3E5] hover:bg-[#D1D5DB] transition-colors">
-                      <Code size={18} className="text-gray-500" />
+                      {audioUploading ? <Loader2 size={18} className="text-gray-500 animate-spin" /> : <Headphones size={18} className="text-gray-500" />}
                     </div>
-                    <span className="text-[10px] text-gray-400 mt-1.5">Embed</span>
+                    <span className="text-[10px] text-gray-400 mt-1.5">Audio</span>
                   </button>
                 </div>
                 <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoFileSelected} />
+                <input ref={audioInputRef} type="file" accept="audio/*" className="hidden" onChange={handleAudioFileSelected} />
               </div>
             </>
           ) : (
