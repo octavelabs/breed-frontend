@@ -19,6 +19,7 @@ interface Lesson {
   sortOrder: number;
   isPublished: boolean;
   chapterTitle?: string;
+  quiz?: { id: string } | null;
 }
 
 interface Chapter {
@@ -122,11 +123,20 @@ function CourseMaterialsInner() {
     [allLessons],
   );
 
-  const handleNextClick = async (stepIndex: number) => {
+  const handleNextClick = async (stepIndex: number): Promise<boolean | void> => {
     const lesson = allLessons[stepIndex];
-    if (lesson) {
-      try { await courseService.markLessonComplete(id, lesson.id); } catch {}
+    if (!lesson) return;
+
+    // If this lesson has a quiz, route to it instead of advancing
+    if (lesson.quiz?.id) {
+      const nextLesson = allLessons[stepIndex + 1];
+      const params = new URLSearchParams({ courseId: id, lessonId: lesson.id });
+      if (nextLesson) params.set('nextLessonId', nextLesson.id);
+      router.push(`/dashboard/learn/quiz/${lesson.quiz.id}?${params.toString()}`);
+      return false;
     }
+
+    try { await courseService.markLessonComplete(id, lesson.id); } catch {}
   };
 
   if (loading) {

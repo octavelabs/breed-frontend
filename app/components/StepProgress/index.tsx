@@ -15,7 +15,7 @@ interface StepProgressProps {
   nextButtonText?: string;
   previousButtonText?: string;
   completeButtonText?: string;
-  handleNextClick?: (stepIndex: number) => void;
+  handleNextClick?: (stepIndex: number) => Promise<boolean | void> | boolean | void;
   initialStep?: number;
 }
 
@@ -31,12 +31,22 @@ const StepProgress:React.FC<StepProgressProps> = ({
   initialStep = 0,
 }) => {
   const [currentStep, setCurrentStep] = useState(initialStep);
+  const [nextPending, setNextPending] = useState(false);
   const totalSteps = steps.length;
   const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
   const router = useRouter();
 
-  const handleNext = () => {
-    if (handleNextClick) handleNextClick(currentStep);
+  const handleNext = async () => {
+    if (nextPending) return;
+    if (handleNextClick) {
+      setNextPending(true);
+      try {
+        const result = await handleNextClick(currentStep);
+        if (result === false) return; // caller intercepted (e.g. routing to quiz)
+      } finally {
+        setNextPending(false);
+      }
+    }
     if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -129,9 +139,14 @@ const StepProgress:React.FC<StepProgressProps> = ({
 
             <button
               onClick={handleNext}
-              className="cursor-pointer px-8 py-3 rounded-full font-medium text-white transition-all hover:opacity-90 bg-gradient-to-b from-[#A967F1] to-[#5B26B1]"
+              disabled={nextPending}
+              className="cursor-pointer px-8 py-3 rounded-full font-medium text-white transition-all hover:opacity-90 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] disabled:opacity-60"
             >
-              {isLastStep ? completeButtonText : nextButtonText}
+              {nextPending ? (
+                <span className="inline-block w-4 h-4 rounded-full border-t-2 border-white animate-spin" />
+              ) : (
+                isLastStep ? completeButtonText : nextButtonText
+              )}
             </button>
           </div>
         </div>
