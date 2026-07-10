@@ -7,11 +7,10 @@ import { OpenStepTwo } from './OpenStepTwo';
 import { OpenStepThree } from './OpenStepThree';
 import { meetingsService } from '@/lib/api-services';
 
-function toScheduledAt(date: string, time: string, fmt: string): string {
-  if (!date || !time) return new Date().toISOString();
-  const [timePart] = time.split(':');
-  let h = parseInt(timePart, 10) || 0;
-  const m = time.includes(':30') ? 30 : 0;
+function toScheduledAt(date: string, hour: string, minute: string, fmt: string): string {
+  if (!date || !hour) return new Date().toISOString();
+  let h = parseInt(hour, 10) || 0;
+  const m = parseInt(minute, 10) || 0;
   if (fmt === 'PM' && h !== 12) h += 12;
   if (fmt === 'AM' && h === 12) h = 0;
   const [y, mo, d] = date.split('-').map(Number);
@@ -36,7 +35,7 @@ export const CreateOpenMeetingModal = ({
 
   const [formData, setFormData] = useState<OpenMeetingFormData>({
     title: '', guests: [], description: '',
-    date: '', timeZone: '', time: '', timeFormat: '',
+    date: '', timeZone: '', time: '', timeMinute: '', timeFormat: '',
     meetingFrequency: '', repeatInterval: 0, repeatPattern: '',
     repeatDays: [], saveDraftOfRecordings: false, lateInterval: '',
   });
@@ -44,7 +43,7 @@ export const CreateOpenMeetingModal = ({
   const canProceedStep1 = formData.title.trim() && formData.description.trim();
   const canProceedStep2 = formData.meetingFrequency === 'custom'
     ? formData.repeatInterval && formData.repeatPattern && formData.repeatDays.length > 0
-    : formData.date.trim() && formData.time.trim() && formData.timeFormat.trim() && formData.timeZone.trim() && formData.meetingFrequency.trim();
+    : formData.date.trim() && formData.time.trim() && formData.timeMinute.trim() && formData.timeFormat.trim() && formData.meetingFrequency.trim();
 
   const handleProceedStep1 = () => {
     if (canProceedStep1) setStep(2);
@@ -61,7 +60,7 @@ export const CreateOpenMeetingModal = ({
       const res = await meetingsService.create({
         title: formData.title,
         description: formData.description || undefined,
-        scheduledAt: toScheduledAt(formData.date, formData.time, formData.timeFormat),
+        scheduledAt: toScheduledAt(formData.date, formData.time, formData.timeMinute, formData.timeFormat),
         type: 'OPEN',
         isRecurring,
         recurrence: isRecurring && freq

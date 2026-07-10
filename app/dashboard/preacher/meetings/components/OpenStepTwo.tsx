@@ -4,30 +4,11 @@ import { OpenMeetingFormData } from "../types";
 import Input from "@/app/components/Input";
 import Dropdown from "@/app/components/Dropdown";
 
-const TIME_OPTIONS = [
-  "12:00", "12:30",
-  "1:00",  "1:30",
-  "2:00",  "2:30",
-  "3:00",  "3:30",
-  "4:00",  "4:30",
-  "5:00",  "5:30",
-  "6:00",  "6:30",
-  "7:00",  "7:30",
-  "8:00",  "8:30",
-  "9:00",  "9:30",
-  "10:00", "10:30",
-  "11:00", "11:30",
-];
+const HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1));
+const MINUTES = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
 
-const TIMEZONE_OPTIONS = [
-  "UTC-12:00",
-  "UTC-08:00 (PST)",
-  "UTC-05:00 (EST)",
-  "UTC+00:00 (GMT)",
-  "UTC+01:00 (WAT)",
-  "UTC+05:30 (IST)",
-  "UTC+08:00 (CST)",
-];
+const selectCls =
+  "w-full h-[48px] border border-[#B9C2CA] rounded-[10px] px-3 text-sm text-[#60666B] bg-white outline-none focus:border-[#870BD6] transition-colors cursor-pointer appearance-none";
 
 export const OpenStepTwo = ({
   formData,
@@ -53,41 +34,51 @@ export const OpenStepTwo = ({
           value={formData.date}
           placeholder=""
           variant="outlined"
-          className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px]"
+          className="!bg-white !border-[#B9C2CA] !w-full !h-[48px] rounded-[10px] cursor-pointer"
         />
-      </div>
-
-      <div className="w-full flex gap-2">
-        <div className="w-[80%]">
-          <label className="block text-sm font-medium mb-[6px]">Time</label>
-          <Dropdown
-            value={formData.time}
-            options={TIME_OPTIONS}
-            keySelector="time"
-            onChange={(item) => setFormData({ ...formData, time: item })}
-            className="!h-[48px]"
-          />
-        </div>
-        <div className="w-[20%]">
-          <Dropdown
-            value={formData.timeFormat}
-            options={["AM", "PM"]}
-            keySelector="timeFormat"
-            onChange={(item) => setFormData({ ...formData, timeFormat: item })}
-            className="!h-[48px] mt-[26px]"
-          />
-        </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-[6px]">Time Zone</label>
-        <Dropdown
-          value={formData.timeZone}
-          options={TIMEZONE_OPTIONS}
-          keySelector="timezone"
-          onChange={(item) => setFormData({ ...formData, timeZone: item })}
-          className="!h-[48px]"
-        />
+        <label className="block text-sm font-medium text-gray-700 mb-[6px]">Time</label>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <select
+              value={formData.time}
+              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              className={selectCls}
+            >
+              <option value="" disabled>HH</option>
+              {HOURS.map((h) => (
+                <option key={h} value={h}>{h.padStart(2, "0")}</option>
+              ))}
+            </select>
+          </div>
+
+          <span className="text-[#60666B] font-semibold text-lg">:</span>
+
+          <div className="relative flex-1">
+            <select
+              value={formData.timeMinute ?? ""}
+              onChange={(e) => setFormData({ ...formData, timeMinute: e.target.value })}
+              className={selectCls}
+            >
+              <option value="" disabled>MM</option>
+              {MINUTES.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="w-[90px]">
+            <Dropdown
+              value={formData.timeFormat}
+              options={["AM", "PM"]}
+              keySelector="timeFormat"
+              onChange={(item) => setFormData({ ...formData, timeFormat: item })}
+              className="!h-[48px] cursor-pointer"
+            />
+          </div>
+        </div>
       </div>
 
       <div>
@@ -143,7 +134,7 @@ export const OpenStepTwo = ({
                           : [...formData.repeatDays, day],
                       })
                     }
-                    className={`w-10 h-10 rounded-full text-xs font-medium transition-colors flex-shrink-0 ${
+                    className={`w-10 h-10 rounded-full text-xs font-medium transition-colors flex-shrink-0 cursor-pointer ${
                       active
                         ? "bg-[#870BD6] text-white"
                         : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -163,7 +154,7 @@ export const OpenStepTwo = ({
         disabled={!canProceedStep2 || loading}
         className={`w-full py-3 rounded-full text-white font-medium transition-all flex items-center justify-center gap-2 ${
           canProceedStep2 && !loading
-            ? "bg-black hover:bg-gray-800 active:scale-[0.98]"
+            ? "bg-black hover:bg-gray-800 active:scale-[0.98] cursor-pointer"
             : "bg-gray-300 cursor-not-allowed"
         }`}
       >
@@ -173,7 +164,7 @@ export const OpenStepTwo = ({
             Creating…
           </>
         ) : (
-          'Proceed'
+          "Proceed"
         )}
       </button>
     </div>

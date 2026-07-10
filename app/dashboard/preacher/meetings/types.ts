@@ -22,6 +22,7 @@ export type OpenMeetingFormData = {
  date: string;
  timeZone: string;
  time: string;
+ timeMinute: string;
  timeFormat: string;
  meetingFrequency: string;
  repeatInterval: number;

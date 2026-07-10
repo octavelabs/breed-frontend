@@ -20,6 +20,23 @@ interface Meeting {
   community?: { name: string } | null;
 }
 
+const STATUS_CLASSES: Record<string, string> = {
+  SCHEDULED:   "bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]",
+  COMPLETED:   "bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]",
+  CANCELLED:   "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]",
+  IN_PROGRESS: "bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]",
+};
+
+function getEffectiveStatus(m: { status: string; scheduledAt: string; duration: number }): string {
+  if (m.status === 'CANCELLED' || m.status === 'COMPLETED') return m.status;
+  const now = Date.now();
+  const start = new Date(m.scheduledAt).getTime();
+  const end = start + (m.duration ?? 60) * 60_000;
+  if (now >= end) return 'COMPLETED';
+  if (now >= start) return 'IN_PROGRESS';
+  return 'SCHEDULED';
+}
+
 const AllMeetingsList = ({
   setOpenModal,
   refreshKey = 0,
@@ -159,14 +176,11 @@ const AllMeetingsList = ({
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-                          m.status === 'SCHEDULED' ? 'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]'
-                          : m.status === 'COMPLETED' ? 'bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]'
-                          : m.status === 'CANCELLED' ? 'bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]'
-                          : 'bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]'
-                        }`}>
-                          {m.status.toLowerCase()}
-                        </span>
+                        {(() => { const s = getEffectiveStatus(m); return (
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_CLASSES[s] ?? "bg-gray-100 text-gray-600"}`}>
+                            {s.toLowerCase().replace("_", " ")}
+                          </span>
+                        ); })()}
                       </td>
                     </tr>
                   ))}
