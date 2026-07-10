@@ -57,7 +57,7 @@ const InviteFriend = ({
         Share Breed with someone you care about and grow in faith together.
       </p>
 
-      <div className="w-full lg:w-[40%] space-y-6">
+      <div className="w-full space-y-6">
         {/* Illustration / banner */}
         <div className="w-full rounded-2xl bg-linear-to-br from-[#A967F1] to-[#5B26B1] p-6 text-white text-center">
           <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">

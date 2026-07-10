@@ -6,7 +6,7 @@ import { useState } from "react";
 const Support = () => {
   const [value, setValue] = useState("");
   return (
-    <div className="w-[40%] flex flex-col gap-8">
+    <div className="w-full flex flex-col gap-8">
       <h2 className="text-[24px] font-bold">Support</h2>
       <p className="text-base">
         We would like to get your feedback, ideas and feelings about Breed. This

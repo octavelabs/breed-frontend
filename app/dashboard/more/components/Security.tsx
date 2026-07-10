@@ -92,7 +92,7 @@ const Security = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) =
       <h2 className="text-2xl font-bold mb-2">Privacy & Security</h2>
       <p className="text-sm text-[#60666B] mb-8">Update your password to keep your account secure.</p>
 
-      <form onSubmit={handleSubmit} className="w-full lg:w-[40%] space-y-5">
+      <form onSubmit={handleSubmit} className="w-full space-y-5">
         <PasswordField
           label="Current password"
           name="currentPassword"
