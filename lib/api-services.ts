@@ -698,4 +698,32 @@ export const adminService = {
     api.patch(`/admin/users/${id}/role`, { role }),
 
   deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
+
+  // Courses
+  getCourses: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
+    api.get('/admin/courses', { params }),
+  updateCourseStatus: (id: string, status: string) =>
+    api.patch(`/admin/courses/${id}/status`, { status }),
+  deleteCourse: (id: string) => api.delete(`/admin/courses/${id}`),
+  getCourseEnrolments: (courseId: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/admin/courses/${courseId}/enrolments`, { params }),
+
+  // Devotionals
+  getDevotionals: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
+    api.get('/admin/devotionals', { params }),
+  updateDevotionalStatus: (id: string, status: string) =>
+    api.patch(`/admin/devotionals/${id}/status`, { status }),
+  deleteDevotional: (id: string) => api.delete(`/admin/devotionals/${id}`),
+
+  // Communities
+  getCommunities: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
+    api.get('/admin/communities', { params }),
+  updateCommunityStatus: (id: string, isActive: boolean) =>
+    api.patch(`/admin/communities/${id}/status`, { isActive }),
+  deleteCommunity: (id: string) => api.delete(`/admin/communities/${id}`),
+
+  // Prayer Requests
+  getPrayerRequests: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
+    api.get('/admin/prayer-requests', { params }),
+  answerPrayerRequest: (id: string) => api.patch(`/admin/prayer-requests/${id}/answer`, {}),
 };

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut } from 'lucide-react';
+import { LogOut, BookOpen, Heart, Users2, HandHeart } from 'lucide-react';
 import AdminOverviewIcon from '@/app/assets/icons/adminOverviewIcon';
 import AdminUsersIcon from '@/app/assets/icons/adminUsersIcon';
 import HomeIcon from '@/app/assets/icons/homeIcon';
@@ -34,8 +34,12 @@ export const preacherNavItems = [
 ];
 
 export const adminNavItems = [
-  { path: '/dashboard/admin/overview', label: 'Overview', icon: AdminOverviewIcon },
-  { path: '/dashboard/admin/users', label: 'Users', icon: AdminUsersIcon },
+  { path: '/dashboard/admin/overview',        label: 'Overview',        icon: AdminOverviewIcon },
+  { path: '/dashboard/admin/users',           label: 'Users',           icon: AdminUsersIcon },
+  { path: '/dashboard/admin/courses',         label: 'Courses',         icon: BookOpen },
+  { path: '/dashboard/admin/devotionals',     label: 'Devotionals',     icon: Heart },
+  { path: '/dashboard/admin/communities',     label: 'Communities',     icon: Users2 },
+  { path: '/dashboard/admin/prayer-requests', label: 'Prayer Requests', icon: HandHeart },
 ];
 
 const SideBar = () => {
