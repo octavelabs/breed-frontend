@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthLayout from "../layout/AuthLayout";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
@@ -72,6 +72,8 @@ interface StepData {
 // ── Root component ────────────────────────────────────────────────────────────
 
 const CreateAccount: React.FC = () => {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") ?? undefined;
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [stepData, setStepData] = useState<StepData>({
     email: "",
@@ -120,7 +122,7 @@ const CreateAccount: React.FC = () => {
       ),
     },
     {
-      content: <StepFour stepData={stepData} updateStepData={updateStepData} />,
+      content: <StepFour stepData={stepData} updateStepData={updateStepData} redirect={redirect} />,
     },
   ];
 
@@ -541,9 +543,11 @@ const StepThree = ({
 const StepFour = ({
   stepData,
   updateStepData,
+  redirect,
 }: {
   stepData: StepData;
   updateStepData: (partial: Partial<StepData>) => void;
+  redirect?: string;
 }) => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -582,7 +586,10 @@ const StepFour = ({
         phone: buildPhone(),
         role: "BELIEVER",
       });
-      router.push("/login?registered=true");
+      const loginUrl = redirect
+        ? `/login?registered=true&redirect=${encodeURIComponent(redirect)}`
+        : `/login?registered=true`;
+      router.push(loginUrl);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Registration failed. Please try again.";

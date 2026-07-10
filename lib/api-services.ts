@@ -550,6 +550,11 @@ export const meetingsService = {
   markAttendance: (id: string) => api.post(`/meetings/${id}/attend`),
 
   markLeft: (id: string) => api.post(`/meetings/${id}/leave`),
+
+  getPublicInfo: (id: string) => api.get(`/meetings/${id}/public`),
+
+  getFollowing: (userId: string, params?: { page?: number; limit?: number }) =>
+    api.get(`/users/${userId}/following`, { params }),
 };
 
 // ── Notification services ──────────────────────────────────────────────────────

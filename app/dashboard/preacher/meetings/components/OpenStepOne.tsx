@@ -32,7 +32,7 @@ export const OpenStepOne = ({
           Description
         </label>
         <textarea
-          placeholder="Describe the goal of this community..."
+          placeholder="Describe the goal of this meeting..."
           value={formData.description}
           onChange={(e) =>
             setFormData({ ...formData, description: e.target.value })

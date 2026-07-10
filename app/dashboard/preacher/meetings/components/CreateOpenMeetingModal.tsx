@@ -9,56 +9,56 @@ import { meetingsService } from '@/lib/api-services';
 
 function toScheduledAt(date: string, time: string, fmt: string): string {
   if (!date || !time) return new Date().toISOString();
-  const [y, m, d] = date.split('-').map(Number);
-  let h = parseInt(time, 10) || 0;
+  const [timePart] = time.split(':');
+  let h = parseInt(timePart, 10) || 0;
+  const m = time.includes(':30') ? 30 : 0;
   if (fmt === 'PM' && h !== 12) h += 12;
   if (fmt === 'AM' && h === 12) h = 0;
-  return new Date(y, m - 1, d, h, 0, 0).toISOString();
+  const [y, mo, d] = date.split('-').map(Number);
+  return new Date(y, mo - 1, d, h, m, 0).toISOString();
 }
 
-
-
-interface CreateCommunityModalProps {
+interface CreateOpenMeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete?: (data: OpenMeetingFormData) => void;
 }
 
-
 export const CreateOpenMeetingModal = ({
   isOpen,
   onClose,
   onComplete,
-}: CreateCommunityModalProps) => {
+}: CreateOpenMeetingModalProps) => {
   const [step, setStep] = useState(1);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [creatingMeeting, setCreatingMeeting] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [meetingId, setMeetingId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<OpenMeetingFormData>({
-    title: "", guests: [], description: "",
-    date: "", timeZone: "", time: "", timeFormat: "",
-    meetingFrequency: "", repeatInterval: 0, repeatPattern: "",
-    repeatDays: [], saveDraftOfRecordings: false, lateInterval: "",
+    title: '', guests: [], description: '',
+    date: '', timeZone: '', time: '', timeFormat: '',
+    meetingFrequency: '', repeatInterval: 0, repeatPattern: '',
+    repeatDays: [], saveDraftOfRecordings: false, lateInterval: '',
   });
 
   const canProceedStep1 = formData.title.trim() && formData.description.trim();
   const canProceedStep2 = formData.meetingFrequency === 'custom'
     ? formData.repeatInterval && formData.repeatPattern && formData.repeatDays.length > 0
     : formData.date.trim() && formData.time.trim() && formData.timeFormat.trim() && formData.timeZone.trim() && formData.meetingFrequency.trim();
-  const canProceedStep3 = formData.lateInterval;
 
-  const handleProceed = () => {
-    if (step === 1 && canProceedStep1) setStep(2);
-    else if (step === 2 && canProceedStep2) setStep(3);
+  const handleProceedStep1 = () => {
+    if (canProceedStep1) setStep(2);
   };
 
-  const handleComplete = async () => {
-    setSubmitting(true);
-    setSubmitError(null);
+  // Create the meeting when advancing from step 2, so step 3 has a real ID/link
+  const handleProceedStep2 = async () => {
+    if (!canProceedStep2) return;
+    setCreatingMeeting(true);
+    setCreateError(null);
     try {
       const isRecurring = formData.meetingFrequency !== 'once' && !!formData.meetingFrequency;
       const freq = formData.meetingFrequency === 'custom' ? formData.repeatPattern : formData.meetingFrequency;
-      await meetingsService.create({
+      const res = await meetingsService.create({
         title: formData.title,
         description: formData.description || undefined,
         scheduledAt: toScheduledAt(formData.date, formData.time, formData.timeFormat),
@@ -67,21 +67,26 @@ export const CreateOpenMeetingModal = ({
         recurrence: isRecurring && freq
           ? { frequency: freq as 'daily' | 'weekly' | 'monthly', endsAt: new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0] }
           : undefined,
-      });
-      onComplete?.(formData);
-      onClose();
+      }) as { id: string };
+      setMeetingId(res.id);
+      setStep(3);
     } catch (err: unknown) {
-      setSubmitError(err instanceof Error ? err.message : 'Failed to schedule meeting.');
-      setSubmitting(false);
+      setCreateError(err instanceof Error ? err.message : 'Failed to create meeting. Please try again.');
+    } finally {
+      setCreatingMeeting(false);
     }
   };
 
- 
+  const handleDone = () => {
+    onComplete?.(formData);
+    onClose();
+  };
 
+  if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50  p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={onClose}
     >
       <div
@@ -95,35 +100,36 @@ export const CreateOpenMeetingModal = ({
             <div>
               <h2 className="text-lg font-bold text-[#180426]">Create Open Meeting</h2>
               <p className="text-xs text-gray-500">
-                {step === 1 && 'Add Meeting information'}
+                {step === 1 && 'Add meeting information'}
                 {step === 2 && 'Set meeting schedule'}
-                {step === 3 && 'Add friends or sharee link to invite others'}
+                {step === 3 && 'Share link and invite people'}
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-          >
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
+
         <div className="px-8 pb-6">
           {step === 1 && (
-           <OpenStepOne formData={formData} setFormData={setFormData} handleProceed={handleProceed} canProceedStep1={canProceedStep1} />
+            <OpenStepOne formData={formData} setFormData={setFormData} handleProceed={handleProceedStep1} canProceedStep1={canProceedStep1} />
           )}
-
-          {/* Step 2: Permissions */}
           {step === 2 && (
-            <OpenStepTwo formData={formData} setFormData={setFormData} handleProceed={handleProceed} canProceedStep2={canProceedStep2}/>
-          )}
-          {step === 3 && (
             <>
-              {submitError && <p className="text-red-500 text-sm mb-2">{submitError}</p>}
-              <OpenStepThree formData={formData} setFormData={setFormData} handleComplete={handleComplete} submitting={submitting} />
+              {createError && <p className="text-red-500 text-sm mb-3">{createError}</p>}
+              <OpenStepTwo
+                formData={formData}
+                setFormData={setFormData}
+                handleProceed={handleProceedStep2}
+                canProceedStep2={canProceedStep2}
+                loading={creatingMeeting}
+              />
             </>
           )}
-
+          {step === 3 && meetingId && (
+            <OpenStepThree meetingId={meetingId} handleDone={handleDone} />
+          )}
         </div>
       </div>
     </div>
