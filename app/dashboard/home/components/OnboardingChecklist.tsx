@@ -32,10 +32,10 @@ const BELIEVER_STEPS: Step[] = [
     href: "/dashboard/buildup?tab=devotionals",
   },
   {
-    id: "follow",
-    label: "Follow a preacher",
-    description: "Follow a preacher to receive their teachings and updates.",
-    href: "/dashboard/buildup",
+    id: "invite",
+    label: "Invite your prayer partner",
+    description: "Invite someone you trust to join you on your faith journey.",
+    href: "/dashboard/more",
   },
   {
     id: "course",
