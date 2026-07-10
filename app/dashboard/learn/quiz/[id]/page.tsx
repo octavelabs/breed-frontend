@@ -137,7 +137,10 @@ function QuizInner() {
   };
 
   const handleNextClick = (stepIndex: number): void => {
-    setCurrentQuestion(stepIndex + 1);
+    const next = stepIndex + 1;
+    if (quiz && next < quiz.questions.length) {
+      setCurrentQuestion(next);
+    }
   };
 
   const handleSubmit = async () => {
