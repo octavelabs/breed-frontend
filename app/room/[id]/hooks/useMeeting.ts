@@ -306,11 +306,7 @@ export function useMeeting(meetingId: string) {
   const leave = useCallback(() => {
     roomRef.current?.disconnect();
     roomRef.current = null;
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      router.replace("/dashboard/home");
-    }
+    router.replace("/dashboard/home");
   }, [router]);
 
   const setChatOpen = useCallback((open: boolean) => {
