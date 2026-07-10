@@ -171,10 +171,14 @@ function CourseMaterialsInner() {
       <StepProgress
         steps={steps}
         initialStep={initialStep}
-        onComplete={() => hasQuiz
-          ? router.push(`/dashboard/learn/quiz/${id}`)
-          : router.push(`/dashboard/learn/${id}/chapters/${id}`)
-        }
+        onComplete={() => {
+          const courseQuizId = course.quizzes?.[0]?.id;
+          if (hasQuiz && courseQuizId) {
+            router.push(`/dashboard/learn/quiz/${courseQuizId}?courseId=${id}`);
+          } else {
+            router.push(`/dashboard/learn/${id}/chapters/${id}`);
+          }
+        }}
         nextButtonText={(stepIndex) => allLessons[stepIndex]?.quiz?.id ? 'Take Lesson Assessment' : 'Proceed'}
         completeButtonText={hasQuiz ? 'Take Final Assessment' : 'Complete Course'}
         handleNextClick={handleNextClick}

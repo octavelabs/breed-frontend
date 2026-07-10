@@ -265,6 +265,7 @@ const CourseDetail: React.FC = () => {
   const chapters    = course ? buildChapters(course) : [];
   const allLessons  = chapters.flatMap((ch) => ch.lessons);
   const firstLesson = allLessons[0];
+  const firstUncompletedLesson = allLessons.find((l) => !completedLessonIds.includes(l.id)) ?? firstLesson;
   const level       = course?.level ?? "BEGINNER";
   const authorName  = course?.author
     ? `${course.author.firstName} ${course.author.lastName}`
@@ -385,7 +386,7 @@ const CourseDetail: React.FC = () => {
             <div>
               {enrollError && <p className="text-red-500 text-sm mb-2">{enrollError}</p>}
               <button
-                onClick={() => handleEnroll(firstLesson?.id)}
+                onClick={() => handleEnroll(firstUncompletedLesson?.id)}
                 disabled={enrolling}
                 className="flex items-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold transition-opacity disabled:opacity-60"
               >

@@ -39,7 +39,7 @@ const CustomPopover: React.FC<CustomPopoverProp> = ({ buttonRef, content, handle
   return (
     <div
     ref={popoverRef}
-      className="popover absolute flex flex-col w-auto h-auto z-20 bg-white font-bold
+      className="popover absolute -ml-20 flex flex-col w-auto h-auto z-20 bg-white font-bold
       shadow-[0px_0px_3.2px_1.5px_rgba(100,132,230,0.20)] rounded-[6px] text-xs md:text-sm "
       style={{
         top: `${rect!.bottom - parentRect!.top + topOffset}px`,
