@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthLayout from "../layout/AuthLayout";
@@ -655,4 +655,10 @@ const StepFour = ({
   );
 };
 
-export default CreateAccount;
+const SignupPage = () => (
+  <Suspense fallback={<div className="min-h-screen bg-[#FBF6FF]" />}>
+    <CreateAccount />
+  </Suspense>
+);
+
+export default SignupPage;
