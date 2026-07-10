@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut } from 'lucide-react';
-import AdminOverviewIcon from '@/app/assets/icons/adminOverviewIcon';
-import AdminUsersIcon from '@/app/assets/icons/adminUsersIcon';
-import AdminCoursesIcon from '@/app/assets/icons/adminCoursesIcon';
-import AdminDevotionalsIcon from '@/app/assets/icons/adminDevotionalsIcon';
-import AdminCommunitiesIcon from '@/app/assets/icons/adminCommunitiesIcon';
-import AdminPrayerRequestsIcon from '@/app/assets/icons/adminPrayerRequestsIcon';
+import { Category2, Profile2User, Book1, Heart, People, Candle } from 'iconsax-react';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
 import BuildupIcon from '@/app/assets/icons/buildupIcon';
@@ -38,12 +33,12 @@ export const preacherNavItems = [
 ];
 
 export const adminNavItems = [
-  { path: '/dashboard/admin/overview',        label: 'Overview',        icon: AdminOverviewIcon },
-  { path: '/dashboard/admin/users',           label: 'Users',           icon: AdminUsersIcon },
-  { path: '/dashboard/admin/courses',         label: 'Courses',         icon: AdminCoursesIcon },
-  { path: '/dashboard/admin/devotionals',     label: 'Devotionals',     icon: AdminDevotionalsIcon },
-  { path: '/dashboard/admin/communities',     label: 'Communities',     icon: AdminCommunitiesIcon },
-  { path: '/dashboard/admin/prayer-requests', label: 'Prayer Requests', icon: AdminPrayerRequestsIcon },
+  { path: '/dashboard/admin/overview',        label: 'Overview',        icon: Category2 },
+  { path: '/dashboard/admin/users',           label: 'Users',           icon: Profile2User },
+  { path: '/dashboard/admin/courses',         label: 'Courses',         icon: Book1 },
+  { path: '/dashboard/admin/devotionals',     label: 'Devotionals',     icon: Heart },
+  { path: '/dashboard/admin/communities',     label: 'Communities',     icon: People },
+  { path: '/dashboard/admin/prayer-requests', label: 'Prayer Requests', icon: Candle },
 ];
 
 const SideBar = () => {

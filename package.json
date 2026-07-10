@@ -18,6 +18,7 @@
     "formik": "^2.4.9",
     "framer-motion": "^12.34.3",
     "hls.js": "^1.6.16",
+    "iconsax-react": "^0.0.8",
     "js-cookie": "^3.0.5",
     "livekit-client": "^2.20.0",
     "lucide-react": "^0.562.0",
