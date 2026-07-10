@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut } from 'lucide-react';
-import { Category2, Profile2User, Book1, Heart, People, Candle } from 'iconsax-react';
+import { PresentionChart, Profile2User, Book1, Heart, People, Candle } from 'iconsax-react';
 import HomeIcon from '@/app/assets/icons/homeIcon';
 import LearnIcon from '@/app/assets/icons/learnIcon';
 import BuildupIcon from '@/app/assets/icons/buildupIcon';
@@ -33,7 +33,7 @@ export const preacherNavItems = [
 ];
 
 export const adminNavItems = [
-  { path: '/dashboard/admin/overview',        label: 'Overview',        icon: Category2 },
+  { path: '/dashboard/admin/overview',        label: 'Overview',        icon: PresentionChart },
   { path: '/dashboard/admin/users',           label: 'Users',           icon: Profile2User },
   { path: '/dashboard/admin/courses',         label: 'Courses',         icon: Book1 },
   { path: '/dashboard/admin/devotionals',     label: 'Devotionals',     icon: Heart },
