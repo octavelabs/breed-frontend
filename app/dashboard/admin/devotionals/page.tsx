@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Heart, Search, X, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight,
-  ChevronRight as Arrow, Users,
+  ChevronRight as Arrow, Users, RefreshCw,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
@@ -38,6 +38,8 @@ const AdminDevotionalsPage = () => {
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [toggling,     setToggling]     = useState<string | null>(null);
+  const [recalculating, setRecalculating] = useState(false);
+  const [recalcResult,  setRecalcResult]  = useState<string | null>(null);
 
   // Modal state
   const [modal, setModal] = useState<{
@@ -107,6 +109,19 @@ const AdminDevotionalsPage = () => {
 
   const modalConfig = getModalConfig();
 
+  const handleRecalculate = async () => {
+    setRecalculating(true);
+    setRecalcResult(null);
+    try {
+      const res = await adminService.recalculateDevotionalReadTimes() as { updated: number };
+      setRecalcResult(`Done — ${res.updated} article${res.updated !== 1 ? 's' : ''} updated`);
+    } catch {
+      setRecalcResult('Failed to recalculate. Please try again.');
+    } finally {
+      setRecalculating(false);
+    }
+  };
+
   return (
     <DashboardLayout custom={true}>
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
@@ -122,11 +137,26 @@ const AdminDevotionalsPage = () => {
           confirmLabel={modalConfig.confirmLabel}
         />
 
-        <div className="mb-6">
-          <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Devotionals</h1>
-          <p className="text-sm text-[#60666B] mt-1">
-            {loading ? 'Loading…' : `${meta.total} total series`}
-          </p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Devotionals</h1>
+            <p className="text-sm text-[#60666B] mt-1">
+              {loading ? 'Loading…' : `${meta.total} total series`}
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={handleRecalculate}
+              disabled={recalculating}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#D2D9DF] text-sm font-medium text-[#60666B] hover:bg-[#F5EBFF] hover:text-[#870BD6] hover:border-[#D49CFD] transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={recalculating ? 'animate-spin' : ''} />
+              Recalculate read times
+            </button>
+            {recalcResult && (
+              <p className="text-xs text-[#60666B]">{recalcResult}</p>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">

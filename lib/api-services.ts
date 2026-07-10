@@ -726,6 +726,7 @@ export const adminService = {
   updateDevotionalSeriesStatus: (id: string, isPublished: boolean) =>
     api.patch(`/admin/devotional-series/${id}/status`, { isPublished }),
   deleteDevotionalSeries: (id: string) => api.delete(`/admin/devotional-series/${id}`),
+  recalculateDevotionalReadTimes: () => api.post('/admin/devotionals/recalculate-read-times', {}),
   trackDevotionalRead: (id: string) => api.post(`/devotionals/${id}/read`, {}),
 
   // Communities
