@@ -35,7 +35,7 @@ const BELIEVER_STEPS: Step[] = [
     id: "invite",
     label: "Invite your prayer partner",
     description: "Invite someone you trust to join you on your faith journey.",
-    href: "/dashboard/more",
+    href: "/dashboard/buildup?tab=accountability",
   },
   {
     id: "course",
