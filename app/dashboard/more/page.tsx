@@ -106,7 +106,7 @@ const MorePage = () => {
 
 const ActiveTabContent = ({ activeTab, setShowSelectedTab } : {activeTab : string, setShowSelectedTab: (val: boolean) => void}) => {
    return (
-    <div className="bg-[#F8F9FC] lg:bg-white rounded-lg p-0 lg:p-8 ">
+    <div className="bg-[#F8F9FC] lg:bg-white rounded-2xl p-0 lg:p-8 lg:max-w-2xl">
         {activeTab === "myProfile" && <MyProfile setShowSelectedTab={setShowSelectedTab} />}
         {activeTab === "security" && <Security setShowSelectedTab={setShowSelectedTab} />}
 

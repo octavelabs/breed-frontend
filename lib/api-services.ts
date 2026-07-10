@@ -16,6 +16,9 @@ export interface User {
   country?: string;
   city?: string;
   churchName?: string;
+  denomination?: string;
+  dateOfBirth?: string;
+  gender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
   avatarUrl?: string;
   createdAt: string;
   lastLoginAt?: string;
