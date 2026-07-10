@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
+import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -43,8 +44,13 @@ const AdminPrayerRequestsPage = () => {
   const [loading,      setLoading]      = useState(true);
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState('OPEN');
-  const [answering,    setAnswering]    = useState<string | null>(null);
   const [expanded,     setExpanded]     = useState<string | null>(null);
+
+  const [modal, setModal] = useState<{
+    open: boolean;
+    request: PrayerRequest | null;
+    loading: boolean;
+  }>({ open: false, request: null, loading: false });
 
   const fetchRequests = useCallback(async (page = 1) => {
     setLoading(true);
@@ -65,23 +71,42 @@ const AdminPrayerRequestsPage = () => {
 
   useEffect(() => { fetchRequests(1); }, [fetchRequests]);
 
-  const handleAnswer = async (request: PrayerRequest) => {
-    setAnswering(request.id);
+  const openModal = (request: PrayerRequest) => {
+    setModal({ open: true, request, loading: false });
+  };
+
+  const closeModal = () => setModal((m) => ({ ...m, open: false }));
+
+  const handleConfirm = async () => {
+    if (!modal.request) return;
+    setModal((m) => ({ ...m, loading: true }));
     try {
-      await adminService.answerPrayerRequest(request.id);
+      await adminService.answerPrayerRequest(modal.request.id);
       setRequests((prev) => prev.map((r) =>
-        r.id === request.id
+        r.id === modal.request!.id
           ? { ...r, status: 'ANSWERED', answeredAt: new Date().toISOString() }
           : r,
       ));
-    } finally {
-      setAnswering(null);
+      closeModal();
+    } catch {
+      setModal((m) => ({ ...m, loading: false }));
     }
   };
 
   return (
     <DashboardLayout custom={true}>
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
+
+        <AdminConfirmModal
+          isOpen={modal.open}
+          onClose={closeModal}
+          onConfirm={handleConfirm}
+          loading={modal.loading}
+          iconType="constructive"
+          title="Mark as answered?"
+          description={`"${modal.request?.title ?? ''}" will be marked as answered and moved out of the open queue.`}
+          confirmLabel="Mark Answered"
+        />
 
         <div className="mb-6">
           <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Prayer Requests</h1>
@@ -160,7 +185,6 @@ const AdminPrayerRequestsPage = () => {
                   key={r.id}
                   className="border border-[#E3E8EF] rounded-2xl overflow-hidden hover:border-[#D5B4FB] transition-colors"
                 >
-                  {/* Header row */}
                   <div className="flex items-start gap-4 p-5">
                     {/* Avatar */}
                     <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center flex-shrink-0 text-[#870BD6] text-xs font-bold overflow-hidden">
@@ -216,13 +240,10 @@ const AdminPrayerRequestsPage = () => {
                     {/* Action */}
                     {isOpen && (
                       <button
-                        onClick={() => handleAnswer(r)}
-                        disabled={answering === r.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ECFDF3] text-[#067647] text-xs font-semibold border border-[#ABEFC6] hover:bg-[#D1FAE5] transition-colors disabled:opacity-60 flex-shrink-0"
+                        onClick={() => openModal(r)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ECFDF3] text-[#067647] text-xs font-semibold border border-[#ABEFC6] hover:bg-[#D1FAE5] transition-colors flex-shrink-0"
                       >
-                        {answering === r.id
-                          ? <span className="inline-block w-3 h-3 rounded-full border-t-2 border-[#067647] animate-spin" />
-                          : <CheckCircle2 size={13} />}
+                        <CheckCircle2 size={13} />
                         Mark Answered
                       </button>
                     )}

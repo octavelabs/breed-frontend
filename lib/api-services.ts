@@ -708,12 +708,22 @@ export const adminService = {
   getCourseEnrolments: (courseId: string, params?: { page?: number; limit?: number }) =>
     api.get(`/admin/courses/${courseId}/enrolments`, { params }),
 
-  // Devotionals
+  // Devotional Articles (legacy — used for series-level article drill-down)
   getDevotionals: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
     api.get('/admin/devotionals', { params }),
   updateDevotionalStatus: (id: string, status: string) =>
     api.patch(`/admin/devotionals/${id}/status`, { status }),
   deleteDevotional: (id: string) => api.delete(`/admin/devotionals/${id}`),
+
+  // Devotional Series
+  getDevotionalSeries: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
+    api.get('/admin/devotional-series', { params }),
+  getDevotionalSeriesArticles: (seriesId: string, params?: { page?: number; limit?: number; search?: string; status?: string }) =>
+    api.get(`/admin/devotional-series/${seriesId}/articles`, { params }),
+  updateDevotionalSeriesStatus: (id: string, isPublished: boolean) =>
+    api.patch(`/admin/devotional-series/${id}/status`, { isPublished }),
+  deleteDevotionalSeries: (id: string) => api.delete(`/admin/devotional-series/${id}`),
+  trackDevotionalRead: (id: string) => api.post(`/devotionals/${id}/read`, {}),
 
   // Communities
   getCommunities: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>

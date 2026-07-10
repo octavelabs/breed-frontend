@@ -8,6 +8,7 @@ import {
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
+import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -62,37 +63,6 @@ const StatusBadge = ({ status }: { status: string }) => {
     </span>
   );
 };
-
-// ── Confirm Delete Modal ──────────────────────────────────────────────────────
-
-const ConfirmDeleteModal = ({
-  user, onConfirm, onCancel, loading,
-}: {
-  user: AdminUser; onConfirm: () => void; onCancel: () => void; loading: boolean;
-}) => (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-    <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-      <div className="w-11 h-11 rounded-full bg-[#FEF3F2] flex items-center justify-center mb-4">
-        <Trash2 size={20} color="#B42318" />
-      </div>
-      <h3 className="text-base font-bold text-gray-900">Delete user?</h3>
-      <p className="text-sm text-[#60666B] mt-2">
-        This will soft-delete <span className="font-semibold text-gray-900">{user.firstName} {user.lastName}</span> ({user.email}).
-        They won&apos;t be able to log in.
-      </p>
-      <div className="flex gap-3 mt-6">
-        <button onClick={onCancel}
-          className="flex-1 h-10 rounded-xl border border-[#D2D9DF] text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-          Cancel
-        </button>
-        <button onClick={onConfirm} disabled={loading}
-          className="flex-1 h-10 rounded-xl bg-[#B42318] text-sm font-semibold text-white hover:bg-[#912018] transition-colors disabled:opacity-60">
-          {loading ? 'Deleting…' : 'Delete'}
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 // ── Role Dropdown ─────────────────────────────────────────────────────────────
 
@@ -161,13 +131,17 @@ const AdminUsersPage = () => {
 
   const [users, setUsers]   = useState<AdminUser[]>([]);
   const [meta, setMeta]     = useState<Meta>({ total: 0, page: 1, limit: 20, totalPages: 1 });
-  const [loading, setLoading]         = useState(true);
-  const [search, setSearch]           = useState('');
-  const [roleFilter, setRoleFilter]   = useState('');
+  const [loading, setLoading]           = useState(true);
+  const [search, setSearch]             = useState('');
+  const [roleFilter, setRoleFilter]     = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [toDelete, setToDelete]       = useState<AdminUser | null>(null);
-  const [deleting, setDeleting]       = useState(false);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const [modal, setModal] = useState<{
+    open: boolean;
+    user: AdminUser | null;
+    action: 'suspend' | 'reactivate' | 'delete' | null;
+    loading: boolean;
+  }>({ open: false, user: null, action: null, loading: false });
 
   const fetchUsers = useCallback(async (page = 1) => {
     setLoading(true);
@@ -190,42 +164,61 @@ const AdminUsersPage = () => {
 
   useEffect(() => { fetchUsers(1); }, [fetchUsers]);
 
-  const handleStatusToggle = async (user: AdminUser) => {
-    const newStatus = user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    setActionLoading(user.id);
+  const openModal = (user: AdminUser, action: 'suspend' | 'reactivate' | 'delete') => {
+    setModal({ open: true, user, action, loading: false });
+  };
+
+  const closeModal = () => setModal((m) => ({ ...m, open: false }));
+
+  const handleConfirm = async () => {
+    if (!modal.user || !modal.action) return;
+    setModal((m) => ({ ...m, loading: true }));
     try {
-      await adminService.updateUserStatus(user.id, newStatus);
-      setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, status: newStatus } : u));
-    } finally {
-      setActionLoading(null);
+      if (modal.action === 'delete') {
+        await adminService.deleteUser(modal.user.id);
+        setUsers((prev) => prev.filter((u) => u.id !== modal.user!.id));
+        setMeta((m) => ({ ...m, total: m.total - 1 }));
+      } else {
+        const newStatus = modal.action === 'suspend' ? 'SUSPENDED' : 'ACTIVE';
+        await adminService.updateUserStatus(modal.user.id, newStatus);
+        setUsers((prev) => prev.map((u) => u.id === modal.user!.id ? { ...u, status: newStatus } : u));
+      }
+      closeModal();
+    } catch {
+      setModal((m) => ({ ...m, loading: false }));
     }
   };
 
-  const handleDelete = async () => {
-    if (!toDelete) return;
-    setDeleting(true);
-    try {
-      await adminService.deleteUser(toDelete.id);
-      setUsers((prev) => prev.filter((u) => u.id !== toDelete.id));
-      setMeta((m) => ({ ...m, total: m.total - 1 }));
-    } finally {
-      setDeleting(false);
-      setToDelete(null);
+  const getModalConfig = () => {
+    const name = modal.user ? `${modal.user.firstName} ${modal.user.lastName}` : '';
+    switch (modal.action) {
+      case 'suspend':
+        return { iconType: 'destructive' as const, title: 'Suspend user?', description: `${name} will not be able to log in until reactivated.`, confirmLabel: 'Suspend' };
+      case 'reactivate':
+        return { iconType: 'constructive' as const, title: 'Reactivate user?', description: `${name}'s account will be restored and they can log in again.`, confirmLabel: 'Reactivate' };
+      case 'delete':
+        return { iconType: 'destructive' as const, title: 'Delete user?', description: `This will soft-delete ${name} (${modal.user?.email}). They won't be able to log in.`, confirmLabel: 'Delete' };
+      default:
+        return { iconType: 'neutral' as const, title: '', description: '', confirmLabel: 'Confirm' };
     }
   };
+
+  const modalConfig = getModalConfig();
 
   return (
     <DashboardLayout custom={true}>
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
 
-        {toDelete && (
-          <ConfirmDeleteModal
-            user={toDelete}
-            onConfirm={handleDelete}
-            onCancel={() => setToDelete(null)}
-            loading={deleting}
-          />
-        )}
+        <AdminConfirmModal
+          isOpen={modal.open}
+          onClose={closeModal}
+          onConfirm={handleConfirm}
+          loading={modal.loading}
+          iconType={modalConfig.iconType}
+          title={modalConfig.title}
+          description={modalConfig.description}
+          confirmLabel={modalConfig.confirmLabel}
+        />
 
         {/* Header */}
         <div className="mb-6">
@@ -369,10 +362,9 @@ const AdminUsersPage = () => {
                           {!isSelf && (
                             <div className="flex items-center justify-end gap-1">
                               <button
-                                onClick={() => handleStatusToggle(user)}
-                                disabled={actionLoading === user.id}
+                                onClick={() => openModal(user, isActive ? 'suspend' : 'reactivate')}
                                 title={isActive ? 'Suspend user' : 'Reactivate user'}
-                                className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                                className={`p-2 rounded-lg transition-colors ${
                                   isActive
                                     ? 'text-[#B42318] hover:bg-[#FEF3F2]'
                                     : 'text-[#067647] hover:bg-[#ECFDF3]'
@@ -381,7 +373,7 @@ const AdminUsersPage = () => {
                                 {isActive ? <Ban size={15} /> : <CheckCircle2 size={15} />}
                               </button>
                               <button
-                                onClick={() => setToDelete(user)}
+                                onClick={() => openModal(user, 'delete')}
                                 title="Delete user"
                                 className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                               >

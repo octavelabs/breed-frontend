@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
+import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -23,36 +24,6 @@ interface AdminCommunity {
 
 interface Meta { total: number; page: number; limit: number; totalPages: number; }
 
-// ── Confirm Delete Modal ──────────────────────────────────────────────────────
-
-const ConfirmDeleteModal = ({
-  community, onConfirm, onCancel, loading,
-}: {
-  community: AdminCommunity; onConfirm: () => void; onCancel: () => void; loading: boolean;
-}) => (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-    <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-      <div className="w-11 h-11 rounded-full bg-[#FEF3F2] flex items-center justify-center mb-4">
-        <Trash2 size={20} color="#B42318" />
-      </div>
-      <h3 className="text-base font-bold text-gray-900">Delete community?</h3>
-      <p className="text-sm text-[#60666B] mt-2">
-        This will remove <span className="font-semibold text-gray-900">{community.name}</span> and all its content. This action cannot be undone.
-      </p>
-      <div className="flex gap-3 mt-6">
-        <button onClick={onCancel}
-          className="flex-1 h-10 rounded-xl border border-[#D2D9DF] text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-          Cancel
-        </button>
-        <button onClick={onConfirm} disabled={loading}
-          className="flex-1 h-10 rounded-xl bg-[#B42318] text-sm font-semibold text-white hover:bg-[#912018] transition-colors disabled:opacity-60">
-          {loading ? 'Deleting…' : 'Delete'}
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const AdminCommunitiesPage = () => {
@@ -61,9 +32,13 @@ const AdminCommunitiesPage = () => {
   const [loading,      setLoading]      = useState(true);
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [toDelete,     setToDelete]     = useState<AdminCommunity | null>(null);
-  const [deleting,     setDeleting]     = useState(false);
-  const [toggling,     setToggling]     = useState<string | null>(null);
+
+  const [modal, setModal] = useState<{
+    open: boolean;
+    item: AdminCommunity | null;
+    action: 'suspend' | 'unsuspend' | 'delete' | null;
+    loading: boolean;
+  }>({ open: false, item: null, action: null, loading: false });
 
   const fetchCommunities = useCallback(async (page = 1) => {
     setLoading(true);
@@ -84,41 +59,61 @@ const AdminCommunitiesPage = () => {
 
   useEffect(() => { fetchCommunities(1); }, [fetchCommunities]);
 
-  const handleToggleStatus = async (community: AdminCommunity) => {
-    setToggling(community.id);
+  const openModal = (item: AdminCommunity, action: 'suspend' | 'unsuspend' | 'delete') => {
+    setModal({ open: true, item, action, loading: false });
+  };
+
+  const closeModal = () => setModal((m) => ({ ...m, open: false }));
+
+  const handleConfirm = async () => {
+    if (!modal.item || !modal.action) return;
+    setModal((m) => ({ ...m, loading: true }));
     try {
-      await adminService.updateCommunityStatus(community.id, !community.isActive);
-      setCommunities((prev) => prev.map((c) => c.id === community.id ? { ...c, isActive: !c.isActive } : c));
-    } finally {
-      setToggling(null);
+      if (modal.action === 'delete') {
+        await adminService.deleteCommunity(modal.item.id);
+        setCommunities((prev) => prev.filter((c) => c.id !== modal.item!.id));
+        setMeta((m) => ({ ...m, total: m.total - 1 }));
+      } else {
+        const isActive = modal.action === 'unsuspend';
+        await adminService.updateCommunityStatus(modal.item.id, isActive);
+        setCommunities((prev) => prev.map((c) => c.id === modal.item!.id ? { ...c, isActive } : c));
+      }
+      closeModal();
+    } catch {
+      setModal((m) => ({ ...m, loading: false }));
     }
   };
 
-  const handleDelete = async () => {
-    if (!toDelete) return;
-    setDeleting(true);
-    try {
-      await adminService.deleteCommunity(toDelete.id);
-      setCommunities((prev) => prev.filter((c) => c.id !== toDelete.id));
-      setMeta((m) => ({ ...m, total: m.total - 1 }));
-    } finally {
-      setDeleting(false);
-      setToDelete(null);
+  const getModalConfig = () => {
+    const name = modal.item?.name ?? '';
+    switch (modal.action) {
+      case 'suspend':
+        return { iconType: 'destructive' as const, title: 'Suspend community?', description: `"${name}" will be hidden from users and members won't be able to post.`, confirmLabel: 'Suspend' };
+      case 'unsuspend':
+        return { iconType: 'constructive' as const, title: 'Unsuspend community?', description: `"${name}" will be restored and visible to members again.`, confirmLabel: 'Unsuspend' };
+      case 'delete':
+        return { iconType: 'destructive' as const, title: 'Delete community?', description: `This will remove "${name}" and all its content. This action cannot be undone.`, confirmLabel: 'Delete' };
+      default:
+        return { iconType: 'neutral' as const, title: '', description: '', confirmLabel: 'Confirm' };
     }
   };
+
+  const modalConfig = getModalConfig();
 
   return (
     <DashboardLayout custom={true}>
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
 
-        {toDelete && (
-          <ConfirmDeleteModal
-            community={toDelete}
-            onConfirm={handleDelete}
-            onCancel={() => setToDelete(null)}
-            loading={deleting}
-          />
-        )}
+        <AdminConfirmModal
+          isOpen={modal.open}
+          onClose={closeModal}
+          onConfirm={handleConfirm}
+          loading={modal.loading}
+          iconType={modalConfig.iconType}
+          title={modalConfig.title}
+          description={modalConfig.description}
+          confirmLabel={modalConfig.confirmLabel}
+        />
 
         <div className="mb-6">
           <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Communities</h1>
@@ -225,10 +220,9 @@ const AdminCommunitiesPage = () => {
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-1">
                           <button
-                            onClick={() => handleToggleStatus(c)}
-                            disabled={toggling === c.id}
+                            onClick={() => openModal(c, c.isActive ? 'suspend' : 'unsuspend')}
                             title={c.isActive ? 'Suspend' : 'Unsuspend'}
-                            className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                            className={`p-2 rounded-lg transition-colors ${
                               c.isActive
                                 ? 'text-[#B42318] hover:bg-[#FEF3F2]'
                                 : 'text-[#067647] hover:bg-[#ECFDF3]'
@@ -237,7 +231,7 @@ const AdminCommunitiesPage = () => {
                             {c.isActive ? <ShieldOff size={15} /> : <ShieldCheck size={15} />}
                           </button>
                           <button
-                            onClick={() => setToDelete(c)}
+                            onClick={() => openModal(c, 'delete')}
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
                             <Trash2 size={15} />
