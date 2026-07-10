@@ -100,14 +100,14 @@ const AdminConfirmModal = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 h-10 rounded-xl border border-[#D2D9DF] text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex-1 h-10 rounded-full border border-[#D2D9DF] text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 h-10 rounded-xl text-sm font-semibold text-white transition-colors disabled:opacity-60 ${CONFIRM_STYLES[iconType]}`}
+            className={`flex-1 h-10 rounded-full text-sm font-semibold text-white transition-colors disabled:opacity-60 ${CONFIRM_STYLES[iconType]}`}
           >
             {loading ? (
               <span className="inline-flex items-center justify-center gap-2">
