@@ -17,6 +17,7 @@ interface StepProgressProps {
   completeButtonText?: string;
   handleNextClick?: (stepIndex: number) => Promise<boolean | void> | boolean | void;
   initialStep?: number;
+  onClose?: () => void;
 }
 
 const StepProgress:React.FC<StepProgressProps> = ({
@@ -29,6 +30,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
   completeButtonText,
   handleNextClick,
   initialStep = 0,
+  onClose,
 }) => {
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [nextPending, setNextPending] = useState(false);
@@ -71,9 +73,9 @@ const StepProgress:React.FC<StepProgressProps> = ({
         <div className="pb-4">
           <div className="flex items-center justify-between mb-4 gap-11">
             {/* Close button */}
-            <button 
+            <button
               className="text-gray-400 hover:text-gray-600 transition-colors"
-              onClick={() => router.back()}
+              onClick={() => onClose ? onClose() : router.back()}
               aria-label="Close"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

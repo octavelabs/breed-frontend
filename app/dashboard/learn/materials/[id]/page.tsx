@@ -182,6 +182,7 @@ function CourseMaterialsInner() {
         nextButtonText={(stepIndex) => allLessons[stepIndex]?.quiz?.id ? 'Take Lesson Assessment' : 'Proceed'}
         completeButtonText={hasQuiz ? 'Take Final Assessment' : 'Complete Course'}
         handleNextClick={handleNextClick}
+        onClose={() => router.push(`/dashboard/learn/${id}/chapters/${id}`)}
         primaryColor="#870BD6"
       />
     </DashboardLayout>
