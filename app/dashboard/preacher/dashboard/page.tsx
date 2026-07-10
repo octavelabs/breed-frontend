@@ -11,6 +11,7 @@ import PreacherCommunityIcon from '@/app/assets/icons/preacherCommunityIcon';
 import MeetingIcon from '@/app/assets/icons/meetingIcon';
 import Link from 'next/link';
 import { CreateCourseModal } from '../showreel/components/CreateCourseModal';
+import { OnboardingChecklist } from '@/app/dashboard/home/components/OnboardingChecklist';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -148,6 +149,9 @@ const PreacherDashboard = () => {
             Here&apos;s an overview of your ministry activity.
           </p>
         </div>
+
+        {/* Onboarding checklist */}
+        <OnboardingChecklist />
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

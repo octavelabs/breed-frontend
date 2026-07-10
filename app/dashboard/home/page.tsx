@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { OnboardingChecklist } from "./components/OnboardingChecklist";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -250,6 +251,9 @@ const HomePage = () => {
             )}
           </div>
         </div>
+
+        {/* ── Onboarding checklist (hides once dismissed or all done) ── */}
+        <OnboardingChecklist />
 
         {/* ── Desktop Consistency Tracker ── */}
         <div
