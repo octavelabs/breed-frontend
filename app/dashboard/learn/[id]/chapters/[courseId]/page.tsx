@@ -342,12 +342,7 @@ const AssessmentReport = ({
                               {submitted}
                             </span>
                           </span>
-                          {!correct && (
-                            <span className="text-[#60666B]">
-                              Correct answer:{" "}
-                              <span className="font-semibold text-[#067647]">{correctAnswer}</span>
-                            </span>
-                          )}
+                          
                         </div>
                       </div>
                     </div>
