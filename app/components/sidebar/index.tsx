@@ -95,7 +95,7 @@ const SideBar = () => {
                       : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <Icon color={iconColor} size={26} />
+                <Icon color={iconColor} size={24} />
                 <span className="font-medium">{item.label}</span>
               </Link>
             );
