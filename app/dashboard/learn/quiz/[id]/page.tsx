@@ -109,13 +109,12 @@ function QuizInner() {
   const lessonId    = searchParams.get('lessonId');
   const nextLessonId = searchParams.get('nextLessonId');
 
-  const [quiz,            setQuiz]            = useState<QuizData | null>(null);
-  const [isLoading,       setIsLoading]       = useState(true);
-  const [screenLoading,   setScreenLoading]   = useState(true); // LoadingScreen animation
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers,         setAnswers]         = useState<Map<string, string>>(new Map());
-  const [submitting,      setSubmitting]      = useState(false);
-  const [result,          setResult]          = useState<QuizResultData | null>(null);
+  const [quiz,          setQuiz]        = useState<QuizData | null>(null);
+  const [isLoading,     setIsLoading]   = useState(true);
+  const [screenLoading, setScreenLoading] = useState(true); // LoadingScreen animation
+  const [answers,       setAnswers]     = useState<Map<string, string>>(new Map());
+  const [submitting,    setSubmitting]  = useState(false);
+  const [result,        setResult]      = useState<QuizResultData | null>(null);
 
   const fetchQuiz = useCallback(async () => {
     try {
@@ -129,19 +128,6 @@ function QuizInner() {
   }, [quizId, router]);
 
   useEffect(() => { fetchQuiz(); }, [fetchQuiz]);
-
-  const handleSelect = (optionText: string) => {
-    if (!quiz) return;
-    const qId = quiz.questions[currentQuestion].id;
-    setAnswers((prev) => new Map(prev).set(qId, optionText));
-  };
-
-  const handleNextClick = (stepIndex: number): void => {
-    const next = stepIndex + 1;
-    if (quiz && next < quiz.questions.length) {
-      setCurrentQuestion(next);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!quiz || submitting) return;
@@ -162,7 +148,6 @@ function QuizInner() {
 
   const handleRetry = () => {
     setResult(null);
-    setCurrentQuestion(0);
     setAnswers(new Map());
   };
 
@@ -204,24 +189,16 @@ function QuizInner() {
     );
   }
 
-  const currentQ = quiz.questions[currentQuestion];
-  const selectedAnswer = answers.get(currentQ.id) ?? null;
-
-  // Map string options to { id, text } for the QuizQuestion component
-  const questionOptions = (currentQ.options as string[]).map((opt, i) => ({
-    id: opt,
-    text: opt,
-  }));
-
+  // Each step captures its own question via closure so Previous/Next both work correctly
   const steps = quiz.questions.map((q) => ({
     subtitle: quiz.title,
     title: q.question,
     content: (
       <QuizQuestion
-        question={quiz.questions[currentQuestion].question}
-        options={(quiz.questions[currentQuestion].options as string[]).map((opt) => ({ id: opt, text: opt }))}
-        onSelect={handleSelect}
-        selectedAnswer={answers.get(quiz.questions[currentQuestion].id) ?? null}
+        question={q.question}
+        options={(q.options as string[]).map((opt) => ({ id: opt, text: opt }))}
+        onSelect={(optionText: string) => setAnswers((prev) => new Map(prev).set(q.id, optionText))}
+        selectedAnswer={answers.get(q.id) ?? null}
       />
     ),
   }));
@@ -234,7 +211,6 @@ function QuizInner() {
           onComplete={handleSubmit}
           completeButtonText={submitting ? 'Submitting…' : 'Submit'}
           nextButtonText="Next Question"
-          handleNextClick={handleNextClick}
           primaryColor="#870BD6"
         />
       </div>
