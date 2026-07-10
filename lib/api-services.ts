@@ -260,6 +260,8 @@ export const courseService = {
 
   getProgress: (id: string) => api.get(`/courses/${id}/progress`),
 
+  getMyQuizResults: (courseId: string) => api.get(`/courses/${courseId}/my-quiz-results`),
+
   markLessonComplete: (courseId: string, lessonId: string) =>
     api.post(`/courses/${courseId}/lessons/${lessonId}/complete`),
 

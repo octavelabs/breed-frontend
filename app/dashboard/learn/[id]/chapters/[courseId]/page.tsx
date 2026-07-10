@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {
   ArrowLeft, BookOpen, Play, Users, Lock, CheckCircle,
-  ChevronDown, ChevronRight, UserRound,
+  ChevronDown, ChevronRight, UserRound, ClipboardList, XCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
@@ -53,6 +53,40 @@ interface Course {
   author?: CourseAuthor | null;
   chapters?: ApiChapter[];
   lessons?: ApiLesson[];
+}
+
+// ── Quiz result types ─────────────────────────────────────────────────────────
+
+interface QuizAnswer {
+  questionId: string;
+  submitted: unknown;
+  isCorrect: boolean;
+}
+
+interface QuizResultSubmission {
+  id: string;
+  score: number;
+  passed: boolean;
+  submittedAt: string;
+  answers: QuizAnswer[];
+}
+
+interface QuizResultQuestion {
+  id: string;
+  question: string;
+  options: string[] | null;
+  correctAnswer: unknown;
+  type: string;
+}
+
+interface QuizResult {
+  quizId: string;
+  title: string;
+  passMark: number;
+  lessonId: string | null;
+  lessonTitle: string | null;
+  submission: QuizResultSubmission | null;
+  questions: QuizResultQuestion[];
 }
 
 const levelLabel: Record<string, string> = {
@@ -201,6 +235,133 @@ const ChapterSection = ({
   );
 };
 
+// ── Assessment Report ─────────────────────────────────────────────────────────
+
+const AssessmentReport = ({
+  results,
+  loading,
+}: {
+  results: QuizResult[];
+  loading: boolean;
+}) => {
+  const [expandedQuiz, setExpandedQuiz] = useState<string | null>(null);
+
+  if (loading) {
+    return (
+      <div className="space-y-3 py-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-20 bg-gray-100 animate-pulse rounded-2xl" />
+        ))}
+      </div>
+    );
+  }
+
+  const attempted = results.filter((r) => r.submission !== null);
+
+  if (attempted.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-16 text-center border border-[#E2E3E5] rounded-2xl">
+        <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+          <ClipboardList size={22} className="text-[#870BD6]" />
+        </div>
+        <p className="text-sm font-semibold text-gray-700">No assessments taken yet</p>
+        <p className="text-xs text-[#60666B] max-w-xs">
+          Complete a lesson or course quiz to see your results here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {attempted.map((quiz) => {
+        const sub = quiz.submission!;
+        const isExpanded = expandedQuiz === quiz.quizId;
+        const answerMap = new Map(sub.answers.map((a) => [a.questionId, a]));
+        const scope = quiz.lessonTitle ? `Lesson: ${quiz.lessonTitle}` : "Final Assessment";
+
+        return (
+          <div key={quiz.quizId} className="border border-[#E2E3E5] rounded-2xl overflow-hidden">
+            {/* Summary row */}
+            <button
+              onClick={() => setExpandedQuiz(isExpanded ? null : quiz.quizId)}
+              className="w-full flex items-center justify-between px-5 py-4 bg-[#FAFAFA] hover:bg-[#F5F0FF] transition-colors text-left"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${sub.passed ? "bg-[#ECFDF3]" : "bg-[#FEF3F2]"}`}>
+                  {sub.passed
+                    ? <CheckCircle size={18} className="text-[#067647]" />
+                    : <XCircle size={18} className="text-[#B42318]" />
+                  }
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[#B0B7C3] mb-0.5 truncate">{scope}</p>
+                  <p className="text-sm font-semibold text-[#180426] truncate">{quiz.title}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 flex-shrink-0 ml-4">
+                <div className="text-right">
+                  <p className="text-lg font-bold text-[#180426]">{Math.round(sub.score)}%</p>
+                  <p className="text-xs text-[#B0B7C3]">pass mark {quiz.passMark}%</p>
+                </div>
+                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${sub.passed ? "bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]" : "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]"}`}>
+                  {sub.passed ? "Passed" : "Failed"}
+                </span>
+                {isExpanded
+                  ? <ChevronDown size={16} className="text-[#870BD6]" />
+                  : <ChevronRight size={16} className="text-[#60666B]" />
+                }
+              </div>
+            </button>
+
+            {/* Question breakdown */}
+            {isExpanded && (
+              <div className="px-5 py-4 space-y-4 border-t border-[#E2E3E5]">
+                {quiz.questions.map((q, idx) => {
+                  const ans = answerMap.get(q.id);
+                  const correct = ans?.isCorrect ?? false;
+                  const submitted = String(ans?.submitted ?? "—");
+                  const correctAnswer = String(q.correctAnswer ?? "—");
+
+                  return (
+                    <div key={q.id} className="flex gap-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${correct ? "bg-[#ECFDF3]" : "bg-[#FEF3F2]"}`}>
+                        {correct
+                          ? <CheckCircle size={13} className="text-[#067647]" />
+                          : <XCircle size={13} className="text-[#B42318]" />
+                        }
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#180426] mb-1.5">
+                          <span className="text-[#B0B7C3] mr-1.5">Q{idx + 1}.</span>{q.question}
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                          <span className="text-[#60666B]">
+                            Your answer:{" "}
+                            <span className={`font-semibold ${correct ? "text-[#067647]" : "text-[#B42318]"}`}>
+                              {submitted}
+                            </span>
+                          </span>
+                          {!correct && (
+                            <span className="text-[#60666B]">
+                              Correct answer:{" "}
+                              <span className="font-semibold text-[#067647]">{correctAnswer}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const CourseDetail: React.FC = () => {
@@ -214,6 +375,10 @@ const CourseDetail: React.FC = () => {
   const [enrolled,            setEnrolled]            = useState(false);
   const [enrollError,         setEnrollError]         = useState<string | null>(null);
   const [completedLessonIds,  setCompletedLessonIds]  = useState<string[]>([]);
+  const [activeTab,           setActiveTab]           = useState<'content' | 'report'>('content');
+  const [quizResults,         setQuizResults]         = useState<QuizResult[]>([]);
+  const [quizResultsLoading,  setQuizResultsLoading]  = useState(false);
+  const [quizResultsFetched,  setQuizResultsFetched]  = useState(false);
 
   useEffect(() => {
     courseService
@@ -233,6 +398,20 @@ const CourseDetail: React.FC = () => {
       .catch(() => setCourse(null))
       .finally(() => setLoading(false));
   }, [courseId]);
+
+  const handleTabChange = (tab: 'content' | 'report') => {
+    setActiveTab(tab);
+    if (tab === 'report' && !quizResultsFetched) {
+      setQuizResultsLoading(true);
+      courseService.getMyQuizResults(courseId)
+        .then((res: unknown) => setQuizResults(res as QuizResult[]))
+        .catch(() => setQuizResults([]))
+        .finally(() => {
+          setQuizResultsLoading(false);
+          setQuizResultsFetched(true);
+        });
+    }
+  };
 
   const handleEnroll = async (lessonId?: string) => {
     const target = `/dashboard/learn/materials/${courseId}${lessonId ? `?lesson=${lessonId}` : ''}`;
@@ -416,57 +595,79 @@ const CourseDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Lessons section ───────────────────────────────────────────────── */}
-        <div>
-          <h2 className="text-lg font-bold text-[#180426] mb-5">
-            Lessons &middot; {allLessons.length}
-          </h2>
-
-          {chapters.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-14 text-center border border-[#E2E3E5] rounded-2xl">
-              <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                <UserRound size={22} className="text-[#870BD6]" />
-              </div>
-              <p className="text-sm font-semibold text-gray-700">No lessons yet</p>
-              <p className="text-xs text-[#60666B] max-w-xs">
-                The creator hasn&apos;t published lessons yet. Check back soon!
-              </p>
-            </div>
-          ) : chapters.length === 1 ? (
-            // Single chapter → flat list, no accordion wrapper
-            <div>
-              {chapters[0].lessons.map((lesson, i) => (
-                <LessonItem
-                  key={lesson.id}
-                  lesson={lesson}
-                  globalIdx={i}
-                  enrolled={enrolled}
-                  enrolling={enrolling}
-                  completed={completedLessonIds.includes(lesson.id)}
-                  onEnroll={handleEnroll}
-                />
-              ))}
-            </div>
-          ) : (
-            // Multiple chapters → accordion per chapter
-            chapters.map((chapter, chapterIndex) => {
-              const offset = lessonOffset;
-              lessonOffset += chapter.lessons.length;
-              return (
-                <ChapterSection
-                  key={chapter.id}
-                  chapter={chapter}
-                  chapterIndex={chapterIndex}
-                  enrolled={enrolled}
-                  enrolling={enrolling}
-                  completedLessonIds={completedLessonIds}
-                  globalLessonOffset={offset}
-                  onEnroll={handleEnroll}
-                />
-              );
-            })
-          )}
+        {/* ── Tab bar ───────────────────────────────────────────────────────── */}
+        <div className="flex border-b border-[#E2E3E5] mb-6 gap-1">
+          {([
+            { key: 'content', label: 'Course Content' },
+            { key: 'report',  label: 'Assessment Report' },
+          ] as const).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => handleTabChange(key)}
+              className={`px-4 py-2.5 text-sm font-semibold transition-colors border-b-2 -mb-px ${
+                activeTab === key
+                  ? "border-[#870BD6] text-[#870BD6]"
+                  : "border-transparent text-[#60666B] hover:text-[#180426]"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
+
+        {/* ── Tab content ───────────────────────────────────────────────────── */}
+        {activeTab === 'content' ? (
+          <div>
+            <h2 className="text-lg font-bold text-[#180426] mb-5">
+              Lessons &middot; {allLessons.length}
+            </h2>
+
+            {chapters.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 py-14 text-center border border-[#E2E3E5] rounded-2xl">
+                <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                  <UserRound size={22} className="text-[#870BD6]" />
+                </div>
+                <p className="text-sm font-semibold text-gray-700">No lessons yet</p>
+                <p className="text-xs text-[#60666B] max-w-xs">
+                  The creator hasn&apos;t published lessons yet. Check back soon!
+                </p>
+              </div>
+            ) : chapters.length === 1 ? (
+              <div>
+                {chapters[0].lessons.map((lesson, i) => (
+                  <LessonItem
+                    key={lesson.id}
+                    lesson={lesson}
+                    globalIdx={i}
+                    enrolled={enrolled}
+                    enrolling={enrolling}
+                    completed={completedLessonIds.includes(lesson.id)}
+                    onEnroll={handleEnroll}
+                  />
+                ))}
+              </div>
+            ) : (
+              chapters.map((chapter, chapterIndex) => {
+                const offset = lessonOffset;
+                lessonOffset += chapter.lessons.length;
+                return (
+                  <ChapterSection
+                    key={chapter.id}
+                    chapter={chapter}
+                    chapterIndex={chapterIndex}
+                    enrolled={enrolled}
+                    enrolling={enrolling}
+                    completedLessonIds={completedLessonIds}
+                    globalLessonOffset={offset}
+                    onEnroll={handleEnroll}
+                  />
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <AssessmentReport results={quizResults} loading={quizResultsLoading} />
+        )}
       </div>
     </DashboardLayout>
   );
