@@ -47,6 +47,7 @@ interface AuthContextValue {
     rememberMe?: boolean,
     redirectUrl?: string,
   ) => Promise<void>;
+  loginWithGoogle: (idToken: string, redirectUrl?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -126,6 +127,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [router],
   );
 
+  const loginWithGoogle = useCallback(
+    async (idToken: string, redirectUrl?: string): Promise<void> => {
+      const response = await authService.googleLogin<{
+        accessToken: string;
+        refreshToken: string;
+        user: User;
+      }>(idToken);
+
+      setTokens(response.accessToken, response.refreshToken);
+      setSessionCookies(response.user.role);
+      setUser(response.user);
+
+      const isPreachers = ['PREACHER', 'ADMIN', 'SUPER_ADMIN'].includes(response.user.role);
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else if (isPreachers) {
+        router.push('/dashboard/preacher/dashboard');
+      } else {
+        router.push('/dashboard/home');
+      }
+    },
+    [router],
+  );
+
   const logout = useCallback(async (): Promise<void> => {
     try {
       const refreshToken = getRefreshToken();
@@ -159,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated,
     userType,
     login,
+    loginWithGoogle,
     logout,
     refreshUser,
   };

@@ -113,6 +113,9 @@ export const authService = {
     rememberMe?: boolean;
   }) => api.post<T>('/auth/login', data),
 
+  googleLogin: <T = LoginResponse>(token: string) =>
+    api.post<T>('/auth/google', { token }),
+
   logout: (refreshToken?: string) =>
     api.post('/auth/logout', { refreshToken }),
 

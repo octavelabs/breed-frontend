@@ -3,6 +3,7 @@
 import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useGoogleLogin } from "@react-oauth/google";
 import AuthLayout from "../layout/AuthLayout";
 import Input from "../components/Input";
 import Button from "../components/Button";
@@ -10,7 +11,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const LoginForm: React.FC = () => {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const searchParams = useSearchParams();
 
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -19,11 +20,29 @@ const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const registered = searchParams.get("registered");
   const reset = searchParams.get("reset");
   const verified = searchParams.get("verified");
   const redirect = searchParams.get("redirect") ?? undefined;
+
+  const signInWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        await loginWithGoogle(tokenResponse.access_token, redirect)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Google sign-in failed. Please try again.')
+      } finally {
+        setGoogleLoading(false)
+      }
+    },
+    onError: () => {
+      setError('Google sign-in was cancelled or failed. Please try again.')
+      setGoogleLoading(false)
+    },
+    flow: 'implicit',
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,6 +190,28 @@ const LoginForm: React.FC = () => {
             Proceed
           </Button>
         </form>
+
+        <div className="flex items-center gap-3 my-1">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400 font-medium">or</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+
+        <Button
+          buttonType="custom"
+          customClass="!w-full !h-[52px] !bg-white border border-gray-200 !text-gray-700 hover:!bg-gray-50"
+          loading={googleLoading}
+          onClick={() => {
+            setError(null)
+            setGoogleLoading(true)
+            signInWithGoogle()
+          }}
+          type="button"
+        >
+          <p className="flex items-center gap-[10px]">
+            <img src='/google.svg' className="w-5 h-5" /> Continue with Google
+          </p>
+        </Button>
 
         <p className="text-center text-sm text-gray-600">
           Forgot your password?{" "}
