@@ -261,7 +261,7 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
                 <button
                   onClick={() => setIsEditing(false)}
                   disabled={saving}
-                  className="flex-1 h-[58px] border border-[#D2D9DF] rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  className="flex-1 h-[58px] border border-[#D2D9DF] rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
                 >
                   Cancel
                 </button>
