@@ -1,35 +1,29 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut } from 'lucide-react';
-import { PresentionChart, Profile2User, Book1, Heart, People, Candle } from 'iconsax-react';
-import HomeIcon from '@/app/assets/icons/homeIcon';
-import LearnIcon from '@/app/assets/icons/learnIcon';
-import BuildupIcon from '@/app/assets/icons/buildupIcon';
-import CommunityIcon from '@/app/assets/icons/communityIcon';
-import MoreIcon from "@/app/assets/icons/MoreIcon";
+import {
+  Home2, Book1, Clipboard, People, Profile2User, Setting2,
+  Grid3, Video, VideoPlay,
+  PresentionChart, Heart, Candle,
+} from 'iconsax-react';
 import { useUser } from "@/app/context/UserContext";
 import { useAuth } from "@/context/AuthContext";
-import DashboardIcon from "@/app/assets/icons/dashboardIcon";
-import MentorshipIcon from "@/app/assets/icons/MentorshipIcon";
-import PreacherCommunityIcon from "@/app/assets/icons/preacherCommunityIcon";
-import MeetingIcon from "@/app/assets/icons/meetingIcon";
-import ShowReelIcon from "@/app/assets/icons/showreelIcon";
 
 export const navItems = [
-  { path: "/dashboard/home", label: "Home", icon: HomeIcon },
-  { path: "/dashboard/learn", label: "Learn", icon: LearnIcon },
-  { path: "/dashboard/buildup", label: "Buildup", icon: BuildupIcon },
-  { path: "/dashboard/community", label: "Community", icon: CommunityIcon },
-  { path: "/dashboard/mentorship", label: "Mentorship", icon: MentorshipIcon },
-  { path: "/dashboard/more", label: "More", icon: MoreIcon },
+  { path: "/dashboard/home",       label: "Home",        icon: Home2 },
+  { path: "/dashboard/learn",      label: "Learn",       icon: Book1 },
+  { path: "/dashboard/buildup",    label: "Buildup",     icon: Clipboard },
+  { path: "/dashboard/community",  label: "Community",   icon: People },
+  { path: "/dashboard/mentorship", label: "Mentorship",  icon: Profile2User },
+  { path: "/dashboard/more",       label: "My Settings", icon: Setting2 },
 ];
 
 export const preacherNavItems = [
-  { path: '/dashboard/preacher/dashboard', label: 'Dashboard', icon: DashboardIcon },
-  { path: '/dashboard/preacher/mentorship', label: 'Mentorship', icon: MentorshipIcon },
-  { path: '/dashboard/preacher/community', label: 'Community', icon: PreacherCommunityIcon },
-  { path: '/dashboard/preacher/meetings', label: 'Meetings', icon: MeetingIcon },
-  { path: '/dashboard/preacher/showreel', label: 'Showreel', icon: ShowReelIcon },
+  { path: '/dashboard/preacher/dashboard',  label: 'Dashboard',  icon: Grid3 },
+  { path: '/dashboard/preacher/mentorship', label: 'Mentorship', icon: Profile2User },
+  { path: '/dashboard/preacher/community',  label: 'Community',  icon: People },
+  { path: '/dashboard/preacher/meetings',   label: 'Meetings',   icon: Video },
+  { path: '/dashboard/preacher/showreel',   label: 'Showreel',   icon: VideoPlay },
 ];
 
 export const adminNavItems = [
@@ -48,7 +42,7 @@ const SideBar = () => {
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
-  const isAdminRoute   = pathname?.startsWith('/dashboard/admin');
+  const isAdminRoute    = pathname?.startsWith('/dashboard/admin');
   const isPreacherRoute = pathname?.startsWith('/dashboard/preacher');
   const isPreacher = userType === 'preacher' || isPreacherRoute || isAdminRoute;
 
@@ -79,23 +73,21 @@ const SideBar = () => {
             const active = isActive(item.path);
             const iconColor = isPreacher
               ? active ? "#FFFFFF" : "#D1D5DB"
-              : active ? "#870BD6" : "#60666B";
+              : active ? "#FFFFFF" : "#60666B";
 
             return (
               <Link
                 key={item.path}
                 href={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isPreacher
-                    ? active
-                      ? "bg-[#870BD6] text-white"
-                      : "text-gray-300 hover:bg-[#2D1B4E]"
-                    : active
-                      ? "bg-[#FBF6FF] text-[#870BD6]"
+                  active
+                    ? "bg-[#870BD6] text-white"
+                    : isPreacher
+                      ? "text-gray-300 hover:bg-[#2D1B4E]"
                       : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <Icon color={iconColor} size={24} />
+                <Icon color={iconColor} size={24} variant={active ? 'Bold' : 'Linear'} />
                 <span className="font-medium">{item.label}</span>
               </Link>
             );
@@ -176,20 +168,25 @@ export const MobileNav = () => {
   return (
     <section className="fixed w-screen bottom-0 left-0 right-0 h-[68px] z-[99] px-6 bg-white md:hidden">
       <div className="flex justify-between items-center h-full">
-        {currentNavItems.map((item) => (
-          <Link
-            key={item.path}
-            href={item.path}
-            className={`flex flex-col items-center gap-1 transition-colors ${
-              isActive(item.path)
-                ? "text-[#870BD6]"
-                : "text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            <item.icon color={isActive(item.path) ? "#870BD6" : "#60666B"} />
-            <span className="text-xs font-medium">{item.label}</span>
-          </Link>
-        ))}
+        {currentNavItems.map((item) => {
+          const active = isActive(item.path);
+          return (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={`flex flex-col items-center gap-1 transition-colors ${
+                active ? "text-[#870BD6]" : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <item.icon
+                color={active ? "#870BD6" : "#60666B"}
+                size={24}
+                variant={active ? 'Bold' : 'Linear'}
+              />
+              <span className="text-xs font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
