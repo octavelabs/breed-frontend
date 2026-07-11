@@ -74,7 +74,7 @@ const CourseEnrolmentsPage = () => {
           onClick={() => router.push('/dashboard/admin/courses')}
           className="flex items-center gap-2 text-[#60666B] hover:text-gray-900 text-sm mb-6 transition-colors"
         >
-          <ArrowLeft size={16} className="text-[#60666B]" /> Back to Courses
+          <ArrowLeft size={16} color="#60666B" /> Back to Courses
         </button>
 
         {/* Header */}
@@ -92,14 +92,14 @@ const CourseEnrolmentsPage = () => {
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div className="rounded-2xl border border-[#E7C8FF] bg-[#FBF6FF] p-4">
               <div className="flex items-center gap-2 mb-1">
-                <People size={16} className="text-[#870BD6]" />
+                <People size={16} color="#870BD6" />
                 <p className="text-[13px] text-[#60666B]">Total Enrolled</p>
               </div>
               <h3 className="text-2xl font-bold text-gray-900">{meta.total}</h3>
             </div>
             <div className="rounded-2xl border border-[#ABEFC6] bg-[#ECFDF3] p-4">
               <div className="flex items-center gap-2 mb-1">
-                <TickCircle size={16} className="text-[#067647]" />
+                <TickCircle size={16} color="#067647" />
                 <p className="text-[13px] text-[#60666B]">Completed</p>
               </div>
               <h3 className="text-2xl font-bold text-gray-900">{completedCount}</h3>
@@ -152,7 +152,7 @@ const CourseEnrolmentsPage = () => {
                 ) : enrolments.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-5 py-20 text-center text-[#60666B] text-sm">
-                      <People size={32} className="mx-auto text-gray-300 mb-3" />
+                      <People size={32} className="mx-auto mb-3" color="#D1D5DB" />
                       No learners enrolled yet
                     </td>
                   </tr>
@@ -213,11 +213,11 @@ const CourseEnrolmentsPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchEnrolments(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowLeft2 size={15} className="text-gray-500" />
+                  <ArrowLeft2 size={15} color="#6B7280" />
                 </button>
                 <button onClick={() => fetchEnrolments(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowRight2 size={15} className="text-gray-500" />
+                  <ArrowRight2 size={15} color="#6B7280" />
                 </button>
               </div>
             </div>

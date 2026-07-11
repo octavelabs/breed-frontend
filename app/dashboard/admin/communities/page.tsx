@@ -124,7 +124,7 @@ const AdminCommunitiesPage = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2" color="#9CA3AF" />
             <input
               type="text"
               placeholder="Search by name or owner…"
@@ -134,7 +134,7 @@ const AdminCommunitiesPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <CloseCircle size={14} className="text-gray-400" />
+                <CloseCircle size={14} color="#9CA3AF" />
               </button>
             )}
           </div>
@@ -179,7 +179,7 @@ const AdminCommunitiesPage = () => {
                 ) : communities.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-5 py-20 text-center text-[#60666B] text-sm">
-                      <People size={32} className="mx-auto text-gray-300 mb-3" />
+                      <People size={32} className="mx-auto mb-3" color="#D1D5DB" />
                       No communities found
                     </td>
                   </tr>
@@ -189,7 +189,7 @@ const AdminCommunitiesPage = () => {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-[#F0FDF9] flex items-center justify-center flex-shrink-0">
-                            <People size={16} className="text-[#0F766E]" />
+                            <People size={16} color="#0F766E" />
                           </div>
                           <p className="font-semibold text-gray-900 truncate max-w-[180px]">{c.name}</p>
                         </div>
@@ -200,8 +200,8 @@ const AdminCommunitiesPage = () => {
                       <td className="px-5 py-4">
                         <span className="flex items-center gap-1 text-[12px] text-[#60666B]">
                           {c.privacy === 'PUBLIC'
-                            ? <><Global size={12} className="text-[#60666B]" /> Public</>
-                            : <><Lock1 size={12} className="text-[#60666B]" /> Private</>}
+                            ? <><Global size={12} color="#60666B" /> Public</>
+                            : <><Lock1 size={12} color="#60666B" /> Private</>}
                         </span>
                       </td>
                       <td className="px-5 py-4 text-[13px] text-[#60666B]">{c.memberCount}</td>
@@ -229,15 +229,15 @@ const AdminCommunitiesPage = () => {
                             }`}
                           >
                             {c.isActive
-                              ? <ShieldSlash size={15} className="text-[#B42318]" />
-                              : <ShieldTick size={15} className="text-[#067647]" />
+                              ? <ShieldSlash size={15} color="#B42318" />
+                              : <ShieldTick size={15} color="#067647" />
                             }
                           </button>
                           <button
                             onClick={() => openModal(c, 'delete')}
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
-                            <Trash size={15} className="text-gray-400" />
+                            <Trash size={15} color="#9CA3AF" />
                           </button>
                         </div>
                       </td>
@@ -256,11 +256,11 @@ const AdminCommunitiesPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchCommunities(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowLeft2 size={15} className="text-gray-500" />
+                  <ArrowLeft2 size={15} color="#6B7280" />
                 </button>
                 <button onClick={() => fetchCommunities(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowRight2 size={15} className="text-gray-500" />
+                  <ArrowRight2 size={15} color="#6B7280" />
                 </button>
               </div>
             </div>
