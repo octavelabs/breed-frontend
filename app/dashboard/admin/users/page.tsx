@@ -9,6 +9,7 @@ import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
+import Toast from '@/app/components/Toast';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ const ROLE_STYLES: Record<string, string> = {
   SUPER_ADMIN: 'bg-[#1A0B2E] text-white border-[#3D1A6E]',
   ADMIN:       'bg-[#FBF6FF] text-[#870BD6] border-[#E7C8FF]',
   PREACHER:    'bg-[#EFF8FF] text-[#175CD3] border-[#B2DDFF]',
-  USER:        'bg-[#F8F9FC] text-[#363F72] border-[#D5D9EB]',
+  BELIEVER:    'bg-[#F8F9FC] text-[#363F72] border-[#D5D9EB]',
 };
 
 const RoleBadge = ({ role }: { role: string }) => (
@@ -66,12 +67,13 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 // ── Role Dropdown ─────────────────────────────────────────────────────────────
 
-const ROLES = ['USER', 'PREACHER', 'ADMIN', 'SUPER_ADMIN'];
+const ROLES = ['BELIEVER', 'PREACHER', 'ADMIN', 'SUPER_ADMIN'];
 
 const RoleDropdown = ({
-  userId, currentRole, onChanged,
+  userId, currentRole, onChanged, onToast,
 }: {
   userId: string; currentRole: string; onChanged: (role: string) => void;
+  onToast: (message: string, type: 'success' | 'error') => void;
 }) => {
   const [open, setOpen]       = useState(false);
   const [loading, setLoading] = useState(false);
@@ -91,8 +93,9 @@ const RoleDropdown = ({
     try {
       await adminService.updateUserRole(userId, role);
       onChanged(role);
+      onToast(`Role updated to ${role.replace('_', ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}`, 'success');
     } catch {
-      // keep current value on error
+      onToast('Failed to update role. Please try again.', 'error');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -135,6 +138,8 @@ const AdminUsersPage = () => {
   const [search, setSearch]             = useState('');
   const [roleFilter, setRoleFilter]     = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const [modal, setModal] = useState<{
     open: boolean;
@@ -209,6 +214,8 @@ const AdminUsersPage = () => {
     <DashboardLayout custom={true}>
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
 
+        {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
+
         <AdminConfirmModal
           isOpen={modal.open}
           onClose={closeModal}
@@ -251,7 +258,7 @@ const AdminUsersPage = () => {
             className="h-10 px-3 border border-[#D2D9DF] rounded-xl text-sm bg-white focus:outline-none focus:border-[#870BD6] min-w-[140px]"
           >
             <option value="">All Roles</option>
-            <option value="USER">User</option>
+            <option value="BELIEVER">Believer</option>
             <option value="PREACHER">Preacher</option>
             <option value="ADMIN">Admin</option>
             <option value="SUPER_ADMIN">Super Admin</option>
@@ -341,6 +348,7 @@ const AdminUsersPage = () => {
                             onChanged={(role) =>
                               setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, role } : u))
                             }
+                            onToast={(message, type) => setToast({ message, type })}
                           />
                         </td>
                         <td className="px-5 py-4">
