@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Users, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import { ArrowLeft, People, ArrowLeft2, ArrowRight2, TickCircle } from 'iconsax-react';
 import { useParams, useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
@@ -92,14 +92,14 @@ const CourseEnrolmentsPage = () => {
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div className="rounded-2xl border border-[#E7C8FF] bg-[#FBF6FF] p-4">
               <div className="flex items-center gap-2 mb-1">
-                <Users size={16} className="text-[#870BD6]" />
+                <People size={16} className="text-[#870BD6]" />
                 <p className="text-[13px] text-[#60666B]">Total Enrolled</p>
               </div>
               <h3 className="text-2xl font-bold text-gray-900">{meta.total}</h3>
             </div>
             <div className="rounded-2xl border border-[#ABEFC6] bg-[#ECFDF3] p-4">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={16} className="text-[#067647]" />
+                <TickCircle size={16} className="text-[#067647]" />
                 <p className="text-[13px] text-[#60666B]">Completed</p>
               </div>
               <h3 className="text-2xl font-bold text-gray-900">{completedCount}</h3>
@@ -152,7 +152,7 @@ const CourseEnrolmentsPage = () => {
                 ) : enrolments.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-5 py-20 text-center text-[#60666B] text-sm">
-                      <Users size={32} className="mx-auto text-gray-300 mb-3" />
+                      <People size={32} className="mx-auto text-gray-300 mb-3" />
                       No learners enrolled yet
                     </td>
                   </tr>
@@ -213,11 +213,11 @@ const CourseEnrolmentsPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchEnrolments(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronLeft size={15} />
+                  <ArrowLeft2 size={15} />
                 </button>
                 <button onClick={() => fetchEnrolments(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronRight size={15} />
+                  <ArrowRight2 size={15} />
                 </button>
               </div>
             </div>

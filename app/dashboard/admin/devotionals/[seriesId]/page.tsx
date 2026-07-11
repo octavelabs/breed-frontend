@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Heart, Search, X, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, BookOpen,
-} from 'lucide-react';
+  Heart, SearchNormal1, CloseCircle, Trash, Eye, EyeSlash, ArrowLeft2, ArrowRight2, Book1,
+} from 'iconsax-react';
 import { useParams, useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
@@ -171,7 +171,7 @@ const SeriesArticlesPage = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search by title…"
@@ -181,7 +181,7 @@ const SeriesArticlesPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X size={14} />
+                <CloseCircle size={14} />
               </button>
             )}
           </div>
@@ -227,7 +227,7 @@ const SeriesArticlesPage = () => {
                 ) : articles.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-5 py-20 text-center text-[#60666B] text-sm">
-                      <BookOpen size={32} className="mx-auto text-gray-300 mb-3" />
+                      <Book1 size={32} className="mx-auto text-gray-300 mb-3" />
                       No articles found in this series
                     </td>
                   </tr>
@@ -265,13 +265,13 @@ const SeriesArticlesPage = () => {
                                 : 'text-[#067647] hover:bg-[#ECFDF3]'
                             }`}
                           >
-                            {a.status === 'PUBLISHED' ? <EyeOff size={15} /> : <Eye size={15} />}
+                            {a.status === 'PUBLISHED' ? <EyeSlash size={15} /> : <Eye size={15} />}
                           </button>
                           <button
                             onClick={() => openModal(a, 'delete')}
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
-                            <Trash2 size={15} />
+                            <Trash size={15} />
                           </button>
                         </div>
                       </td>
@@ -290,11 +290,11 @@ const SeriesArticlesPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchArticles(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronLeft size={15} />
+                  <ArrowLeft2 size={15} />
                 </button>
                 <button onClick={() => fetchArticles(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronRight size={15} />
+                  <ArrowRight2 size={15} />
                 </button>
               </div>
             </div>

@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  BookOpen, Search, X, Trash2, ChevronLeft, ChevronRight,
-  Eye, EyeOff, Users, ChevronRight as Arrow,
-} from 'lucide-react';
+  Book1, SearchNormal1, CloseCircle, Trash, ArrowLeft2, ArrowRight2,
+  Eye, EyeSlash, People, ArrowRight2 as Arrow,
+} from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
@@ -164,7 +164,7 @@ const AdminCoursesPage = () => {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search by title or author…"
@@ -174,7 +174,7 @@ const AdminCoursesPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X size={14} />
+                <CloseCircle size={14} />
               </button>
             )}
           </div>
@@ -221,7 +221,7 @@ const AdminCoursesPage = () => {
                 ) : courses.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-5 py-20 text-center text-[#60666B] text-sm">
-                      <BookOpen size={32} className="mx-auto text-gray-300 mb-3" />
+                      <Book1 size={32} className="mx-auto text-gray-300 mb-3" />
                       No courses found
                     </td>
                   </tr>
@@ -231,7 +231,7 @@ const AdminCoursesPage = () => {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-[#F5EBFF] flex items-center justify-center flex-shrink-0">
-                            <BookOpen size={16} className="text-[#870BD6]" />
+                            <Book1 size={16} className="text-[#870BD6]" />
                           </div>
                           <div className="min-w-0">
                             <p className="font-semibold text-gray-900 truncate max-w-[200px]">{course.title}</p>
@@ -251,7 +251,7 @@ const AdminCoursesPage = () => {
                           onClick={() => router.push(`/dashboard/admin/courses/${course.id}/enrolments`)}
                           className="flex items-center gap-1.5 text-[13px] text-[#870BD6] font-semibold hover:underline"
                         >
-                          <Users size={13} />
+                          <People size={13} />
                           {course.enrollmentCount}
                         </button>
                       </td>
@@ -269,14 +269,14 @@ const AdminCoursesPage = () => {
                                 : 'text-[#067647] hover:bg-[#ECFDF3]'
                             }`}
                           >
-                            {course.status === 'PUBLISHED' ? <EyeOff size={15} /> : <Eye size={15} />}
+                            {course.status === 'PUBLISHED' ? <EyeSlash size={15} /> : <Eye size={15} />}
                           </button>
                           <button
                             onClick={() => openModal(course, 'delete')}
                             title="Delete course"
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
-                            <Trash2 size={15} />
+                            <Trash size={15} />
                           </button>
                           <button
                             onClick={() => router.push(`/dashboard/admin/courses/${course.id}/enrolments`)}
@@ -303,11 +303,11 @@ const AdminCoursesPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchCourses(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronLeft size={15} />
+                  <ArrowLeft2 size={15} />
                 </button>
                 <button onClick={() => fetchCourses(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronRight size={15} />
+                  <ArrowRight2 size={15} />
                 </button>
               </div>
             </div>

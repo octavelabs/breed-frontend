@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import {
-  Users, UserCheck, UserPlus, BookOpen, BookMarked,
-  Users2, ShieldAlert, MoreHorizontal,
-} from 'lucide-react';
+  People, ProfileTick, ProfileAdd, Book1, BookSaved,
+  ShieldSecurity, More,
+} from 'iconsax-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
 
@@ -263,9 +263,9 @@ const AdminOverviewPage = () => {
         <section>
           <h2 className="text-sm font-semibold text-[#60666B] uppercase tracking-wider mb-4">Users</h2>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            <StatCard label="Total Users"    value={stats?.totalUsers ?? 0}        sub="All time"       Icon={Users}     palette={PURPLE} loading={statsLoading} />
-            <StatCard label="New This Month" value={stats?.newUsersThisMonth ?? 0} sub="Since the 1st"  Icon={UserPlus}  palette={GREEN}  loading={statsLoading} />
-            <StatCard label="New This Week"  value={stats?.newUsersThisWeek ?? 0}  sub="Last 7 days"    Icon={UserCheck} palette={BLUE}   loading={statsLoading} />
+            <StatCard label="Total Users"    value={stats?.totalUsers ?? 0}        sub="All time"       Icon={People}      palette={PURPLE} loading={statsLoading} />
+            <StatCard label="New This Month" value={stats?.newUsersThisMonth ?? 0} sub="Since the 1st"  Icon={ProfileAdd}  palette={GREEN}  loading={statsLoading} />
+            <StatCard label="New This Week"  value={stats?.newUsersThisWeek ?? 0}  sub="Last 7 days"    Icon={ProfileTick} palette={BLUE}   loading={statsLoading} />
           </div>
         </section>
 
@@ -303,10 +303,10 @@ const AdminOverviewPage = () => {
           <section>
             <h2 className="text-sm font-semibold text-[#60666B] uppercase tracking-wider mb-4">Content</h2>
             <div className="grid grid-cols-2 gap-4">
-              <StatCard label="Active Communities"    value={stats?.activeCommunities ?? 0}    sub={`of ${stats?.totalCommunities ?? 0} total`}    Icon={Users2}     palette={TEAL}   loading={statsLoading} />
-              <StatCard label="Published Courses"     value={stats?.publishedCourses ?? 0}     sub={`of ${stats?.totalCourses ?? 0} total`}         Icon={BookOpen}   palette={PURPLE} loading={statsLoading} />
-              <StatCard label="Total Enrolments"      value={stats?.totalEnrollments ?? 0}     sub="Course sign-ups"                                Icon={BookMarked} palette={AMBER}  loading={statsLoading} />
-              <StatCard label="Published Devotionals" value={stats?.publishedDevotionals ?? 0} sub={`of ${stats?.totalDevotionals ?? 0} total`}     Icon={BookMarked} palette={BLUE}   loading={statsLoading} />
+              <StatCard label="Active Communities"    value={stats?.activeCommunities ?? 0}    sub={`of ${stats?.totalCommunities ?? 0} total`}    Icon={People}          palette={TEAL}   loading={statsLoading} />
+              <StatCard label="Published Courses"     value={stats?.publishedCourses ?? 0}     sub={`of ${stats?.totalCourses ?? 0} total`}         Icon={Book1}           palette={PURPLE} loading={statsLoading} />
+              <StatCard label="Total Enrolments"      value={stats?.totalEnrollments ?? 0}     sub="Course sign-ups"                                Icon={BookSaved}       palette={AMBER}  loading={statsLoading} />
+              <StatCard label="Published Devotionals" value={stats?.publishedDevotionals ?? 0} sub={`of ${stats?.totalDevotionals ?? 0} total`}     Icon={BookSaved}       palette={BLUE}   loading={statsLoading} />
             </div>
           </section>
 
@@ -329,8 +329,8 @@ const AdminOverviewPage = () => {
         <section>
           <h2 className="text-sm font-semibold text-[#60666B] uppercase tracking-wider mb-4">Moderation</h2>
           <div className="grid grid-cols-2 gap-4 max-w-md">
-            <StatCard label="Pending Reports"      value={stats?.pendingReports ?? 0}     sub="Awaiting review" Icon={ShieldAlert}    palette={RED}   loading={statsLoading} />
-            <StatCard label="Open Prayer Requests" value={stats?.openPrayerRequests ?? 0} sub="Unanswered"       Icon={MoreHorizontal} palette={AMBER} loading={statsLoading} />
+            <StatCard label="Pending Reports"      value={stats?.pendingReports ?? 0}     sub="Awaiting review" Icon={ShieldSecurity} palette={RED}   loading={statsLoading} />
+            <StatCard label="Open Prayer Requests" value={stats?.openPrayerRequests ?? 0} sub="Unanswered"       Icon={More}           palette={AMBER} loading={statsLoading} />
           </div>
         </section>
 

@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Users, ChevronDown, Search, X, CheckCircle2,
-  Ban, Trash2, ChevronLeft, ChevronRight, Check,
-} from 'lucide-react';
+  People, ArrowDown2, SearchNormal1, CloseCircle, TickCircle,
+  Forbidden, Trash, ArrowLeft2, ArrowRight2,
+} from 'iconsax-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
@@ -110,14 +110,14 @@ const RoleDropdown = ({
         className="flex items-center gap-1 disabled:opacity-60"
       >
         <RoleBadge role={currentRole} />
-        {!loading && <ChevronDown size={12} className="text-gray-400 -ml-0.5 flex-shrink-0" />}
+        {!loading && <ArrowDown2 size={12} className="text-gray-400 -ml-0.5 flex-shrink-0" />}
       </button>
       {open && (
         <div className="absolute left-0 top-full mt-1 bg-white border border-[#E3E8EF] rounded-xl shadow-lg z-20 py-1 min-w-[148px]">
           {ROLES.map((r) => (
             <button key={r} onClick={() => select(r)}
               className={`w-full text-left px-3 py-2 text-[12px] font-medium hover:bg-[#F8F9FC] flex items-center gap-2 ${r === currentRole ? 'text-[#870BD6]' : 'text-gray-700'}`}>
-              {r === currentRole && <Check size={12} className="text-[#870BD6] flex-shrink-0" />}
+              {r === currentRole && <TickCircle size={12} className="text-[#870BD6] flex-shrink-0" />}
               {r.replace('_', ' ')}
             </button>
           ))}
@@ -238,7 +238,7 @@ const AdminUsersPage = () => {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search by name, email or username…"
@@ -248,7 +248,7 @@ const AdminUsersPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X size={14} />
+                <CloseCircle size={14} />
               </button>
             )}
           </div>
@@ -312,7 +312,7 @@ const AdminUsersPage = () => {
                 ) : users.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-5 py-20 text-center text-[#60666B] text-sm">
-                      <Users size={32} className="mx-auto text-gray-300 mb-3" />
+                      <People size={32} className="mx-auto text-gray-300 mb-3" />
                       No users found
                     </td>
                   </tr>
@@ -378,14 +378,14 @@ const AdminUsersPage = () => {
                                     : 'text-[#067647] hover:bg-[#ECFDF3]'
                                 }`}
                               >
-                                {isActive ? <Ban size={15} /> : <CheckCircle2 size={15} />}
+                                {isActive ? <Forbidden size={15} /> : <TickCircle size={15} />}
                               </button>
                               <button
                                 onClick={() => openModal(user, 'delete')}
                                 title="Delete user"
                                 className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                               >
-                                <Trash2 size={15} />
+                                <Trash size={15} />
                               </button>
                             </div>
                           )}
@@ -410,14 +410,14 @@ const AdminUsersPage = () => {
                   disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors"
                 >
-                  <ChevronLeft size={15} />
+                  <ArrowLeft2 size={15} />
                 </button>
                 <button
                   onClick={() => fetchUsers(meta.page + 1)}
                   disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors"
                 >
-                  <ChevronRight size={15} />
+                  <ArrowRight2 size={15} />
                 </button>
               </div>
             </div>

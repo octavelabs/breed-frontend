@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  HandHeart, Search, X, CheckCircle2, ChevronLeft, ChevronRight, EyeOff,
-} from 'lucide-react';
+  Heart, SearchNormal1, CloseCircle, TickCircle, ArrowLeft2, ArrowRight2, EyeSlash,
+} from 'iconsax-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
 import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
@@ -117,7 +117,7 @@ const AdminPrayerRequestsPage = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search by title or requester…"
@@ -127,7 +127,7 @@ const AdminPrayerRequestsPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X size={14} />
+                <CloseCircle size={14} />
               </button>
             )}
           </div>
@@ -162,7 +162,7 @@ const AdminPrayerRequestsPage = () => {
         ) : requests.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center border border-[#E3E8EF] rounded-2xl">
             <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-              <HandHeart size={22} className="text-[#870BD6]" />
+              <Heart size={22} className="text-[#870BD6]" />
             </div>
             <p className="text-sm font-semibold text-gray-700">No prayer requests found</p>
             <p className="text-xs text-[#60666B]">Try adjusting your filters.</p>
@@ -207,7 +207,7 @@ const AdminPrayerRequestsPage = () => {
                         </span>
                         {r.isAnonymous && (
                           <span className="flex items-center gap-1 text-[11px] text-[#60666B]">
-                            <EyeOff size={11} /> Anonymous
+                            <EyeSlash size={11} /> Anonymous
                           </span>
                         )}
                       </div>
@@ -243,7 +243,7 @@ const AdminPrayerRequestsPage = () => {
                         onClick={() => openModal(r)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ECFDF3] text-[#067647] text-xs font-semibold border border-[#ABEFC6] hover:bg-[#D1FAE5] transition-colors flex-shrink-0"
                       >
-                        <CheckCircle2 size={13} />
+                        <TickCircle size={13} />
                         Mark Answered
                       </button>
                     )}
@@ -268,11 +268,11 @@ const AdminPrayerRequestsPage = () => {
             <div className="flex gap-1">
               <button onClick={() => fetchRequests(meta.page - 1)} disabled={meta.page <= 1}
                 className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                <ChevronLeft size={15} />
+                <ArrowLeft2 size={15} />
               </button>
               <button onClick={() => fetchRequests(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                 className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                <ChevronRight size={15} />
+                <ArrowRight2 size={15} />
               </button>
             </div>
           </div>

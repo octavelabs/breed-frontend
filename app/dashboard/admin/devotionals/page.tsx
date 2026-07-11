@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Heart, Search, X, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight,
-  ChevronRight as Arrow, Users,
-} from 'lucide-react';
+  Heart, SearchNormal1, CloseCircle, Trash, Eye, EyeSlash, ArrowLeft2, ArrowRight2,
+  ArrowRight2 as Arrow, People,
+} from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
@@ -131,7 +131,7 @@ const AdminDevotionalsPage = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchNormal1 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search by title or author…"
@@ -141,7 +141,7 @@ const AdminDevotionalsPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X size={14} />
+                <CloseCircle size={14} />
               </button>
             )}
           </div>
@@ -219,7 +219,7 @@ const AdminDevotionalsPage = () => {
                       </td>
                       <td className="px-5 py-4">
                         <span className="flex items-center gap-1.5 text-[13px] text-[#60666B]">
-                          <Users size={12} />
+                          <People size={12} />
                           {s.subscriberCount}
                         </span>
                       </td>
@@ -247,13 +247,13 @@ const AdminDevotionalsPage = () => {
                                 : 'text-[#067647] hover:bg-[#ECFDF3]'
                             }`}
                           >
-                            {s.isPublished ? <EyeOff size={15} /> : <Eye size={15} />}
+                            {s.isPublished ? <EyeSlash size={15} /> : <Eye size={15} />}
                           </button>
                           <button
                             onClick={() => openModal(s, 'delete')}
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
-                            <Trash2 size={15} />
+                            <Trash size={15} />
                           </button>
                           <button
                             onClick={() => router.push(`/dashboard/admin/devotionals/${s.id}`)}
@@ -279,11 +279,11 @@ const AdminDevotionalsPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchSeries(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronLeft size={15} />
+                  <ArrowLeft2 size={15} />
                 </button>
                 <button onClick={() => fetchSeries(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ChevronRight size={15} />
+                  <ArrowRight2 size={15} />
                 </button>
               </div>
             </div>
