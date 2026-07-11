@@ -74,7 +74,7 @@ const CourseEnrolmentsPage = () => {
           onClick={() => router.push('/dashboard/admin/courses')}
           className="flex items-center gap-2 text-[#60666B] hover:text-gray-900 text-sm mb-6 transition-colors"
         >
-          <ArrowLeft size={16} /> Back to Courses
+          <ArrowLeft size={16} className="text-[#60666B]" /> Back to Courses
         </button>
 
         {/* Header */}
@@ -213,11 +213,11 @@ const CourseEnrolmentsPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchEnrolments(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowLeft2 size={15} />
+                  <ArrowLeft2 size={15} className="text-gray-500" />
                 </button>
                 <button onClick={() => fetchEnrolments(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowRight2 size={15} />
+                  <ArrowRight2 size={15} className="text-gray-500" />
                 </button>
               </div>
             </div>

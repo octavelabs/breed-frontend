@@ -181,7 +181,7 @@ const SeriesArticlesPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <CloseCircle size={14} />
+                <CloseCircle size={14} className="text-gray-400" />
               </button>
             )}
           </div>
@@ -265,13 +265,16 @@ const SeriesArticlesPage = () => {
                                 : 'text-[#067647] hover:bg-[#ECFDF3]'
                             }`}
                           >
-                            {a.status === 'PUBLISHED' ? <EyeSlash size={15} /> : <Eye size={15} />}
+                            {a.status === 'PUBLISHED'
+                              ? <EyeSlash size={15} className="text-[#B54708]" />
+                              : <Eye size={15} className="text-[#067647]" />
+                            }
                           </button>
                           <button
                             onClick={() => openModal(a, 'delete')}
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
-                            <Trash size={15} />
+                            <Trash size={15} className="text-gray-400" />
                           </button>
                         </div>
                       </td>
@@ -290,11 +293,11 @@ const SeriesArticlesPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchArticles(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowLeft2 size={15} />
+                  <ArrowLeft2 size={15} className="text-gray-500" />
                 </button>
                 <button onClick={() => fetchArticles(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowRight2 size={15} />
+                  <ArrowRight2 size={15} className="text-gray-500" />
                 </button>
               </div>
             </div>

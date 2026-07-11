@@ -248,7 +248,7 @@ const AdminUsersPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <CloseCircle size={14} />
+                <CloseCircle size={14} className="text-gray-400" />
               </button>
             )}
           </div>
@@ -378,14 +378,17 @@ const AdminUsersPage = () => {
                                     : 'text-[#067647] hover:bg-[#ECFDF3]'
                                 }`}
                               >
-                                {isActive ? <Forbidden size={15} /> : <TickCircle size={15} />}
+                                {isActive
+                                  ? <Forbidden size={15} className="text-[#B42318]" />
+                                  : <TickCircle size={15} className="text-[#067647]" />
+                                }
                               </button>
                               <button
                                 onClick={() => openModal(user, 'delete')}
                                 title="Delete user"
                                 className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                               >
-                                <Trash size={15} />
+                                <Trash size={15} className="text-gray-400" />
                               </button>
                             </div>
                           )}
@@ -410,14 +413,14 @@ const AdminUsersPage = () => {
                   disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors"
                 >
-                  <ArrowLeft2 size={15} />
+                  <ArrowLeft2 size={15} className="text-gray-500" />
                 </button>
                 <button
                   onClick={() => fetchUsers(meta.page + 1)}
                   disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors"
                 >
-                  <ArrowRight2 size={15} />
+                  <ArrowRight2 size={15} className="text-gray-500" />
                 </button>
               </div>
             </div>

@@ -174,7 +174,7 @@ const AdminCoursesPage = () => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <CloseCircle size={14} />
+                <CloseCircle size={14} className="text-gray-400" />
               </button>
             )}
           </div>
@@ -251,7 +251,7 @@ const AdminCoursesPage = () => {
                           onClick={() => router.push(`/dashboard/admin/courses/${course.id}/enrolments`)}
                           className="flex items-center gap-1.5 text-[13px] text-[#870BD6] font-semibold hover:underline"
                         >
-                          <People size={13} />
+                          <People size={13} className="text-[#870BD6]" />
                           {course.enrollmentCount}
                         </button>
                       </td>
@@ -269,21 +269,24 @@ const AdminCoursesPage = () => {
                                 : 'text-[#067647] hover:bg-[#ECFDF3]'
                             }`}
                           >
-                            {course.status === 'PUBLISHED' ? <EyeSlash size={15} /> : <Eye size={15} />}
+                            {course.status === 'PUBLISHED'
+                              ? <EyeSlash size={15} className="text-[#B54708]" />
+                              : <Eye size={15} className="text-[#067647]" />
+                            }
                           </button>
                           <button
                             onClick={() => openModal(course, 'delete')}
                             title="Delete course"
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#FEF3F2] hover:text-[#B42318] transition-colors"
                           >
-                            <Trash size={15} />
+                            <Trash size={15} className="text-gray-400" />
                           </button>
                           <button
                             onClick={() => router.push(`/dashboard/admin/courses/${course.id}/enrolments`)}
                             title="View enrolments"
                             className="p-2 rounded-lg text-gray-400 hover:bg-[#F5EBFF] hover:text-[#870BD6] transition-colors"
                           >
-                            <Arrow size={15} />
+                            <Arrow size={15} className="text-gray-400" />
                           </button>
                         </div>
                       </td>
@@ -303,11 +306,11 @@ const AdminCoursesPage = () => {
               <div className="flex gap-1">
                 <button onClick={() => fetchCourses(meta.page - 1)} disabled={meta.page <= 1}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowLeft2 size={15} />
+                  <ArrowLeft2 size={15} className="text-gray-500" />
                 </button>
                 <button onClick={() => fetchCourses(meta.page + 1)} disabled={meta.page >= meta.totalPages}
                   className="p-2 rounded-lg border border-[#D2D9DF] disabled:opacity-40 hover:bg-gray-50 transition-colors">
-                  <ArrowRight2 size={15} />
+                  <ArrowRight2 size={15} className="text-gray-500" />
                 </button>
               </div>
             </div>
