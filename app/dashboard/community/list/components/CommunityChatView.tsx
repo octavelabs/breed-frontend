@@ -4,18 +4,14 @@ import {
   ArrowLeft,
   BellOff,
   ChartAreaIcon,
-  ImageIcon,
   LogOut,
   MoreVerticalIcon,
   Search,
   Send,
   Settings,
-  Trash,
   Users,
-  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import ImageUpload from "@/app/components/upload/ImageUpload";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
 import Button from "@/app/components/Button";
@@ -88,7 +84,6 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   community,
   setSelectedCommunity,
   onLeave,
-  onCoverUpdated,
 }) => {
   const { user } = useAuth();
   const router = useRouter();
@@ -96,9 +91,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   const [messages, setMessages] = useState<ApiMessage[]>([]);
   const [sending, setSending] = useState(false);
   const [leaving, setLeaving] = useState(false);
-  const [showEditCover, setShowEditCover] = useState(false);
-  const [coverSaving, setCoverSaving] = useState(false);
-  const [localCoverImage, setLocalCoverImage] = useState<string | null | undefined>(community.coverImage);
+  const [localCoverImage] = useState<string | null | undefined>(community.coverImage);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<HTMLButtonElement | null>(null);
@@ -192,32 +185,10 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
     setPopover((prev) => ({ ...prev, visible: false, rowData: null }));
   }, []);
 
-  const handleSaveCover = async (url: string) => {
-    setCoverSaving(true);
-    try {
-      await communityService.updateCommunity(community.id, { coverImage: url });
-      setLocalCoverImage(url);
-      onCoverUpdated?.(community.id, url);
-      setShowEditCover(false);
-    } catch {
-      // error already shown by ImageUpload
-    } finally {
-      setCoverSaving(false);
-    }
-  };
-
   const popoverContent = useMemo(
     () => [
       ...(isOwnerOrAdmin
         ? [
-            {
-              item: "Edit Cover Image",
-              icon: <ImageIcon className="w-3.5 h-3.5" />,
-              onClick: () => {
-                setPopover({ visible: false, rowData: null });
-                setShowEditCover(true);
-              },
-            },
             {
               item: "Manage Community",
               icon: <Settings className="w-3.5 h-3.5" />,
@@ -381,38 +352,6 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
         />
       )}
 
-      {/* Edit Cover Image Modal */}
-      {showEditCover && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => !coverSaving && setShowEditCover(false)}
-        >
-          <div
-            className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-[#180426]">Edit Cover Image</h3>
-              <button
-                onClick={() => setShowEditCover(false)}
-                className="p-1 rounded-full hover:bg-gray-100 text-gray-400"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <ImageUpload
-              type="community"
-              value={localCoverImage ?? undefined}
-              onUpload={handleSaveCover}
-              aspectRatio="banner"
-              hint="Upload a banner image for your community"
-            />
-            {coverSaving && (
-              <p className="text-xs text-center text-[#870BD6]">Saving…</p>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

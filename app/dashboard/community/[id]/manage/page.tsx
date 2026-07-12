@@ -4,11 +4,13 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { communityService, meetingsService, userService } from '@/lib/api-services';
+import { useAuth } from '@/context/AuthContext';
 import {
   ArrowLeft, Users, Globe, Lock, Shield, UserX, MoreVertical, Settings, Save, Trash2,
-  UserCheck, Crown, Copy, Check, UserPlus, Search, Video, Calendar, Plus,
+  UserCheck, Crown, Copy, Check, UserPlus, Search, Video, Calendar, Plus, Camera, X,
 } from 'lucide-react';
 import Button from '@/app/components/Button';
+import ImageUpload from '@/app/components/upload/ImageUpload';
 import { CreateCommunityMeetingModal } from '@/app/dashboard/preacher/meetings/components/CreateCommunityMeetingModal';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -22,7 +24,6 @@ interface Community {
   maxMembers?: number;
   createdAt?: string;
   memberCount?: number;
-  myRole?: string | null;
   _count?: { members: number; messages: number };
 }
 
@@ -63,32 +64,32 @@ interface LookupUser {
 
 type Palette = { bg: string; border: string; icon: string; accent: string };
 const PURPLE: Palette = { bg: '#FBF6FF', border: '#E7C8FF', icon: '#E7C8FF', accent: '#870BD6' };
-const GREEN: Palette = { bg: '#ECFDF3', border: '#ABEFC6', icon: '#ABEFC6', accent: '#067647' };
-const AMBER: Palette = { bg: '#FFFAEB', border: '#FEDF89', icon: '#FEDF89', accent: '#B54708' };
-const BLUE: Palette = { bg: '#EFF8FF', border: '#B2DDFF', icon: '#B2DDFF', accent: '#175CD3' };
+const GREEN: Palette  = { bg: '#ECFDF3', border: '#ABEFC6', icon: '#ABEFC6', accent: '#067647' };
+const AMBER: Palette  = { bg: '#FFFAEB', border: '#FEDF89', icon: '#FEDF89', accent: '#B54708' };
+const BLUE: Palette   = { bg: '#EFF8FF', border: '#B2DDFF', icon: '#B2DDFF', accent: '#175CD3' };
 
 // ── Role helpers ──────────────────────────────────────────────────────────────
 
 const roleColor: Record<string, string> = {
-  OWNER: 'bg-[#FBF6FF] text-[#870BD6] border border-[#E7C8FF]',
-  ADMIN: 'bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]',
-  MODERATOR: 'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]',
-  MEMBER: 'bg-[#F8F9FC] text-[#363F72] border border-[#D5D9EB]',
+  OWNER:    'bg-[#FBF6FF] text-[#870BD6] border border-[#E7C8FF]',
+  ADMIN:    'bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]',
+  MODERATOR:'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]',
+  MEMBER:   'bg-[#F8F9FC] text-[#363F72] border border-[#D5D9EB]',
 };
 
 const roleIcon: Record<string, React.ReactNode> = {
-  OWNER: <Crown size={11} />,
-  ADMIN: <Shield size={11} />,
-  MODERATOR: <UserCheck size={11} />,
-  MEMBER: <Users size={11} />,
+  OWNER:    <Crown size={11} />,
+  ADMIN:    <Shield size={11} />,
+  MODERATOR:<UserCheck size={11} />,
+  MEMBER:   <Users size={11} />,
 };
 
 // ── Meeting status helpers ────────────────────────────────────────────────────
 
 const MEETING_STATUS: Record<string, string> = {
-  SCHEDULED: 'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]',
-  COMPLETED: 'bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]',
-  CANCELLED: 'bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]',
+  SCHEDULED:   'bg-[#FFFAEB] text-[#B54708] border border-[#FEDF89]',
+  COMPLETED:   'bg-[#ECFDF3] text-[#067647] border border-[#ABEFC6]',
+  CANCELLED:   'bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]',
   IN_PROGRESS: 'bg-[#EFF8FF] text-[#175CD3] border border-[#B2DDFF]',
 };
 
@@ -138,9 +139,7 @@ function buildGrowthData(members: Member[], createdAt?: string, pts = 8): Growth
   const active = members.filter((m) => m.status !== 'BANNED' && m.status !== 'LEFT');
   const now = Date.now();
   const joinTimes = active.map((m) => new Date(m.joinedAt).getTime());
-  const created = createdAt
-    ? new Date(createdAt).getTime()
-    : joinTimes.length ? Math.min(...joinTimes) : now;
+  const created = createdAt ? new Date(createdAt).getTime() : joinTimes.length ? Math.min(...joinTimes) : now;
   const start = Math.min(created, joinTimes.length ? Math.min(...joinTimes) : created);
   const minRange = pts * 24 * 60 * 60 * 1000;
   const effectiveStart = Math.min(start, now - minRange);
@@ -149,10 +148,7 @@ function buildGrowthData(members: Member[], createdAt?: string, pts = 8): Growth
     const cutoff = effectiveStart + (i + 1) * interval;
     const count = active.filter((m) => new Date(m.joinedAt).getTime() <= cutoff).length;
     const mid = new Date(effectiveStart + (i + 0.5) * interval);
-    return {
-      label: mid.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-      count,
-    };
+    return { label: mid.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }), count };
   });
 }
 
@@ -235,41 +231,27 @@ const InviteModal = ({
     : `/dashboard/community/${communityId}`;
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(inviteLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {}
+    try { await navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {}
   };
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    setSearching(true);
-    setFoundUser(null);
-    setInvited(false);
-    setInviteErr('');
+    setSearching(true); setFoundUser(null); setInvited(false); setInviteErr('');
     try {
       const res = (await userService.lookup(query.trim())) as LookupUser | null;
       setFoundUser(res ?? 'notfound');
-    } catch {
-      setFoundUser('notfound');
-    } finally {
-      setSearching(false);
-    }
+    } catch { setFoundUser('notfound'); }
+    finally { setSearching(false); }
   };
 
   const handleInvite = async () => {
     if (!foundUser || foundUser === 'notfound') return;
-    setInviting(true);
-    setInviteErr('');
+    setInviting(true); setInviteErr('');
     try {
       await communityService.invite(communityId, { recipientId: foundUser.id });
       setInvited(true);
-    } catch (err: unknown) {
-      setInviteErr(err instanceof Error ? err.message : 'Failed to send invite.');
-    } finally {
-      setInviting(false);
-    }
+    } catch (err: unknown) { setInviteErr(err instanceof Error ? err.message : 'Failed to send invite.'); }
+    finally { setInviting(false); }
   };
 
   return (
@@ -290,11 +272,8 @@ const InviteModal = ({
           </div>
           <div className="flex gap-1 mt-4 bg-[#F8F9FC] rounded-xl p-1">
             {(['link', 'username'] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tab === t ? 'bg-white text-[#180426] shadow-sm' : 'text-[#60666B] hover:text-[#180426]'}`}
-              >
+              <button key={t} onClick={() => setTab(t)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tab === t ? 'bg-white text-[#180426] shadow-sm' : 'text-[#60666B] hover:text-[#180426]'}`}>
                 {t === 'link' ? 'Invite Link' : 'By Username'}
               </button>
             ))}
@@ -306,10 +285,8 @@ const InviteModal = ({
               <p className="text-sm text-[#60666B]">Share this link with anyone you&apos;d like to invite.</p>
               <div className="flex items-center gap-2 bg-[#F8F9FC] border border-[#E3E8EF] rounded-xl px-4 py-3">
                 <p className="text-sm text-[#180426] flex-1 truncate">{inviteLink}</p>
-                <button
-                  onClick={handleCopy}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${copied ? 'bg-[#ECFDF3] text-[#067647]' : 'bg-[#870BD6] text-white hover:bg-[#6B09B0]'}`}
-                >
+                <button onClick={handleCopy}
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${copied ? 'bg-[#ECFDF3] text-[#067647]' : 'bg-[#870BD6] text-white hover:bg-[#6B09B0]'}`}>
                   {copied ? <><Check size={12} /> Copied!</> : <><Copy size={12} /> Copy</>}
                 </button>
               </div>
@@ -321,14 +298,10 @@ const InviteModal = ({
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Username or email..."
-                    value={query}
+                  <input type="text" placeholder="Username or email..." value={query}
                     onChange={(e) => { setQuery(e.target.value); setFoundUser(null); setInvited(false); setInviteErr(''); }}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="w-full pl-9 pr-4 py-2.5 border border-[#E3E8EF] rounded-xl text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10"
-                  />
+                    className="w-full pl-9 pr-4 py-2.5 border border-[#E3E8EF] rounded-xl text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10" />
                 </div>
                 <Button customClass="!w-fit px-4 !h-[42px] !text-white shrink-0" type="button" loading={searching} onClick={handleSearch} disabled={!query.trim()}>
                   Find
@@ -428,12 +401,57 @@ const DeleteConfirmModal = ({
   </div>
 );
 
+// ── Cover Image Modal ─────────────────────────────────────────────────────────
+
+const CoverImageModal = ({
+  communityId, currentCoverImage, onClose, onSaved,
+}: {
+  communityId: string;
+  currentCoverImage?: string | null;
+  onClose: () => void;
+  onSaved: (url: string) => void;
+}) => {
+  const [saving, setSaving] = useState(false);
+
+  const handleUpload = async (url: string) => {
+    setSaving(true);
+    try {
+      await communityService.updateCommunity(communityId, { coverImage: url });
+      onSaved(url);
+      onClose();
+    } catch {}
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !saving && onClose()}>
+      <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-[#180426]">Edit Cover Image</h3>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 text-gray-400">
+            <X size={18} />
+          </button>
+        </div>
+        <ImageUpload
+          type="community"
+          value={currentCoverImage ?? undefined}
+          onUpload={handleUpload}
+          aspectRatio="banner"
+          hint="Upload a banner image for your community"
+        />
+        {saving && <p className="text-xs text-center text-[#870BD6]">Saving…</p>}
+      </div>
+    </div>
+  );
+};
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const CommunityManagePage = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const { user: currentUser } = useAuth();
 
   const [community, setCommunity] = useState<Community | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -444,6 +462,7 @@ const CommunityManagePage = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [showCoverModal, setShowCoverModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [settingsForm, setSettingsForm] = useState({ name: '', description: '', privacy: 'PUBLIC' as string });
   const [saving, setSaving] = useState(false);
@@ -451,6 +470,7 @@ const CommunityManagePage = () => {
   const [memberAction, setMemberAction] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [memberSearch, setMemberSearch] = useState('');
+  const [coverImage, setCoverImage] = useState<string | null | undefined>(null);
 
   const loadCommunity = useCallback(async () => {
     setLoading(true);
@@ -459,22 +479,31 @@ const CommunityManagePage = () => {
         communityService.getById(id) as Promise<Community>,
         communityService.getMembers(id, { limit: 100 }) as Promise<unknown>,
       ]);
-      if (!comm.myRole || !['OWNER', 'ADMIN'].includes(comm.myRole)) {
+
+      const mData = (mem as any)?.data ?? mem;
+      const memberList: Member[] = Array.isArray(mData) ? mData : [];
+
+      // Authorization check: find current user in the members list
+      const myMembership = memberList.find((m) => m.user.id === currentUser?.id);
+      if (!myMembership || !['OWNER', 'ADMIN'].includes(myMembership.role)) {
         router.replace('/dashboard/community');
         return;
       }
+
       setCommunity(comm);
+      setCoverImage(comm.coverImage);
       setSettingsForm({ name: comm.name, description: comm.description ?? '', privacy: comm.privacy });
-      const mData = (mem as any)?.data ?? mem;
-      setMembers(Array.isArray(mData) ? mData : []);
+      setMembers(memberList);
     } catch {
       router.replace('/dashboard/community');
     } finally {
       setLoading(false);
     }
-  }, [id, router]);
+  }, [id, router, currentUser?.id]);
 
-  useEffect(() => { loadCommunity(); }, [loadCommunity]);
+  useEffect(() => {
+    if (currentUser !== undefined) loadCommunity();
+  }, [loadCommunity, currentUser]);
 
   const loadMeetings = useCallback(async () => {
     setMeetingsLoading(true);
@@ -482,11 +511,8 @@ const CommunityManagePage = () => {
       const res = await meetingsService.getAll({ type: 'COMMUNITY', limit: 100 }) as any;
       const data: Meeting[] = (res?.data ?? res) as Meeting[];
       setMeetings(Array.isArray(data) ? data.filter((m) => m.communityId === id) : []);
-    } catch {
-      setMeetings([]);
-    } finally {
-      setMeetingsLoading(false);
-    }
+    } catch { setMeetings([]); }
+    finally { setMeetingsLoading(false); }
   }, [id]);
 
   useEffect(() => {
@@ -494,8 +520,7 @@ const CommunityManagePage = () => {
   }, [activeTab, loadMeetings]);
 
   const handleSaveSettings = async () => {
-    setSaving(true);
-    setSaveMsg(null);
+    setSaving(true); setSaveMsg(null);
     try {
       await communityService.updateCommunity(id, {
         name: settingsForm.name,
@@ -503,7 +528,7 @@ const CommunityManagePage = () => {
         privacy: settingsForm.privacy,
       });
       setSaveMsg({ type: 'success', text: 'Community updated successfully.' });
-      loadCommunity();
+      setCommunity((prev) => prev ? { ...prev, name: settingsForm.name, description: settingsForm.description, privacy: settingsForm.privacy as Community['privacy'] } : prev);
     } catch (err: unknown) {
       setSaveMsg({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save changes.' });
     } finally {
@@ -521,29 +546,23 @@ const CommunityManagePage = () => {
     } catch (err: unknown) {
       setShowDeleteModal(false);
       setSaveMsg({ type: 'error', text: err instanceof Error ? err.message : 'Failed to delete community.' });
-    } finally {
-      setDeleting(false);
-    }
+    } finally { setDeleting(false); }
   };
 
   const handleRoleChange = async (userId: string, role: string) => {
-    setMemberAction(userId);
-    setOpenDropdown(null);
+    setMemberAction(userId); setOpenDropdown(null);
     try {
       await communityService.updateMemberRole(id, userId, role);
       setMembers((prev) => prev.map((m) => m.user.id === userId ? { ...m, role: role as Member['role'] } : m));
-    } catch {}
-    finally { setMemberAction(null); }
+    } catch {} finally { setMemberAction(null); }
   };
 
   const handleRemoveMember = async (userId: string) => {
-    setMemberAction(userId);
-    setOpenDropdown(null);
+    setMemberAction(userId); setOpenDropdown(null);
     try {
       await communityService.removeMember(id, userId);
       setMembers((prev) => prev.filter((m) => m.user.id !== userId));
-    } catch {}
-    finally { setMemberAction(null); }
+    } catch {} finally { setMemberAction(null); }
   };
 
   const initial = community?.name?.charAt(0)?.toUpperCase() ?? 'C';
@@ -599,9 +618,17 @@ const CommunityManagePage = () => {
           onComplete={() => { setShowMeetingModal(false); loadMeetings(); }}
         />
       )}
+      {showCoverModal && (
+        <CoverImageModal
+          communityId={id}
+          currentCoverImage={coverImage}
+          onClose={() => setShowCoverModal(false)}
+          onSaved={(url) => { setCoverImage(url); setCommunity((prev) => prev ? { ...prev, coverImage: url } : prev); }}
+        />
+      )}
 
       <div className="border-l border-[#D2D9DF] min-h-screen bg-[#F8F9FC]">
-        {/* Banner */}
+        {/* ── Banner ──────────────────────────────────────────────────────── */}
         <div
           className="bg-[#870BD6] h-48 relative"
           style={{ backgroundImage: "url('/dashboard-header.png')" }}
@@ -615,21 +642,32 @@ const CommunityManagePage = () => {
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.15)_1px,_transparent_1px)] [background-size:20px_20px]" />
         </div>
 
-        {/* Profile header */}
+        {/* ── Profile header ────────────────────────────────────────────── */}
         <div className="px-4 md:px-12 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white border-b border-[#E3E8EF]">
           <div className="flex items-center gap-5">
-            {community.coverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={community.coverImage}
-                alt={community.name}
-                className="w-[120px] h-[120px] rounded-full border-4 border-white object-cover -mt-16 relative z-20 shadow-lg"
-              />
-            ) : (
-              <div className="w-[120px] h-[120px] rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-4xl font-bold border-4 border-white -mt-16 relative z-20 shadow-lg shrink-0">
-                {initial}
-              </div>
-            )}
+            {/* Avatar with edit cover button */}
+            <div className="relative -mt-16 z-20 shrink-0 group">
+              {coverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverImage}
+                  alt={community.name}
+                  className="w-[120px] h-[120px] rounded-full border-4 border-white object-cover shadow-lg"
+                />
+              ) : (
+                <div className="w-[120px] h-[120px] rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-4xl font-bold border-4 border-white shadow-lg">
+                  {initial}
+                </div>
+              )}
+              <button
+                onClick={() => setShowCoverModal(true)}
+                title="Edit cover image"
+                className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-white border border-[#E3E8EF] shadow flex items-center justify-center hover:bg-[#FBF6FF] transition-colors"
+              >
+                <Camera size={14} className="text-[#870BD6]" />
+              </button>
+            </div>
+
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-2xl font-bold text-[#180426]">{community.name}</h2>
@@ -643,12 +681,13 @@ const CommunityManagePage = () => {
               )}
             </div>
           </div>
+
           <Button customClass="!w-fit px-5 !h-[40px] !text-white shrink-0" type="button" onClick={() => setActiveTab('settings')}>
             <span className="flex items-center gap-2"><Settings size={15} /> Settings</span>
           </Button>
         </div>
 
-        {/* Tabs */}
+        {/* ── Tabs ──────────────────────────────────────────────────────── */}
         <div className="px-4 md:px-12 bg-white border-b border-[#D2D9DF]">
           <div className="flex gap-8">
             {(['overview', 'members', 'meetings', 'settings'] as const).map((tab) => (
@@ -663,7 +702,7 @@ const CommunityManagePage = () => {
           </div>
         </div>
 
-        {/* Content */}
+        {/* ── Content ───────────────────────────────────────────────────── */}
         <div className="px-4 md:px-12 py-8">
 
           {/* Overview */}
@@ -751,10 +790,7 @@ const CommunityManagePage = () => {
                         const isInFlight = memberAction === member.user.id;
                         const promotionRoles = (['ADMIN', 'MODERATOR', 'MEMBER'] as const).filter((r) => r !== member.role);
                         return (
-                          <div
-                            key={member.id}
-                            className={`flex items-center justify-between px-6 py-4 transition-colors ${isBanned ? 'opacity-60 bg-[#FEF3F2]' : 'hover:bg-[#FAFAFA]'}`}
-                          >
+                          <div key={member.id} className={`flex items-center justify-between px-6 py-4 transition-colors ${isBanned ? 'opacity-60 bg-[#FEF3F2]' : 'hover:bg-[#FAFAFA]'}`}>
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm overflow-hidden shrink-0">
                                 {member.user.avatarUrl
@@ -793,22 +829,15 @@ const CommunityManagePage = () => {
                                       <div className="absolute right-0 mt-1 w-52 bg-white border border-[#E3E8EF] rounded-xl shadow-lg z-50 overflow-hidden">
                                         <p className="px-4 py-2 text-[10px] font-semibold text-[#60666B] uppercase tracking-wider border-b border-[#F0F2F4]">Change Role</p>
                                         {promotionRoles.map((role) => (
-                                          <button
-                                            key={role}
-                                            onClick={() => handleRoleChange(member.user.id, role)}
-                                            className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2"
-                                          >
+                                          <button key={role} onClick={() => handleRoleChange(member.user.id, role)}
+                                            className="w-full text-left px-4 py-2.5 text-sm text-[#180426] hover:bg-[#FBF6FF] flex items-center gap-2">
                                             {roleIcon[role]}
-                                            <span>
-                                              {role === 'ADMIN' ? 'Promote to Admin' : role === 'MODERATOR' ? 'Promote to Moderator' : 'Demote to Member'}
-                                            </span>
+                                            <span>{role === 'ADMIN' ? 'Promote to Admin' : role === 'MODERATOR' ? 'Promote to Moderator' : 'Demote to Member'}</span>
                                           </button>
                                         ))}
                                         <div className="border-t border-[#F0F2F4]">
-                                          <button
-                                            onClick={() => handleRemoveMember(member.user.id)}
-                                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]"
-                                          >
+                                          <button onClick={() => handleRemoveMember(member.user.id)}
+                                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 hover:bg-[#FEF3F2] text-[#B42318]">
                                             <UserX size={14} /> Remove from Community
                                           </button>
                                         </div>
@@ -840,9 +869,7 @@ const CommunityManagePage = () => {
 
               {meetingsLoading ? (
                 <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="animate-pulse bg-white border border-[#E3E8EF] rounded-2xl p-5 h-20" />
-                  ))}
+                  {[1, 2, 3].map((i) => <div key={i} className="animate-pulse bg-white border border-[#E3E8EF] rounded-2xl p-5 h-20" />)}
                 </div>
               ) : meetings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 gap-4 bg-white border border-[#E3E8EF] rounded-2xl">
@@ -874,7 +901,7 @@ const CommunityManagePage = () => {
                               <Calendar size={11} />
                               {new Date(meeting.scheduledAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
-                            <span className="flex items-center gap-1 text-xs text-[#60666B]">
+                            <span className="text-xs text-[#60666B]">
                               {new Date(meeting.scheduledAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                             </span>
                             {meeting._count?.attendances !== undefined && (
@@ -951,6 +978,8 @@ const CommunityManagePage = () => {
                   <span className="flex items-center gap-2"><Save size={15} /> Save Changes</span>
                 </Button>
               </div>
+
+              {/* Danger zone */}
               <div className="bg-white border border-[#FECDCA] rounded-2xl p-6 space-y-3">
                 <h3 className="font-semibold text-[#B42318]">Danger Zone</h3>
                 <p className="text-sm text-[#60666B]">Deleting this community is permanent and cannot be undone. All messages and member records will be removed.</p>
