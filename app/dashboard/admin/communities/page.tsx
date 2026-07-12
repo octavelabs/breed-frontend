@@ -7,6 +7,7 @@ import {
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { adminService } from '@/lib/api-services';
 import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
+import Toast from '@/app/components/Toast';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -32,6 +33,7 @@ const AdminCommunitiesPage = () => {
   const [loading,      setLoading]      = useState(true);
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const [modal, setModal] = useState<{
     open: boolean;
@@ -67,20 +69,27 @@ const AdminCommunitiesPage = () => {
 
   const handleConfirm = async () => {
     if (!modal.item || !modal.action) return;
+    const { item, action } = modal;
     setModal((m) => ({ ...m, loading: true }));
     try {
-      if (modal.action === 'delete') {
-        await adminService.deleteCommunity(modal.item.id);
-        setCommunities((prev) => prev.filter((c) => c.id !== modal.item!.id));
+      if (action === 'delete') {
+        await adminService.deleteCommunity(item.id);
+        setCommunities((prev) => prev.filter((c) => c.id !== item.id));
         setMeta((m) => ({ ...m, total: m.total - 1 }));
+        setToast({ message: `"${item.name}" has been deleted.`, type: 'success' });
       } else {
-        const isActive = modal.action === 'unsuspend';
-        await adminService.updateCommunityStatus(modal.item.id, isActive);
-        setCommunities((prev) => prev.map((c) => c.id === modal.item!.id ? { ...c, isActive } : c));
+        const isActive = action === 'unsuspend';
+        await adminService.updateCommunityStatus(item.id, isActive);
+        setCommunities((prev) => prev.map((c) => c.id === item.id ? { ...c, isActive } : c));
+        setToast({
+          message: isActive ? `"${item.name}" has been restored.` : `"${item.name}" has been suspended.`,
+          type: 'success',
+        });
       }
       closeModal();
     } catch {
       setModal((m) => ({ ...m, loading: false }));
+      setToast({ message: `Failed to ${action} community. Please try again.`, type: 'error' });
     }
   };
 
@@ -103,6 +112,8 @@ const AdminCommunitiesPage = () => {
   return (
     <DashboardLayout custom={true}>
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
+
+        {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
 
         <AdminConfirmModal
           isOpen={modal.open}
