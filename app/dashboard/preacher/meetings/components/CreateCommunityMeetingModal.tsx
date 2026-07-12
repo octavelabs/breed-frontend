@@ -22,6 +22,7 @@ interface CreateCommunityModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete?: (data: CommunityMeetingFormData) => void;
+  defaultCommunityId?: string;
 }
 
 
@@ -29,13 +30,14 @@ export const CreateCommunityMeetingModal = ({
   isOpen,
   onClose,
   onComplete,
+  defaultCommunityId,
 }: CreateCommunityModalProps) => {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CommunityMeetingFormData>({
-    title: "", community: "", guests: "", description: "",
+    title: "", community: defaultCommunityId ?? "", guests: "", description: "",
     date: "", timeZone: "", time: "", timeMinute: "", timeFormat: "",
     meetingFrequency: "", repeatInterval: 0, repeatPattern: "",
     repeatDays: [], saveDraftOfRecordings: false, lateInterval: "",

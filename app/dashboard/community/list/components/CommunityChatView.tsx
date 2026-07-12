@@ -14,6 +14,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import ImageUpload from "@/app/components/upload/ImageUpload";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
@@ -90,6 +91,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   onCoverUpdated,
 }) => {
   const { user } = useAuth();
+  const router = useRouter();
   const [messageText, setMessageText] = useState("");
   const [messages, setMessages] = useState<ApiMessage[]>([]);
   const [sending, setSending] = useState(false);
@@ -207,14 +209,24 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
   const popoverContent = useMemo(
     () => [
       ...(isOwnerOrAdmin
-        ? [{
-            item: "Edit Cover Image",
-            icon: <ImageIcon className="w-3.5 h-3.5" />,
-            onClick: () => {
-              setPopover({ visible: false, rowData: null });
-              setShowEditCover(true);
+        ? [
+            {
+              item: "Edit Cover Image",
+              icon: <ImageIcon className="w-3.5 h-3.5" />,
+              onClick: () => {
+                setPopover({ visible: false, rowData: null });
+                setShowEditCover(true);
+              },
             },
-          }]
+            {
+              item: "Manage Community",
+              icon: <Settings className="w-3.5 h-3.5" />,
+              onClick: () => {
+                setPopover({ visible: false, rowData: null });
+                router.push(`/dashboard/community/${community.id}/manage`);
+              },
+            },
+          ]
         : []),
       {
         item: "Mute",
@@ -227,7 +239,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
         onClick: handleLeave,
       },
     ],
-    [handleLeave, isOwnerOrAdmin],
+    [handleLeave, isOwnerOrAdmin, router, community.id],
   );
 
   const formatTime = (iso: string) =>
