@@ -23,6 +23,7 @@ export interface Participant {
   stream?: MediaStream;
   videoEnabled: boolean;
   audioEnabled: boolean;
+  isScreenSharing: boolean;
   connectionState: RTCPeerConnectionState;
 }
 
@@ -61,14 +62,27 @@ function syncParticipantStream(
   p: RemoteParticipant,
   cache: Map<string, MediaStream>,
 ): MediaStream | undefined {
+  // Detect active screen share first so we can swap camera → screen video
+  let hasScreenShare = false;
+  p.trackPublications.forEach((pub) => {
+    const rtp = pub as RemoteTrackPublication;
+    if (
+      pub.source === Track.Source.ScreenShare &&
+      rtp.isSubscribed &&
+      pub.track?.mediaStreamTrack
+    ) {
+      hasScreenShare = true;
+    }
+  });
+
   const tracks: MediaStreamTrack[] = [];
   p.trackPublications.forEach((pub) => {
     const rtp = pub as RemoteTrackPublication;
-    // Skip screen-share tracks — they're shown in the sharer's local tile
-    if (pub.source === Track.Source.ScreenShare) return;
-    if (rtp.isSubscribed && pub.track?.mediaStreamTrack) {
-      tracks.push(pub.track.mediaStreamTrack);
-    }
+    if (!rtp.isSubscribed || !pub.track?.mediaStreamTrack) return;
+    // When screen sharing is active, skip the camera track so only the
+    // screen video is rendered (audio tracks always pass through).
+    if (pub.source === Track.Source.Camera && hasScreenShare) return;
+    tracks.push(pub.track.mediaStreamTrack);
   });
 
   if (tracks.length === 0) {
@@ -101,8 +115,10 @@ function toParticipant(
     name: p.name || p.identity,
     avatarUrl: undefined,
     stream: syncParticipantStream(p, cache),
-    videoEnabled: p.isCameraEnabled,
+    // Camera OR screen share counts as "video" so the tile shows the stream
+    videoEnabled: p.isCameraEnabled || p.isScreenShareEnabled,
     audioEnabled: p.isMicrophoneEnabled,
+    isScreenSharing: p.isScreenShareEnabled,
     connectionState: "connected",
   };
 }

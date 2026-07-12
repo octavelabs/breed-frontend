@@ -16,11 +16,11 @@ import { useAuth } from "@/context/AuthContext";
 function VideoTile({
   stream, name, avatarUrl, muted = false, isMe = false,
   videoEnabled = true, audioEnabled = true,
-  connectionState,
+  connectionState, isScreenSharing = false,
 }: {
   stream?: MediaStream; name: string; avatarUrl?: string; muted?: boolean;
   isMe?: boolean; videoEnabled?: boolean; audioEnabled?: boolean;
-  connectionState?: RTCPeerConnectionState;
+  connectionState?: RTCPeerConnectionState; isScreenSharing?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -51,7 +51,7 @@ function VideoTile({
           autoPlay
           playsInline
           muted={muted}
-          style={isMe ? { transform: "scaleX(-1)" } : undefined}
+          style={isMe && !isScreenSharing ? { transform: "scaleX(-1)" } : undefined}
           className={`w-full h-full object-cover${videoEnabled ? "" : " hidden"}`}
         />
       )}
@@ -189,8 +189,9 @@ export default function RoomPage() {
       name: myName,
       avatarUrl: user?.avatarUrl ?? undefined,
       stream: localStream ?? undefined,
-      videoEnabled: camOn,
+      videoEnabled: camOn || sharing,   // screen share counts as video
       audioEnabled: micOn,
+      isScreenSharing: sharing,
       connectionState: "connected",
     },
     ...participants,
@@ -290,14 +291,14 @@ export default function RoomPage() {
                   stream={pinned.stream} name={pinned.name} avatarUrl={pinned.avatarUrl}
                   muted={pinned.socketId === "me"} isMe={pinned.socketId === "me"}
                   videoEnabled={pinned.videoEnabled} audioEnabled={pinned.audioEnabled}
-                  connectionState={pinned.connectionState}
+                  connectionState={pinned.connectionState} isScreenSharing={pinned.isScreenSharing}
                 />
               </div>
               <div className="w-28 lg:w-36 flex flex-col gap-2 overflow-y-auto">
                 {allParticipants.filter((p) => p.socketId !== pinnedId).map((p) => (
                   <div key={p.socketId} onClick={() => setPinnedId(p.socketId)} className="cursor-pointer rounded-xl overflow-hidden aspect-video">
                     <VideoTile stream={p.stream} name={p.name} avatarUrl={p.avatarUrl} muted={p.socketId === "me"} isMe={p.socketId === "me"}
-                      videoEnabled={p.videoEnabled} audioEnabled={p.audioEnabled} connectionState={p.connectionState} />
+                      videoEnabled={p.videoEnabled} audioEnabled={p.audioEnabled} connectionState={p.connectionState} isScreenSharing={p.isScreenSharing} />
                   </div>
                 ))}
               </div>
@@ -311,7 +312,7 @@ export default function RoomPage() {
                     stream={p.stream} name={p.name} avatarUrl={p.avatarUrl}
                     muted={p.socketId === "me"} isMe={p.socketId === "me"}
                     videoEnabled={p.videoEnabled} audioEnabled={p.audioEnabled}
-                    connectionState={p.connectionState}
+                    connectionState={p.connectionState} isScreenSharing={p.isScreenSharing}
                   />
                 </div>
               ))}
