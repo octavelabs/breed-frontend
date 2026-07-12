@@ -325,14 +325,51 @@ const AdminOverviewPage = () => {
 
         </div>
 
-        {/* ── Moderation ──────────────────────────────────────────────────── */}
-        <section>
-          <h2 className="text-sm font-semibold text-[#60666B] uppercase tracking-wider mb-4">Moderation</h2>
-          <div className="grid grid-cols-2 gap-4 max-w-md">
-            <StatCard label="Pending Reports"      value={stats?.pendingReports ?? 0}     sub="Awaiting review" Icon={ShieldSecurity} palette={RED}   loading={statsLoading} />
-            <StatCard label="Open Prayer Requests" value={stats?.openPrayerRequests ?? 0} sub="Unanswered"       Icon={More}           palette={AMBER} loading={statsLoading} />
-          </div>
-        </section>
+        {/* ── Moderation + Top Courses ────────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+          <section>
+            <h2 className="text-sm font-semibold text-[#60666B] uppercase tracking-wider mb-4">Moderation</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard label="Pending Reports"      value={stats?.pendingReports ?? 0}     sub="Awaiting review" Icon={ShieldSecurity} palette={RED}   loading={statsLoading} />
+              <StatCard label="Open Prayer Requests" value={stats?.openPrayerRequests ?? 0} sub="Unanswered"       Icon={More}           palette={AMBER} loading={statsLoading} />
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-semibold text-[#60666B] uppercase tracking-wider mb-4">Top Courses by Enrolment</h2>
+            <div className="bg-white border border-[#E3E8EF] rounded-2xl divide-y divide-[#F0F2F4] overflow-hidden">
+              {statsLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-5 py-3.5 animate-pulse">
+                    <div className="w-6 h-4 bg-gray-200 rounded shrink-0" />
+                    <div className="flex-1 h-4 bg-gray-200 rounded" />
+                    <div className="w-10 h-4 bg-gray-200 rounded shrink-0" />
+                  </div>
+                ))
+              ) : !stats?.topCourses?.length ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-2">
+                  <Book1 size={24} color="#D1D5DB" />
+                  <p className="text-sm text-[#60666B]">No enrolment data yet</p>
+                </div>
+              ) : (
+                stats.topCourses.map((course, i) => (
+                  <div key={i} className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#FAFAFA] transition-colors">
+                    <span className="text-xs font-bold text-[#60666B] w-5 shrink-0 tabular-nums">#{i + 1}</span>
+                    <div className="w-8 h-8 rounded-lg bg-[#FBF6FF] flex items-center justify-center shrink-0">
+                      <Book1 size={14} color="#870BD6" />
+                    </div>
+                    <p className="flex-1 text-sm font-medium text-[#180426] truncate">{course.title}</p>
+                    <span className="text-xs font-semibold text-[#870BD6] bg-[#FBF6FF] border border-[#E7C8FF] px-2.5 py-1 rounded-full shrink-0 tabular-nums">
+                      {course.enrollmentCount} enrolled
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+
+        </div>
 
       </div>
     </DashboardLayout>
