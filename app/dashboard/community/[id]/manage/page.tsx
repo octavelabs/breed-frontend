@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import Button from '@/app/components/Button';
 import ImageUpload from '@/app/components/upload/ImageUpload';
+import Toast from '@/app/components/Toast';
 import { CreateCommunityMeetingModal } from '@/app/dashboard/preacher/meetings/components/CreateCommunityMeetingModal';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -466,7 +467,7 @@ const CommunityManagePage = () => {
   const [deleting, setDeleting] = useState(false);
   const [settingsForm, setSettingsForm] = useState({ name: '', description: '', privacy: 'PUBLIC' as string });
   const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [memberAction, setMemberAction] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [memberSearch, setMemberSearch] = useState('');
@@ -520,20 +521,19 @@ const CommunityManagePage = () => {
   }, [activeTab, loadMeetings]);
 
   const handleSaveSettings = async () => {
-    setSaving(true); setSaveMsg(null);
+    setSaving(true);
     try {
       await communityService.updateCommunity(id, {
         name: settingsForm.name,
         description: settingsForm.description || undefined,
         privacy: settingsForm.privacy,
       });
-      setSaveMsg({ type: 'success', text: 'Community updated successfully.' });
+      setToast({ message: 'Community updated successfully.', type: 'success' });
       setCommunity((prev) => prev ? { ...prev, name: settingsForm.name, description: settingsForm.description, privacy: settingsForm.privacy as Community['privacy'] } : prev);
     } catch (err: unknown) {
-      setSaveMsg({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save changes.' });
+      setToast({ message: err instanceof Error ? err.message : 'Failed to save changes.', type: 'error' });
     } finally {
       setSaving(false);
-      setTimeout(() => setSaveMsg(null), 3000);
     }
   };
 
@@ -545,7 +545,7 @@ const CommunityManagePage = () => {
       router.push('/dashboard/community');
     } catch (err: unknown) {
       setShowDeleteModal(false);
-      setSaveMsg({ type: 'error', text: err instanceof Error ? err.message : 'Failed to delete community.' });
+      setToast({ message: err instanceof Error ? err.message : 'Failed to delete community.', type: 'error' });
     } finally { setDeleting(false); }
   };
 
@@ -599,6 +599,7 @@ const CommunityManagePage = () => {
 
   return (
     <DashboardLayout custom={true}>
+      {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
       {showInviteModal && (
         <InviteModal communityId={id} communityName={community.name} onClose={() => setShowInviteModal(false)} />
       )}
@@ -938,11 +939,6 @@ const CommunityManagePage = () => {
             <div className="max-w-2xl space-y-6">
               <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6 space-y-5">
                 <h3 className="font-semibold text-[#180426]">Community Settings</h3>
-                {saveMsg && (
-                  <div className={`px-4 py-2.5 rounded-lg text-sm font-medium ${saveMsg.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                    {saveMsg.text}
-                  </div>
-                )}
                 <div>
                   <label className="block text-sm font-medium text-[#180426] mb-2">Community Name</label>
                   <input

@@ -169,7 +169,14 @@ const SingleCommunityPage = () => {
             </div>
           </div>
 
-          {!isMember && (
+          {isMember ? (
+            <button
+              onClick={() => router.push('/dashboard/community')}
+              className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer"
+            >
+              Go to Community
+            </button>
+          ) : (
             <button
               onClick={() => setOpenModal(true)}
               className="bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white px-8 py-3 rounded-full font-semibold cursor-pointer"
@@ -219,7 +226,15 @@ const SingleCommunityPage = () => {
                 </div>
               </div>
 
-              {!isMember && (
+              {isMember ? (
+                <Button
+                  customClass="!w-full px-6 !h-[48px] !text-white mt-6 lg:hidden"
+                  type="button"
+                  onClick={() => router.push('/dashboard/community')}
+                >
+                  Go to Community
+                </Button>
+              ) : (
                 <Button
                   customClass="!w-full px-6 !h-[48px] !text-white mt-6 lg:hidden"
                   type="button"
