@@ -38,6 +38,7 @@ const SingleCommunityPage = () => {
   const { user } = useAuth();
 
   const [community, setCommunity] = useState<Community | null>(null);
+  const [isMember, setIsMember] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -52,10 +53,28 @@ const SingleCommunityPage = () => {
 
   useEffect(() => {
     if (!id) return;
-    communityService.getById(id)
-      .then((res: unknown) => setCommunity(res as Community))
-      .catch(() => setCommunity(null))
-      .finally(() => setLoading(false));
+    const load = async () => {
+      try {
+        const comm = await communityService.getById(id) as Community;
+        setCommunity(comm);
+        // isJoined/myRole may be unreliable from the public endpoint —
+        // always verify against the authenticated getMine() list
+        if (comm.isJoined || !!comm.myRole) {
+          setIsMember(true);
+        } else {
+          const mine = await communityService.getMine() as unknown;
+          const list: { id: string }[] = Array.isArray((mine as any)?.data)
+            ? (mine as any).data
+            : Array.isArray(mine) ? mine as { id: string }[] : [];
+          setIsMember(list.some((c) => c.id === id));
+        }
+      } catch {
+        setCommunity(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, [id]);
 
   const handleJoin = async () => {
@@ -63,6 +82,7 @@ const SingleCommunityPage = () => {
     setJoining(true);
     try {
       await communityService.join(id);
+      setIsMember(true);
       setCommunity((prev) => {
         if (!prev) return prev;
         const current = prev.memberCount ?? prev._count?.members ?? 0;
@@ -80,8 +100,6 @@ const SingleCommunityPage = () => {
       setOpenModal(false);
     }
   };
-
-  const isMember = community?.isJoined || !!community?.myRole;
   const isPrivate = community?.privacy !== 'PUBLIC';
   const memberCount = community?.memberCount ?? community?._count?.members ?? 0;
 
