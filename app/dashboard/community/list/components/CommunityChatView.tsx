@@ -236,7 +236,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
           </button>
           <button
             onClick={() => router.push(`/dashboard/community/${community.id}`)}
-            className="flex items-center gap-2.5 hover:opacity-75 transition-opacity"
+            className="flex items-center gap-2.5 hover:opacity-75. cursor-pointer transition-opacity"
           >
             <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
               {localCoverImage ? (

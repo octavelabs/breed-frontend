@@ -920,7 +920,7 @@ const CommunityManagePage = () => {
                           {isJoinable && (
                             <a
                               href={`/room/${meeting.id}`}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#870BD6] text-white text-xs font-semibold rounded-lg hover:bg-[#6B09B0] transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white text-xs font-semibold rounded-full hover:bg-[#6B09B0] transition-colors"
                             >
                               <Video size={12} />
                               {status === 'IN_PROGRESS' ? 'Join' : 'Start'}
