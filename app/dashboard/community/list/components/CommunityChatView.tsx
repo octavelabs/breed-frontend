@@ -234,28 +234,33 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
           >
             <ArrowLeft size={20} className="text-[#60666B]" />
           </button>
-          <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
-            {localCoverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={localCoverImage}
-                alt={community.name}
-                className="w-full h-full object-cover rounded-full"
-              />
-            ) : (
-              community.name.charAt(0).toUpperCase()
-            )}
-          </div>
-          <div>
-            <p className="font-semibold text-sm text-[#180426] leading-none">
-              {community.name}
-            </p>
-            {memberCount > 0 && (
-              <p className="text-[11px] text-[#60666B] mt-0.5 flex items-center gap-1">
-                <Users size={10} /> {memberCount.toLocaleString()} members
+          <button
+            onClick={() => router.push(`/dashboard/community/${community.id}`)}
+            className="flex items-center gap-2.5 hover:opacity-75 transition-opacity"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0">
+              {localCoverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={localCoverImage}
+                  alt={community.name}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                community.name.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-sm text-[#180426] leading-none">
+                {community.name}
               </p>
-            )}
-          </div>
+              {memberCount > 0 && (
+                <p className="text-[11px] text-[#60666B] mt-0.5 flex items-center gap-1">
+                  <Users size={10} /> {memberCount.toLocaleString()} members
+                </p>
+              )}
+            </div>
+          </button>
         </div>
         <div className="flex items-center gap-2">
           <button className="p-1.5 rounded-lg hover:bg-gray-100 text-[#60666B]">

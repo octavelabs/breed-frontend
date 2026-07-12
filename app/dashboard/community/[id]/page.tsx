@@ -25,6 +25,7 @@ interface Community {
   coverImage?: string | null;
   privacy: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
   isJoined?: boolean;
+  myRole?: string | null;
   memberCount?: number;
   _count?: { members: number; messages: number };
 }
@@ -80,7 +81,7 @@ const SingleCommunityPage = () => {
     }
   };
 
-  const isMember = community?.isJoined ?? false;
+  const isMember = community?.isJoined || !!community?.myRole;
   const isPrivate = community?.privacy !== 'PUBLIC';
   const memberCount = community?.memberCount ?? community?._count?.members ?? 0;
 
