@@ -615,6 +615,7 @@ const CommunityManagePage = () => {
         <CreateCommunityMeetingModal
           isOpen={showMeetingModal}
           defaultCommunityId={id}
+          defaultCommunityName={community?.name}
           onClose={() => setShowMeetingModal(false)}
           onComplete={() => { setShowMeetingModal(false); loadMeetings(); }}
         />

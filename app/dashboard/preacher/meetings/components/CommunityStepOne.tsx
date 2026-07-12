@@ -7,20 +7,23 @@ export const CommunityStepOne = ({
   setFormData,
   handleProceed,
   canProceedStep1,
+  lockedCommunityName,
 }: {
   formData: CommunityMeetingFormData;
   setFormData: Dispatch<SetStateAction<CommunityMeetingFormData>>;
   handleProceed: () => void;
   canProceedStep1: string | boolean;
+  lockedCommunityName?: string;
 }) => {
   const [communities, setCommunities] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
+    if (lockedCommunityName) return;
     communityService.getMine().then((res: unknown) => {
       const data = (res as any)?.data ?? res;
       setCommunities(Array.isArray(data) ? data : []);
     }).catch(() => {});
-  }, []);
+  }, [lockedCommunityName]);
 
   return (
     <div className="space-y-3">
@@ -41,16 +44,22 @@ export const CommunityStepOne = ({
         <label className="block text-sm font-medium text-gray-700 mb-[6px]">
           Community
         </label>
-        <select
-          value={formData.community}
-          onChange={(e) => setFormData({ ...formData, community: e.target.value })}
-          className="w-full h-[48px] px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
-        >
-          <option value="">Select a community</option>
-          {communities.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        {lockedCommunityName ? (
+          <div className="w-full h-[48px] px-4 flex items-center border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-500">
+            {lockedCommunityName}
+          </div>
+        ) : (
+          <select
+            value={formData.community}
+            onChange={(e) => setFormData({ ...formData, community: e.target.value })}
+            className="w-full h-[48px] px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white"
+          >
+            <option value="">Select a community</option>
+            {communities.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div>

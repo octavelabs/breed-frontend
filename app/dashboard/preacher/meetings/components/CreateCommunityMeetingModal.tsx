@@ -23,6 +23,7 @@ interface CreateCommunityModalProps {
   onClose: () => void;
   onComplete?: (data: CommunityMeetingFormData) => void;
   defaultCommunityId?: string;
+  defaultCommunityName?: string;
 }
 
 
@@ -31,6 +32,7 @@ export const CreateCommunityMeetingModal = ({
   onClose,
   onComplete,
   defaultCommunityId,
+  defaultCommunityName,
 }: CreateCommunityModalProps) => {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
@@ -113,7 +115,7 @@ export const CreateCommunityMeetingModal = ({
         </div>
         <div className="px-8 pb-6">
           {step === 1 && (
-           <CommunityStepOne formData={formData} setFormData={setFormData} handleProceed={handleProceed} canProceedStep1={canProceedStep1} />
+           <CommunityStepOne formData={formData} setFormData={setFormData} handleProceed={handleProceed} canProceedStep1={canProceedStep1} lockedCommunityName={defaultCommunityName} />
           )}
 
           {/* Step 2: Permissions */}
