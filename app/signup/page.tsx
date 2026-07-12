@@ -553,12 +553,16 @@ const StepFour = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Build E.164 phone number
+  // Build E.164 phone number.
+  // Strip non-digit/non-+ chars from dialCode first — some entries like "+1-876"
+  // (Jamaica) contain dashes that would break E.164 validation on the backend.
   const buildPhone = (): string | undefined => {
     if (!stepData.phone) return undefined;
     const digits = stepData.phone.replace(/\D/g, "").replace(/^0+/, "");
     if (!digits) return undefined;
-    return `${stepData.dialCode}${digits}`;
+    const cleanDialCode = stepData.dialCode.replace(/[^+\d]/g, "");
+    if (!cleanDialCode || cleanDialCode === "+") return undefined;
+    return `${cleanDialCode}${digits}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
