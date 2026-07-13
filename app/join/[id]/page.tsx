@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Video, Calendar, User, Clock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -30,6 +30,9 @@ export default function JoinPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  // Preserve query params (e.g. ?session=) so the room page can log prayer streaks
+  const searchParams = useSearchParams();
+  const roomQuery = searchParams.toString() ? `?${searchParams.toString()}` : "";
 
   const [meeting, setMeeting] = useState<PublicMeetingInfo | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -62,11 +65,11 @@ export default function JoinPage() {
   // Redirect logged-in users only when the window is open
   useEffect(() => {
     if (!isLoading && user && timeState === "open") {
-      router.replace(`/room/${id}`);
+      router.replace(`/room/${id}${roomQuery}`);
     }
-  }, [isLoading, user, timeState, id, router]);
+  }, [isLoading, user, timeState, id, router, roomQuery]);
 
-  // Auth still resolving, or logged in and about to redirect
+  // Auth still resolving, or logged in and about to redirect to room
   if (isLoading || (!isLoading && user && timeState === "open")) {
     return (
       <div className="fixed inset-0 bg-[#0d0d1a] flex flex-col items-center justify-center gap-4">

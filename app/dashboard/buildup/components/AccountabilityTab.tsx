@@ -256,9 +256,8 @@ function PartnershipDetail({
   const handleStartPrayer = async () => {
     setStarting(true);
     try {
-      const result = await accountabilityService.startPrayerSession(p.id) as { sessionId: string; meetingLink: string };
-      const url = new URL(result.meetingLink, window.location.origin);
-      router.push(url.pathname + url.search);
+      const result = await accountabilityService.startPrayerSession(p.id) as { sessionId: string; meetingId: string; meetingLink: string };
+      router.push(`/room/${result.meetingId}?session=${result.sessionId}`);
     } catch (err: unknown) {
       alert((err as Error)?.message ?? 'Could not start session');
     } finally {
