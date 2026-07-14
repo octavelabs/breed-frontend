@@ -213,7 +213,7 @@ const LoginForm: React.FC = () => {
           </p>
         </Button>
 
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-600 mt-2.5">
           Forgot your password?{" "}
           <Link
             href="/forgot-password"

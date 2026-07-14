@@ -69,7 +69,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
   return (
     <div className="flex flex-col min-h-[calc(100dvh-120px)]">
       {/* Sticky header — progress bar + step counter */}
-      <div className="sticky top-0 bg-white z-10 pb-3 pt-1">
+      <div className="sticky top-0 z-10 pb-3 pt-1">
         <div className="flex items-center justify-between gap-4">
           <button
             className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
@@ -99,7 +99,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
       {/* Scrollable content */}
       <div className="flex-1 pb-6">
         {currentStepData?.subtitle && (
-          <p className="text-sm lg:text-base text-[#60666B] mb-1">
+          <p className="text-sm lg:text-base text-[#60666B] my-4 lg:my-6">
             {currentStepData.subtitle}
           </p>
         )}
@@ -116,7 +116,7 @@ const StepProgress:React.FC<StepProgressProps> = ({
       </div>
 
       {/* Sticky nav buttons */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-100 pt-3 pb-4 flex items-center justify-between gap-4">
+      <div className="sticky bottom-0 border-t border-gray-100 pt-3 pb-4 flex items-center justify-between gap-4">
         <button
           onClick={handlePrevious}
           disabled={isFirstStep}
