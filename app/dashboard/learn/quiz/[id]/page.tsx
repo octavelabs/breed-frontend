@@ -110,6 +110,7 @@ function QuizInner() {
   const nextLessonId = searchParams.get('nextLessonId');
 
   const [quiz,          setQuiz]        = useState<QuizData | null>(null);
+  const [lessonLabel,   setLessonLabel] = useState('');
   const [isLoading,     setIsLoading]   = useState(true);
   const [screenLoading, setScreenLoading] = useState(true); // LoadingScreen animation
   const [answers,       setAnswers]     = useState<Map<string, string>>(new Map());
@@ -127,7 +128,21 @@ function QuizInner() {
     }
   }, [quizId, router]);
 
-  useEffect(() => { fetchQuiz(); }, [fetchQuiz]);
+  // Fetch chapter + lesson title for the header label
+  const fetchLessonLabel = useCallback(async () => {
+    if (!courseId || !lessonId) return;
+    try {
+      const res = await courseService.getById(courseId) as { data?: { chapters?: Array<{ title: string; lessons?: Array<{ id: string; title: string }> }> }; chapters?: Array<{ title: string; lessons?: Array<{ id: string; title: string }> }> };
+      const course = res.data ?? res;
+      const chapters = (course as { chapters?: Array<{ title: string; lessons?: Array<{ id: string; title: string }> }> }).chapters ?? [];
+      for (const ch of chapters) {
+        const lesson = (ch.lessons ?? []).find((l) => l.id === lessonId);
+        if (lesson) { setLessonLabel(`${ch.title}: ${lesson.title}`); return; }
+      }
+    } catch {}
+  }, [courseId, lessonId]);
+
+  useEffect(() => { fetchQuiz(); fetchLessonLabel(); }, [fetchQuiz, fetchLessonLabel]);
 
   const handleSubmit = async () => {
     if (!quiz || submitting) return;
@@ -189,10 +204,9 @@ function QuizInner() {
     );
   }
 
-  // Each step captures its own question via closure so Previous/Next both work correctly
+  // subtitle = "Chapter: Lesson Title"; question text rendered only inside QuizQuestion (no bold duplicate)
   const steps = quiz.questions.map((q) => ({
-    subtitle: quiz.title,
-    title: q.question,
+    subtitle: lessonLabel || quiz.title || undefined,
     content: (
       <QuizQuestion
         question={q.question}
