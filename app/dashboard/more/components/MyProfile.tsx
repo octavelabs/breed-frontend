@@ -5,11 +5,155 @@ import Input from "@/app/components/Input";
 import Toast from "@/app/components/Toast";
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/lib/api-services";
-import { ArrowLeft, Camera, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, ChevronDown, Loader2, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useUpload } from "@/app/hooks/useUpload";
 
 type GenderValue = '' | 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+
+// ── Country code data ─────────────────────────────────────────────────────────
+
+interface CountryDial { code: string; name: string; dial: string }
+
+const flag = (iso: string) =>
+  iso.toUpperCase().split('').map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('');
+
+const COUNTRY_DIALS: CountryDial[] = [
+  { code: 'NG', name: 'Nigeria',              dial: '+234' },
+  { code: 'GH', name: 'Ghana',                dial: '+233' },
+  { code: 'KE', name: 'Kenya',                dial: '+254' },
+  { code: 'ZA', name: 'South Africa',         dial: '+27'  },
+  { code: 'ET', name: 'Ethiopia',             dial: '+251' },
+  { code: 'TZ', name: 'Tanzania',             dial: '+255' },
+  { code: 'UG', name: 'Uganda',               dial: '+256' },
+  { code: 'RW', name: 'Rwanda',               dial: '+250' },
+  { code: 'CM', name: 'Cameroon',             dial: '+237' },
+  { code: 'SN', name: 'Senegal',              dial: '+221' },
+  { code: 'CI', name: "Côte d'Ivoire",        dial: '+225' },
+  { code: 'CD', name: 'DR Congo',             dial: '+243' },
+  { code: 'ZM', name: 'Zambia',               dial: '+260' },
+  { code: 'ZW', name: 'Zimbabwe',             dial: '+263' },
+  { code: 'US', name: 'United States',        dial: '+1'   },
+  { code: 'CA', name: 'Canada',               dial: '+1'   },
+  { code: 'GB', name: 'United Kingdom',       dial: '+44'  },
+  { code: 'IE', name: 'Ireland',              dial: '+353' },
+  { code: 'AU', name: 'Australia',            dial: '+61'  },
+  { code: 'NZ', name: 'New Zealand',          dial: '+64'  },
+  { code: 'IN', name: 'India',                dial: '+91'  },
+  { code: 'PK', name: 'Pakistan',             dial: '+92'  },
+  { code: 'BD', name: 'Bangladesh',           dial: '+880' },
+  { code: 'AE', name: 'UAE',                  dial: '+971' },
+  { code: 'SA', name: 'Saudi Arabia',         dial: '+966' },
+  { code: 'QA', name: 'Qatar',                dial: '+974' },
+  { code: 'DE', name: 'Germany',              dial: '+49'  },
+  { code: 'FR', name: 'France',               dial: '+33'  },
+  { code: 'IT', name: 'Italy',                dial: '+39'  },
+  { code: 'ES', name: 'Spain',                dial: '+34'  },
+  { code: 'NL', name: 'Netherlands',          dial: '+31'  },
+  { code: 'BR', name: 'Brazil',               dial: '+55'  },
+  { code: 'MX', name: 'Mexico',               dial: '+52'  },
+  { code: 'CN', name: 'China',                dial: '+86'  },
+  { code: 'JP', name: 'Japan',                dial: '+81'  },
+  { code: 'SG', name: 'Singapore',            dial: '+65'  },
+];
+
+function parseStoredPhone(stored: string | undefined): { dial: string; local: string } {
+  if (!stored) return { dial: '+234', local: '' };
+  // Match longest prefix first to avoid e.g. "+1" matching "+11..."
+  const sorted = [...COUNTRY_DIALS].sort((a, b) => b.dial.length - a.dial.length);
+  for (const c of sorted) {
+    if (stored.startsWith(c.dial)) {
+      return { dial: c.dial, local: stored.slice(c.dial.length) };
+    }
+  }
+  return { dial: '+234', local: stored };
+}
+
+// ── CountryCodeSelector ───────────────────────────────────────────────────────
+
+function CountryCodeSelector({
+  value, onChange, disabled,
+}: { value: string; onChange: (dial: string) => void; disabled: boolean }) {
+  const [open, setOpen]     = useState(false);
+  const [query, setQuery]   = useState('');
+  const ref                 = useRef<HTMLDivElement>(null);
+
+  const selected = COUNTRY_DIALS.find(c => c.dial === value) ?? COUNTRY_DIALS[0];
+  const filtered = query
+    ? COUNTRY_DIALS.filter(c =>
+        c.name.toLowerCase().includes(query.toLowerCase()) ||
+        c.dial.includes(query))
+    : COUNTRY_DIALS;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => !disabled && setOpen(o => !o)}
+        className={`w-full h-[48px] flex items-center gap-1.5 px-3 rounded-[10px] text-sm font-medium transition-colors ${
+          disabled
+            ? 'bg-[#d9d9d93d] text-[#60666B] cursor-default'
+            : 'border border-[#B9C2CA] bg-white text-[#180426] hover:border-[#870BD6] cursor-pointer'
+        }`}
+      >
+        <span className="text-lg leading-none">{flag(selected.code)}</span>
+        <span className="flex-1 text-left">{selected.dial}</span>
+        {!disabled && <ChevronDown size={14} className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />}
+      </button>
+
+      {open && (
+        <div className="absolute z-50 top-[52px] left-0 w-64 bg-white border border-[#E3E8EF] rounded-2xl shadow-xl overflow-hidden">
+          {/* Search */}
+          <div className="p-2 border-b border-[#E3E8EF]">
+            <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50 rounded-xl">
+              <Search size={13} className="text-gray-400 shrink-0" />
+              <input
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search country…"
+                className="flex-1 text-xs bg-transparent outline-none text-[#180426] placeholder:text-gray-400"
+              />
+            </div>
+          </div>
+          {/* List */}
+          <ul className="max-h-52 overflow-y-auto py-1">
+            {filtered.length === 0 && (
+              <li className="px-4 py-3 text-xs text-gray-400 text-center">No results</li>
+            )}
+            {filtered.map(c => (
+              <li key={`${c.code}-${c.dial}`}>
+                <button
+                  type="button"
+                  onClick={() => { onChange(c.dial); setOpen(false); setQuery(''); }}
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-purple-50 transition-colors text-left cursor-pointer ${
+                    c.dial === value ? 'bg-purple-50 font-semibold text-[#870BD6]' : 'text-[#180426]'
+                  }`}
+                >
+                  <span className="text-base leading-none">{flag(c.code)}</span>
+                  <span className="flex-1 truncate">{c.name}</span>
+                  <span className="text-xs text-gray-400 shrink-0">{c.dial}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) => void }) => {
   const { user, refreshUser } = useAuth();
@@ -54,12 +198,13 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
 
   useEffect(() => {
     if (user) {
+      const { dial, local } = parseStoredPhone(user.phone ?? undefined);
       setFormData({
         firstName: user.firstName ?? "",
         lastName: user.lastName ?? "",
         email: user.email ?? "",
-        phoneCountryCode: "+234",
-        phoneNumber: user.phone ?? "",
+        phoneCountryCode: dial,
+        phoneNumber: local,
         bio: user.bio ?? "",
         dateOfBirth: user.dateOfBirth ? user.dateOfBirth.slice(0, 10) : "",
         gender: (user.gender ?? "") as GenderValue,
@@ -186,11 +331,28 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
           <div>
             <label className="block text-sm font-medium mb-1">Phone number</label>
             <div className="flex gap-2">
-              <div className="w-[25%]">
-                <Input type="tel" id="phoneCountryCode" name="phoneCountryCode" value={formData.phoneCountryCode} onChange={handleChange} placeholder="+234" isDisabled={!isEditing} variant={inputVariant} />
+              <div className="w-[30%]">
+                <CountryCodeSelector
+                  value={formData.phoneCountryCode}
+                  onChange={(dial) => setFormData(prev => ({ ...prev, phoneCountryCode: dial }))}
+                  disabled={!isEditing}
+                />
               </div>
               <div className="flex-1">
-                <Input type="tel" id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Phone number" isDisabled={!isEditing} variant={inputVariant} />
+                <Input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={(e) => {
+                    // Strip any leading + or country code digits the user might paste
+                    const digits = e.target.value.replace(/[^\d]/g, '');
+                    setFormData(prev => ({ ...prev, phoneNumber: digits }));
+                  }}
+                  placeholder="8012345678"
+                  isDisabled={!isEditing}
+                  variant={inputVariant}
+                />
               </div>
             </div>
           </div>
