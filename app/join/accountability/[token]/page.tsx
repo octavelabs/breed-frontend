@@ -12,7 +12,8 @@ const DAY_LABELS: Record<string, string> = {
 
 interface InviteInfo {
   invitedBy: { firstName: string; lastName: string; avatarUrl?: string };
-  email: string;
+  email: string | null;
+  isLinkInvite: boolean;
   prayerDays: string[];
   prayerTime: string;
   timezone: string;
@@ -78,7 +79,7 @@ export default function AccountabilityInvitePage() {
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] p-4">
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-sm">
           <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h2 className="text-lg font-bold text-gray-900 mb-2">You&apos;re prayer partners! 🙏</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-2">You&apos;ve joined the prayer group!</h2>
           <p className="text-sm text-gray-500">Taking you to your prayer room...</p>
         </div>
       </div>
@@ -100,7 +101,7 @@ export default function AccountabilityInvitePage() {
 
         <h1 className="text-xl font-bold text-gray-900 text-center mb-1">You&apos;ve been invited</h1>
         <p className="text-sm text-gray-500 text-center mb-6">
-          <strong>{inviterName}</strong> wants to be your prayer partner on Breed
+          <strong>{inviterName}</strong> {info?.isLinkInvite ? 'has invited you to join their prayer group on Breed' : 'wants to be your prayer partner on Breed'}
         </p>
 
         {info && (

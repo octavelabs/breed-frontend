@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
-  CheckCircle, Calendar, Trash2, Globe, UserPlus,
+  CheckCircle, Calendar, Trash2, Globe, UserPlus, Link2, Copy,
 } from 'lucide-react';
 import { accountabilityService, userService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
@@ -267,13 +267,15 @@ function PartnershipDetail({
   onPartnerAdded: () => void;
   router: ReturnType<typeof useRouter>;
 }) {
-  const [starting, setStarting]           = useState(false);
-  const [ending, setEnding]               = useState(false);
-  const [accepting, setAccepting]         = useState(false);
-  const [declining, setDeclining]         = useState(false);
+  const [starting, setStarting]             = useState(false);
+  const [ending, setEnding]                 = useState(false);
+  const [accepting, setAccepting]           = useState(false);
+  const [declining, setDeclining]           = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showAddPartner, setShowAddPartner] = useState(false);
-  const [streaks, setStreaks]             = useState(p.streaks ?? []);
+  const [streaks, setStreaks]               = useState(p.streaks ?? []);
+  const [copyingLink, setCopyingLink]       = useState(false);
+  const [linkCopied, setLinkCopied]         = useState(false);
 
   void onRefresh;
 
@@ -320,6 +322,20 @@ function PartnershipDetail({
       alert((err as Error)?.message ?? 'Could not decline');
     } finally {
       setDeclining(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    setCopyingLink(true);
+    try {
+      const result = await accountabilityService.generateInviteLink(p.id) as { inviteLink: string };
+      await navigator.clipboard.writeText(result.inviteLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 3000);
+    } catch (err: unknown) {
+      alert((err as Error)?.message ?? 'Could not generate invite link');
+    } finally {
+      setCopyingLink(false);
     }
   };
 
@@ -502,6 +518,21 @@ function PartnershipDetail({
               </button>
             )}
 
+            {p.canAddMore && !iAmPending && (
+              <button
+                onClick={handleCopyLink}
+                disabled={copyingLink}
+                className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#870BD6] text-[#870BD6] rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors mb-3 disabled:opacity-60 cursor-pointer"
+              >
+                {copyingLink
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : linkCopied
+                  ? <Copy className="w-4 h-4" />
+                  : <Link2 className="w-4 h-4" />}
+                {linkCopied ? 'Link copied!' : 'Copy invite link'}
+              </button>
+            )}
+
             {!showEndConfirm ? (
               <button
                 onClick={() => setShowEndConfirm(true)}
@@ -660,8 +691,11 @@ function PartnerSearchInput({
               }}
               className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
             >
-              <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0">
-                {s.firstName[0]}{s.lastName[0]}
+              <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0 overflow-hidden">
+                {s.avatarUrl
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={s.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  : `${s.firstName[0]}${s.lastName[0]}`}
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{s.firstName} {s.lastName}</p>
@@ -688,6 +722,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const submittingRef = useRef(false);
 
   const addInvitee = () => {
     if (invitees.length < MAX_MEMBERS - 1) setInvitees((prev) => [...prev, '']);
@@ -713,9 +748,11 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
   };
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
     const filled = invitees.filter((v) => v.trim());
     if (filled.length === 0) { setError('Add at least one prayer partner'); return; }
     if (prayerDays.length === 0) { setError('Select at least one prayer day'); return; }
+    submittingRef.current = true;
     setSubmitting(true); setError('');
     try {
       await accountabilityService.createPartnership({
@@ -728,6 +765,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
     } catch (err: unknown) {
       setError((err as Error)?.message ?? 'Failed to send invite');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };

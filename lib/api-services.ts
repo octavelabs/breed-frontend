@@ -660,6 +660,9 @@ export const accountabilityService = {
   addPartner: (partnershipId: string, data: { email?: string; username?: string }) =>
     api.post(`/accountability/partnerships/${partnershipId}/add-partner`, data),
 
+  generateInviteLink: (partnershipId: string) =>
+    api.post(`/accountability/partnerships/${partnershipId}/invite-link`),
+
   getMyPartnerships: () => api.get('/accountability/partnerships'),
 
   getPartnershipById: (id: string) => api.get(`/accountability/partnerships/${id}`),
