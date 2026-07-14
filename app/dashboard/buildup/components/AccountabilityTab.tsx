@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
-  CheckCircle, Calendar, Trash2, Globe,
+  CheckCircle, Calendar, Trash2, Globe, UserPlus,
 } from 'lucide-react';
 import { accountabilityService, userService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
@@ -14,14 +14,20 @@ const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 const DAY_LABELS: Record<string, string> = {
   MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu', FRI: 'Fri', SAT: 'Sat', SUN: 'Sun',
 };
+const MAX_MEMBERS = 5;
 
-interface Partner {
+// ── Types ──────────────────────────────────────────────────────────────────────
+
+interface Member {
   id: string;
   firstName: string;
   lastName: string;
   username: string;
   avatarUrl?: string;
   email: string;
+  memberRole: 'OWNER' | 'MEMBER';
+  memberStatus: 'PENDING' | 'ACTIVE';
+  isMe: boolean;
 }
 
 interface Streak {
@@ -32,15 +38,19 @@ interface Streak {
 
 interface Partnership {
   id: string;
-  partner?: Partner;
+  members: Member[];
+  activeMemberCount: number;
+  canAddMore: boolean;
   prayerDays: string[];
   prayerTime: string;
   timezone: string;
   status: 'PENDING' | 'ACTIVE' | 'ENDED';
   isCreator: boolean;
-  invite?: { status: string; email: string; token?: string };
+  isOwner: boolean;
+  pendingInviteEmail?: string | null;
+  invites?: Array<{ status: string; email: string; token?: string }>;
   myStreak?: Streak;
-  streaks?: Array<{ user: Partner; currentStreak: number; longestStreak: number; lastPrayedAt?: string; isMe: boolean }>;
+  streaks?: Array<{ user: Member; currentStreak: number; longestStreak: number; lastPrayedAt?: string; isMe: boolean }>;
   lastSession?: { startedAt: string };
   createdAt: string;
 }
@@ -57,6 +67,8 @@ interface AccountabilityTabProps {
   externalShowCreate?: boolean;
   onExternalShowCreateChange?: (val: boolean) => void;
 }
+
+// ── Tab root ───────────────────────────────────────────────────────────────────
 
 export default function AccountabilityTab({ externalShowCreate, onExternalShowCreateChange }: AccountabilityTabProps) {
   const { user } = useAuth();
@@ -108,6 +120,7 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
           load();
         }}
         onAccepted={() => { refreshSelected(selected.id); }}
+        onPartnerAdded={() => { refreshSelected(selected.id); }}
         router={router}
       />
     );
@@ -116,7 +129,7 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
   return (
     <div>
       <div className="mb-6">
-        <p className="text-sm text-gray-500">1-on-1 live prayer sessions with your partner</p>
+        <p className="text-sm text-gray-500">Live prayer sessions with up to 5 people</p>
       </div>
 
       {loading ? (
@@ -128,22 +141,18 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
           <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center mb-4">
             <Users className="w-8 h-8 text-[#870BD6]" />
           </div>
-          <h3 className="font-bold text-gray-900 mb-2">No prayer partners yet</h3>
+          <h3 className="font-bold text-gray-900 mb-2">No prayer groups yet</h3>
           <p className="text-sm text-gray-500 mb-6 text-center max-w-xs">
-            Invite someone to pray with you at a set time each week.
+            Invite up to 4 people to pray with you at a set time each week.
           </p>
           <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-6 !h-[44px] !text-white">
-            <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />Invite a Prayer Partner</p>
+            <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />Invite Prayer Partners</p>
           </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {partnerships.map((p) => (
-            <PartnershipCard
-              key={p.id}
-              partnership={p}
-              onClick={() => setSelected(p)}
-            />
+            <PartnershipCard key={p.id} partnership={p} onClick={() => setSelected(p)} />
           ))}
         </div>
       )}
@@ -158,44 +167,65 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
   );
 }
 
+// ── Partnership card ───────────────────────────────────────────────────────────
+
+function MemberAvatars({ members }: { members: Member[] }) {
+  const active = members.filter((m) => m.memberStatus === 'ACTIVE');
+  const shown  = active.slice(0, 4);
+  const extra  = active.length - shown.length;
+
+  return (
+    <div className="flex -space-x-2">
+      {shown.map((m) => (
+        <div
+          key={m.id}
+          className="w-8 h-8 rounded-full border-2 border-white bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0 overflow-hidden"
+          title={`${m.firstName} ${m.lastName}`}
+        >
+          {m.avatarUrl
+            // eslint-disable-next-line @next/next/no-img-element
+            ? <img src={m.avatarUrl} alt="" className="w-full h-full object-cover" />
+            : `${m.firstName[0]}${m.lastName[0]}`}
+        </div>
+      ))}
+      {extra > 0 && (
+        <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs">
+          +{extra}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership; onClick: () => void }) {
-  const isPending = p.status === 'PENDING';
-  const partnerName = p.partner
-    ? `${p.partner.firstName} ${p.partner.lastName}`
-    : p.invite?.email ?? 'Pending invite';
-  const initials = p.partner
-    ? `${p.partner.firstName[0]}${p.partner.lastName[0]}`.toUpperCase()
-    : '?';
+  const isPending  = p.status === 'PENDING';
+  const otherMembers = p.members.filter((m) => !m.isMe);
+  const groupName  = otherMembers.length > 0
+    ? otherMembers.map((m) => m.firstName).join(', ')
+    : p.pendingInviteEmail ?? 'Pending invite';
 
   return (
     <div
       onClick={onClick}
       className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow cursor-pointer"
     >
-      <div className="flex items-start gap-3">
-        {p.partner?.avatarUrl ? (
-          <img src={p.partner.avatarUrl} alt={partnerName} className="w-14 h-14 rounded-full object-cover shrink-0" />
-        ) : (
-          <div className="w-14 h-14 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-base shrink-0">
-            {initials}
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <p className="font-bold text-[#180426] leading-tight">{partnerName}</p>
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
-              isPending ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'
-            }`}>
-              {isPending ? 'Pending' : 'Active'}
-            </span>
-          </div>
-          {p.partner?.username && (
-            <p className="text-xs text-[#60666B] mt-0.5">@{p.partner.username}</p>
-          )}
-          <div className="flex items-center gap-1 mt-1 text-xs text-[#60666B]">
-            <Clock size={11} />
-            {p.prayerTime}
-          </div>
+      <div className="flex items-start justify-between gap-2">
+        <MemberAvatars members={p.members} />
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+          isPending ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'
+        }`}>
+          {isPending ? 'Pending' : 'Active'}
+        </span>
+      </div>
+
+      <div>
+        <p className="font-bold text-[#180426] leading-tight truncate">{groupName}</p>
+        <p className="text-xs text-[#60666B] mt-0.5">
+          {p.activeMemberCount} {p.activeMemberCount === 1 ? 'member' : 'members'}
+          {p.canAddMore && ` · up to ${MAX_MEMBERS - p.activeMemberCount} more`}
+        </p>
+        <div className="flex items-center gap-1 mt-1 text-xs text-[#60666B]">
+          <Clock size={11} /> {p.prayerTime}
         </div>
       </div>
 
@@ -211,37 +241,39 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
 
       {p.myStreak && p.myStreak.currentStreak > 0 && (
         <p className="flex items-center gap-1 text-xs font-semibold text-orange-500">
-          <Flame className="w-3.5 h-3.5" />
-          {p.myStreak.currentStreak} day streak
+          <Flame className="w-3.5 h-3.5" /> {p.myStreak.currentStreak} day streak
         </p>
       )}
 
       <div className="mt-auto pt-1">
         <div className="w-full h-10 flex items-center justify-center gap-1 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full">
-          View Details
-          <ChevronRight size={14} />
+          View Details <ChevronRight size={14} />
         </div>
       </div>
     </div>
   );
 }
 
+// ── Partnership detail ─────────────────────────────────────────────────────────
+
 function PartnershipDetail({
-  partnership: p, onBack, onRefresh, onEnd, onAccepted, router,
+  partnership: p, onBack, onRefresh, onEnd, onAccepted, onPartnerAdded, router,
 }: {
   partnership: Partnership;
   onBack: () => void;
   onRefresh: () => void;
-  onEnd: () => void;
+  onEnd: () => Promise<void>;
   onAccepted: () => void;
+  onPartnerAdded: () => void;
   router: ReturnType<typeof useRouter>;
 }) {
-  const [starting, setStarting] = useState(false);
-  const [ending, setEnding] = useState(false);
-  const [accepting, setAccepting] = useState(false);
-  const [declining, setDeclining] = useState(false);
+  const [starting, setStarting]           = useState(false);
+  const [ending, setEnding]               = useState(false);
+  const [accepting, setAccepting]         = useState(false);
+  const [declining, setDeclining]         = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
-  const [streaks, setStreaks] = useState(p.streaks ?? []);
+  const [showAddPartner, setShowAddPartner] = useState(false);
+  const [streaks, setStreaks]             = useState(p.streaks ?? []);
 
   void onRefresh;
 
@@ -268,7 +300,7 @@ function PartnershipDetail({
   const handleAccept = async () => {
     setAccepting(true);
     try {
-      const token = p.invite?.token;
+      const token = p.invites?.find((i) => i.status === 'PENDING')?.token;
       if (!token) throw new Error('Invite token not available. Please refresh and try again.');
       await accountabilityService.acceptInvite(token);
       onAccepted();
@@ -285,19 +317,19 @@ function PartnershipDetail({
       await accountabilityService.endPartnership(p.id);
       onBack();
     } catch (err: unknown) {
-      alert((err as Error)?.message ?? 'Could not decline partnership');
+      alert((err as Error)?.message ?? 'Could not decline');
     } finally {
       setDeclining(false);
     }
   };
 
-  const partnerName = p.partner
-    ? `${p.partner.firstName} ${p.partner.lastName}`
-    : p.invite?.email ?? 'Pending invite';
-  const isPending = p.status === 'PENDING';
-  const initials = p.partner
-    ? `${p.partner.firstName[0]}${p.partner.lastName[0]}`.toUpperCase()
-    : '?';
+  const myMembership   = p.members.find((m) => m.isMe);
+  const isPending      = p.status === 'PENDING';
+  const iAmPending     = myMembership?.memberStatus === 'PENDING';
+  const activeMembers  = p.members.filter((m) => m.memberStatus === 'ACTIVE');
+  const pendingMembers = p.members.filter((m) => m.memberStatus === 'PENDING');
+
+  const groupTitle = p.members.filter((m) => !m.isMe).map((m) => m.firstName).join(', ') || 'Prayer Group';
 
   return (
     <div>
@@ -306,8 +338,8 @@ function PartnershipDetail({
         <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
           <ChevronRight className="w-5 h-5 text-gray-500 rotate-180" />
         </button>
-        <h1 className="text-xl font-bold text-[#180426]">{partnerName}</h1>
-        <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+        <h1 className="text-xl font-bold text-[#180426] truncate">{groupTitle}</h1>
+        <span className={`text-xs font-bold px-3 py-1 rounded-full border shrink-0 ${
           isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
         }`}>
           {isPending ? 'Pending' : 'Active'}
@@ -315,64 +347,109 @@ function PartnershipDetail({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Left column — details */}
+        {/* Left column */}
         <div className="lg:col-span-2 space-y-4">
+          {/* Members card */}
           <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
-            {/* Partner avatar + name */}
-            <div className="flex items-center gap-4 mb-5">
-              {p.partner?.avatarUrl ? (
-                <img src={p.partner.avatarUrl} alt={partnerName} className="w-14 h-14 rounded-full object-cover shrink-0" />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-lg shrink-0">
-                  {initials}
-                </div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-[#180426]">
+                Members ({activeMembers.length}{pendingMembers.length > 0 ? ` + ${pendingMembers.length} pending` : ''})
+              </h3>
+              {p.canAddMore && (
+                <button
+                  onClick={() => setShowAddPartner(true)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#870BD6] hover:opacity-75 transition-opacity cursor-pointer"
+                >
+                  <UserPlus size={13} /> Add partner
+                </button>
               )}
-              <div>
-                <p className="font-bold text-[#180426] text-lg leading-tight">{partnerName}</p>
-                {p.partner?.username && <p className="text-sm text-[#60666B]">@{p.partner.username}</p>}
-              </div>
             </div>
 
-            <div className="flex items-center gap-2 mb-5">
+            <div className="space-y-3">
+              {p.members.map((m) => (
+                <div key={m.id} className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm shrink-0 overflow-hidden">
+                    {m.avatarUrl
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={m.avatarUrl} alt="" className="w-full h-full object-cover" />
+                      : `${m.firstName[0]}${m.lastName[0]}`}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[#180426] leading-none">
+                      {m.isMe ? 'You' : `${m.firstName} ${m.lastName}`}
+                    </p>
+                    {m.username && <p className="text-xs text-[#60666B] mt-0.5">@{m.username}</p>}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {m.memberRole === 'OWNER' && (
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded-full">Owner</span>
+                    )}
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      m.memberStatus === 'ACTIVE'
+                        ? 'bg-green-50 text-green-600'
+                        : 'bg-amber-50 text-amber-600'
+                    }`}>
+                      {m.memberStatus === 'ACTIVE' ? 'Active' : 'Pending'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {p.canAddMore && (
+              <button
+                onClick={() => setShowAddPartner(true)}
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-[#870BD6] text-[#870BD6] rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors cursor-pointer"
+              >
+                <UserPlus size={15} /> Add more partners ({MAX_MEMBERS - p.members.length} spots left)
+              </button>
+            )}
+          </div>
+
+          {/* Schedule card */}
+          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-4">
               <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                 isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
               }`}>{isPending ? 'Pending' : 'Active'}</span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Partnership</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Group</span>
             </div>
 
-            <div className="border-t border-gray-100 mb-5" />
-
             <div className="space-y-4">
-              <DetailRow icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Prayer Days" value={p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ') || '—'} />
+              <DetailRow icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Prayer Days"
+                value={p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ') || '—'} />
               <DetailRow icon={<Clock className="w-4 h-4 text-gray-400" />} label="Prayer Time" value={p.prayerTime} />
               <DetailRow icon={<Globe className="w-4 h-4 text-gray-400" />} label="Timezone" value={p.timezone} />
               <DetailRow
-                icon={<Calendar className="w-4 h-4 text-gray-400" />}
-                label="Since"
+                icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Since"
                 value={new Date(p.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
               />
               {p.lastSession && (
                 <DetailRow
-                  icon={<CheckCircle className="w-4 h-4 text-green-500" />}
-                  label="Last Session"
+                  icon={<CheckCircle className="w-4 h-4 text-green-500" />} label="Last Session"
                   value={new Date(p.lastSession.startedAt).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
                 />
               )}
             </div>
           </div>
 
-          {/* Streak cards */}
+          {/* Streaks */}
           {streaks.length > 0 && (
             <div>
               <h3 className="font-bold text-[#180426] mb-3">Prayer Streaks</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {streaks.map((s, i) => (
                   <div key={s.user?.id ?? i} className="bg-white rounded-2xl p-4 border border-[#E3E8EF]">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-7 h-7 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs">
-                        {s.user?.firstName?.[0] ?? '?'}{s.user?.lastName?.[0] ?? ''}
+                      <div className="w-7 h-7 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs overflow-hidden">
+                        {s.user?.avatarUrl
+                          // eslint-disable-next-line @next/next/no-img-element
+                          ? <img src={s.user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                          : `${s.user?.firstName?.[0] ?? '?'}${s.user?.lastName?.[0] ?? ''}`}
                       </div>
-                      <p className="text-sm font-semibold text-[#180426]">{s.isMe ? 'You' : (s.user?.firstName ?? 'Partner')}</p>
+                      <p className="text-sm font-semibold text-[#180426] truncate">
+                        {s.isMe ? 'You' : (s.user?.firstName ?? 'Member')}
+                      </p>
                     </div>
                     <div className="flex items-center gap-1.5 text-orange-500 mb-1">
                       <Flame className="w-4 h-4" />
@@ -387,13 +464,13 @@ function PartnershipDetail({
           )}
         </div>
 
-        {/* Right column — actions + stats */}
+        {/* Right column — actions */}
         <div className="space-y-4">
           <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5">
             <h3 className="font-semibold text-[#180426] mb-4">Actions</h3>
 
-            {/* Recipient: accept / decline */}
-            {isPending && !p.isCreator && (
+            {/* Recipient pending: accept / decline */}
+            {iAmPending && !p.isCreator && (
               <div className="space-y-2 mb-3">
                 <button
                   onClick={handleAccept}
@@ -414,7 +491,7 @@ function PartnershipDetail({
               </div>
             )}
 
-            {p.status === 'ACTIVE' && (
+            {p.status === 'ACTIVE' && !iAmPending && (
               <button
                 onClick={handleStartPrayer}
                 disabled={starting}
@@ -454,12 +531,12 @@ function PartnershipDetail({
             )}
           </div>
 
-          {/* Creator awaiting response */}
+          {/* Creator awaiting responses */}
           {isPending && p.isCreator && (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-              <p className="text-sm font-semibold text-amber-700 mb-1">Awaiting Response</p>
+              <p className="text-sm font-semibold text-amber-700 mb-1">Awaiting Responses</p>
               <p className="text-xs text-amber-600">
-                Waiting for {p.partner ? p.partner.firstName : 'your partner'} to accept the invitation.
+                Waiting for {pendingMembers.map((m) => m.firstName).join(', ')} to accept.
               </p>
             </div>
           )}
@@ -467,8 +544,8 @@ function PartnershipDetail({
           <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 text-sm">
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-[#60666B]">Partner</span>
-                <span className="font-medium text-[#180426] text-right truncate ml-2 max-w-[120px]">{partnerName}</span>
+                <span className="text-[#60666B]">Members</span>
+                <span className="font-medium text-[#180426]">{activeMembers.length} / {MAX_MEMBERS}</span>
               </div>
               <div className="flex justify-between border-t border-gray-100 pt-3">
                 <span className="text-[#60666B]">Days / week</span>
@@ -486,9 +563,19 @@ function PartnershipDetail({
           </div>
         </div>
       </div>
+
+      {showAddPartner && (
+        <AddPartnerModal
+          partnershipId={p.id}
+          onClose={() => setShowAddPartner(false)}
+          onAdded={() => { setShowAddPartner(false); onPartnerAdded(); }}
+        />
+      )}
     </div>
   );
 }
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
 
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
@@ -502,12 +589,98 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
   );
 }
 
-function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-  const [step, setStep] = useState<'partner' | 'schedule'>('partner');
-  const [partnerInput, setPartnerInput] = useState('');
+// ── Partner search input (shared) ──────────────────────────────────────────────
+
+function PartnerSearchInput({
+  value,
+  onChange,
+  onClear,
+  placeholder = 'name@email.com or @username',
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  onClear?: () => void;
+  placeholder?: string;
+}) {
   const [suggestions, setSuggestions] = useState<UserSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const justSelected = useRef(false);
+
+  useEffect(() => {
+    if (justSelected.current) { justSelected.current = false; return; }
+    const cleaned  = value.trim().replace(/^@/, '');
+    const isUsername = !value.includes('@') || value.startsWith('@');
+    if (!isUsername || cleaned.length < 2) {
+      setSuggestions([]); setShowSuggestions(false); setLoading(false); return;
+    }
+    setLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await userService.lookup(cleaned) as UserSuggestion[];
+        const results = Array.isArray(res) ? res.slice(0, 5) : [];
+        setSuggestions(results);
+        setShowSuggestions(results.length > 0);
+      } catch { setSuggestions([]); setShowSuggestions(false); }
+      finally { setLoading(false); }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => { onChange(e.target.value); }}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+          onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+          placeholder={placeholder}
+          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] pr-8"
+        />
+        {(loading) && <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-gray-400" />}
+        {!loading && value && onClear && (
+          <button type="button" onClick={onClear} className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600 cursor-pointer">
+            <X size={14} />
+          </button>
+        )}
+      </div>
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+          {suggestions.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                justSelected.current = true;
+                onChange(`@${s.username}`);
+                setShowSuggestions(false);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+            >
+              <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0">
+                {s.firstName[0]}{s.lastName[0]}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{s.firstName} {s.lastName}</p>
+                <p className="text-xs text-gray-400">@{s.username}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Create Partnership Modal ───────────────────────────────────────────────────
+
+function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [step, setStep] = useState<'partners' | 'schedule'>('partners');
+  // Each invitee is a string (email or @username)
+  const [invitees, setInvitees] = useState<string[]>(['']);
   const [prayerDays, setPrayerDays] = useState<string[]>([]);
   const [prayerTime, setPrayerTime] = useState('07:00');
   const [timezone] = useState(() => {
@@ -515,53 +688,38 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const justSelected = useRef(false);
 
-  useEffect(() => {
-    if (justSelected.current) {
-      justSelected.current = false;
-      return;
-    }
-    const cleaned = partnerInput.trim().replace(/^@/, '');
-    const isUsername = !partnerInput.includes('@') || partnerInput.startsWith('@');
-    if (!isUsername || cleaned.length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setSearchLoading(false);
-      return;
-    }
-    setSearchLoading(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await userService.lookup(cleaned) as UserSuggestion[];
-        const results = Array.isArray(res) ? res : [];
-        setSuggestions(results.slice(0, 5));
-        setShowSuggestions(results.length > 0);
-      } catch {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      } finally {
-        setSearchLoading(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [partnerInput]);
-
-  const toggleDay = (day: string) => {
-    setPrayerDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    );
+  const addInvitee = () => {
+    if (invitees.length < MAX_MEMBERS - 1) setInvitees((prev) => [...prev, '']);
   };
 
-  const isEmail = partnerInput.includes('@') && !partnerInput.startsWith('@');
+  const updateInvitee = (i: number, val: string) => {
+    setInvitees((prev) => prev.map((v, idx) => (idx === i ? val : v)));
+    setError('');
+  };
+
+  const removeInvitee = (i: number) => {
+    setInvitees((prev) => prev.filter((_, idx) => idx !== i));
+  };
+
+  const toggleDay = (day: string) => {
+    setPrayerDays((prev) => prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]);
+  };
+
+  const toInviteePayload = (val: string) => {
+    const trimmed = val.trim();
+    if (trimmed.includes('@') && !trimmed.startsWith('@')) return { email: trimmed };
+    return { username: trimmed.replace(/^@/, '') };
+  };
 
   const handleSubmit = async () => {
+    const filled = invitees.filter((v) => v.trim());
+    if (filled.length === 0) { setError('Add at least one prayer partner'); return; }
     if (prayerDays.length === 0) { setError('Select at least one prayer day'); return; }
-    setSubmitting(true);
-    setError('');
+    setSubmitting(true); setError('');
     try {
       await accountabilityService.createPartnership({
-        ...(isEmail ? { email: partnerInput.trim() } : { username: partnerInput.trim().replace(/^@/, '') }),
+        invitees: filled.map(toInviteePayload),
         prayerDays,
         prayerTime,
         timezone,
@@ -579,67 +737,52 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
       <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0 sm:max-h-[90vh] sm:flex sm:flex-col">
         <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
           <h3 className="font-bold text-gray-900">
-            {step === 'partner' ? 'Add Prayer Partner' : 'Set Schedule'}
+            {step === 'partners' ? 'Add Prayer Partners' : 'Set Schedule'}
           </h3>
           <button onClick={onClose} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="p-5 space-y-4 sm:overflow-y-auto sm:flex-1">
-          {step === 'partner' ? (
+          {step === 'partners' ? (
             <>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                  Partner&apos;s email or username
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={partnerInput}
-                    onChange={(e) => { setPartnerInput(e.target.value); setError(''); }}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                    onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                    placeholder="name@email.com or @username"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
-                  />
-                  {searchLoading && (
-                    <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-gray-400" />
-                  )}
-                  {showSuggestions && suggestions.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
-                      {suggestions.map((s) => (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            justSelected.current = true;
-                            setPartnerInput(`@${s.username}`);
-                            setShowSuggestions(false);
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
-                        >
-                          <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0">
-                            {s.firstName[0]}{s.lastName[0]}
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">{s.firstName} {s.lastName}</p>
-                            <p className="text-xs text-gray-400">@{s.username}</p>
-                          </div>
-                        </button>
-                      ))}
+              <p className="text-xs text-gray-400">Invite 1–{MAX_MEMBERS - 1} people to your prayer group.</p>
+
+              <div className="space-y-2">
+                {invitees.map((val, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <PartnerSearchInput
+                        value={val}
+                        onChange={(v) => updateInvitee(i, v)}
+                        onClear={invitees.length > 1 ? () => removeInvitee(i) : () => updateInvitee(i, '')}
+                        placeholder={i === 0 ? 'name@email.com or @username' : 'Add another partner'}
+                      />
                     </div>
-                  )}
-                </div>
-                <p className="text-xs text-gray-400 mt-1.5">
-                  They&apos;ll receive an invite to join your prayer partnership.
-                </p>
+                    {invitees.length > 1 && (
+                      <button type="button" onClick={() => removeInvitee(i)} className="shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer">
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
+
+              {invitees.length < MAX_MEMBERS - 1 && (
+                <button
+                  type="button"
+                  onClick={addInvitee}
+                  className="flex items-center gap-1.5 text-sm text-[#870BD6] font-semibold hover:opacity-75 transition-opacity cursor-pointer"
+                >
+                  <Plus size={14} /> Add another person
+                </button>
+              )}
+
               {error && <p className="text-xs text-red-500">{error}</p>}
+
               <Button
                 onClick={() => {
-                  if (!partnerInput.trim()) { setError('Enter your partner\'s email or username'); return; }
-                  setError('');
-                  setStep('schedule');
+                  if (!invitees.some((v) => v.trim())) { setError('Add at least one partner'); return; }
+                  setError(''); setStep('schedule');
                 }}
                 customClass="w-full !h-[42px] !text-white text-sm"
               >
@@ -676,16 +819,14 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                   onChange={(e) => setPrayerTime(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
                 />
-                <p className="text-xs text-gray-400 mt-1.5">
-                  Both of you will be notified 30 minutes before.
-                </p>
+                <p className="text-xs text-gray-400 mt-1.5">Everyone will be notified 30 minutes before.</p>
               </div>
 
               {error && <p className="text-xs text-red-500">{error}</p>}
 
               <div className="flex gap-2 pt-1">
                 <button
-                  onClick={() => setStep('partner')}
+                  onClick={() => setStep('partners')}
                   className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
                 >
                   Back
@@ -696,11 +837,77 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                   loading={submitting}
                   customClass="flex-1 !h-[42px] !text-white text-sm"
                 >
-                  Send Invite
+                  Send Invites
                 </Button>
               </div>
             </>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Add Partner Modal ─────────────────────────────────────────────────────────
+
+function AddPartnerModal({
+  partnershipId,
+  onClose,
+  onAdded,
+}: {
+  partnershipId: string;
+  onClose: () => void;
+  onAdded: () => void;
+}) {
+  const [input, setInput]       = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]       = useState('');
+
+  const toPayload = (val: string) => {
+    const trimmed = val.trim();
+    if (trimmed.includes('@') && !trimmed.startsWith('@')) return { email: trimmed };
+    return { username: trimmed.replace(/^@/, '') };
+  };
+
+  const handleAdd = async () => {
+    if (!input.trim()) { setError('Enter a username or email'); return; }
+    setSubmitting(true); setError('');
+    try {
+      await accountabilityService.addPartner(partnershipId, toPayload(input));
+      onAdded();
+    } catch (err: unknown) {
+      setError((err as Error)?.message ?? 'Failed to add partner');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <h3 className="font-bold text-gray-900">Add Partner</h3>
+          <button onClick={onClose} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Partner's email or username</label>
+            <PartnerSearchInput
+              value={input}
+              onChange={(v) => { setInput(v); setError(''); }}
+              onClear={() => setInput('')}
+            />
+            <p className="text-xs text-gray-400 mt-1.5">They'll receive an invite to join the prayer group.</p>
+          </div>
+          {error && <p className="text-xs text-red-500">{error}</p>}
+          <Button
+            onClick={handleAdd}
+            disabled={submitting}
+            loading={submitting}
+            customClass="w-full !h-[42px] !text-white text-sm"
+          >
+            Send Invite
+          </Button>
         </div>
       </div>
     </div>

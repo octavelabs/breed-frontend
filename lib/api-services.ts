@@ -651,12 +651,14 @@ export const mentorshipService = {
 
 export const accountabilityService = {
   createPartnership: (data: {
-    email?: string;
-    username?: string;
+    invitees: Array<{ email?: string; username?: string }>;
     prayerDays: string[];
     prayerTime: string;
     timezone?: string;
   }) => api.post('/accountability/partnerships', data),
+
+  addPartner: (partnershipId: string, data: { email?: string; username?: string }) =>
+    api.post(`/accountability/partnerships/${partnershipId}/add-partner`, data),
 
   getMyPartnerships: () => api.get('/accountability/partnerships'),
 
