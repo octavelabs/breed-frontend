@@ -93,11 +93,12 @@ const SingleCommunityPage = () => {
           ...(prev._count ? { _count: { ...prev._count, members: current + 1 } } : {}),
         };
       });
-    } catch {
-      // already a member or error — silently proceed
+      setOpenModal(false);
+    } catch (err) {
+      // Rethrow so the modal can display the error message
+      throw err;
     } finally {
       setJoining(false);
-      setOpenModal(false);
     }
   };
   const isPrivate = community?.privacy !== 'PUBLIC';
@@ -137,6 +138,7 @@ const SingleCommunityPage = () => {
           onClose={() => setOpenModal(false)}
           communityName={community.name}
           communityId={id}
+          privacy={community.privacy}
           guidelines={GUIDELINES}
           onJoin={handleJoin}
           joining={joining}

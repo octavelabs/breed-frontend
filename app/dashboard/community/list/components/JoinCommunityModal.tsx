@@ -2,7 +2,7 @@
 
 import Button from "@/app/components/Button";
 import { CustomModal } from "@/app/components/Modal/customModal";
-import { Globe, Users } from "lucide-react";
+import { Globe, Link2, Lock, Users } from "lucide-react";
 import { useState } from "react";
 
 interface JoinCommunityModalProps {
@@ -10,22 +10,31 @@ interface JoinCommunityModalProps {
   onClose: () => void;
   communityName: string;
   communityId: string;
+  privacy: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
   guidelines: string[];
   onJoin: () => Promise<void>;
   joining?: boolean;
 }
 
+const PRIVACY_META: Record<string, { icon: React.ReactNode; text: string }> = {
+  PUBLIC:       { icon: <Globe stroke="#870BD6" className="w-3 h-3 shrink-0" />,  text: 'This is an open community. Anyone can join.' },
+  PRIVATE:      { icon: <Link2 stroke="#870BD6" className="w-3 h-3 shrink-0" />,  text: 'This is a private community. Access is granted via invite link.' },
+  INVITE_ONLY:  { icon: <Lock  stroke="#870BD6" className="w-3 h-3 shrink-0" />,  text: 'This community is invite-only.' },
+};
+
 export const JoinCommunityModal = ({
   isOpen,
   onClose,
   communityName,
-  communityId,
+  privacy,
   guidelines,
   onJoin,
   joining = false,
 }: JoinCommunityModalProps) => {
   const [isGuidelinesAccepted, setIsGuidelinesAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const privacyMeta = PRIVACY_META[privacy] ?? PRIVACY_META.PUBLIC;
 
   const handleJoin = async () => {
     setError(null);
@@ -43,11 +52,11 @@ export const JoinCommunityModal = ({
           <p className="text-sm font-medium">Join &apos;{communityName}&apos;</p>
           <div className="space-y-2 text-sm text-gray-600">
             <div className="flex items-center gap-2 text-sm text-[#4E5255]">
-              <Globe stroke="#870BD6" className="w-3 h-3" />
-              <p>This is an open community. Anyone can join.</p>
+              {privacyMeta.icon}
+              <p>{privacyMeta.text}</p>
             </div>
             <div className="flex items-center gap-2 text-sm text-[#4E5255]">
-              <Users stroke="#870BD6" className="w-3 h-3" />
+              <Users stroke="#870BD6" className="w-3 h-3 shrink-0" />
               <p>Everyone can interact in this community</p>
             </div>
           </div>
