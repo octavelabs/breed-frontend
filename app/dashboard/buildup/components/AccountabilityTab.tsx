@@ -584,7 +584,7 @@ function PartnershipDetail({
                   <button
                     onClick={async () => { setEnding(true); try { await onEnd(); } finally { setEnding(false); } }}
                     disabled={ending}
-                    className="flex-1 py-2 bg-red-500 text-white rounded-full text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                    className="flex-1 py-2 bg-[#e44e4e] text-white rounded-full text-sm font-semibold disabled:opacity-60 cursor-pointer"
                   >
                     {ending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, end it'}
                   </button>

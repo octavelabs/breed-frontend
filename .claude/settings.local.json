@@ -20,12 +20,19 @@
       "Bash(git push *)",
       "Bash(dir \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-backend\\\\src\\\\modules\\\\users\" /b)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sommie\\\\Desktop\\\\AdabanyaC\\\\breed-frontend\\\\app\\\\dashboard\\\\community\" -Recurse -File)",
-      "Bash(npx prisma *)"
+      "Bash(npx prisma *)",
+      "Read(//Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/src/modules/courses/**)",
+      "Read(//Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/prisma/**)",
+      "Bash(grep -n \"email\" /Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/prisma/schema.prisma | grep -i \"partnership_invite\\\\|PartnershipInvite\" | head -5 *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src",
       "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-backend\\src\\modules\\cache",
-      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-frontend\\app\\dashboard\\learn\\preacher"
+      "C:\\Users\\Sommie\\Desktop\\AdabanyaC\\breed-frontend\\app\\dashboard\\learn\\preacher",
+      "/Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/src/modules/courses",
+      "/Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/src/modules/admin",
+      "/Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/prisma",
+      "/Users/clinton.adabanya/Desktop/clintoncodes/breed-backend/src/modules/accountability/dto"
     ]
   }
 }
