@@ -41,7 +41,6 @@ const SingleCommunityPage = () => {
   const [isMember, setIsMember] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [joining, setJoining] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -79,27 +78,19 @@ const SingleCommunityPage = () => {
 
   const handleJoin = async () => {
     if (!id) return;
-    setJoining(true);
-    try {
-      await communityService.join(id);
-      setIsMember(true);
-      setCommunity((prev) => {
-        if (!prev) return prev;
-        const current = prev.memberCount ?? prev._count?.members ?? 0;
-        return {
-          ...prev,
-          isJoined: true,
-          memberCount: current + 1,
-          ...(prev._count ? { _count: { ...prev._count, members: current + 1 } } : {}),
-        };
-      });
-      setOpenModal(false);
-    } catch (err) {
-      // Rethrow so the modal can display the error message
-      throw err;
-    } finally {
-      setJoining(false);
-    }
+    await communityService.join(id);
+    setIsMember(true);
+    setCommunity((prev) => {
+      if (!prev) return prev;
+      const current = prev.memberCount ?? prev._count?.members ?? 0;
+      return {
+        ...prev,
+        isJoined: true,
+        memberCount: current + 1,
+        ...(prev._count ? { _count: { ...prev._count, members: current + 1 } } : {}),
+      };
+    });
+    setOpenModal(false);
   };
   const isPrivate = community?.privacy !== 'PUBLIC';
   const memberCount = community?.memberCount ?? community?._count?.members ?? 0;
@@ -141,7 +132,6 @@ const SingleCommunityPage = () => {
           privacy={community.privacy}
           guidelines={GUIDELINES}
           onJoin={handleJoin}
-          joining={joining}
         />
       )}
 

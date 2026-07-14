@@ -13,7 +13,6 @@ interface JoinCommunityModalProps {
   privacy: 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY';
   guidelines: string[];
   onJoin: () => Promise<void>;
-  joining?: boolean;
 }
 
 const PRIVACY_META: Record<string, { icon: React.ReactNode; text: string }> = {
@@ -29,19 +28,23 @@ export const JoinCommunityModal = ({
   privacy,
   guidelines,
   onJoin,
-  joining = false,
 }: JoinCommunityModalProps) => {
   const [isGuidelinesAccepted, setIsGuidelinesAccepted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const privacyMeta = PRIVACY_META[privacy] ?? PRIVACY_META.PUBLIC;
 
   const handleJoin = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     setError(null);
     try {
       await onJoin();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to join community.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -75,7 +78,8 @@ export const JoinCommunityModal = ({
               id="accept-guidelines"
               checked={isGuidelinesAccepted}
               onChange={() => setIsGuidelinesAccepted(!isGuidelinesAccepted)}
-              className="w-5 h-5 text-purple-600 rounded cursor-pointer mt-0.5"
+              disabled={submitting}
+              className="w-5 h-5 text-purple-600 rounded cursor-pointer mt-0.5 disabled:opacity-50"
             />
           </div>
           <ul className="ml-4 space-y-2 text-sm text-[#4E5255]">
@@ -91,13 +95,13 @@ export const JoinCommunityModal = ({
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <Button
-          disabled={!isGuidelinesAccepted || joining}
-          loading={joining}
+          disabled={!isGuidelinesAccepted || submitting}
+          loading={submitting}
           customClass="!w-full px-6 !h-[48px] !text-white !bg-black"
           type="button"
           onClick={handleJoin}
         >
-          {joining ? "Joining..." : "Join Community"}
+          {submitting ? "Joining..." : "Join Community"}
         </Button>
       </div>
     </CustomModal>
