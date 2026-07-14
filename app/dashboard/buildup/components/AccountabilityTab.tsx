@@ -3,12 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
-  CheckCircle, Calendar, Trash2, Globe, UserPlus, Link2, Copy,
+  CheckCircle, Calendar, Trash2, Globe, UserPlus, Link2, Copy, LogOut,
 } from 'lucide-react';
 import { accountabilityService, userService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Button from '@/app/components/Button';
+import Toast from '@/app/components/Toast';
 
 const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 const DAY_LABELS: Record<string, string> = {
@@ -119,7 +120,13 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
           setSelected(null);
           load();
         }}
+        onLeave={async () => {
+          await accountabilityService.leavePartnership(selected.id);
+          setSelected(null);
+          load();
+        }}
         onAccepted={() => { refreshSelected(selected.id); }}
+        onDeclined={() => { setSelected(null); load(); }}
         onPartnerAdded={() => { refreshSelected(selected.id); }}
         router={router}
       />
@@ -257,25 +264,31 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
 // ── Partnership detail ─────────────────────────────────────────────────────────
 
 function PartnershipDetail({
-  partnership: p, onBack, onRefresh, onEnd, onAccepted, onPartnerAdded, router,
+  partnership: p, onBack, onRefresh, onEnd, onLeave, onAccepted, onDeclined, onPartnerAdded, router,
 }: {
   partnership: Partnership;
   onBack: () => void;
   onRefresh: () => void;
   onEnd: () => Promise<void>;
+  onLeave: () => Promise<void>;
   onAccepted: () => void;
+  onDeclined: () => void;
   onPartnerAdded: () => void;
   router: ReturnType<typeof useRouter>;
 }) {
   const [starting, setStarting]             = useState(false);
   const [ending, setEnding]                 = useState(false);
+  const [leaving, setLeaving]               = useState(false);
   const [accepting, setAccepting]           = useState(false);
   const [declining, setDeclining]           = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showAddPartner, setShowAddPartner] = useState(false);
   const [streaks, setStreaks]               = useState(p.streaks ?? []);
   const [copyingLink, setCopyingLink]       = useState(false);
   const [linkCopied, setLinkCopied]         = useState(false);
+  const [alertMsg, setAlertMsg]             = useState('');
+  const [toast, setToast]                   = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   void onRefresh;
 
@@ -287,13 +300,16 @@ function PartnershipDetail({
     }
   }, [p.id, p.status]);
 
+  const showAlert = (msg: string) => setAlertMsg(msg);
+  const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
+
   const handleStartPrayer = async () => {
     setStarting(true);
     try {
       const result = await accountabilityService.startPrayerSession(p.id) as { sessionId: string; meetingId: string; meetingLink: string };
       router.push(`/room/${result.meetingId}?session=${result.sessionId}`);
     } catch (err: unknown) {
-      alert((err as Error)?.message ?? 'Could not start session');
+      showAlert((err as Error)?.message ?? 'Could not start session');
     } finally {
       setStarting(false);
     }
@@ -302,12 +318,11 @@ function PartnershipDetail({
   const handleAccept = async () => {
     setAccepting(true);
     try {
-      const token = p.invites?.find((i) => i.status === 'PENDING')?.token;
-      if (!token) throw new Error('Invite token not available. Please refresh and try again.');
-      await accountabilityService.acceptInvite(token);
+      await accountabilityService.acceptMembership(p.id);
+      showToast('You\'ve joined the prayer group!', 'success');
       onAccepted();
     } catch (err: unknown) {
-      alert((err as Error)?.message ?? 'Could not accept partnership');
+      showToast((err as Error)?.message ?? 'Could not accept partnership', 'error');
     } finally {
       setAccepting(false);
     }
@@ -316,10 +331,11 @@ function PartnershipDetail({
   const handleDecline = async () => {
     setDeclining(true);
     try {
-      await accountabilityService.endPartnership(p.id);
-      onBack();
+      await accountabilityService.declineMembership(p.id);
+      showToast('Invitation declined', 'success');
+      setTimeout(() => onDeclined(), 1500);
     } catch (err: unknown) {
-      alert((err as Error)?.message ?? 'Could not decline');
+      showToast((err as Error)?.message ?? 'Could not decline', 'error');
     } finally {
       setDeclining(false);
     }
@@ -333,7 +349,7 @@ function PartnershipDetail({
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 3000);
     } catch (err: unknown) {
-      alert((err as Error)?.message ?? 'Could not generate invite link');
+      showAlert((err as Error)?.message ?? 'Could not generate invite link');
     } finally {
       setCopyingLink(false);
     }
@@ -344,11 +360,34 @@ function PartnershipDetail({
   const iAmPending     = myMembership?.memberStatus === 'PENDING';
   const activeMembers  = p.members.filter((m) => m.memberStatus === 'ACTIVE');
   const pendingMembers = p.members.filter((m) => m.memberStatus === 'PENDING');
+  const isOwner        = myMembership?.memberRole === 'OWNER';
 
   const groupTitle = p.members.filter((m) => !m.isMe).map((m) => m.firstName).join(', ') || 'Prayer Group';
 
   return (
     <div>
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
+      )}
+
+      {/* Alert modal — replaces browser alert() */}
+      {alertMsg && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setAlertMsg('')}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+              <X className="w-5 h-5 text-red-500" />
+            </div>
+            <p className="text-sm text-gray-700 text-center mb-5 leading-relaxed">{alertMsg}</p>
+            <button
+              onClick={() => setAlertMsg('')}
+              className="w-full py-2.5 bg-[#870BD6] text-white rounded-full text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
@@ -401,9 +440,7 @@ function PartnershipDetail({
                       <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded-full">Owner</span>
                     )}
                     <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                      m.memberStatus === 'ACTIVE'
-                        ? 'bg-green-50 text-green-600'
-                        : 'bg-amber-50 text-amber-600'
+                      m.memberStatus === 'ACTIVE' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
                     }`}>
                       {m.memberStatus === 'ACTIVE' ? 'Active' : 'Pending'}
                     </span>
@@ -415,7 +452,7 @@ function PartnershipDetail({
             {p.canAddMore && (
               <button
                 onClick={() => setShowAddPartner(true)}
-                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-[#870BD6] text-[#870BD6] rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors cursor-pointer"
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 transition-colors cursor-pointer"
               >
                 <UserPlus size={15} /> Add more partners ({MAX_MEMBERS - p.members.length} spots left)
               </button>
@@ -430,7 +467,6 @@ function PartnershipDetail({
               }`}>{isPending ? 'Pending' : 'Active'}</span>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Group</span>
             </div>
-
             <div className="space-y-4">
               <DetailRow icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Prayer Days"
                 value={p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ') || '—'} />
@@ -491,7 +527,7 @@ function PartnershipDetail({
                 <button
                   onClick={handleAccept}
                   disabled={accepting}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
                 >
                   {accepting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                   Accept Request
@@ -499,7 +535,7 @@ function PartnershipDetail({
                 <button
                   onClick={handleDecline}
                   disabled={declining}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-red-200 text-red-500 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer"
                 >
                   {declining ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
                   Decline
@@ -511,7 +547,7 @@ function PartnershipDetail({
               <button
                 onClick={handleStartPrayer}
                 disabled={starting}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-xl font-semibold text-sm mb-3 hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold text-sm mb-3 hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
               >
                 {starting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
                 Start Prayer Session
@@ -522,38 +558,74 @@ function PartnershipDetail({
               <button
                 onClick={handleCopyLink}
                 disabled={copyingLink}
-                className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#870BD6] text-[#870BD6] rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors mb-3 disabled:opacity-60 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 transition-colors mb-3 disabled:opacity-60 cursor-pointer"
               >
                 {copyingLink
                   ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : linkCopied
-                  ? <Copy className="w-4 h-4" />
-                  : <Link2 className="w-4 h-4" />}
+                  : linkCopied ? <Copy className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
                 {linkCopied ? 'Link copied!' : 'Copy invite link'}
               </button>
             )}
 
-            {!showEndConfirm ? (
+            {/* Owner: End Partnership */}
+            {isOwner && !showEndConfirm && (
               <button
                 onClick={() => setShowEndConfirm(true)}
-                className="w-full py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-2.5 border border-red-200 text-red-500 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
                 <Trash2 className="w-4 h-4" /> End Partnership
               </button>
-            ) : (
-              <div className="bg-red-50 rounded-xl p-4">
-                <p className="text-sm text-red-700 font-medium mb-3">End this partnership?</p>
+            )}
+            {isOwner && showEndConfirm && (
+              <div className="bg-red-50 rounded-2xl p-4">
+                <p className="text-sm text-red-700 font-medium mb-1">End for everyone?</p>
+                <p className="text-xs text-red-500 mb-3">This will end the prayer group for all members.</p>
                 <div className="flex gap-2">
                   <button
                     onClick={async () => { setEnding(true); try { await onEnd(); } finally { setEnding(false); } }}
                     disabled={ending}
-                    className="flex-1 py-2 bg-red-500 text-white rounded-lg text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                    className="flex-1 py-2 bg-red-500 text-white rounded-full text-sm font-semibold disabled:opacity-60 cursor-pointer"
                   >
                     {ending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, end it'}
                   </button>
                   <button
                     onClick={() => setShowEndConfirm(false)}
-                    className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-semibold cursor-pointer"
+                    className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-semibold cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Non-owner: Leave Partnership */}
+            {!isOwner && !iAmPending && !showLeaveConfirm && (
+              <button
+                onClick={() => setShowLeaveConfirm(true)}
+                className="w-full py-2.5 border border-red-200 text-red-500 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                <LogOut className="w-4 h-4" /> Leave Partnership
+              </button>
+            )}
+            {!isOwner && !iAmPending && showLeaveConfirm && (
+              <div className="bg-red-50 rounded-2xl p-4">
+                <p className="text-sm text-red-700 font-medium mb-1">Leave this group?</p>
+                <p className="text-xs text-red-500 mb-3">
+                  {activeMembers.length <= 2
+                    ? 'You are one of 2 members — leaving will end the partnership.'
+                    : 'Others will continue praying together without you.'}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => { setLeaving(true); try { await onLeave(); } finally { setLeaving(false); } }}
+                    disabled={leaving}
+                    className="flex-1 py-2 bg-red-500 text-white rounded-full text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                  >
+                    {leaving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, leave'}
+                  </button>
+                  <button
+                    onClick={() => setShowLeaveConfirm(false)}
+                    className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-semibold cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -562,7 +634,6 @@ function PartnershipDetail({
             )}
           </div>
 
-          {/* Creator awaiting responses */}
           {isPending && p.isCreator && (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
               <p className="text-sm font-semibold text-amber-700 mb-1">Awaiting Responses</p>

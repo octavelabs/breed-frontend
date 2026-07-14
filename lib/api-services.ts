@@ -672,6 +672,12 @@ export const accountabilityService = {
 
   endPartnership: (id: string) => api.delete(`/accountability/partnerships/${id}`),
 
+  leavePartnership: (id: string) => api.post(`/accountability/partnerships/${id}/leave`),
+
+  acceptMembership: (id: string) => api.post(`/accountability/partnerships/${id}/accept-membership`),
+
+  declineMembership: (id: string) => api.post(`/accountability/partnerships/${id}/decline-membership`),
+
   getInviteInfo: (token: string) => api.get(`/accountability/join/${token}`),
 
   acceptInvite: (token: string) => api.post(`/accountability/join/${token}`),
