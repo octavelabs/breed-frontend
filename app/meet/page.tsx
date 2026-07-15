@@ -47,7 +47,9 @@ export default function MeetLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
+      {/* Same pink/purple background blob as main hero */}
+      <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full pointer-events-none" />
       {/* Nav — exact same styles as main site Navbar */}
       <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] lg:px-[60px] flex w-full lg:w-fit lg:min-w-[680px] h-[80px] box-border mx-auto items-center gap-0 lg:gap-[72px] justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white lg:bg-[#FBF6FF] lg:rounded-full border-[5px] border-white">
         <a href="https://joinbreed.com" className="h-[30px] w-[80px]">
@@ -76,7 +78,7 @@ export default function MeetLanding() {
               </div>
 
               <h1 className="text-[42px] lg:text-[80px] font-[800] text-[#180426] leading-tight mb-6 font-almarai">
-                Gather in faith, wherever you are.
+                Gather in faith,<br />wherever you are.
               </h1>
 
               <p className="text-base lg:text-[24px] text-[#4E5255] mb-12 max-w-2xl mx-auto lg:mx-0 font-medium">
