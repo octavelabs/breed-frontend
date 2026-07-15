@@ -35,6 +35,7 @@ interface MeetingDetail {
   scheduledAt: string;
   duration: number;
   meetingLink?: string | null;
+  roomCode?: string | null;
   platform?: string | null;
   isRecurring: boolean;
   recurrence?: { frequency: string; endsAt: string } | null;
@@ -260,7 +261,7 @@ export default function MeetingDetailPage() {
   }, [load]);
 
   const joinLink = meeting
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/join/${id}`
+    ? (meeting.roomCode ? `https://meet.joinbreed.com/${meeting.roomCode}` : `${typeof window !== "undefined" ? window.location.origin : ""}/join/${id}`)
     : "";
 
   const handleCopyLink = async () => {

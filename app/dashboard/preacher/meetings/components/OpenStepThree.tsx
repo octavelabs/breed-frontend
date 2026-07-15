@@ -14,9 +14,11 @@ interface FollowUser {
 
 export const OpenStepThree = ({
   meetingId,
+  roomCode,
   handleDone,
 }: {
   meetingId: string;
+  roomCode?: string | null;
   handleDone: () => void;
 }) => {
   const { user } = useAuth();
@@ -27,9 +29,9 @@ export const OpenStepThree = ({
   const [inviting, setInviting] = useState<Record<string, boolean>>({});
   const [invited, setInvited] = useState<Record<string, boolean>>({});
 
-  const joinLink = typeof window !== 'undefined'
-    ? `${window.location.origin}/join/${meetingId}`
-    : `/join/${meetingId}`;
+  const joinLink = roomCode
+    ? `https://meet.joinbreed.com/${roomCode}`
+    : (typeof window !== 'undefined' ? `${window.location.origin}/join/${meetingId}` : `/join/${meetingId}`);
 
   useEffect(() => {
     if (!user?.id) return;

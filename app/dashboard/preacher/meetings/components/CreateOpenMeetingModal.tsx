@@ -32,6 +32,7 @@ export const CreateOpenMeetingModal = ({
   const [creatingMeeting, setCreatingMeeting] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [meetingId, setMeetingId] = useState<string | null>(null);
+  const [roomCode, setRoomCode] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<OpenMeetingFormData>({
     title: '', guests: [], description: '',
@@ -66,8 +67,9 @@ export const CreateOpenMeetingModal = ({
         recurrence: isRecurring && freq
           ? { frequency: freq as 'daily' | 'weekly' | 'monthly', endsAt: new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0] }
           : undefined,
-      }) as { id: string };
+      }) as { id: string; roomCode?: string | null };
       setMeetingId(res.id);
+      setRoomCode(res.roomCode ?? null);
       setStep(3);
     } catch (err: unknown) {
       setCreateError(err instanceof Error ? err.message : 'Failed to create meeting. Please try again.');
@@ -127,7 +129,7 @@ export const CreateOpenMeetingModal = ({
             </>
           )}
           {step === 3 && meetingId && (
-            <OpenStepThree meetingId={meetingId} handleDone={handleDone} />
+            <OpenStepThree meetingId={meetingId} roomCode={roomCode} handleDone={handleDone} />
           )}
         </div>
       </div>

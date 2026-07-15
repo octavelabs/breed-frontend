@@ -29,6 +29,7 @@ interface SessionDetail {
   duration: number;
   status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
   meetingLink?: string | null;
+  roomCode?: string | null;
   notes?: string | null;
   mentorId: string;
   discipleId: string;
@@ -136,9 +137,9 @@ export default function SessionDetailPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const joinLink = typeof window !== "undefined"
-    ? `${window.location.origin}/join/${id}`
-    : `https://joinbreed.com/join/${id}`;
+  const joinLink = session?.roomCode
+    ? `https://meet.joinbreed.com/${session.roomCode}`
+    : (typeof window !== "undefined" ? `${window.location.origin}/join/${id}` : `https://joinbreed.com/join/${id}`);
 
   const handleCopy = async () => {
     try {

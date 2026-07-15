@@ -9,6 +9,16 @@ const AUTH_ROUTES = [
 ];
 
 export function middleware(request: NextRequest) {
+  // Rewrite meet.joinbreed.com/{code} → /join/{code} on the same app
+  const host = request.headers.get('host') ?? '';
+  if (host.startsWith('meet.')) {
+    const { pathname, search } = request.nextUrl;
+    const code = pathname.replace(/^\//, ''); // strip leading slash
+    if (code) {
+      return NextResponse.rewrite(new URL(`/join/${code}${search}`, request.url));
+    }
+  }
+
   const { pathname } = request.nextUrl;
 
   const isLoggedIn = request.cookies.has('breed_logged_in');
