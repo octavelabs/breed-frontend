@@ -9,14 +9,17 @@ const AUTH_ROUTES = [
 ];
 
 export function middleware(request: NextRequest) {
-  // Rewrite meet.joinbreed.com/{code} → /join/{code} on the same app
+  // Handle meet.joinbreed.com subdomain
   const host = request.headers.get('host') ?? '';
   if (host.startsWith('meet.')) {
     const { pathname, search } = request.nextUrl;
     const code = pathname.replace(/^\//, ''); // strip leading slash
     if (code) {
+      // meet.joinbreed.com/{code} → /join/{code}
       return NextResponse.rewrite(new URL(`/join/${code}${search}`, request.url));
     }
+    // meet.joinbreed.com/ → /meet (landing page)
+    return NextResponse.rewrite(new URL('/meet', request.url));
   }
 
   const { pathname } = request.nextUrl;
