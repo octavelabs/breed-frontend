@@ -28,7 +28,7 @@ export default function MeetLanding() {
       inputRef.current?.focus();
       return;
     }
-    router.push(`/join/${code}`);
+    router.push(`/${code}`);
   };
 
   return (

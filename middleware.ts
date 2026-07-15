@@ -13,13 +13,18 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   if (host.startsWith('meet.')) {
     const { pathname, search } = request.nextUrl;
-    const code = pathname.replace(/^\//, ''); // strip leading slash
-    if (code) {
-      // meet.joinbreed.com/{code} → /join/{code}
-      return NextResponse.rewrite(new URL(`/join/${code}${search}`, request.url));
+    const slug = pathname.slice(1); // strip leading slash
+
+    // Only rewrite paths that look like room codes (e.g. oiop-ahla-eyvo)
+    // Other app paths (/join/xxx, /room/xxx, /meet, etc.) pass through to their own pages
+    if (/^[a-z]+-[a-z]+-[a-z]+$/.test(slug)) {
+      return NextResponse.rewrite(new URL(`/join/${slug}${search}`, request.url));
     }
-    // meet.joinbreed.com/ → /meet (landing page)
-    return NextResponse.rewrite(new URL('/meet', request.url));
+
+    // Root → landing page
+    if (!slug) {
+      return NextResponse.rewrite(new URL('/meet', request.url));
+    }
   }
 
   const { pathname } = request.nextUrl;
