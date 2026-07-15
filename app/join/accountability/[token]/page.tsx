@@ -20,6 +20,16 @@ interface InviteInfo {
   status: string;
 }
 
+function Logo() {
+  return (
+    <div className="flex justify-center mb-8">
+      <a href="https://joinbreed.com">
+        <img src="/Logo.png" alt="Breed" className="h-[30px] w-[80px] object-contain" />
+      </a>
+    </div>
+  );
+}
+
 export default function AccountabilityInvitePage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
@@ -56,7 +66,7 @@ export default function AccountabilityInvitePage() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f8edfe]">
         <div className="w-8 h-8 rounded-full border-2 border-t-[#870BD6] border-[#E9D5FF] animate-spin" />
       </div>
     );
@@ -64,7 +74,8 @@ export default function AccountabilityInvitePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8edfe] p-4">
+        <Logo />
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-sm">
           <CloseCircle size={48} color="#f87171" className="mx-auto mb-4" />
           <h2 className="text-lg font-bold text-gray-900 mb-2">Invite unavailable</h2>
@@ -76,7 +87,8 @@ export default function AccountabilityInvitePage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8edfe] p-4">
+        <Logo />
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-sm">
           <TickCircle size={48} color="#22c55e" className="mx-auto mb-4" />
           <h2 className="text-lg font-bold text-gray-900 mb-2">You&apos;ve joined the prayer group!</h2>
@@ -89,9 +101,10 @@ export default function AccountabilityInvitePage() {
   const inviterName = info ? `${info.invitedBy.firstName} ${info.invitedBy.lastName}` : '';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8edfe] p-4">
+      <Logo />
       <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-sm">
-        {/* Logo */}
+        {/* Header */}
         <div className="text-center mb-6">
           <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
             <Profile2User size={28} color="#870BD6" />
@@ -120,7 +133,7 @@ export default function AccountabilityInvitePage() {
         <button
           onClick={handleAccept}
           disabled={accepting}
-          className="w-full py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold hover:bg-[#7009b8] transition-colors disabled:opacity-60"
+          className="w-full py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
         >
           {accepting ? (
             <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin mx-auto" />
