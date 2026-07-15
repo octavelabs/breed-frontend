@@ -3,9 +3,20 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { TickCircle, CloseCircle, InfoCircle } from "iconsax-react";
 import { authService } from "../../lib/api-services";
 
 type Status = "loading" | "success" | "error" | "missing";
+
+function Logo() {
+  return (
+    <div className="flex justify-center mb-8">
+      <a href="https://joinbreed.com">
+        <img src="/Logo.png" alt="Breed" className="h-[30px] w-[80px] object-contain" />
+      </a>
+    </div>
+  );
+}
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -25,7 +36,6 @@ function VerifyEmailContent() {
       try {
         await authService.verifyEmail(token);
         setStatus("success");
-        // Redirect to login after 3 seconds
         setTimeout(() => router.push("/login?verified=true"), 3000);
       } catch (err: unknown) {
         const msg =
@@ -39,13 +49,9 @@ function VerifyEmailContent() {
   }, [token, router]);
 
   return (
-    <div className="min-h-screen bg-[#FBF6FF] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#f8edfe] flex flex-col items-center justify-center px-4">
+      <Logo />
       <div className="bg-white rounded-[24px] shadow-sm p-8 max-w-md w-full text-center">
-        {/* Logo */}
-        <div className="w-[52px] h-[52px] rounded-full bg-[#FBF6FF] mb-6 flex justify-center items-center mx-auto">
-          <img src="/heroImage2.svg" alt="Breed" className="w-[36px] h-[36px]" />
-        </div>
-
         {status === "loading" && (
           <>
             <div className="flex justify-center mb-4">
@@ -58,18 +64,14 @@ function VerifyEmailContent() {
 
         {status === "success" && (
           <>
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+            <TickCircle size={64} color="#22c55e" className="mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Email Verified!</h2>
             <p className="text-gray-500 text-sm mb-6">
               Your account is now active. Redirecting you to login…
             </p>
             <Link
               href="/login"
-              className="inline-block w-full py-3 px-6 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors text-sm"
+              className="inline-block w-full py-3 px-6 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold rounded-full hover:opacity-90 transition-opacity text-sm"
             >
               Go to Login
             </Link>
@@ -78,18 +80,14 @@ function VerifyEmailContent() {
 
         {status === "error" && (
           <>
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
+            <CloseCircle size={64} color="#f87171" className="mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Failed</h2>
             <p className="text-gray-500 text-sm mb-6">
               {message || "This link is invalid or has expired. Please request a new verification email."}
             </p>
             <Link
               href="/login"
-              className="inline-block w-full py-3 px-6 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors text-sm"
+              className="inline-block w-full py-3 px-6 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold rounded-full hover:opacity-90 transition-opacity text-sm"
             >
               Back to Login
             </Link>
@@ -98,18 +96,14 @@ function VerifyEmailContent() {
 
         {status === "missing" && (
           <>
-            <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" />
-              </svg>
-            </div>
+            <InfoCircle size={64} color="#eab308" className="mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Invalid Link</h2>
             <p className="text-gray-500 text-sm mb-6">
               No verification token was found in this link. Please use the link from your email.
             </p>
             <Link
               href="/login"
-              className="inline-block w-full py-3 px-6 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors text-sm"
+              className="inline-block w-full py-3 px-6 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold rounded-full hover:opacity-90 transition-opacity text-sm"
             >
               Back to Login
             </Link>
@@ -122,7 +116,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FBF6FF]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#f8edfe]" />}>
       <VerifyEmailContent />
     </Suspense>
   );
