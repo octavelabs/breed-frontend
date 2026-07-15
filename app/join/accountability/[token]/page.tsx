@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, Users, CheckCircle, XCircle, Clock, Calendar } from 'lucide-react';
+import { Profile2User, TickCircle, CloseCircle, Clock, Calendar } from 'iconsax-react';
 import { accountabilityService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 
@@ -57,7 +57,7 @@ export default function AccountabilityInvitePage() {
   if (isLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#870BD6]" />
+        <div className="w-8 h-8 rounded-full border-2 border-t-[#870BD6] border-[#E9D5FF] animate-spin" />
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function AccountabilityInvitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] p-4">
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-sm">
-          <XCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <CloseCircle size={48} color="#f87171" className="mx-auto mb-4" />
           <h2 className="text-lg font-bold text-gray-900 mb-2">Invite unavailable</h2>
           <p className="text-sm text-gray-500">{error}</p>
         </div>
@@ -78,7 +78,7 @@ export default function AccountabilityInvitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FC] p-4">
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-sm">
-          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+          <TickCircle size={48} color="#22c55e" className="mx-auto mb-4" />
           <h2 className="text-lg font-bold text-gray-900 mb-2">You&apos;ve joined the prayer group!</h2>
           <p className="text-sm text-gray-500">Taking you to your prayer room...</p>
         </div>
@@ -94,7 +94,7 @@ export default function AccountabilityInvitePage() {
         {/* Logo */}
         <div className="text-center mb-6">
           <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-            <Users className="w-7 h-7 text-[#870BD6]" />
+            <Profile2User size={28} color="#870BD6" />
           </div>
           <p className="text-xs font-bold uppercase tracking-widest text-[#870BD6]">Breed — Prayer Partner</p>
         </div>
@@ -107,11 +107,11 @@ export default function AccountabilityInvitePage() {
         {info && (
           <div className="bg-purple-50 rounded-2xl p-4 mb-6 space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-700">
-              <Clock className="w-4 h-4 text-[#870BD6]" />
+              <Clock size={16} color="#870BD6" />
               <span>Prayer time: <strong>{info.prayerTime}</strong></span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-700">
-              <Calendar className="w-4 h-4 text-[#870BD6]" />
+              <Calendar size={16} color="#870BD6" />
               <span>{info.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ')}</span>
             </div>
           </div>
@@ -120,10 +120,10 @@ export default function AccountabilityInvitePage() {
         <button
           onClick={handleAccept}
           disabled={accepting}
-          className="w-full py-3 bg-[#870BD6] text-white rounded-xl font-semibold hover:bg-[#7009b8] transition-colors disabled:opacity-60"
+          className="w-full py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold hover:bg-[#7009b8] transition-colors disabled:opacity-60"
         >
           {accepting ? (
-            <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+            <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin mx-auto" />
           ) : isAuthenticated ? (
             'Accept & Start Praying Together'
           ) : (
