@@ -47,11 +47,11 @@ export default function MeetLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
-      {/* Same pink/purple background blob as main hero */}
-      <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full pointer-events-none" />
+    <div className="min-h-screen bg-[#F7EDFE] flex flex-col relative overflow-hidden">
+      {/* Same pink/purple background blob as main hero — to-[#F7EDFE] matches page bg so edges blend */}
+      <div className="absolute left-[-30px] top-[-80%] right-0 bg-gradient-to-r from-[#F1DFFF] to-[#F7EDFE] aspect-square rounded-full pointer-events-none z-0" />
       {/* Nav — exact same styles as main site Navbar */}
-      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] lg:px-[60px] flex w-full lg:w-fit lg:min-w-[680px] h-[80px] box-border mx-auto items-center gap-0 lg:gap-[72px] justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white lg:bg-[#FBF6FF] lg:rounded-full border-[5px] border-white">
+      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] lg:px-[60px] flex w-full lg:w-fit lg:min-w-[680px] h-[80px] box-border mx-auto items-center gap-0 lg:gap-[72px] justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white lg:bg-[#FBF6FF] lg:rounded-full border-[5px] border-white relative">
         <a href="https://joinbreed.com" className="h-[30px] w-[80px]">
           <img src="/Logo.png" alt="logo" className="h-full w-full" />
         </a>
@@ -66,7 +66,7 @@ export default function MeetLanding() {
       </nav>
 
       {/* Hero — push content below fixed nav (80px mobile, 80px+40px desktop) */}
-      <main className="flex-1 flex items-center pt-[80px] lg:pt-[120px]">
+      <main className="flex-1 flex items-center pt-[80px] lg:pt-[120px] relative z-10">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-12 lg:py-0">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
@@ -165,7 +165,7 @@ export default function MeetLanding() {
       </main>
 
       {/* Footer */}
-      <footer className="px-6 lg:px-12 py-5 border-t border-gray-100 flex items-center justify-between">
+      <footer className="px-6 lg:px-12 py-5 border-t border-[#e8d9f8] flex items-center justify-between relative z-10">
         <p className="text-xs text-[#A0A8B0]">© 2025 Breed. All rights reserved.</p>
         <div className="flex items-center gap-4 text-xs text-[#A0A8B0]">
           <a href="https://joinbreed.com/privacy" className="hover:text-[#870BD6] transition-colors">Privacy</a>
