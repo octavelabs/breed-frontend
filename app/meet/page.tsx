@@ -48,30 +48,23 @@ export default function MeetLanding() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 lg:px-12 py-5 border-b border-gray-100">
-        {/* Same logo treatment as main site navbar */}
+      {/* Nav — exact same styles as main site Navbar */}
+      <nav className="shadow-[0px_16px_50px_0px_#0310271A] px-4 sm:px-[40px] flex w-full lg:w-fit h-[80px] box-border mx-auto items-center gap-0 lg:gap-[72px] justify-between left-1/2 -translate-x-1/2 fixed top-0 lg:top-[40px] z-20 bg-white lg:bg-[#FBF6FF] lg:rounded-full border-[5px] border-white">
         <a href="https://joinbreed.com" className="h-[30px] w-[80px]">
-          <img src="/Logo.png" alt="Breed" className="h-full w-full object-contain" />
+          <img src="/Logo.png" alt="logo" className="h-full w-full" />
         </a>
-        <div className="flex items-center gap-3">
-          <a
-            href="https://joinbreed.com/login"
-            className="whitespace-nowrap px-5 py-3 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            Sign in
-          </a>
-          <a
-            href="https://joinbreed.com/signup"
-            className="whitespace-nowrap px-5 py-3 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            Get started
-          </a>
+        <div className="flex gap-4">
+          <button className="whitespace-nowrap px-5 py-4 bg-white text-[#5B26B1] border-[1.5px] border-[#5B26B1] rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
+            <a href="https://joinbreed.com/login">Sign in</a>
+          </button>
+          <button className="whitespace-nowrap px-5 py-4 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300">
+            <a href="https://joinbreed.com/signup">Get started</a>
+          </button>
         </div>
       </nav>
 
-      {/* Hero */}
-      <main className="flex-1 flex items-center">
+      {/* Hero — push content below fixed nav (80px mobile, 80px+40px desktop) */}
+      <main className="flex-1 flex items-center pt-[80px] lg:pt-[120px]">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-12 lg:py-0">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
