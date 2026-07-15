@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Video } from "lucide-react";
 
 function formatCode(raw: string): string {
-  const letters = raw.replace(/[^a-zA-Z]/g, "").toLowerCase().slice(0, 12);
-  const parts = [letters.slice(0, 4), letters.slice(4, 8), letters.slice(8, 12)].filter(Boolean);
+  const letters = raw.replace(/[^a-zA-Z]/g, "").toLowerCase().slice(0, 9);
+  const parts = [letters.slice(0, 3), letters.slice(3, 6), letters.slice(6, 9)].filter(Boolean);
   return parts.join("-");
 }
 
@@ -94,7 +94,7 @@ export default function MeetLanding() {
 
         <p className="mt-4 text-xs text-[#A0A8B0]">
           Room codes look like{" "}
-          <span className="font-mono font-medium text-[#60666B]">abcd-efgh-ijkl</span>
+          <span className="font-mono font-medium text-[#60666B]">abc-def-ghi</span>
         </p>
 
       </main>
