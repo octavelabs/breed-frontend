@@ -2,9 +2,17 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Users, Flame, Plus, ChevronRight, Loader2, X, Video, Clock,
-  CheckCircle, Calendar, Trash2, Globe, UserPlus, Link2, Copy, LogOut,
-} from 'lucide-react';
+  People, Add, ArrowRight2, Video, Clock, TickCircle, Calendar,
+  Trash, Global, UserAdd, Link2, Copy, CloseCircle, Logout,
+} from 'iconsax-react';
+
+function FlameIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33 7.26 13 4.85 13.95 3c-.95.23-1.78.75-2.45 1.32C9.49 6.05 8.5 8.5 8.67 10.93l.01.08v.1c0 .41-.23.79-.59.99-.37.16-.72.47-.72.97v.17c.01 1.43.85 2.66 2.04 3.33-1.14-1.94-.83-4.39.61-5.93 0 1.05.12 2.12.7 3.03.78 1.25 2.23 2 2.58 3.54.29 1.25-.24 2.79-1.36 3.55 1.45 0 2.84-.79 3.7-1.95.86-1.16 1.14-2.65.86-4.06-.23-1.21-.96-2.04-1.56-2.97.77.34 1.42.85 1.93 1.5.78.96 1.14 2.19 1.15 3.43 0 .43-.05.86-.15 1.28 1.27-1.2 2-2.94 2-4.71 0-1.07-.37-2.12-1-3l-.82.7z" />
+    </svg>
+  );
+}
 import { accountabilityService, userService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -146,14 +154,14 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
       ) : partnerships.length === 0 ? (
         <div className="flex flex-col items-center py-20">
           <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center mb-4">
-            <Users className="w-8 h-8 text-[#870BD6]" />
+            <People size={32} color="#870BD6" />
           </div>
           <h3 className="font-bold text-gray-900 mb-2">No prayer groups yet</h3>
           <p className="text-sm text-gray-500 mb-6 text-center max-w-xs">
             Invite up to 4 people to pray with you at a set time each week.
           </p>
           <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-6 !h-[44px] !text-white">
-            <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />Invite Prayer Partners</p>
+            <p className="flex items-center gap-1.5 text-sm"><Add size={16} color="white" />Invite Prayer Partners</p>
           </Button>
         </div>
       ) : (
@@ -248,13 +256,13 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
 
       {p.myStreak && p.myStreak.currentStreak > 0 && (
         <p className="flex items-center gap-1 text-xs font-semibold text-orange-500">
-          <Flame className="w-3.5 h-3.5" /> {p.myStreak.currentStreak} day streak
+          <FlameIcon className="w-3.5 h-3.5" /> {p.myStreak.currentStreak} day streak
         </p>
       )}
 
       <div className="mt-auto pt-1">
         <div className="w-full h-10 flex items-center justify-center gap-1 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-medium rounded-full">
-          View Details <ChevronRight size={14} />
+          View Details <ArrowRight2 size={14} />
         </div>
       </div>
     </div>
@@ -375,7 +383,7 @@ function PartnershipDetail({
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setAlertMsg('')}>
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-              <X className="w-5 h-5 text-red-500" />
+              <CloseCircle size={20} color="#ef4444" />
             </div>
             <p className="text-sm text-gray-700 text-center mb-5 leading-relaxed">{alertMsg}</p>
             <button
@@ -391,7 +399,7 @@ function PartnershipDetail({
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
-          <ChevronRight className="w-5 h-5 text-gray-500 rotate-180" />
+          <ArrowRight2 size={20} color="#6b7280" className="rotate-180" />
         </button>
         <h1 className="text-xl font-bold text-[#180426] truncate">{groupTitle}</h1>
         <span className={`text-xs font-bold px-3 py-1 rounded-full border shrink-0 ${
@@ -415,7 +423,7 @@ function PartnershipDetail({
                   onClick={() => setShowAddPartner(true)}
                   className="flex items-center gap-1.5 text-xs font-semibold text-[#870BD6] hover:opacity-75 transition-opacity cursor-pointer"
                 >
-                  <UserPlus size={13} /> Add partner
+                  <UserAdd size={13} color="#870BD6" /> Add partner
                 </button>
               )}
             </div>
@@ -454,7 +462,7 @@ function PartnershipDetail({
                 onClick={() => setShowAddPartner(true)}
                 className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 transition-colors cursor-pointer"
               >
-                <UserPlus size={15} /> Add more partners ({MAX_MEMBERS - p.members.length} spots left)
+                <UserAdd size={15} color="#870BD6" /> Add more partners ({MAX_MEMBERS - p.members.length} spots left)
               </button>
             )}
           </div>
@@ -468,17 +476,17 @@ function PartnershipDetail({
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Group</span>
             </div>
             <div className="space-y-4">
-              <DetailRow icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Prayer Days"
+              <DetailRow icon={<Calendar size={16} color="#9ca3af" />} label="Prayer Days"
                 value={p.prayerDays.map((d) => DAY_LABELS[d] ?? d).join(', ') || '—'} />
-              <DetailRow icon={<Clock className="w-4 h-4 text-gray-400" />} label="Prayer Time" value={p.prayerTime} />
-              <DetailRow icon={<Globe className="w-4 h-4 text-gray-400" />} label="Timezone" value={p.timezone} />
+              <DetailRow icon={<Clock size={16} color="#9ca3af" />} label="Prayer Time" value={p.prayerTime} />
+              <DetailRow icon={<Global size={16} color="#9ca3af" />} label="Timezone" value={p.timezone} />
               <DetailRow
-                icon={<Calendar className="w-4 h-4 text-gray-400" />} label="Since"
+                icon={<Calendar size={16} color="#9ca3af" />} label="Since"
                 value={new Date(p.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
               />
               {p.lastSession && (
                 <DetailRow
-                  icon={<CheckCircle className="w-4 h-4 text-green-500" />} label="Last Session"
+                  icon={<TickCircle size={16} color="#22c55e" />} label="Last Session"
                   value={new Date(p.lastSession.startedAt).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
                 />
               )}
@@ -504,7 +512,7 @@ function PartnershipDetail({
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5 text-orange-500 mb-1">
-                      <Flame className="w-4 h-4" />
+                      <FlameIcon className="w-4 h-4" />
                       <span className="font-bold text-lg">{s.currentStreak}</span>
                       <span className="text-xs text-gray-400">day streak</span>
                     </div>
@@ -529,7 +537,7 @@ function PartnershipDetail({
                   disabled={accepting}
                   className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
                 >
-                  {accepting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  {accepting ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin" /> : <TickCircle size={16} color="white" />}
                   Accept Request
                 </button>
                 <button
@@ -537,7 +545,7 @@ function PartnershipDetail({
                   disabled={declining}
                   className="w-full flex items-center justify-center gap-2 py-2.5 border border-red-200 text-red-500 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer"
                 >
-                  {declining ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                  {declining ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-red-400 border-red-200 animate-spin" /> : <CloseCircle size={16} color="#ef4444" />}
                   Decline
                 </button>
               </div>
@@ -549,7 +557,7 @@ function PartnershipDetail({
                 disabled={starting}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full font-semibold text-sm mb-3 hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer"
               >
-                {starting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
+                {starting ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin" /> : <Video size={16} color="white" />}
                 Start Prayer Session
               </button>
             )}
@@ -561,8 +569,8 @@ function PartnershipDetail({
                 className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 transition-colors mb-3 disabled:opacity-60 cursor-pointer"
               >
                 {copyingLink
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : linkCopied ? <Copy className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
+                  ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-[#870BD6] border-purple-200 animate-spin" />
+                  : linkCopied ? <Copy size={16} color="#870BD6" /> : <Link2 size={16} color="#870BD6" />}
                 {linkCopied ? 'Link copied!' : 'Copy invite link'}
               </button>
             )}
@@ -573,7 +581,7 @@ function PartnershipDetail({
                 onClick={() => setShowEndConfirm(true)}
                 className="w-full py-2.5 border border-red-200 text-red-500 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
-                <Trash2 className="w-4 h-4" /> End Partnership
+                <Trash size={16} color="#ef4444" /> End Partnership
               </button>
             )}
             {isOwner && showEndConfirm && (
@@ -586,7 +594,7 @@ function PartnershipDetail({
                     disabled={ending}
                     className="flex-1 py-2 bg-[#e44e4e] text-white rounded-full text-sm font-semibold disabled:opacity-60 cursor-pointer"
                   >
-                    {ending ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, end it'}
+                    {ending ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin mx-auto" /> : 'Yes, end it'}
                   </button>
                   <button
                     onClick={() => setShowEndConfirm(false)}
@@ -604,7 +612,7 @@ function PartnershipDetail({
                 onClick={() => setShowLeaveConfirm(true)}
                 className="w-full py-2.5 border border-red-200 text-red-500 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
-                <LogOut className="w-4 h-4" /> Leave Partnership
+                <Logout size={16} color="#ef4444" /> Leave Partnership
               </button>
             )}
             {!isOwner && !iAmPending && showLeaveConfirm && (
@@ -621,7 +629,7 @@ function PartnershipDetail({
                     disabled={leaving}
                     className="flex-1 py-2 bg-red-500 text-white rounded-full text-sm font-semibold disabled:opacity-60 cursor-pointer"
                   >
-                    {leaving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, leave'}
+                    {leaving ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin mx-auto" /> : 'Yes, leave'}
                   </button>
                   <button
                     onClick={() => setShowLeaveConfirm(false)}
@@ -657,7 +665,7 @@ function PartnershipDetail({
                 <div className="flex justify-between border-t border-gray-100 pt-3">
                   <span className="text-[#60666B]">My Streak</span>
                   <span className="flex items-center gap-1 font-medium text-orange-500">
-                    <Flame className="w-3.5 h-3.5" />{p.myStreak.currentStreak} days
+                    <FlameIcon className="w-3.5 h-3.5" />{p.myStreak.currentStreak} days
                   </span>
                 </div>
               )}
@@ -741,10 +749,10 @@ function PartnerSearchInput({
           placeholder={placeholder}
           className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] pr-8"
         />
-        {(loading) && <Loader2 className="absolute right-3 top-2.5 w-4 h-4 animate-spin text-gray-400" />}
+        {(loading) && <span className="absolute right-3 top-2.5 inline-block w-4 h-4 rounded-full border-2 border-t-gray-400 border-gray-200 animate-spin" />}
         {!loading && value && onClear && (
           <button type="button" onClick={onClear} className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600 cursor-pointer">
-            <X size={14} />
+            <CloseCircle size={14} color="#9ca3af" />
           </button>
         )}
       </div>
@@ -848,7 +856,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
           <h3 className="font-bold text-gray-900">
             {step === 'partners' ? 'Add Prayer Partners' : 'Set Schedule'}
           </h3>
-          <button onClick={onClose} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="cursor-pointer"><CloseCircle size={20} color="#9ca3af" /></button>
         </div>
 
         <div className="p-5 space-y-4 sm:overflow-y-auto sm:flex-1">
@@ -869,7 +877,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                     </div>
                     {invitees.length > 1 && (
                       <button type="button" onClick={() => removeInvitee(i)} className="shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer">
-                        <X size={16} />
+                        <CloseCircle size={16} color="#9ca3af" />
                       </button>
                     )}
                   </div>
@@ -882,7 +890,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                   onClick={addInvitee}
                   className="flex items-center gap-1.5 text-sm text-[#870BD6] font-semibold hover:opacity-75 transition-opacity cursor-pointer"
                 >
-                  <Plus size={14} /> Add another person
+                  <Add size={14} color="#870BD6" /> Add another person
                 </button>
               )}
 
@@ -996,7 +1004,7 @@ function AddPartnerModal({
       <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="font-bold text-gray-900">Add Partner</h3>
-          <button onClick={onClose} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="cursor-pointer"><CloseCircle size={20} color="#9ca3af" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div>
