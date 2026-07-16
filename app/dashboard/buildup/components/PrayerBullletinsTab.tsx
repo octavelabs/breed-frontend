@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { BookOpen, Bookmark, BookmarkCheck, ChevronRight, Loader2, Flame, X, Plus } from 'lucide-react';
+import { Bookmark, ArrowRight2, CloseCircle, Add } from 'iconsax-react';
 import { prayerService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/app/components/Button';
@@ -126,7 +126,7 @@ export default function PrayerBullletinsTab() {
         <p className="text-sm text-gray-500">Focused prayer points for every season</p>
         {isAdmin && (
           <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-5 !h-[44px] !text-white">
-            <p className="flex items-center gap-1.5 text-sm"><Plus stroke="white" size={16} />New Bulletin</p>
+            <p className="flex items-center gap-1.5 text-sm"><Add size={16} color="white" />New Bulletin</p>
           </Button>
         )}
       </div>
@@ -151,7 +151,9 @@ export default function PrayerBullletinsTab() {
       {/* Today */}
       {mode === 'today' && (
         loadingToday ? (
-          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+          </div>
         ) : todayBulletin ? (
           <FeaturedBulletin bulletin={todayBulletin} onSelect={() => setSelected(todayBulletin)} onBookmark={() => toggleBookmark(todayBulletin)} />
         ) : (
@@ -183,11 +185,13 @@ export default function PrayerBullletinsTab() {
       {/* Bookmarks */}
       {mode === 'bookmarks' && (
         loadingBookmarks ? (
-          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+          </div>
         ) : bookmarks.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
-              <Bookmark className="w-8 h-8 text-[#870BD6]" />
+              <Bookmark size={32} color="#870BD6" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">No saved bulletins</h3>
             <p className="text-sm text-gray-500">Bookmark prayer bulletins to revisit them anytime.</p>
@@ -206,7 +210,9 @@ export default function PrayerBullletinsTab() {
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
             <div className="flex justify-between mb-4">
               <h3 className="font-bold">Create Bulletin (Admin)</h3>
-              <button onClick={() => setShowCreate(false)} className="cursor-pointer"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowCreate(false)} className="cursor-pointer">
+                <CloseCircle size={20} color="#9ca3af" />
+              </button>
             </div>
             <p className="text-sm text-gray-500">Bulletin creation requires admin access through the admin panel.</p>
           </div>
@@ -223,23 +229,25 @@ function FeaturedBulletin({ bulletin: b, onSelect, onBookmark }: { bulletin: Bul
       <div className="absolute inset-0 bg-black/25" />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-bold uppercase tracking-widest text-white/70">Today's Prayer</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-white/70">Today&apos;s Prayer</span>
           <button
             onClick={(e) => { e.stopPropagation(); onBookmark(); }}
             className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors cursor-pointer"
           >
-            {b.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-white" /> : <Bookmark className="w-4 h-4 text-white" />}
+            {b.isBookmarked
+              ? <Bookmark variant="Bold" size={16} color="white" />
+              : <Bookmark size={16} color="white" />}
           </button>
         </div>
         <h2 className="text-xl md:text-2xl font-bold text-white mb-3 leading-tight">{b.title}</h2>
         <p className="text-white/80 text-sm leading-relaxed line-clamp-3 mb-4">{b.content}</p>
         {b.bibleVerse && (
-          <p className="text-white/60 text-xs italic">"{b.bibleVerse}"</p>
+          <p className="text-white/60 text-xs italic">&ldquo;{b.bibleVerse}&rdquo;</p>
         )}
         <div className="flex items-center justify-between mt-4">
           {cat && <span className="text-xs text-white/70 font-medium">{cat.emoji} {cat.label}</span>}
           <div className="flex items-center gap-1 text-white/70 text-xs">
-            <ChevronRight className="w-4 h-4" />
+            <ArrowRight2 size={16} color="rgba(255,255,255,0.7)" />
             <span>Read more</span>
           </div>
         </div>
@@ -257,7 +265,9 @@ function BulletinCard({ bulletin: b, onSelect, onBookmark }: { bulletin: Bulleti
           {cat?.emoji} {cat?.label ?? b.category}
         </span>
         <button onClick={(e) => { e.stopPropagation(); onBookmark(); }} className="text-gray-400 hover:text-[#870BD6] cursor-pointer">
-          {b.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-[#870BD6]" /> : <Bookmark className="w-4 h-4" />}
+          {b.isBookmarked
+            ? <Bookmark variant="Bold" size={16} color="#870BD6" />
+            : <Bookmark size={16} color="#9ca3af" />}
         </button>
       </div>
       <h3 className="font-bold text-gray-900 mb-2 leading-tight">{b.title}</h3>
@@ -280,12 +290,14 @@ function CategoryBulletins({
     <div>
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full cursor-pointer">
-          <ChevronRight className="w-5 h-5 text-gray-500 rotate-180" />
+          <ArrowRight2 size={20} color="#6b7280" className="rotate-180" />
         </button>
         <h2 className="text-xl font-bold text-gray-900">{category.emoji} {category.label}</h2>
       </div>
       {loading ? (
-        <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
+        <div className="flex justify-center items-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+        </div>
       ) : bulletins.length === 0 ? (
         <div className="text-center py-16 text-gray-400 text-sm">No bulletins in this category yet.</div>
       ) : (
@@ -304,15 +316,17 @@ function BulletinDetail({ bulletin: b, onBack, onBookmark }: { bulletin: Bulleti
   return (
     <div className="max-w-2xl">
       <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
-        <ChevronRight className="w-5 h-5 rotate-180" />
-        <span className="text-sm">Back</span>
+        <ArrowRight2 size={20} color="#6b7280" className="rotate-180" />
+        <span className="text-sm font-medium">Back</span>
       </button>
 
       <div className={`rounded-2xl p-6 bg-linear-to-br ${cat?.color ?? 'from-purple-600 to-purple-800'} mb-6`}>
         <div className="flex items-start justify-between">
           <span className="text-3xl">{cat?.emoji}</span>
           <button onClick={onBookmark} className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors cursor-pointer">
-            {b.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-white" /> : <Bookmark className="w-4 h-4 text-white" />}
+            {b.isBookmarked
+              ? <Bookmark variant="Bold" size={16} color="white" />
+              : <Bookmark size={16} color="white" />}
           </button>
         </div>
         <span className="text-xs font-bold uppercase tracking-widest text-white/60 mt-2 block">{cat?.label}</span>
@@ -321,7 +335,7 @@ function BulletinDetail({ bulletin: b, onBack, onBookmark }: { bulletin: Bulleti
 
       {b.bibleVerse && (
         <div className="bg-purple-50 border-l-4 border-[#870BD6] rounded-r-2xl p-4 mb-5">
-          <p className="text-sm italic text-[#870BD6] font-medium">"{b.bibleVerse}"</p>
+          <p className="text-sm italic text-[#870BD6] font-medium">&ldquo;{b.bibleVerse}&rdquo;</p>
         </div>
       )}
 

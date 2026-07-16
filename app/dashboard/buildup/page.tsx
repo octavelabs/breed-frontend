@@ -6,7 +6,7 @@ import DashboardLayout from "@/app/layout/DashboardLayout";
 import AccountabilityTab from "./components/AccountabilityTab";
 import DevotionalsTab from "./components/DevotionalsTab";
 import PrayerBullletinsTab from "./components/PrayerBullletinsTab";
-import { Plus } from "lucide-react";
+import { Add } from "iconsax-react";
 
 const TABS = [
   { id: "accountability", label: "Accountability" },
@@ -34,7 +34,7 @@ function BuildupContent() {
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-2 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold rounded-full transition-colors cursor-pointer px-3 py-3 text-sm"
           >
-            <Plus size={16} strokeWidth={2.5} />
+            <Add size={16} color="white" />
             <span className="hidden sm:inline">Add Partner</span>
           </button>
         )}

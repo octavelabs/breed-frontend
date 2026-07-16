@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   People, Add, ArrowRight2, Video, Clock, TickCircle, Calendar,
-  Trash, Global, UserAdd, Link2, Copy, CloseCircle, Logout,
+  Trash, Global, UserAdd, Link2, Copy, CloseCircle, Logout, Edit2,
 } from 'iconsax-react';
 
 function FlameIcon({ className }: { className?: string }) {
@@ -45,6 +45,20 @@ interface Streak {
   lastPrayedAt?: string;
 }
 
+interface PrayerSessionRecord {
+  id: string;
+  startedAt: string;
+  endedAt?: string | null;
+  startedBy?: { id: string; firstName: string; lastName: string; avatarUrl?: string } | null;
+}
+
+interface PrayerNote {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: { id: string; firstName: string; lastName: string; avatarUrl?: string | null };
+}
+
 interface Partnership {
   id: string;
   members: Member[];
@@ -61,6 +75,7 @@ interface Partnership {
   myStreak?: Streak;
   streaks?: Array<{ user: Member; currentStreak: number; longestStreak: number; lastPrayedAt?: string; isMe: boolean }>;
   lastSession?: { startedAt: string };
+  recentSessions?: PrayerSessionRecord[];
   createdAt: string;
 }
 
@@ -167,7 +182,7 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {partnerships.map((p) => (
-            <PartnershipCard key={p.id} partnership={p} onClick={() => setSelected(p)} />
+            <PartnershipCard key={p.id} partnership={p} onClick={() => { setSelected(p); refreshSelected(p.id); }} />
           ))}
         </div>
       )}
@@ -284,6 +299,7 @@ function PartnershipDetail({
   onPartnerAdded: () => void;
   router: ReturnType<typeof useRouter>;
 }) {
+  const { user }                            = useAuth();
   const [starting, setStarting]             = useState(false);
   const [ending, setEnding]                 = useState(false);
   const [leaving, setLeaving]               = useState(false);
@@ -292,13 +308,33 @@ function PartnershipDetail({
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showAddPartner, setShowAddPartner] = useState(false);
+  const [showEditSchedule, setShowEditSchedule] = useState(false);
   const [streaks, setStreaks]               = useState(p.streaks ?? []);
   const [copyingLink, setCopyingLink]       = useState(false);
   const [linkCopied, setLinkCopied]         = useState(false);
   const [alertMsg, setAlertMsg]             = useState('');
   const [toast, setToast]                   = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [milestone, setMilestone]           = useState<string | null>(null);
+  const [notes, setNotes]                   = useState<PrayerNote[]>([]);
+  const [notesLoading, setNotesLoading]     = useState(false);
 
   void onRefresh;
+
+  const loadNotes = useCallback(async () => {
+    setNotesLoading(true);
+    try {
+      const data = await accountabilityService.getNotes(p.id) as PrayerNote[];
+      setNotes(Array.isArray(data) ? data : []);
+    } catch {
+      setNotes([]);
+    } finally {
+      setNotesLoading(false);
+    }
+  }, [p.id]);
+
+  useEffect(() => {
+    if (p.status === 'ACTIVE') { loadNotes(); }
+  }, [p.id, p.status, loadNotes]);
 
   useEffect(() => {
     if (p.status === 'ACTIVE') {
@@ -307,6 +343,27 @@ function PartnershipDetail({
         .catch(() => {});
     }
   }, [p.id, p.status]);
+
+  useEffect(() => {
+    if (!user?.id || streaks.length === 0) return;
+    const mine = streaks.find((s) => s.isMe);
+    if (!mine || mine.currentStreak < 1) return;
+    const MILESTONES: { threshold: number; message: string }[] = [
+      { threshold: 30, message: '30-day streak! A month of faithful dedication.' },
+      { threshold: 7,  message: '7-day streak! A week of consistent prayer.' },
+      { threshold: 1,  message: 'First prayer session! Your journey begins.' },
+    ];
+    for (const { threshold, message } of MILESTONES) {
+      if (mine.currentStreak >= threshold) {
+        const key = `breed_milestone_${user.id}_${p.id}_${threshold}`;
+        if (!localStorage.getItem(key)) {
+          localStorage.setItem(key, '1');
+          setMilestone(message);
+        }
+        break;
+      }
+    }
+  }, [streaks, user?.id, p.id]);
 
   const showAlert = (msg: string) => setAlertMsg(msg);
   const showToast = (message: string, type: 'success' | 'error') => setToast({ message, type });
@@ -376,6 +433,9 @@ function PartnershipDetail({
     <div>
       {toast && (
         <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
+      )}
+      {milestone && (
+        <MilestoneToast message={milestone} onDismiss={() => setMilestone(null)} />
       )}
 
       {/* Alert modal — replaces browser alert() */}
@@ -469,11 +529,21 @@ function PartnershipDetail({
 
           {/* Schedule card */}
           <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
-              }`}>{isPending ? 'Pending' : 'Active'}</span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Group</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                  isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
+                }`}>{isPending ? 'Pending' : 'Active'}</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Group</span>
+              </div>
+              {isOwner && !iAmPending && (
+                <button
+                  onClick={() => setShowEditSchedule(true)}
+                  className="flex items-center gap-1 text-xs font-semibold text-[#870BD6] hover:opacity-75 transition-opacity cursor-pointer"
+                >
+                  <Edit2 size={13} color="#870BD6" /> Edit
+                </button>
+              )}
             </div>
             <div className="space-y-4">
               <DetailRow icon={<Calendar size={16} color="#9ca3af" />} label="Prayer Days"
@@ -521,6 +591,21 @@ function PartnershipDetail({
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Session History */}
+          {p.status === 'ACTIVE' && (
+            <SessionHistoryPanel sessions={p.recentSessions ?? []} members={p.members} />
+          )}
+
+          {/* Prayer Journal */}
+          {p.status === 'ACTIVE' && (
+            <NotesPanel
+              notes={notes}
+              loading={notesLoading}
+              partnershipId={p.id}
+              onNoteAdded={(note: PrayerNote) => setNotes((prev) => [note, ...prev])}
+            />
           )}
         </div>
 
@@ -679,6 +764,18 @@ function PartnershipDetail({
           partnershipId={p.id}
           onClose={() => setShowAddPartner(false)}
           onAdded={() => { setShowAddPartner(false); onPartnerAdded(); }}
+        />
+      )}
+
+      {showEditSchedule && (
+        <EditScheduleModal
+          partnership={p}
+          onClose={() => setShowEditSchedule(false)}
+          onSaved={() => {
+            setShowEditSchedule(false);
+            showToast('Schedule updated!', 'success');
+            onRefresh();
+          }}
         />
       )}
     </div>
@@ -1027,6 +1124,302 @@ function AddPartnerModal({
           </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Edit Schedule Modal ────────────────────────────────────────────────────────
+
+function EditScheduleModal({
+  partnership,
+  onClose,
+  onSaved,
+}: {
+  partnership: Partnership;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [prayerDays, setPrayerDays] = useState<string[]>(partnership.prayerDays);
+  const [prayerTime, setPrayerTime] = useState(partnership.prayerTime);
+  const [saving, setSaving]         = useState(false);
+  const [error, setError]           = useState('');
+
+  const toggleDay = (day: string) => {
+    setPrayerDays((prev) => prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]);
+  };
+
+  const handleSave = async () => {
+    if (prayerDays.length === 0) { setError('Select at least one prayer day'); return; }
+    setSaving(true); setError('');
+    try {
+      await accountabilityService.updatePartnership(partnership.id, { prayerDays, prayerTime });
+      onSaved();
+    } catch (err: unknown) {
+      setError((err as Error)?.message ?? 'Could not update schedule');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <h3 className="font-bold text-gray-900">Edit Schedule</h3>
+          <button onClick={onClose} className="cursor-pointer"><CloseCircle size={20} color="#9ca3af" /></button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-2">Prayer days</label>
+            <div className="flex flex-wrap gap-2">
+              {DAYS.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => toggleDay(d)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                    prayerDays.includes(d)
+                      ? 'bg-[#870BD6] text-white'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  }`}
+                >
+                  {DAY_LABELS[d]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Prayer time</label>
+            <input
+              type="time"
+              value={prayerTime}
+              onChange={(e) => setPrayerTime(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">Everyone will be notified 30 minutes before.</p>
+          </div>
+
+          {error && <p className="text-xs text-red-500">{error}</p>}
+
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={onClose}
+              className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              loading={saving}
+              customClass="flex-1 !h-[42px] !text-white text-sm"
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Milestone Toast ────────────────────────────────────────────────────────────
+
+function MilestoneToast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDismiss, 5000);
+    return () => clearTimeout(t);
+  }, [onDismiss]);
+
+  return (
+    <div className="fixed top-6 right-6 z-[9999] flex items-start gap-3 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium bg-amber-50 border border-amber-200 max-w-xs w-full">
+      <FlameIcon className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+      <div className="flex-1">
+        <p className="font-bold text-amber-900">Milestone reached!</p>
+        <p className="text-amber-700 text-xs mt-0.5">{message}</p>
+      </div>
+      <button onClick={onDismiss} className="text-amber-400 hover:text-amber-600 transition-colors shrink-0 cursor-pointer mt-0.5">
+        <CloseCircle size={14} color="currentColor" />
+      </button>
+    </div>
+  );
+}
+
+// ── Prayer Journal (Notes) Panel ──────────────────────────────────────────────
+
+function NotesPanel({
+  notes,
+  loading,
+  partnershipId,
+  onNoteAdded,
+}: {
+  notes: PrayerNote[];
+  loading: boolean;
+  partnershipId: string;
+  onNoteAdded: (note: PrayerNote) => void;
+}) {
+  const [input, setInput]       = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]       = useState('');
+
+  const handleAdd = async () => {
+    const content = input.trim();
+    if (!content) return;
+    setSubmitting(true); setError('');
+    try {
+      const note = await accountabilityService.createNote(partnershipId, content) as PrayerNote;
+      onNoteAdded(note);
+      setInput('');
+    } catch (err: unknown) {
+      setError((err as Error)?.message ?? 'Could not save note');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
+  return (
+    <div>
+      <h3 className="font-bold text-[#180426] mb-3">Prayer Journal</h3>
+
+      {/* Input */}
+      <div className="bg-white border border-[#E3E8EF] rounded-2xl p-4 mb-3">
+        <textarea
+          value={input}
+          onChange={(e) => { setInput(e.target.value); setError(''); }}
+          placeholder="Write a prayer note or reflection…"
+          rows={3}
+          className="w-full text-sm text-[#180426] placeholder-[#9ca3af] resize-none focus:outline-none"
+        />
+        {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
+        <div className="flex justify-end mt-2">
+          <button
+            onClick={handleAdd}
+            disabled={submitting || !input.trim()}
+            className="flex items-center gap-1.5 px-4 py-1.5 bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full text-xs font-semibold disabled:opacity-50 cursor-pointer hover:opacity-90 transition-opacity"
+          >
+            {submitting
+              ? <span className="inline-block w-3 h-3 rounded-full border-2 border-t-white border-white/30 animate-spin" />
+              : <Add size={12} color="white" />}
+            Add note
+          </button>
+        </div>
+      </div>
+
+      {/* Notes list */}
+      {loading ? (
+        <div className="flex justify-center py-6">
+          <span className="inline-block w-5 h-5 rounded-full border-2 border-t-[#870BD6] border-[#E7C8FF] animate-spin" />
+        </div>
+      ) : notes.length === 0 ? (
+        <p className="text-xs text-[#60666B] text-center py-4">No notes yet. Add your first prayer reflection above.</p>
+      ) : (
+        <div className="space-y-3">
+          {notes.map((n) => (
+            <div key={n.id} className="bg-white rounded-2xl p-4 border border-[#E3E8EF]">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-[10px] overflow-hidden shrink-0">
+                  {n.author.avatarUrl
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={n.author.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    : `${n.author.firstName[0]}${n.author.lastName[0]}`}
+                </div>
+                <span className="text-xs font-semibold text-[#180426]">{n.author.firstName}</span>
+                <span className="text-xs text-[#60666B] ml-auto">{formatDate(n.createdAt)}</span>
+              </div>
+              <p className="text-sm text-[#180426] leading-relaxed whitespace-pre-wrap">{n.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Session History Panel ──────────────────────────────────────────────────────
+// Note: PrayerSession only stores startedAt, endedAt, and startedById.
+// Per-member attendance is NOT tracked in the current data model.
+// To add attendance, a PrayerSessionAttendee join table would be needed.
+
+function SessionHistoryPanel({
+  sessions,
+  members,
+}: {
+  sessions: PrayerSessionRecord[];
+  members: Member[];
+}) {
+  const formatDuration = (startedAt: string, endedAt?: string | null) => {
+    if (!endedAt) return null;
+    const ms = new Date(endedAt).getTime() - new Date(startedAt).getTime();
+    const min = Math.round(ms / 60000);
+    return min > 0 ? `${min} min` : null;
+  };
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+  return (
+    <div>
+      <h3 className="font-bold text-[#180426] mb-3">Session History</h3>
+      {sessions.length === 0 ? (
+        <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6 flex flex-col items-center text-center gap-2">
+          <div className="w-10 h-10 rounded-full bg-[#F5EBFF] flex items-center justify-center mb-1">
+            <Video size={18} color="#870BD6" />
+          </div>
+          <p className="text-sm font-semibold text-[#180426]">No sessions yet</p>
+          <p className="text-xs text-[#60666B] max-w-xs">Your prayer session history will appear here once you hold your first session together.</p>
+        </div>
+      ) : (
+      <div className="space-y-3">
+        {sessions.map((s, i) => {
+          const starter = s.startedBy
+            ? members.find((m) => m.id === s.startedBy!.id) ?? s.startedBy
+            : null;
+          const duration = formatDuration(s.startedAt, s.endedAt);
+
+          return (
+            <div key={s.id} className="bg-white rounded-2xl p-4 border border-[#E3E8EF] flex items-start gap-3">
+              {/* Timeline dot */}
+              <div className="flex flex-col items-center shrink-0 pt-0.5">
+                <div className={`w-2.5 h-2.5 rounded-full ${i === 0 ? 'bg-[#870BD6]' : 'bg-[#D2D9DF]'}`} />
+                {i < sessions.length - 1 && <div className="w-px flex-1 bg-[#E3E8EF] mt-1" style={{ minHeight: 16 }} />}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-[#180426]">{formatDate(s.startedAt)}</p>
+                  {duration && (
+                    <span className="text-xs text-[#60666B] bg-[#F5EBFF] px-2 py-0.5 rounded-full font-medium shrink-0">
+                      {duration}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-[#60666B] mt-0.5">{formatTime(s.startedAt)}</p>
+                {starter && (
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <div className="w-5 h-5 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-[9px] overflow-hidden shrink-0">
+                      {(starter as Member).avatarUrl
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={(starter as Member).avatarUrl} alt="" className="w-full h-full object-cover" />
+                        : `${starter.firstName[0]}${starter.lastName[0]}`}
+                    </div>
+                    <p className="text-xs text-[#60666B]">
+                      Started by <span className="font-medium text-[#180426]">{starter.firstName}</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      )}
     </div>
   );
 }

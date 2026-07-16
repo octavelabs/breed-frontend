@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { devotionalService } from "@/lib/api-services";
-import { ArrowLeft, BookOpen, Users, Check, Bell, Clock } from "lucide-react";
+import { ArrowLeft, Book1, People, TickCircle, Notification, Clock } from "iconsax-react";
 import { useAuth } from "@/context/AuthContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ const ArticleCard = ({ article, onClick }: { article: Article; onClick: () => vo
               className="w-full h-full object-cover"
             />
           ) : (
-            <BookOpen size={28} className="text-white opacity-20" />
+            <Book1 size={28} color="rgba(255,255,255,0.2)" />
           )}
         </div>
       </div>
@@ -86,7 +86,7 @@ const ArticleCard = ({ article, onClick }: { article: Article; onClick: () => vo
         <div className="flex items-center gap-3 text-[12px] text-[#60666B] mt-auto pt-1">
           {article.estimatedMinutes != null && (
             <span className="flex items-center gap-1">
-              <Clock size={11} /> {article.estimatedMinutes} min
+              <Clock size={11} color="#60666b" /> {article.estimatedMinutes} min
             </span>
           )}
           {article.tags && article.tags.length > 0 && (
@@ -200,7 +200,7 @@ const DevotionalSeriesPage = () => {
       <DashboardLayout custom={true}>
         <div className="flex flex-col items-center justify-center py-24 gap-3 text-center px-4">
           <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-            <BookOpen size={22} className="text-[#870BD6]" />
+            <Book1 size={22} color="#870BD6" />
           </div>
           <p className="text-sm font-semibold text-gray-700">Series not found</p>
           <button
@@ -227,7 +227,7 @@ const DevotionalSeriesPage = () => {
             onClick={() => router.back()}
             className="flex items-center gap-2 cursor-pointer px-4 md:px-12 pt-16 relative z-20"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft size={20} color="white" />
           </button>
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.15)_1px,_transparent_1px)] [background-size:20px_20px]" />
         </div>
@@ -245,7 +245,7 @@ const DevotionalSeriesPage = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <BookOpen size={32} className="text-[#870BD6]" />
+                <Book1 size={32} color="#870BD6" />
               )}
             </div>
 
@@ -314,9 +314,9 @@ const DevotionalSeriesPage = () => {
               {subscribing ? (
                 <span className="inline-block w-4 h-4 rounded-full border-t-2 border-current animate-spin" />
               ) : series.isSubscribed ? (
-                <Check size={15} />
+                <TickCircle size={15} color="currentColor" />
               ) : (
-                <Bell size={15} />
+                <Notification size={15} color="currentColor" />
               )}
               {series.isSubscribed ? "Subscribed" : "Subscribe"}
             </button>
@@ -350,7 +350,7 @@ const DevotionalSeriesPage = () => {
             publishedArticles.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 gap-3 text-center border border-[#E2E3E5] rounded-2xl">
                 <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                  <BookOpen size={22} className="text-[#870BD6]" />
+                  <Book1 size={22} color="#870BD6" />
                 </div>
                 <p className="text-sm font-semibold text-gray-700">No articles yet</p>
                 <p className="text-xs text-[#60666B] max-w-xs">
@@ -411,7 +411,7 @@ const DevotionalSeriesPage = () => {
                     )}
                   </div>
                   <div className="ml-auto flex items-center gap-1.5 text-sm text-[#60666B]">
-                    <Users size={13} />
+                    <People size={13} color="#60666b" />
                     <span>{(series.subscriberCount ?? 0).toLocaleString()}</span>
                   </div>
                 </div>

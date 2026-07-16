@@ -690,6 +690,12 @@ export const accountabilityService = {
 
   getStreaks: (partnershipId: string) =>
     api.get(`/accountability/partnerships/${partnershipId}/streaks`),
+
+  getNotes: (partnershipId: string) =>
+    api.get(`/accountability/partnerships/${partnershipId}/notes`),
+
+  createNote: (partnershipId: string, content: string) =>
+    api.post(`/accountability/partnerships/${partnershipId}/notes`, { content }),
 };
 
 // ── Admin services ─────────────────────────────────────────────────────────────

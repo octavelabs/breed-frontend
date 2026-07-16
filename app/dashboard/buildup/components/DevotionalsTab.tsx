@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  BookOpen, Bookmark, BookmarkCheck, Loader2, ChevronRight,
-  UserPlus, UserCheck, Clock, Tag, Users,
-} from 'lucide-react';
+  Book1, Bookmark, ArrowRight2, UserAdd, ProfileTick, Clock, Tag, People,
+} from 'iconsax-react';
 import { devotionalService } from '@/lib/api-services';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+
 interface Author {
   id: string;
   firstName: string;
@@ -43,12 +43,26 @@ interface DevotionalArticle {
   publishedAt?: string;
 }
 
+interface DevotionalArticleFull extends DevotionalArticle {
+  content?: string;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  parentId?: string | null;
+  user: Author;
+}
+
 type FeedMode = 'feed' | 'browse' | 'bookmarks';
 
 export default function DevotionalsTab() {
   const { user } = useAuth();
   const router = useRouter();
   const [mode, setMode] = useState<FeedMode>('feed');
+  const [selectedArticle, setSelectedArticle] = useState<DevotionalArticle | null>(null);
+  const savedScrollY = useRef(0);
 
   // Feed
   const [feedArticles, setFeedArticles] = useState<DevotionalArticle[]>([]);
@@ -102,15 +116,31 @@ export default function DevotionalsTab() {
   useEffect(() => { if (mode === 'browse') loadSeries(); }, [mode, loadSeries]);
   useEffect(() => { if (mode === 'bookmarks') loadBookmarks(); }, [mode, loadBookmarks]);
 
+  const openArticle = (article: DevotionalArticle) => {
+    savedScrollY.current = window.scrollY;
+    window.scrollTo(0, 0);
+    setSelectedArticle(article);
+  };
+
+  const closeArticle = () => {
+    setSelectedArticle(null);
+    setTimeout(() => window.scrollTo(0, savedScrollY.current), 0);
+  };
+
+  const syncBookmark = (id: string, isBookmarked: boolean) => {
+    const upd = (a: DevotionalArticle) => a.id === id ? { ...a, isBookmarked } : a;
+    setFeedArticles((prev) => prev.map(upd));
+    setBookmarks((prev) =>
+      mode === 'bookmarks' && !isBookmarked
+        ? prev.filter((a) => a.id !== id)
+        : prev.map(upd),
+    );
+  };
+
   const toggleBookmark = async (article: DevotionalArticle) => {
     try {
       await devotionalService.toggleBookmark(article.id);
-      const update = (a: DevotionalArticle) =>
-        a.id === article.id ? { ...a, isBookmarked: !a.isBookmarked } : a;
-      setFeedArticles((prev) => prev.map(update));
-      setBookmarks((prev) =>
-        mode === 'bookmarks' ? prev.filter((a) => a.id !== article.id) : prev.map(update),
-      );
+      syncBookmark(article.id, !article.isBookmarked);
     } catch {}
   };
 
@@ -125,7 +155,18 @@ export default function DevotionalsTab() {
     } catch {}
   };
 
-  // ── Render: main view ─────────────────────────────────────────────────────
+  // ── In-tab article reader ────────────────────────────────────────────────────
+  if (selectedArticle) {
+    return (
+      <ArticleReader
+        article={selectedArticle}
+        onBack={closeArticle}
+        onBookmarkChange={(id, isBookmarked) => syncBookmark(id, isBookmarked)}
+      />
+    );
+  }
+
+  // ── List view ────────────────────────────────────────────────────────────────
   return (
     <div>
       {/* Header */}
@@ -153,11 +194,13 @@ export default function DevotionalsTab() {
       {/* Feed */}
       {mode === 'feed' && (
         loadingFeed ? (
-          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+          </div>
         ) : feedArticles.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-[#870BD6]" />
+              <Book1 size={32} color="#870BD6" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Your feed is empty</h3>
             <p className="text-sm text-gray-500 max-w-xs mx-auto">Subscribe to devotionals in Browse All to see new articles here.</p>
@@ -165,7 +208,7 @@ export default function DevotionalsTab() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {feedArticles.map((a) => (
-              <ArticleCard key={a.id} article={a} onClick={() => router.push(`/dashboard/home/article/${a.id}`)} onBookmark={() => toggleBookmark(a)} />
+              <ArticleCard key={a.id} article={a} onClick={() => openArticle(a)} onBookmark={() => toggleBookmark(a)} />
             ))}
           </div>
         )
@@ -174,11 +217,13 @@ export default function DevotionalsTab() {
       {/* Browse All — shows series */}
       {mode === 'browse' && (
         loadingSeries ? (
-          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+          </div>
         ) : seriesList.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-[#870BD6]" />
+              <Book1 size={32} color="#870BD6" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">No devotionals yet</h3>
             <p className="text-sm text-gray-500">Check back later for new content.</p>
@@ -201,11 +246,13 @@ export default function DevotionalsTab() {
       {/* Bookmarks */}
       {mode === 'bookmarks' && (
         loadingBookmarks ? (
-          <div className="flex justify-center items-center py-16"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" /></div>
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+          </div>
         ) : bookmarks.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
-              <Bookmark className="w-8 h-8 text-[#870BD6]" />
+              <Bookmark size={32} color="#870BD6" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">No saved articles</h3>
             <p className="text-sm text-gray-500">Bookmark articles to find them here easily.</p>
@@ -213,12 +260,11 @@ export default function DevotionalsTab() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {bookmarks.map((a) => (
-              <ArticleCard key={a.id} article={a} onClick={() => router.push(`/dashboard/home/article/${a.id}`)} onBookmark={() => toggleBookmark(a)} />
+              <ArticleCard key={a.id} article={a} onClick={() => openArticle(a)} onBookmark={() => toggleBookmark(a)} />
             ))}
           </div>
         )
       )}
-
     </div>
   );
 }
@@ -248,10 +294,11 @@ function SeriesCard({
       onClick={onSelect}
     >
       {s.coverImageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={s.coverImageUrl} alt={s.title} className="w-full h-40 object-cover" />
       ) : (
         <div className="w-full h-40 bg-linear-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-          <BookOpen className="w-10 h-10 text-purple-300" />
+          <Book1 size={40} color="#d8b4fe" />
         </div>
       )}
       <div className="p-4">
@@ -265,8 +312,8 @@ function SeriesCard({
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 text-[11px] text-gray-400">
-            <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{s.articleCount} articles</span>
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{s.subscriberCount}</span>
+            <span className="flex items-center gap-1"><Book1 size={12} color="#9ca3af" />{s.articleCount} articles</span>
+            <span className="flex items-center gap-1"><People size={12} color="#9ca3af" />{s.subscriberCount}</span>
           </div>
           {currentUserId && currentUserId !== s.author.id && (
             <button
@@ -278,7 +325,11 @@ function SeriesCard({
                   : 'bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white'
               }`}
             >
-              {toggling ? <Loader2 className="w-3 h-3 animate-spin" /> : s.isSubscribed ? <UserCheck className="w-3 h-3" /> : <UserPlus className="w-3 h-3" />}
+              {toggling
+                ? <span className="inline-block w-3 h-3 rounded-full border-2 border-t-current border-current/30 animate-spin" />
+                : s.isSubscribed
+                  ? <ProfileTick size={12} color="#4b5563" />
+                  : <UserAdd size={12} color="white" />}
               {s.isSubscribed ? 'Subscribed' : 'Subscribe'}
             </button>
           )}
@@ -294,10 +345,11 @@ function ArticleCard({ article: a, onClick, onBookmark }: { article: DevotionalA
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer" onClick={onClick}>
       {a.coverImageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={a.coverImageUrl} alt={a.title} className="w-full h-40 object-cover" />
       ) : (
         <div className="w-full h-40 bg-linear-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-          <BookOpen className="w-10 h-10 text-purple-300" />
+          <Book1 size={40} color="#d8b4fe" />
         </div>
       )}
       <div className="p-4">
@@ -317,12 +369,16 @@ function ArticleCard({ article: a, onClick, onBookmark }: { article: DevotionalA
             <span className="text-xs text-gray-500">{a.author.firstName} {a.author.lastName}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-[11px] text-gray-400"><Clock className="w-3 h-3" />{a.estimatedMinutes}m</span>
+            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+              <Clock size={12} color="#9ca3af" />{a.estimatedMinutes}m
+            </span>
             <button
               onClick={(e) => { e.stopPropagation(); onBookmark(); }}
               className="text-gray-400 hover:text-[#870BD6] transition-colors cursor-pointer"
             >
-              {a.isBookmarked ? <BookmarkCheck className="w-4 h-4 text-[#870BD6]" /> : <Bookmark className="w-4 h-4" />}
+              {a.isBookmarked
+                ? <Bookmark variant="Bold" size={16} color="#870BD6" />
+                : <Bookmark size={16} color="#9ca3af" />}
             </button>
           </div>
         </div>
@@ -331,58 +387,284 @@ function ArticleCard({ article: a, onClick, onBookmark }: { article: DevotionalA
   );
 }
 
-// ── Article Detail ────────────────────────────────────────────────────────────
+// ── In-tab Article Reader ─────────────────────────────────────────────────────
 
-function ArticleDetail({ article: a, onBack, onBookmark }: { article: DevotionalArticle; onBack: () => void; onBookmark: () => void }) {
+const REACTION_TYPES = [
+  { type: 'LIKE', label: 'Amen', emoji: '🙏' },
+  { type: 'LOVE', label: 'Love', emoji: '❤️' },
+  { type: 'FIRE', label: 'Fire', emoji: '🔥' },
+];
+
+interface ReactionCount { type: string; count: number; hasReacted: boolean; }
+
+function ArticleReader({
+  article: initialArticle,
+  onBack,
+  onBookmarkChange,
+}: {
+  article: DevotionalArticle;
+  onBack: () => void;
+  onBookmarkChange: (id: string, isBookmarked: boolean) => void;
+}) {
+  const [article, setArticle] = useState<DevotionalArticleFull>(initialArticle);
+  const [loadingContent, setLoadingContent] = useState(true);
+  const [bookmarked, setBookmarked] = useState(initialArticle.isBookmarked);
+  const [bookmarking, setBookmarking] = useState(false);
+  const [reactions, setReactions] = useState<ReactionCount[]>(
+    REACTION_TYPES.map((r) => ({ type: r.type, count: 0, hasReacted: false })),
+  );
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(true);
+  const [commentInput, setCommentInput] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Fetch full article content
+  useEffect(() => {
+    setLoadingContent(true);
+    devotionalService.getById(initialArticle.id)
+      .then((data) => {
+        const full = data as DevotionalArticleFull;
+        setArticle(full);
+        setBookmarked(full.isBookmarked ?? initialArticle.isBookmarked);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingContent(false));
+  }, [initialArticle.id, initialArticle.isBookmarked]);
+
+  // Fetch comments
+  useEffect(() => {
+    setLoadingComments(true);
+    devotionalService.getComments(initialArticle.id)
+      .then((data) => setComments(Array.isArray(data) ? data as Comment[] : []))
+      .catch(() => setComments([]))
+      .finally(() => setLoadingComments(false));
+  }, [initialArticle.id]);
+
+  const handleBookmark = async () => {
+    if (bookmarking) return;
+    const next = !bookmarked;
+    setBookmarking(true);
+    setBookmarked(next);
+    try {
+      await devotionalService.toggleBookmark(article.id);
+      onBookmarkChange(article.id, next);
+    } catch {
+      setBookmarked(!next);
+    } finally {
+      setBookmarking(false);
+    }
+  };
+
+  const handleReact = async (type: string) => {
+    try {
+      await devotionalService.react(article.id, type);
+      setReactions((prev) =>
+        prev.map((r) =>
+          r.type === type
+            ? { ...r, hasReacted: !r.hasReacted, count: r.count + (r.hasReacted ? -1 : 1) }
+            : r,
+        ),
+      );
+    } catch {}
+  };
+
+  const handleAddComment = async () => {
+    const text = commentInput.trim();
+    if (!text || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await devotionalService.addComment(article.id, text) as Comment;
+      setComments((prev) => [res, ...prev]);
+      setCommentInput('');
+    } catch {} finally {
+      setSubmitting(false);
+    }
+  };
+
+  const categoryLabel = article.series?.title ?? article.category?.name ?? null;
+
   return (
-    <div className="max-w-2xl">
+    <div>
+      {/* Back button — same pattern as PartnershipDetail */}
       <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
-        <ChevronRight className="w-5 h-5 rotate-180" />
-        <span className="text-sm">Back</span>
+        <ArrowRight2 size={20} color="#6b7280" className="rotate-180" />
+        <span className="text-sm font-medium">Back</span>
       </button>
 
-      {a.coverImageUrl && (
-        <img src={a.coverImageUrl} alt={a.title} className="w-full h-56 object-cover rounded-2xl mb-6" />
-      )}
+      <div className="max-w-2xl">
+        {/* Cover image */}
+        {article.coverImageUrl && (
+          <div className="w-full h-52 lg:h-64 rounded-2xl overflow-hidden mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={article.coverImageUrl} alt={article.title} className="w-full h-full object-cover" />
+          </div>
+        )}
 
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          {a.series && <span className="text-xs font-bold text-[#870BD6] uppercase tracking-wide">{a.series.title}</span>}
-          {!a.series && a.category && <span className="text-xs font-bold text-[#870BD6] uppercase tracking-wide">{a.category.name}</span>}
-          <h1 className="text-2xl font-bold text-gray-900 mt-1 leading-tight">{a.title}</h1>
-        </div>
-        <button onClick={onBookmark} className="ml-4 p-2 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer">
-          {a.isBookmarked ? <BookmarkCheck className="w-5 h-5 text-[#870BD6]" /> : <Bookmark className="w-5 h-5 text-gray-400" />}
-        </button>
-      </div>
+        {/* Title */}
+        <h1 className="text-2xl lg:text-3xl font-bold text-[#180426] mb-4 leading-tight">
+          {article.title}
+        </h1>
 
-      {/* Author & read time */}
-      <div className="flex items-center gap-4 bg-gray-50 rounded-2xl p-4 mb-6">
-        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center font-bold text-[#870BD6]">
-          {a.author.firstName[0]}
+        {/* Category + read time + bookmark row */}
+        <div className="flex items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            {categoryLabel && (
+              <span className="bg-[#F7EDFF] text-[#870BD6] font-medium text-xs px-3 py-1.5 rounded-full">
+                {categoryLabel}
+              </span>
+            )}
+            {article.tags?.map((t) => (
+              <span key={t} className="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
+                <Tag size={10} color="#6b7280" />{t}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            {article.estimatedMinutes != null && (
+              <span className="flex items-center gap-1.5 text-sm text-gray-500">
+                <Clock size={14} color="#9ca3af" />{article.estimatedMinutes}m
+              </span>
+            )}
+            <button
+              onClick={handleBookmark}
+              disabled={bookmarking}
+              className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+            >
+              {bookmarked
+                ? <Bookmark variant="Bold" size={20} color="#870BD6" />
+                : <Bookmark size={20} color="#9ca3af" />}
+            </button>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold text-gray-900 text-sm">{a.author.firstName} {a.author.lastName}</p>
-          <p className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3" />{a.estimatedMinutes} min read</p>
-        </div>
-      </div>
 
-      {/* Tags */}
-      {a.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-5">
-          {a.tags.map((t) => (
-            <span key={t} className="flex items-center gap-1 px-2.5 py-1 bg-purple-50 text-[#870BD6] text-xs font-medium rounded-full">
-              <Tag className="w-3 h-3" />{t}
-            </span>
-          ))}
+        {/* Author row */}
+        <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-4 mb-6">
+          <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center font-bold text-[#870BD6] text-sm shrink-0 overflow-hidden">
+            {article.author.avatarUrl
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={article.author.avatarUrl} alt="" className="w-full h-full object-cover" />
+              : `${article.author.firstName[0]}${article.author.lastName[0]}`}
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 text-sm">{article.author.firstName} {article.author.lastName}</p>
+            {article.publishedAt && (
+              <p className="text-xs text-gray-400">
+                {new Date(article.publishedAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+              </p>
+            )}
+          </div>
         </div>
-      )}
 
-      {/* Content */}
-      <div className="text-gray-700 leading-relaxed text-base">
-        {a.excerpt && <p className="text-base text-gray-600 font-medium mb-4">{a.excerpt}</p>}
+        {/* Excerpt */}
+        {article.excerpt && (
+          <p className="text-base text-gray-600 font-medium mb-6 leading-relaxed">{article.excerpt}</p>
+        )}
+
+        {/* Full content */}
+        {loadingContent ? (
+          <div className="flex justify-center py-12">
+            <div className="w-8 h-8 rounded-full border-2 border-t-[#870BD6] border-[#E9D5FF] animate-spin" />
+          </div>
+        ) : article.content ? (
+          <div
+            className="prose prose-base max-w-none text-gray-700 leading-relaxed
+              prose-headings:text-[#180426] prose-a:text-[#870BD6]
+              prose-blockquote:border-l-[#870BD6] prose-blockquote:text-gray-600
+              prose-img:rounded-xl prose-pre:bg-[#1e1e1e] prose-pre:text-[#d4d4d4]"
+            dangerouslySetInnerHTML={{ __html: article.content }}
+          />
+        ) : (
+          <p className="text-gray-400 italic text-sm">No content available.</p>
+        )}
+
+        {/* ── Reactions ──────────────────────────────────────────────────────── */}
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Reactions</p>
+          <div className="flex gap-2 flex-wrap">
+            {REACTION_TYPES.map((r) => {
+              const current = reactions.find((rx) => rx.type === r.type);
+              return (
+                <button
+                  key={r.type}
+                  onClick={() => handleReact(r.type)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer ${
+                    current?.hasReacted
+                      ? 'bg-[#F5EBFF] border-[#D49CFD] text-[#870BD6]'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-[#D49CFD] hover:bg-[#F5EBFF]'
+                  }`}
+                >
+                  <span>{r.emoji}</span>
+                  <span>{r.label}</span>
+                  {(current?.count ?? 0) > 0 && (
+                    <span className="text-xs font-bold">{current?.count}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Comments ───────────────────────────────────────────────────────── */}
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
+            Comments {comments.length > 0 && `(${comments.length})`}
+          </p>
+
+          {/* Add comment */}
+          <div className="flex gap-3 mb-6">
+            <textarea
+              value={commentInput}
+              onChange={(e) => setCommentInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAddComment(); } }}
+              placeholder="Share a reflection…"
+              rows={2}
+              className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] resize-none"
+            />
+            <button
+              onClick={handleAddComment}
+              disabled={!commentInput.trim() || submitting}
+              className="self-end px-4 py-2.5 bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white rounded-full text-sm font-semibold disabled:opacity-50 cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              {submitting
+                ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-white border-white/30 animate-spin" />
+                : 'Post'}
+            </button>
+          </div>
+
+          {/* Comment list */}
+          {loadingComments ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 rounded-full border-2 border-t-[#870BD6] border-[#E9D5FF] animate-spin" />
+            </div>
+          ) : comments.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6">Be the first to share a reflection.</p>
+          ) : (
+            <div className="space-y-4">
+              {comments.map((c) => (
+                <div key={c.id} className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0 overflow-hidden">
+                    {c.user?.avatarUrl
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={c.user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                      : `${c.user?.firstName?.[0] ?? '?'}${c.user?.lastName?.[0] ?? ''}`}
+                  </div>
+                  <div className="flex-1 bg-gray-50 rounded-2xl px-4 py-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-semibold text-[#180426]">
+                        {c.user?.firstName} {c.user?.lastName}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        {new Date(c.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">{c.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
