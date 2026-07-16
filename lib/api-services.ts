@@ -31,7 +31,8 @@ export type ActivityType =
   | 'LESSON_COMPLETED'
   | 'COMMUNITY_ENGAGED'
   | 'MENTORSHIP_TASK_COMPLETED'
-  | 'MENTORSHIP_SESSION_ATTENDED';
+  | 'MENTORSHIP_SESSION_ATTENDED'
+  | 'EDIFY';
 
 export interface DayActivity {
   date: string;
@@ -765,4 +766,33 @@ export const adminService = {
   getPrayerRequests: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
     api.get('/admin/prayer-requests', { params }),
   answerPrayerRequest: (id: string) => api.patch(`/admin/prayer-requests/${id}/answer`, {}),
+};
+
+// ── Edify service ──────────────────────────────────────────────────────────────
+
+export interface EdifyLog {
+  id: string;
+  durationMin: number;
+  category?: string;
+  reflection?: string;
+  verseRef?: string;
+  loggedAt: string;
+}
+
+export interface EdifyMonthResponse {
+  logs: EdifyLog[];
+  byDate: Record<string, { totalMin: number; sessions: EdifyLog[] }>;
+}
+
+export const edifyService = {
+  createLog: (data: {
+    durationMin: number;
+    category?: string;
+    reflection?: string;
+    verseRef?: string;
+    loggedAt: string;
+  }) => api.post<EdifyLog>('/edify/logs', data),
+
+  getMonthLogs: (year: number, month: number) =>
+    api.get<EdifyMonthResponse>(`/edify/logs/month/${year}/${month}`),
 };

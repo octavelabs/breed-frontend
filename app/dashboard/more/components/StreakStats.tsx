@@ -2,16 +2,7 @@
 
 import FlameIcon from '@/app/assets/icons/flame';
 import { ActivityType, CalendarDay, StreakStatsResult, userService } from '@/lib/api-services';
-import {
-  BookOpen,
-  Dumbbell,
-  GraduationCap,
-  MessageCircle,
-  Trophy,
-  TrendingUp,
-  Users,
-  Zap,
-} from 'lucide-react';
+import { Book1, Cup, Flash, Heart, MessageText, People, Teacher, Timer1, TrendUp, Weight } from 'iconsax-react';
 import { useEffect, useState } from 'react';
 
 // ── Activity metadata ──────────────────────────────────────────────────────
@@ -22,45 +13,52 @@ const ACTIVITY_META: Record<
 > = {
   DEVOTIONAL_READ: {
     label: 'Devotionals',
-    icon: <BookOpen size={18} />,
+    icon: <Book1 size={18} color="#B54708" />,
     colour: '#B54708',
     bg: '#FFF6E5',
     border: '#F9DBAF',
   },
   PRAYER_PRAYED: {
-    label: 'Prayer',
-    icon: <span className="text-base leading-none">🙏</span>,
+    label: 'Bonds',
+    icon: <Heart size={18} color="#067647" />,
     colour: '#067647',
     bg: '#ECFDF3',
     border: '#ABEFC6',
   },
   LESSON_COMPLETED: {
     label: 'Learning',
-    icon: <GraduationCap size={18} />,
+    icon: <Teacher size={18} color="#175CD3" />,
     colour: '#175CD3',
     bg: '#EFF8FF',
     border: '#B2DDFF',
   },
   COMMUNITY_ENGAGED: {
     label: 'Community',
-    icon: <MessageCircle size={18} />,
+    icon: <MessageText size={18} color="#6941C6" />,
     colour: '#6941C6',
     bg: '#F4F3FF',
     border: '#D9D6FE',
   },
   MENTORSHIP_TASK_COMPLETED: {
     label: 'Tasks',
-    icon: <Dumbbell size={18} />,
+    icon: <Weight size={18} color="#870BD6" />,
     colour: '#870BD6',
     bg: '#F5EBFF',
     border: '#E7C8FF',
   },
   MENTORSHIP_SESSION_ATTENDED: {
     label: 'Sessions',
-    icon: <Users size={18} />,
+    icon: <People size={18} color="#C11574" />,
     colour: '#C11574',
     bg: '#FDF2FA',
     border: '#FCCEEE',
+  },
+  EDIFY: {
+    label: 'Edify',
+    icon: <Timer1 size={18} color="#5B26B1" />,
+    colour: '#5B26B1',
+    bg: '#F5EBFF',
+    border: '#C084FC',
   },
 };
 
@@ -71,6 +69,7 @@ const TRACKED: ActivityType[] = [
   'COMMUNITY_ENGAGED',
   'MENTORSHIP_TASK_COMPLETED',
   'MENTORSHIP_SESSION_ATTENDED',
+  'EDIFY',
 ];
 
 // ── Calendar heat intensity ────────────────────────────────────────────────
@@ -95,7 +94,7 @@ const Skeleton = () => (
         ))}
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        {[...Array(6)].map((_, i) => (
+        {[...Array(7)].map((_, i) => (
           <div key={i} className="h-28 bg-gray-100 rounded-2xl" />
         ))}
       </div>
@@ -221,7 +220,7 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
               <span className="text-xl text-[#8B8FA3] font-medium">days</span>
             </div>
             <div className="flex items-center gap-1.5 mt-3">
-              <Trophy size={13} className="text-[#C084FC]" />
+              <Cup size={13} color="#C084FC" />
               <p className="text-sm text-[#8B8FA3]">
                 Best: <span className="font-bold text-[#C084FC]">{overall.longest} days</span>
               </p>
@@ -239,7 +238,7 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-2xl border border-[#F0F2F4] bg-white px-4 py-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] flex items-center justify-center shrink-0">
-              <Zap size={18} className="text-[#870BD6]" />
+              <Flash size={18} color="#870BD6" />
             </div>
             <div>
               <p className="text-2xl font-bold text-[#180426] leading-none">{totalActiveDays}</p>
@@ -268,7 +267,7 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
           ) : (
             <div className="rounded-2xl border border-[#F0F2F4] bg-white px-4 py-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#F0F2F4] flex items-center justify-center shrink-0">
-                <TrendingUp size={18} className="text-[#60666B]" />
+                <TrendUp size={18} color="#60666B" />
               </div>
               <div>
                 <p className="text-xs text-[#60666B]">Most Active</p>

@@ -90,11 +90,12 @@ interface UserSuggestion {
 interface AccountabilityTabProps {
   externalShowCreate?: boolean;
   onExternalShowCreateChange?: (val: boolean) => void;
+  onDetailOpen?: (open: boolean) => void;
 }
 
 // ── Tab root ───────────────────────────────────────────────────────────────────
 
-export default function AccountabilityTab({ externalShowCreate, onExternalShowCreateChange }: AccountabilityTabProps) {
+export default function AccountabilityTab({ externalShowCreate, onExternalShowCreateChange, onDetailOpen }: AccountabilityTabProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
@@ -123,6 +124,7 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
   }, []);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { onDetailOpen?.(selected !== null); }, [selected, onDetailOpen]);
 
   const refreshSelected = async (id: string) => {
     try {
