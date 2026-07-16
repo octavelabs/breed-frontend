@@ -15,7 +15,6 @@ export const navItems = [
   { path: "/dashboard/buildup",    label: "Buildup",     icon: Clipboard },
   { path: "/dashboard/community",  label: "Community",   icon: People },
   { path: "/dashboard/mentorship", label: "Mentorship",  icon: Profile2User },
-  { path: "/dashboard/more",       label: "My Settings", icon: Setting2 },
 ];
 
 export const preacherNavItems = [

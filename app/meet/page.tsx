@@ -101,7 +101,7 @@ export default function MeetLanding() {
 
       {/* Footer */}
       <footer className="px-6 lg:px-12 py-5 flex items-center justify-between">
-        <p className="text-xs text-[#A0A8B0]">© 2025 Breed. All rights reserved.</p>
+        <p className="text-xs text-[#A0A8B0]">© 2026 Breed. All rights reserved.</p>
         <div className="flex items-center gap-4 text-xs text-[#A0A8B0]">
           <a href="https://joinbreed.com/privacy" className="hover:text-[#870BD6] transition-colors">Privacy</a>
           <a href="https://joinbreed.com/terms" className="hover:text-[#870BD6] transition-colors">Terms</a>
