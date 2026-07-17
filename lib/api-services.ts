@@ -500,6 +500,9 @@ export const prayerService = {
   prayBulletin: (id: string) =>
     api.post(`/prayer/bulletins/${id}/pray`),
 
+  seedHistoryBulletins: () =>
+    api.post('/prayer/bulletins/admin/seed-history'),
+
   toggleBulletinBookmark: (id: string) =>
     api.post(`/prayer/bulletins/${id}/bookmark`),
 

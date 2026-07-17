@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Heart, SearchNormal1, CloseCircle, TickCircle, ArrowLeft2, ArrowRight2, EyeSlash,
+  Refresh, TickSquare,
 } from 'iconsax-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
-import { adminService } from '@/lib/api-services';
+import { adminService, prayerService } from '@/lib/api-services';
 import AdminConfirmModal from '@/app/components/admin/AdminConfirmModal';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -51,6 +52,22 @@ const AdminPrayerRequestsPage = () => {
     request: PrayerRequest | null;
     loading: boolean;
   }>({ open: false, request: null, loading: false });
+
+  const [seeding, setSeeding] = useState(false);
+  const [seedResult, setSeedResult] = useState<{ created: number; skipped: number } | null>(null);
+
+  const runSeedHistory = async () => {
+    setSeeding(true);
+    setSeedResult(null);
+    try {
+      const res = await prayerService.seedHistoryBulletins() as { created: number; skipped: number };
+      setSeedResult(res);
+    } catch {
+      setSeedResult(null);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const fetchRequests = useCallback(async (page = 1) => {
     setLoading(true);
@@ -108,11 +125,33 @@ const AdminPrayerRequestsPage = () => {
           confirmLabel="Mark Answered"
         />
 
-        <div className="mb-6">
-          <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Prayer Requests</h1>
-          <p className="text-sm text-[#60666B] mt-1">
-            {loading ? 'Loading…' : `${meta.total} ${statusFilter.toLowerCase()} request${meta.total !== 1 ? 's' : ''}`}
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Prayer Requests</h1>
+            <p className="text-sm text-[#60666B] mt-1">
+              {loading ? 'Loading…' : `${meta.total} ${statusFilter.toLowerCase()} request${meta.total !== 1 ? 's' : ''}`}
+            </p>
+          </div>
+
+          <div className="flex flex-col items-end gap-1.5">
+            <button
+              onClick={runSeedHistory}
+              disabled={seeding}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F5EBFF] text-[#870BD6] text-sm font-semibold border border-[#D5B4FB] hover:bg-[#EDD5FF] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {seeding
+                ? <Refresh size={15} color="#870BD6" className="animate-spin" />
+                : <Refresh size={15} color="#870BD6" />}
+              {seeding ? 'Generating…' : 'Seed Past Week\'s Bulletins'}
+            </button>
+            {seedResult && (
+              <p className="flex items-center gap-1.5 text-xs text-[#067647]">
+                <TickSquare size={13} color="#067647" variant="Bold" />
+                {seedResult.created} bulletin{seedResult.created !== 1 ? 's' : ''} created
+                {seedResult.skipped > 0 ? `, ${seedResult.skipped} already existed` : ''}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
