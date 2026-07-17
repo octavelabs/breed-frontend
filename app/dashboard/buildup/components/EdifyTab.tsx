@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft2, ArrowRight2, Timer1 } from 'iconsax-react';
+import { ArrowLeft2, ArrowRight2, Timer1, TickCircle } from 'iconsax-react';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { EdifyMonthResponse, edifyService } from '@/lib/api-services';
 
@@ -11,6 +11,14 @@ export interface EdifyTabHandle {
 
 interface EdifyTabProps {
   onTimerStateChange?: (state: TimerState) => void;
+  autoStart?: { category?: string };
+}
+
+interface BulletinCtx {
+  bulletinId: string;
+  title: string;
+  category: string;
+  points: string[];
 }
 
 const FOCUS_OPTIONS = [
@@ -49,12 +57,14 @@ function formatElapsed(secs: number): string {
 type TimerState = 'idle' | 'running' | 'details';
 
 const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
-  const { onTimerStateChange } = props;
+  const { onTimerStateChange, autoStart } = props;
   // ── Timer ─────────────────────────────────────────────────────────────────
   const [timerState, setTimerState] = useState<TimerState>('idle');
   const [elapsed, setElapsed] = useState(0);
   const startTimeRef = useRef<Date | null>(null);
   const stoppedAtRef = useRef<Date | null>(null);
+  const [bulletinCtx, setBulletinCtx] = useState<BulletinCtx | null>(null);
+  const [checkedPoints, setCheckedPoints] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (timerState !== 'running') return;
@@ -79,12 +89,34 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
 
   function stopTimer() {
     stoppedAtRef.current = new Date();
+    if (bulletinCtx && !reflection) {
+      setReflection(`Prayed through: ${bulletinCtx.title}`);
+    }
     setTimerState('details');
   }
 
   useEffect(() => { onTimerStateChange?.(timerState); }, [timerState, onTimerStateChange]);
 
   useImperativeHandle(ref, () => ({ startTimer, stopTimer }), [timerState]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-start from deep-link (e.g. "Start Praying" from a bulletin)
+  useEffect(() => {
+    if (!autoStart) return;
+    try {
+      const raw = sessionStorage.getItem('edify_bulletin_ctx');
+      if (raw) {
+        const ctx = JSON.parse(raw) as BulletinCtx;
+        setBulletinCtx(ctx);
+        sessionStorage.removeItem('edify_bulletin_ctx');
+        const valid = FOCUS_OPTIONS.find((f) => f.id === ctx.category);
+        if (valid) setCategory(valid.id);
+      } else if (autoStart.category) {
+        const valid = FOCUS_OPTIONS.find((f) => f.id === autoStart.category);
+        if (valid) setCategory(valid.id);
+      }
+    } catch {}
+    startTimer();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Session details form ──────────────────────────────────────────────────
   const [category, setCategory] = useState('');
@@ -108,6 +140,8 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
       setCategory('');
       setReflection('');
       setVerseRef('');
+      setBulletinCtx(null);
+      setCheckedPoints(new Set());
       startTimeRef.current = null;
       stoppedAtRef.current = null;
       loadMonth(viewYear, viewMonth);
@@ -313,13 +347,50 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
               >
                 Stop Session
               </button>
+
+              {/* Bulletin prayer point context card */}
+              {bulletinCtx && bulletinCtx.points.length > 0 && (
+                <div className="w-full mt-2 bg-white/10 border border-white/15 rounded-2xl p-4">
+                  <p className="text-[#C084FC] text-xs font-bold uppercase tracking-wider mb-3">Prayer Points</p>
+                  <div className="space-y-2.5">
+                    {bulletinCtx.points.map((point, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCheckedPoints((prev) => {
+                          const next = new Set(prev);
+                          next.has(idx) ? next.delete(idx) : next.add(idx);
+                          return next;
+                        })}
+                        className="w-full flex items-start gap-3 text-left cursor-pointer group"
+                      >
+                        <span className={`mt-0.5 shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${checkedPoints.has(idx) ? 'border-[#C084FC] bg-[#C084FC]' : 'border-white/30 group-hover:border-white/60'}`}>
+                          {checkedPoints.has(idx) && <TickCircle size={10} color="white" variant="Bold" />}
+                        </span>
+                        <span className={`text-sm leading-relaxed transition-colors ${checkedPoints.has(idx) ? 'text-white/40 line-through' : 'text-white/80'}`}>
+                          {point}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  {checkedPoints.size > 0 && (
+                    <p className="text-xs text-[#C084FC] mt-3">
+                      {checkedPoints.size} of {bulletinCtx.points.length} covered
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           {timerState === 'details' && (
             <div className="relative z-10 space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-white font-bold text-base">Session Complete</p>
+                <div>
+                  <p className="text-white font-bold text-base">Session Complete</p>
+                  {bulletinCtx && (
+                    <p className="text-[#C084FC] text-xs mt-0.5 truncate max-w-[220px]">{bulletinCtx.title}</p>
+                  )}
+                </div>
                 <span className="text-[#C084FC] font-mono font-bold text-sm bg-white/10 px-3 py-1.5 rounded-full">
                   {Math.max(1, Math.round(elapsed / 60))} min
                 </span>

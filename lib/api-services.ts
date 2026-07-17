@@ -497,6 +497,9 @@ export const prayerService = {
   getBulletinsByCategory: (category: string, params?: { page?: number; limit?: number }) =>
     api.get(`/prayer/bulletins/category/${category}`, { params }),
 
+  prayBulletin: (id: string) =>
+    api.post(`/prayer/bulletins/${id}/pray`),
+
   toggleBulletinBookmark: (id: string) =>
     api.post(`/prayer/bulletins/${id}/bookmark`),
 

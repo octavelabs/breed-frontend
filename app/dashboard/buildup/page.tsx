@@ -20,6 +20,7 @@ function BuildupContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeTab = searchParams.get("tab") ?? "edify";
+  const startCategory = searchParams.get("startCategory") ?? undefined;
   const [showCreate, setShowCreate] = useState(false);
   const [partnershipDetailOpen, setPartnershipDetailOpen] = useState(false);
   const [edifyTimerState, setEdifyTimerState] = useState<'idle' | 'running' | 'details'>('idle');
@@ -86,7 +87,11 @@ function BuildupContent() {
         {/* Tab content */}
         <div className="border-t border-[#D2D9DF] mt-5 px-4 lg:px-12 py-6">
           {activeTab === "edify" && (
-            <EdifyTab ref={edifyTabRef} onTimerStateChange={setEdifyTimerState} />
+            <EdifyTab
+              ref={edifyTabRef}
+              onTimerStateChange={setEdifyTimerState}
+              autoStart={startCategory ? { category: startCategory } : undefined}
+            />
           )}
           {activeTab === "accountability" && (
             <AccountabilityTab
