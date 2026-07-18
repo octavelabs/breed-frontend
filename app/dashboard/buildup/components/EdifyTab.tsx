@@ -29,6 +29,7 @@ const FOCUS_OPTIONS = [
   { id: 'THANKSGIVING_AND_TESTIMONIES', label: 'Thanksgiving' },
   { id: 'FAMILY', label: 'Family' },
   { id: 'PURPOSE_AND_CALLING', label: 'Purpose & Calling' },
+  { id: 'OTHER', label: 'Other' },
 ];
 
 const DURATION_PRESETS = [5, 10, 15, 20, 30, 45, 60, 90];
@@ -120,7 +121,9 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
 
   // ── Session details form ──────────────────────────────────────────────────
   const [category, setCategory] = useState('');
+  const [customCategory, setCustomCategory] = useState('');
   const [reflection, setReflection] = useState('');
+  const [prayerPoints, setPrayerPoints] = useState('');
   const [verseRef, setVerseRef] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -128,17 +131,32 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
     setSaving(true);
     try {
       const durationMin = Math.max(1, Math.round(elapsed / 60));
+
+      // Merge custom focus + reflection note + prayer points into one reflection string
+      let effectiveReflection: string | undefined;
+      let effectiveCategory: string | undefined;
+      if (!skip) {
+        effectiveCategory = category === 'OTHER' ? undefined : (category || undefined);
+        const parts: string[] = [];
+        if (category === 'OTHER' && customCategory.trim()) parts.push(`Focus: ${customCategory.trim()}`);
+        if (reflection.trim()) parts.push(reflection.trim());
+        if (prayerPoints.trim()) parts.push(`Prayer Points:\n${prayerPoints.trim()}`);
+        effectiveReflection = parts.length > 0 ? parts.join('\n\n') : undefined;
+      }
+
       await edifyService.createLog({
         durationMin,
-        category: skip ? undefined : (category || undefined),
-        reflection: skip ? undefined : (reflection || undefined),
+        category: effectiveCategory,
+        reflection: effectiveReflection,
         verseRef: skip ? undefined : (verseRef || undefined),
         loggedAt: (stoppedAtRef.current ?? new Date()).toISOString(),
       });
       setTimerState('idle');
       setElapsed(0);
       setCategory('');
+      setCustomCategory('');
       setReflection('');
+      setPrayerPoints('');
       setVerseRef('');
       setBulletinCtx(null);
       setCheckedPoints(new Set());
@@ -157,7 +175,9 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
   const [pastDuration, setPastDuration] = useState(15);
   const [pastDatetime, setPastDatetime] = useState('');
   const [pastCategory, setPastCategory] = useState('');
+  const [pastCustomCategory, setPastCustomCategory] = useState('');
   const [pastReflection, setPastReflection] = useState('');
+  const [pastPrayerPoints, setPastPrayerPoints] = useState('');
   const [pastVerse, setPastVerse] = useState('');
   const [pastSaving, setPastSaving] = useState(false);
 
@@ -165,10 +185,17 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
     if (!pastDatetime) return;
     setPastSaving(true);
     try {
+      const effectiveCategory = pastCategory === 'OTHER' ? undefined : (pastCategory || undefined);
+      const parts: string[] = [];
+      if (pastCategory === 'OTHER' && pastCustomCategory.trim()) parts.push(`Focus: ${pastCustomCategory.trim()}`);
+      if (pastReflection.trim()) parts.push(pastReflection.trim());
+      if (pastPrayerPoints.trim()) parts.push(`Prayer Points:\n${pastPrayerPoints.trim()}`);
+      const effectiveReflection = parts.length > 0 ? parts.join('\n\n') : undefined;
+
       await edifyService.createLog({
         durationMin: pastDuration,
-        category: pastCategory || undefined,
-        reflection: pastReflection || undefined,
+        category: effectiveCategory,
+        reflection: effectiveReflection,
         verseRef: pastVerse || undefined,
         loggedAt: new Date(pastDatetime).toISOString(),
       });
@@ -176,7 +203,9 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
       setPastDuration(15);
       setPastDatetime('');
       setPastCategory('');
+      setPastCustomCategory('');
       setPastReflection('');
+      setPastPrayerPoints('');
       setPastVerse('');
       loadMonth(viewYear, viewMonth);
     } catch {
@@ -413,17 +442,39 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                     </button>
                   ))}
                 </div>
+                {category === 'OTHER' && (
+                  <input
+                    autoFocus
+                    type="text"
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    placeholder="Describe your focus…"
+                    className="mt-2 w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-[#8B8FA3] outline-none focus:border-[#870BD6] transition-colors"
+                  />
+                )}
               </div>
 
-              <div>
-                <p className="text-[#8B8FA3] text-xs mb-2">Reflection note (optional)</p>
-                <textarea
-                  value={reflection}
-                  onChange={(e) => setReflection(e.target.value)}
-                  placeholder="What did you pray about?"
-                  rows={2}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-[#8B8FA3] resize-none outline-none focus:border-[#870BD6] transition-colors"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[#8B8FA3] text-xs mb-2">Reflection note (optional)</p>
+                  <textarea
+                    value={reflection}
+                    onChange={(e) => setReflection(e.target.value)}
+                    placeholder="What did you pray about?"
+                    rows={3}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-[#8B8FA3] resize-none outline-none focus:border-[#870BD6] transition-colors"
+                  />
+                </div>
+                <div>
+                  <p className="text-[#8B8FA3] text-xs mb-2">Prayer points (optional)</p>
+                  <textarea
+                    value={prayerPoints}
+                    onChange={(e) => setPrayerPoints(e.target.value)}
+                    placeholder={"Point 1\nPoint 2\nPoint 3"}
+                    rows={3}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-[#8B8FA3] resize-none outline-none focus:border-[#870BD6] transition-colors"
+                  />
+                </div>
               </div>
 
               <div>
@@ -517,15 +568,34 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                     </button>
                   ))}
                 </div>
+                {pastCategory === 'OTHER' && (
+                  <input
+                    autoFocus
+                    type="text"
+                    value={pastCustomCategory}
+                    onChange={(e) => setPastCustomCategory(e.target.value)}
+                    placeholder="Describe your focus…"
+                    className="mt-2 w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] outline-none focus:border-[#870BD6] transition-colors"
+                  />
+                )}
               </div>
 
-              <textarea
-                value={pastReflection}
-                onChange={(e) => setPastReflection(e.target.value)}
-                placeholder="Reflection note (optional)"
-                rows={2}
-                className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] resize-none outline-none focus:border-[#870BD6] transition-colors"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <textarea
+                  value={pastReflection}
+                  onChange={(e) => setPastReflection(e.target.value)}
+                  placeholder="Reflection note (optional)"
+                  rows={3}
+                  className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] resize-none outline-none focus:border-[#870BD6] transition-colors"
+                />
+                <textarea
+                  value={pastPrayerPoints}
+                  onChange={(e) => setPastPrayerPoints(e.target.value)}
+                  placeholder={"Prayer points (optional)\nPoint 1\nPoint 2"}
+                  rows={3}
+                  className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] resize-none outline-none focus:border-[#870BD6] transition-colors"
+                />
+              </div>
 
               <input
                 type="text"
