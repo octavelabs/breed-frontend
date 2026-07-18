@@ -460,7 +460,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                   <textarea
                     value={reflection}
                     onChange={(e) => setReflection(e.target.value)}
-                    placeholder="What did you pray about?"
+                    placeholder="What did you learn or experience during this session?"
                     rows={3}
                     className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-[#8B8FA3] resize-none outline-none focus:border-[#870BD6] transition-colors"
                   />
@@ -470,7 +470,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                   <textarea
                     value={prayerPoints}
                     onChange={(e) => setPrayerPoints(e.target.value)}
-                    placeholder={"Point 1\nPoint 2\nPoint 3"}
+                    placeholder={"What did you pray about?"}
                     rows={3}
                     className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-[#8B8FA3] resize-none outline-none focus:border-[#870BD6] transition-colors"
                   />
