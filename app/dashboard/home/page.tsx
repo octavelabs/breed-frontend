@@ -19,6 +19,7 @@ import {
   MessageCircle,
   Users,
 } from "lucide-react";
+import { Timer1 } from "iconsax-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { OnboardingChecklist } from "./components/OnboardingChecklist";
@@ -66,6 +67,11 @@ const ACTIVITY_META: Record<
     colour: "#C11574",
     bg: "#FDF2FA",
   },
+  EDIFY: {
+    icon: <Timer1 size={9} color="#6D28D9" />,
+    colour: "#6D28D9",
+    bg: "#EDE9FE",
+  },
 };
 
 const TRACKED: ActivityType[] = [
@@ -75,6 +81,7 @@ const TRACKED: ActivityType[] = [
   "COMMUNITY_ENGAGED",
   "MENTORSHIP_TASK_COMPLETED",
   "MENTORSHIP_SESSION_ATTENDED",
+  "EDIFY",
 ];
 
 // ── Skeleton ───────────────────────────────────────────────────────────────
