@@ -157,10 +157,21 @@ export default function PrayerBullletinsTab() {
 
       const archiveList: Bulletin[] = archiveData?.data ?? [];
 
-      // Merge: today goes at index 0, then remaining list without duplicates
+      // Merge: today first, then archive — deduplicate by id AND by calendar date
+      // (guards against multiple DB rows for the same day caused by cron race conditions)
       const merged: Bulletin[] = [todayData];
+      const seenDates = new Set<string>();
+      const toDateKey = (b: Bulletin) => {
+        const d = new Date(b.scheduledAt ?? b.createdAt);
+        return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      };
+      seenDates.add(toDateKey(todayData));
       for (const b of archiveList) {
-        if (!merged.some((m) => m.id === b.id)) merged.push(b);
+        const dateKey = toDateKey(b);
+        if (!merged.some((m) => m.id === b.id) && !seenDates.has(dateKey)) {
+          merged.push(b);
+          seenDates.add(dateKey);
+        }
       }
 
       setBulletinList(hydratePrayed(merged));
