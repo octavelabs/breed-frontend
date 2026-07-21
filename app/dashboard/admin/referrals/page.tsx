@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Link21, AddCircle, CloseCircle, People, TickSquare, Refresh,
+  Link21, AddCircle, CloseCircle, People, TickSquare, Refresh, ArrowLeft2, ArrowRight2,
 } from 'iconsax-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import Button from '@/app/components/Button';
@@ -74,103 +74,14 @@ const CreateModal = ({
           {error && <p className="text-xs text-red-500">{error}</p>}
 
           <div className="flex gap-2 pt-1">
-            <Button
-              type="button"
-              buttonType="bordered"
-              customClass="flex-1 !rounded-full !text-sm !text-gray-700"
-              onClick={onClose}
-            >
+            <Button type="button" buttonType="bordered" customClass="flex-1 !rounded-full !text-sm !text-gray-700" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              loading={loading}
-              customClass="flex-1 !rounded-full !text-sm !text-white"
-            >
+            <Button type="submit" loading={loading} customClass="flex-1 !rounded-full !text-sm !text-white">
               Create Link
             </Button>
           </div>
         </form>
-      </div>
-    </div>
-  );
-};
-
-// ── Signups Drawer ────────────────────────────────────────────────────────────
-
-const SignupsDrawer = ({
-  code,
-  marketerName,
-  onClose,
-}: {
-  code: string;
-  marketerName: string;
-  onClose: () => void;
-}) => {
-  const [signups, setSignups] = useState<ReferralSignup[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    referralService.getSignups(code)
-      .then((res) => { const r = res as { signups: ReferralSignup[] }; setSignups(r.signups); })
-      .catch(() => setSignups([]))
-      .finally(() => setLoading(false));
-  }, [code]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:justify-end">
-      <div className="fixed inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative bg-white w-full sm:w-[420px] h-[80vh] sm:h-full sm:max-h-screen overflow-y-auto shadow-2xl sm:border-l border-[#E3E8EF] flex flex-col rounded-t-2xl sm:rounded-none">
-        <div className="flex items-center justify-between p-5 border-b border-[#E3E8EF] sticky top-0 bg-white z-10">
-          <div>
-            <p className="font-bold text-gray-900 text-[15px]">{marketerName}</p>
-            <p className="text-xs text-[#60666B] font-mono mt-0.5">{code}</p>
-          </div>
-          <button onClick={onClose}>
-            <CloseCircle size={20} color="#9CA3AF" />
-          </button>
-        </div>
-
-        <div className="flex-1 p-5">
-          {loading ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="animate-pulse flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 bg-gray-200 rounded w-32" />
-                    <div className="h-3 bg-gray-200 rounded w-48" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : signups.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-16 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-                <People size={22} color="#870BD6" />
-              </div>
-              <p className="text-sm font-semibold text-gray-700">No signups yet</p>
-              <p className="text-xs text-[#60666B]">Share the link and signups will appear here.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {signups.map((s) => (
-                <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl border border-[#E3E8EF]">
-                  <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-xs font-bold flex-shrink-0">
-                    {s.firstName[0]}{s.lastName[0]}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{s.firstName} {s.lastName}</p>
-                    <p className="text-xs text-[#60666B] truncate">{s.email}</p>
-                  </div>
-                  <p className="text-[11px] text-[#60666B] flex-shrink-0">
-                    {new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -182,8 +93,11 @@ const AdminReferralsPage = () => {
   const [codes, setCodes] = useState<ReferralCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
-  const [drawer, setDrawer] = useState<{ code: string; marketerName: string } | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const [selected, setSelected] = useState<ReferralCode | null>(null);
+  const [signups, setSignups] = useState<ReferralSignup[]>([]);
+  const [signupsLoading, setSignupsLoading] = useState(false);
 
   const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://joinbreed.com';
 
@@ -201,12 +115,32 @@ const AdminReferralsPage = () => {
 
   useEffect(() => { fetchCodes(); }, [fetchCodes]);
 
+  const handleSelectRow = async (code: ReferralCode) => {
+    if (selected?.code === code.code) {
+      setSelected(null);
+      setSignups([]);
+      return;
+    }
+    setSelected(code);
+    setSignupsLoading(true);
+    setSignups([]);
+    try {
+      const res = await referralService.getSignups(code.code) as { signups: ReferralSignup[] };
+      setSignups(res.signups);
+    } catch {
+      setSignups([]);
+    } finally {
+      setSignupsLoading(false);
+    }
+  };
+
   const handleCreated = (code: ReferralCode) => {
     setCodes((prev) => [{ ...code, signupCount: 0 }, ...prev]);
     setShowCreate(false);
   };
 
-  const copyLink = (code: string) => {
+  const copyLink = (e: React.MouseEvent, code: string) => {
+    e.stopPropagation();
     navigator.clipboard.writeText(`${BASE_URL}/welcome?ref=${code}`);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
@@ -217,15 +151,10 @@ const AdminReferralsPage = () => {
       {showCreate && (
         <CreateModal onClose={() => setShowCreate(false)} onCreated={handleCreated} />
       )}
-      {drawer && (
-        <SignupsDrawer
-          code={drawer.code}
-          marketerName={drawer.marketerName}
-          onClose={() => setDrawer(null)}
-        />
-      )}
 
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
+
+        {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
           <div>
             <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Referral Links</h1>
@@ -234,98 +163,173 @@ const AdminReferralsPage = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              buttonType="bordered"
-              customClass="!rounded-full !text-sm !text-gray-700 !px-3"
-              onClick={fetchCodes}
-            >
+            <Button buttonType="bordered" customClass="!rounded-full !text-sm !text-gray-700 !px-3" onClick={fetchCodes}>
               <Refresh size={14} color="#6B7280" />
               Refresh
             </Button>
-            <Button
-              customClass="!rounded-full !text-sm !text-white !px-4"
-              onClick={() => setShowCreate(true)}
-            >
+            <Button customClass="!rounded-full !text-sm !text-white !px-4" onClick={() => setShowCreate(true)}>
               <AddCircle size={16} color="white" />
               New Link
             </Button>
           </div>
         </div>
 
-        {loading ? (
-          <div className="space-y-3">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="animate-pulse border border-[#E3E8EF] rounded-2xl p-5 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-gray-200" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-40" />
-                  <div className="h-3 bg-gray-200 rounded w-56" />
-                </div>
-                <div className="h-8 w-24 bg-gray-200 rounded-lg" />
-              </div>
-            ))}
+        {/* Referral Codes Table */}
+        <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden mb-6">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E3E8EF] bg-[#F8F9FC]">
+                  <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Marketer</th>
+                  <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Code</th>
+                  <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Link</th>
+                  <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Signups</th>
+                  <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Created</th>
+                  <th className="px-5 py-3.5" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E3E8EF]">
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-28" /></td>
+                      <td className="px-5 py-4"><div className="h-6 bg-gray-200 rounded-full w-24" /></td>
+                      <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-48" /></td>
+                      <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-12" /></td>
+                      <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-20" /></td>
+                      <td className="px-5 py-4"><div className="h-7 bg-gray-200 rounded-full w-20 ml-auto" /></td>
+                    </tr>
+                  ))
+                ) : codes.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-20 text-center text-[#60666B] text-sm">
+                      <Link21 size={32} className="mx-auto mb-3" color="#D1D5DB" />
+                      No referral links yet
+                      <div className="mt-4">
+                        <Button customClass="!rounded-full !text-sm !text-white !px-4" onClick={() => setShowCreate(true)}>
+                          <AddCircle size={15} color="white" />
+                          Create First Link
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  codes.map((c) => (
+                    <tr
+                      key={c.id}
+                      onClick={() => handleSelectRow(c)}
+                      className={`transition-colors cursor-pointer ${selected?.code === c.code ? 'bg-[#FAF5FF]' : 'hover:bg-[#FAFAFA]'}`}
+                    >
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs flex-shrink-0">
+                            {c.marketerName.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-semibold text-gray-900">{c.marketerName}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="text-[12px] font-mono font-semibold px-2.5 py-1 rounded-full bg-[#F5EBFF] text-[#870BD6] border border-[#D5B4FB]">
+                          {c.code}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-[12px] text-[#60666B] font-mono">
+                        {BASE_URL}/welcome?ref={c.code}
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="flex items-center gap-1.5 text-[13px] text-[#870BD6] font-semibold">
+                          <People size={13} color="#870BD6" />
+                          {c.signupCount}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-[12px] text-[#60666B] whitespace-nowrap">
+                        {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end">
+                          <button
+                            onClick={(e) => copyLink(e, c.code)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#D2D9DF] text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                          >
+                            {copiedCode === c.code ? (
+                              <><TickSquare size={12} color="#067647" variant="Bold" /><span className="text-[#067647]">Copied!</span></>
+                            ) : (
+                              <><Link21 size={12} color="#6B7280" />Copy Link</>
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        ) : codes.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 py-20 text-center border border-[#E3E8EF] rounded-2xl">
-            <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
-              <Link21 size={22} color="#870BD6" />
+        </div>
+
+        {/* Signups Table */}
+        {selected && (
+          <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E3E8EF] bg-[#F8F9FC]">
+              <div>
+                <p className="text-[13px] font-bold text-gray-900">
+                  Signups via <span className="text-[#870BD6]">{selected.code}</span>
+                  <span className="ml-1.5 font-normal text-[#60666B]">· {selected.marketerName}</span>
+                </p>
+              </div>
+              <button onClick={() => { setSelected(null); setSignups([]); }} className="text-gray-400 hover:text-gray-600">
+                <CloseCircle size={18} color="#9CA3AF" />
+              </button>
             </div>
-            <p className="text-sm font-semibold text-gray-700">No referral links yet</p>
-            <p className="text-xs text-[#60666B]">Create a link for each marketer to track their signups.</p>
-            <Button
-              customClass="mt-2 !rounded-full !text-sm !text-white !px-4"
-              onClick={() => setShowCreate(true)}
-            >
-              <AddCircle size={15} color="white" />
-              Create First Link
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {codes.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => setDrawer({ code: c.code, marketerName: c.marketerName })}
-                className="border border-[#E3E8EF] rounded-2xl p-5 flex flex-wrap items-center gap-4 hover:border-[#D5B4FB] transition-colors cursor-pointer"
-              >
-                <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm flex-shrink-0">
-                  {c.marketerName.charAt(0).toUpperCase()}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm">{c.marketerName}</p>
-                  <p className="text-xs text-[#60666B] font-mono mt-0.5 truncate">
-                    {BASE_URL}/welcome?ref=<span className="text-[#870BD6] font-semibold">{c.code}</span>
-                  </p>
-                  <p className="text-xs text-[#60666B] mt-1">
-                    Created {new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => setDrawer({ code: c.code, marketerName: c.marketerName })}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5EBFF] text-[#870BD6] text-xs font-semibold border border-[#D5B4FB] hover:bg-[#EDD5FF] transition-colors"
-                  >
-                    <People size={13} color="#870BD6" />
-                    {c.signupCount} signup{c.signupCount !== 1 ? 's' : ''}
-                  </button>
-
-                  <button
-                    onClick={(e) => { e.stopPropagation(); copyLink(c.code); }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#D2D9DF] text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    {copiedCode === c.code ? (
-                      <><TickSquare size={13} color="#067647" variant="Bold" /><span className="text-[#067647]">Copied!</span></>
-                    ) : (
-                      <><Link21 size={13} color="#6B7280" />Copy Link</>
-                    )}
-                  </button>
-                </div>
-              </div>
-            ))}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#E3E8EF] bg-[#FAFAFA]">
+                    <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B]">Name</th>
+                    <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B]">Email</th>
+                    <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Signed Up</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E3E8EF]">
+                  {signupsLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-32" /></td>
+                        <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-44" /></td>
+                        <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-20" /></td>
+                      </tr>
+                    ))
+                  ) : signups.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="px-5 py-12 text-center text-[#60666B] text-sm">
+                        <People size={28} className="mx-auto mb-2" color="#D1D5DB" />
+                        No signups yet — share the link to get started.
+                      </td>
+                    </tr>
+                  ) : (
+                    signups.map((s) => (
+                      <tr key={s.id} className="hover:bg-[#FAFAFA] transition-colors">
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-xs font-bold flex-shrink-0">
+                              {s.firstName[0]}{s.lastName[0]}
+                            </div>
+                            <span className="font-semibold text-gray-900 text-[13px]">{s.firstName} {s.lastName}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-[13px] text-[#60666B]">{s.email}</td>
+                        <td className="px-5 py-4 text-[12px] text-[#60666B] whitespace-nowrap">
+                          {new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
+
       </div>
     </DashboardLayout>
   );
