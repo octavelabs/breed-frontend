@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Link21, AddCircle, CloseCircle, People, TickSquare, Refresh, ArrowLeft2, ArrowRight2,
+  Link21, AddCircle, CloseCircle, People, TickSquare, Refresh,
 } from 'iconsax-react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import Button from '@/app/components/Button';
-import { referralService, type ReferralCode, type ReferralSignup } from '@/lib/api-services';
+import { referralService, type ReferralCode } from '@/lib/api-services';
 
 // ── Create Modal ──────────────────────────────────────────────────────────────
 
@@ -90,14 +91,11 @@ const CreateModal = ({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const AdminReferralsPage = () => {
+  const router = useRouter();
   const [codes, setCodes] = useState<ReferralCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-
-  const [selected, setSelected] = useState<ReferralCode | null>(null);
-  const [signups, setSignups] = useState<ReferralSignup[]>([]);
-  const [signupsLoading, setSignupsLoading] = useState(false);
 
   const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://joinbreed.com';
 
@@ -114,25 +112,6 @@ const AdminReferralsPage = () => {
   }, []);
 
   useEffect(() => { fetchCodes(); }, [fetchCodes]);
-
-  const handleSelectRow = async (code: ReferralCode) => {
-    if (selected?.code === code.code) {
-      setSelected(null);
-      setSignups([]);
-      return;
-    }
-    setSelected(code);
-    setSignupsLoading(true);
-    setSignups([]);
-    try {
-      const res = await referralService.getSignups(code.code) as { signups: ReferralSignup[] };
-      setSignups(res.signups);
-    } catch {
-      setSignups([]);
-    } finally {
-      setSignupsLoading(false);
-    }
-  };
 
   const handleCreated = (code: ReferralCode) => {
     setCodes((prev) => [{ ...code, signupCount: 0 }, ...prev]);
@@ -154,7 +133,6 @@ const AdminReferralsPage = () => {
 
       <div className="bg-white min-h-full px-4 lg:px-10 pt-6 pb-10">
 
-        {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
           <div>
             <h1 className="text-[24px] lg:text-[28px] font-bold text-gray-900 leading-none">Referral Links</h1>
@@ -174,8 +152,7 @@ const AdminReferralsPage = () => {
           </div>
         </div>
 
-        {/* Referral Codes Table */}
-        <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden mb-6">
+        <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -217,8 +194,8 @@ const AdminReferralsPage = () => {
                   codes.map((c) => (
                     <tr
                       key={c.id}
-                      onClick={() => handleSelectRow(c)}
-                      className={`transition-colors cursor-pointer ${selected?.code === c.code ? 'bg-[#FAF5FF]' : 'hover:bg-[#FAFAFA]'}`}
+                      onClick={() => router.push(`/dashboard/admin/referrals/${c.code}`)}
+                      className="hover:bg-[#FAFAFA] transition-colors cursor-pointer"
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
@@ -266,69 +243,6 @@ const AdminReferralsPage = () => {
             </table>
           </div>
         </div>
-
-        {/* Signups Table */}
-        {selected && (
-          <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#E3E8EF] bg-[#F8F9FC]">
-              <div>
-                <p className="text-[13px] font-bold text-gray-900">
-                  Signups via <span className="text-[#870BD6]">{selected.code}</span>
-                  <span className="ml-1.5 font-normal text-[#60666B]">· {selected.marketerName}</span>
-                </p>
-              </div>
-              <button onClick={() => { setSelected(null); setSignups([]); }} className="text-gray-400 hover:text-gray-600">
-                <CloseCircle size={18} color="#9CA3AF" />
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[#E3E8EF] bg-[#FAFAFA]">
-                    <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B]">Name</th>
-                    <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B]">Email</th>
-                    <th className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#60666B] whitespace-nowrap">Signed Up</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E3E8EF]">
-                  {signupsLoading ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-32" /></td>
-                        <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-44" /></td>
-                        <td className="px-5 py-4"><div className="h-4 bg-gray-200 rounded w-20" /></td>
-                      </tr>
-                    ))
-                  ) : signups.length === 0 ? (
-                    <tr>
-                      <td colSpan={3} className="px-5 py-12 text-center text-[#60666B] text-sm">
-                        <People size={28} className="mx-auto mb-2" color="#D1D5DB" />
-                        No signups yet — share the link to get started.
-                      </td>
-                    </tr>
-                  ) : (
-                    signups.map((s) => (
-                      <tr key={s.id} className="hover:bg-[#FAFAFA] transition-colors">
-                        <td className="px-5 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] text-xs font-bold flex-shrink-0">
-                              {s.firstName[0]}{s.lastName[0]}
-                            </div>
-                            <span className="font-semibold text-gray-900 text-[13px]">{s.firstName} {s.lastName}</span>
-                          </div>
-                        </td>
-                        <td className="px-5 py-4 text-[13px] text-[#60666B]">{s.email}</td>
-                        <td className="px-5 py-4 text-[12px] text-[#60666B] whitespace-nowrap">
-                          {new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
       </div>
     </DashboardLayout>
