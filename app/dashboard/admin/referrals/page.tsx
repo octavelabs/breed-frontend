@@ -285,7 +285,8 @@ const AdminReferralsPage = () => {
             {codes.map((c) => (
               <div
                 key={c.id}
-                className="border border-[#E3E8EF] rounded-2xl p-5 flex flex-wrap items-center gap-4 hover:border-[#D5B4FB] transition-colors"
+                onClick={() => setDrawer({ code: c.code, marketerName: c.marketerName })}
+                className="border border-[#E3E8EF] rounded-2xl p-5 flex flex-wrap items-center gap-4 hover:border-[#D5B4FB] transition-colors cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-sm flex-shrink-0">
                   {c.marketerName.charAt(0).toUpperCase()}
@@ -311,7 +312,7 @@ const AdminReferralsPage = () => {
                   </button>
 
                   <button
-                    onClick={() => copyLink(c.code)}
+                    onClick={(e) => { e.stopPropagation(); copyLink(c.code); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#D2D9DF] text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     {copiedCode === c.code ? (
