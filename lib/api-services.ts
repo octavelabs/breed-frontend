@@ -106,6 +106,7 @@ export const authService = {
     username: string;
     phone?: string;
     role?: 'BELIEVER' | 'PREACHER';
+    referralCode?: string;
   }) => api.post('/auth/register', data),
 
   login: <T = LoginResponse>(data: {
@@ -114,8 +115,11 @@ export const authService = {
     rememberMe?: boolean;
   }) => api.post<T>('/auth/login', data),
 
-  googleLogin: <T = LoginResponse>(token: string) =>
-    api.post<T>('/auth/google', { token }),
+  googleLogin: <T = LoginResponse>(token: string, referralCode?: string) =>
+    api.post<T>('/auth/google', { token, ...(referralCode ? { referralCode } : {}) }),
+
+  applyReferral: (referralCode: string) =>
+    api.post('/auth/apply-referral', { referralCode }),
 
   logout: (refreshToken?: string) =>
     api.post('/auth/logout', { refreshToken }),
@@ -801,4 +805,33 @@ export const edifyService = {
 
   getMonthLogs: (year: number, month: number) =>
     api.get<EdifyMonthResponse>(`/edify/logs/month/${year}/${month}`),
+};
+
+// ── Referral services ──────────────────────────────────────────────────────────
+
+export interface ReferralCode {
+  id: string;
+  code: string;
+  marketerName: string;
+  createdAt: string;
+  signupCount: number;
+}
+
+export interface ReferralSignup {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  createdAt: string;
+}
+
+export const referralService = {
+  createCode: (marketerName: string, code?: string) =>
+    api.post<ReferralCode>('/referrals', { marketerName, code }),
+
+  listCodes: () =>
+    api.get<ReferralCode[]>('/referrals'),
+
+  getSignups: (code: string) =>
+    api.get<{ code: string; marketerName: string; signups: ReferralSignup[] }>(`/referrals/${code}/signups`),
 };

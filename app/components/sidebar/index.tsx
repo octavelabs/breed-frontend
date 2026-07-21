@@ -4,7 +4,7 @@ import { LogOut } from 'lucide-react';
 import {
   Home2, Book1, Clipboard, People, Profile2User, Setting2,
   Grid3, Video, VideoPlay,
-  PresentionChart, Heart, Candle,
+  PresentionChart, Heart, Candle, Link21,
 } from 'iconsax-react';
 import { useUser } from "@/app/context/UserContext";
 import { useAuth } from "@/context/AuthContext";
@@ -32,6 +32,7 @@ export const adminNavItems = [
   { path: '/dashboard/admin/devotionals',     label: 'Devotionals',     icon: Heart },
   { path: '/dashboard/admin/communities',     label: 'Communities',     icon: People },
   { path: '/dashboard/admin/prayer-requests', label: 'Prayer Requests', icon: Candle },
+  { path: '/dashboard/admin/referrals',       label: 'Referrals',       icon: Link21 },
 ];
 
 const SideBar = () => {

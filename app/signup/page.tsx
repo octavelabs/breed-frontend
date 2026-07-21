@@ -9,6 +9,7 @@ import Dropdown from "../components/Dropdown";
 import { EyeIcon, EyeOffIcon, Check, X } from "lucide-react";
 import StepProgress from "./components/StepProgress";
 import { authService } from "../../lib/api-services";
+import { REFERRAL_STORAGE_KEY } from "../providers";
 
 // ── Country data ──────────────────────────────────────────────────────────────
 
@@ -580,6 +581,7 @@ const StepFour = ({
 
     setIsSubmitting(true);
     try {
+      const refCode = localStorage.getItem(REFERRAL_STORAGE_KEY) ?? undefined;
       await authService.register({
         email: stepData.email.toLowerCase().trim(),
         password: stepData.password,
@@ -589,7 +591,9 @@ const StepFour = ({
         username: stepData.username.trim(),
         phone: buildPhone(),
         role: "BELIEVER",
+        referralCode: refCode,
       });
+      if (refCode) localStorage.removeItem(REFERRAL_STORAGE_KEY);
       const loginUrl = redirect
         ? `/login?registered=true&redirect=${encodeURIComponent(redirect)}`
         : `/login?registered=true`;

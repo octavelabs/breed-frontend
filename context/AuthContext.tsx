@@ -11,6 +11,7 @@ import {
 import { useRouter, usePathname } from 'next/navigation';
 import { authService } from '../lib/api-services';
 import type { User } from '../lib/api-services';
+import { REFERRAL_STORAGE_KEY } from '../app/providers';
 import { setTokens, clearTokens, getAccessToken, getRefreshToken } from '../lib/api';
 
 // ── Cookie helpers (middleware-readable) ──────────────────────────────────────
@@ -129,11 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginWithGoogle = useCallback(
     async (idToken: string, redirectUrl?: string): Promise<void> => {
+      const refCode = localStorage.getItem(REFERRAL_STORAGE_KEY) ?? undefined;
       const response = await authService.googleLogin<{
         accessToken: string;
         refreshToken: string;
         user: User;
-      }>(idToken);
+      }>(idToken, refCode);
+      if (refCode) localStorage.removeItem(REFERRAL_STORAGE_KEY);
 
       setTokens(response.accessToken, response.refreshToken);
       setSessionCookies(response.user.role);
