@@ -77,7 +77,7 @@ const CreateModal = ({
             <Button
               type="button"
               buttonType="bordered"
-              customClass="flex-1 !rounded-xl !text-sm !text-gray-700"
+              customClass="flex-1 !rounded-full !text-sm !text-gray-700"
               onClick={onClose}
             >
               Cancel
@@ -85,7 +85,7 @@ const CreateModal = ({
             <Button
               type="submit"
               loading={loading}
-              customClass="flex-1 !rounded-xl !text-sm !text-white"
+              customClass="flex-1 !rounded-full !text-sm !text-white"
             >
               Create Link
             </Button>
@@ -236,14 +236,14 @@ const AdminReferralsPage = () => {
           <div className="flex gap-2">
             <Button
               buttonType="bordered"
-              customClass="!rounded-xl !text-sm !text-gray-700 !px-3"
+              customClass="!rounded-full !text-sm !text-gray-700 !px-3"
               onClick={fetchCodes}
             >
               <Refresh size={14} color="#6B7280" />
               Refresh
             </Button>
             <Button
-              customClass="!rounded-xl !text-sm !text-white !px-4"
+              customClass="!rounded-full !text-sm !text-white !px-4"
               onClick={() => setShowCreate(true)}
             >
               <AddCircle size={16} color="white" />
@@ -273,7 +273,7 @@ const AdminReferralsPage = () => {
             <p className="text-sm font-semibold text-gray-700">No referral links yet</p>
             <p className="text-xs text-[#60666B]">Create a link for each marketer to track their signups.</p>
             <Button
-              customClass="mt-2 !rounded-xl !text-sm !text-white !px-4"
+              customClass="mt-2 !rounded-full !text-sm !text-white !px-4"
               onClick={() => setShowCreate(true)}
             >
               <AddCircle size={15} color="white" />
@@ -304,7 +304,7 @@ const AdminReferralsPage = () => {
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={() => setDrawer({ code: c.code, marketerName: c.marketerName })}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5EBFF] text-[#870BD6] text-xs font-semibold border border-[#D5B4FB] hover:bg-[#EDD5FF] transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5EBFF] text-[#870BD6] text-xs font-semibold border border-[#D5B4FB] hover:bg-[#EDD5FF] transition-colors"
                   >
                     <People size={13} color="#870BD6" />
                     {c.signupCount} signup{c.signupCount !== 1 ? 's' : ''}
@@ -312,7 +312,7 @@ const AdminReferralsPage = () => {
 
                   <button
                     onClick={() => copyLink(c.code)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#D2D9DF] text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#D2D9DF] text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     {copiedCode === c.code ? (
                       <><TickSquare size={13} color="#067647" variant="Bold" /><span className="text-[#067647]">Copied!</span></>
