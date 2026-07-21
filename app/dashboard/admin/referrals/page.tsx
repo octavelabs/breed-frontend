@@ -182,7 +182,7 @@ const AdminReferralsPage = () => {
                     <td colSpan={6} className="px-5 py-20 text-center text-[#60666B] text-sm">
                       <Link21 size={32} className="mx-auto mb-3" color="#D1D5DB" />
                       No referral links yet
-                      <div className="mt-4">
+                      <div className="mt-4 flex justify-center">
                         <Button customClass="!rounded-full !text-sm !text-white !px-4" onClick={() => setShowCreate(true)}>
                           <AddCircle size={15} color="white" />
                           Create First Link
