@@ -5,6 +5,7 @@ import {
   Link21, AddCircle, CloseCircle, People, TickSquare, Refresh,
 } from 'iconsax-react';
 import DashboardLayout from '@/app/layout/DashboardLayout';
+import Button from '@/app/components/Button';
 import { referralService, type ReferralCode, type ReferralSignup } from '@/lib/api-services';
 
 // ── Create Modal ──────────────────────────────────────────────────────────────
@@ -73,20 +74,21 @@ const CreateModal = ({
           {error && <p className="text-xs text-red-500">{error}</p>}
 
           <div className="flex gap-2 pt-1">
-            <button
+            <Button
               type="button"
+              buttonType="bordered"
+              customClass="flex-1 !rounded-xl !text-sm !text-gray-700"
               onClick={onClose}
-              className="flex-1 h-10 rounded-xl border border-[#D2D9DF] text-sm text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={loading}
-              className="flex-1 h-10 rounded-xl bg-[#870BD6] text-white text-sm font-semibold hover:bg-[#7209B7] disabled:opacity-50 transition-colors"
+              loading={loading}
+              customClass="flex-1 !rounded-xl !text-sm !text-white"
             >
-              {loading ? 'Creating…' : 'Create Link'}
-            </button>
+              Create Link
+            </Button>
           </div>
         </form>
       </div>
@@ -232,20 +234,21 @@ const AdminReferralsPage = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
+              buttonType="bordered"
+              customClass="!rounded-xl !text-sm !text-gray-700 !px-3"
               onClick={fetchCodes}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#D2D9DF] text-sm text-gray-600 hover:bg-gray-50 transition-colors"
             >
               <Refresh size={14} color="#6B7280" />
               Refresh
-            </button>
-            <button
+            </Button>
+            <Button
+              customClass="!rounded-xl !text-sm !text-white !px-4"
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#870BD6] text-white text-sm font-semibold hover:bg-[#7209B7] transition-colors"
             >
               <AddCircle size={16} color="white" />
               New Link
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -269,13 +272,13 @@ const AdminReferralsPage = () => {
             </div>
             <p className="text-sm font-semibold text-gray-700">No referral links yet</p>
             <p className="text-xs text-[#60666B]">Create a link for each marketer to track their signups.</p>
-            <button
+            <Button
+              customClass="mt-2 !rounded-xl !text-sm !text-white !px-4"
               onClick={() => setShowCreate(true)}
-              className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#870BD6] text-white text-sm font-semibold hover:bg-[#7209B7] transition-colors"
             >
               <AddCircle size={15} color="white" />
               Create First Link
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="space-y-3">
