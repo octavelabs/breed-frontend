@@ -7,6 +7,7 @@ import {
   ActivityType,
   courseService,
   devotionalService,
+  prayerService,
   userService,
   WeekStreakResult,
 } from "@/lib/api-services";
@@ -19,7 +20,12 @@ import {
   MessageCircle,
   Users,
 } from "lucide-react";
-import { Timer1 } from "iconsax-react";
+import {
+  Timer1, Candle, Lovely, Flag2, HeartAdd, MessageQuestion, Heart,
+  Buildings, Cup, Profile2User, Flash, ShieldCross, HeartCircle,
+  Global, Wallet, MedalStar, Sun1, Crown, Briefcase, Bookmark,
+  type Icon as IcosaxIcon,
+} from "iconsax-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode } from "react";
@@ -90,6 +96,131 @@ const TRACKED: ActivityType[] = [
 const TextSkeleton = ({ w = "w-3/4" }: { w?: string }) => (
   <div className={`animate-pulse bg-gray-200 dark:bg-[#252830] rounded h-4 ${w}`} />
 );
+
+// ── Bulletin category map ──────────────────────────────────────────────────
+
+const BULLETIN_CATEGORIES: Array<{
+  id: string;
+  label: string;
+  Icon: IcosaxIcon;
+  gradient: string;
+  vector: string;
+}> = [
+  { id: 'PERSONAL_DEVOTION', label: 'Personal Devotion', Icon: Candle, gradient: 'linear-gradient(135deg, #5B26B1, #3B0764)', vector: '/assets/clarity-vector2.svg' },
+  { id: 'INTERCESSION', label: 'Intercession', Icon: Lovely, gradient: 'linear-gradient(135deg, #1D4ED8, #1E3A8A)', vector: '/assets/clarity-vector1.svg' },
+  { id: 'INTERCESSION_FOR_NATION', label: 'Intercession for Nation', Icon: Flag2, gradient: 'linear-gradient(135deg, #1E40AF, #1E3A8A)', vector: '/assets/clarity-vector1.svg' },
+  { id: 'HEALTH_AND_COMFORT', label: 'Health & Comfort', Icon: HeartAdd, gradient: 'linear-gradient(135deg, #047857, #064E3B)', vector: '/assets/clarity-vector3.svg' },
+  { id: 'SPECIAL_REQUEST', label: 'Special Request', Icon: MessageQuestion, gradient: 'linear-gradient(135deg, #6D28D9, #4C1D95)', vector: '/assets/clarity-vector4.svg' },
+  { id: 'HEALING', label: 'Healing', Icon: Heart, gradient: 'linear-gradient(135deg, #059669, #064E3B)', vector: '/assets/clarity-vector3.svg' },
+  { id: 'NATION_AND_CHURCH', label: 'Nation & Church', Icon: Buildings, gradient: 'linear-gradient(135deg, #870BD6, #5B26B1)', vector: '/assets/clarity-vector2.svg' },
+  { id: 'THANKSGIVING_AND_TESTIMONIES', label: 'Thanksgiving', Icon: Cup, gradient: 'linear-gradient(135deg, #D97706, #92400E)', vector: '/assets/clarity-vector4.svg' },
+  { id: 'FAMILY', label: 'Family', Icon: Profile2User, gradient: 'linear-gradient(135deg, #DB2777, #9D174D)', vector: '/assets/clarity-vector3.svg' },
+  { id: 'PURPOSE_AND_CALLING', label: 'Purpose & Calling', Icon: Flash, gradient: 'linear-gradient(135deg, #4338CA, #312E81)', vector: '/assets/clarity-vector1.svg' },
+  { id: 'SPIRITUAL_WARFARE', label: 'Spiritual Warfare', Icon: ShieldCross, gradient: 'linear-gradient(135deg, #7F1D1D, #450A0A)', vector: '/assets/clarity-vector4.svg' },
+  { id: 'MARRIAGES_AND_RELATIONSHIPS', label: 'Marriages & Relationships', Icon: HeartCircle, gradient: 'linear-gradient(135deg, #BE123C, #881337)', vector: '/assets/clarity-vector2.svg' },
+  { id: 'MISSIONS_AND_EVANGELISM', label: 'Missions & Evangelism', Icon: Global, gradient: 'linear-gradient(135deg, #0F766E, #134E4A)', vector: '/assets/clarity-vector3.svg' },
+  { id: 'PROVISION_AND_FINANCE', label: 'Provision & Finance', Icon: Wallet, gradient: 'linear-gradient(135deg, #A16207, #713F12)', vector: '/assets/clarity-vector4.svg' },
+  { id: 'YOUTH_AND_NEXT_GENERATION', label: 'Youth & Next Generation', Icon: MedalStar, gradient: 'linear-gradient(135deg, #0E7490, #164E63)', vector: '/assets/clarity-vector1.svg' },
+  { id: 'PEACE_AND_MENTAL_HEALTH', label: 'Peace & Mental Health', Icon: Sun1, gradient: 'linear-gradient(135deg, #0369A1, #0C4A6E)', vector: '/assets/clarity-vector2.svg' },
+  { id: 'SALVATION', label: 'Salvation', Icon: Crown, gradient: 'linear-gradient(135deg, #EA580C, #9A3412)', vector: '/assets/clarity-vector3.svg' },
+  { id: 'WORK_AND_CALLING', label: 'Work & Calling', Icon: Briefcase, gradient: 'linear-gradient(135deg, #475569, #1E293B)', vector: '/assets/clarity-vector4.svg' },
+];
+
+const DEFAULT_BULLETIN_GRADIENT = 'linear-gradient(135deg, #870BD6, #5B26B1)';
+const DEFAULT_BULLETIN_VECTOR = '/assets/clarity-vector2.svg';
+
+// ── Today's Bulletin Card ──────────────────────────────────────────────────
+
+function TodayBulletinCard({ bulletin, loading }: { bulletin: any; loading: boolean }) {
+  const cat = bulletin?.category
+    ? BULLETIN_CATEGORIES.find((c) => c.id === bulletin.category)
+    : null;
+  const gradient = cat?.gradient ?? DEFAULT_BULLETIN_GRADIENT;
+  const vector = cat?.vector ?? DEFAULT_BULLETIN_VECTOR;
+  const CategoryIcon = cat?.Icon ?? null;
+
+  const dateStr = bulletin?.publishedAt
+    ? new Date(bulletin.publishedAt).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      })
+    : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  if (loading) {
+    return (
+      <div
+        className="rounded-2xl overflow-hidden animate-pulse h-full min-h-[200px]"
+        style={{ background: DEFAULT_BULLETIN_GRADIENT }}
+      />
+    );
+  }
+
+  return (
+    <Link href="/dashboard/buildup?tab=bulletins" className="block h-full">
+      <div
+        className="rounded-2xl overflow-hidden cursor-pointer relative flex flex-col h-full min-h-[200px] p-6"
+        style={{ background: gradient }}
+      >
+        {/* Decorative vector */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={vector}
+          alt=""
+          aria-hidden="true"
+          className="absolute right-0 top-0 h-full w-auto pointer-events-none select-none"
+          style={{ opacity: 0.15 }}
+        />
+
+        {/* Top-center label */}
+        <p className="absolute top-8 left-0 right-0 text-white/80 text-sm font-semibold text-center uppercase tracking-widest z-10 pointer-events-none">
+          Today&apos;s Prayer Focus
+        </p>
+
+        {/* Top row: category icon + bookmark */}
+        <div className="relative z-10 flex items-start justify-between mb-4">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            {CategoryIcon ? (
+              <CategoryIcon size={20} color="white" />
+            ) : (
+              <Heart size={20} color="white" />
+            )}
+          </div>
+          {bulletin && (
+            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+              <Bookmark
+                size={16}
+                color="white"
+                variant={bulletin.isBookmarked ? 'Bold' : 'Linear'}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex-1">
+          <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-3">
+            {cat?.label ?? "Today's Bulletin"}
+          </p>
+          <h3 className="text-white font-bold text-xl leading-snug mb-2 line-clamp-3">
+            {bulletin?.title ?? "Today's Prayer Bulletin"}
+          </h3>
+          <p className="text-white/60 text-sm">{dateStr}</p>
+        </div>
+
+        {/* Footer */}
+        {bulletin && (
+          <div className="relative z-10 mt-4 pt-4 border-t border-white/20 flex items-center gap-2">
+            <Heart size={14} color="rgba(255,255,255,0.7)" />
+            <span className="text-white/70 text-sm">
+              {bulletin.prayerCount ?? 0} prayed this
+            </span>
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
 
 // ── Streak Day Column ──────────────────────────────────────────────────────
 
@@ -177,6 +308,12 @@ const HomePage = () => {
       devotionalService.getToday().then((res: any) => res?.data ?? res ?? null),
   });
 
+  const { data: bulletin = null, isLoading: bulletinLoading } = useQuery({
+    queryKey: ['bulletin', 'today'],
+    queryFn: () =>
+      prayerService.getTodaysBulletin().then((res: any) => res?.data ?? res ?? null),
+  });
+
   const currentStreak = weekStreak?.currentStreak ?? 0;
   const breakdown = weekStreak?.breakdown ?? {};
 
@@ -204,6 +341,11 @@ const HomePage = () => {
               )}
             </div>
           </Link>
+        </div>
+
+        {/* ── Today's Bulletin (mobile) ── */}
+        <div className="lg:hidden mb-6">
+          <TodayBulletinCard bulletin={bulletin} loading={bulletinLoading} />
         </div>
 
         {/* ── Mobile hero card ── */}
@@ -247,13 +389,14 @@ const HomePage = () => {
         {/* ── Onboarding checklist (hides once dismissed or all done) ── */}
         <OnboardingChecklist />
 
-        {/* ── Desktop Consistency Tracker ── */}
-        <div
-          style={{ backgroundImage: `url('/dashboard-header.png')` }}
-          className="hidden lg:block rounded-2xl"
-        >
+        {/* ── Desktop Consistency Tracker + Today's Bulletin ── */}
+        <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6 mb-16">
+          <div
+            style={{ backgroundImage: `url('/dashboard-header.png')` }}
+            className="rounded-2xl"
+          >
           <Link href="/dashboard/streaks">
-            <div className="bg-white/90 dark:bg-[#181A1F] rounded-2xl px-16.5 py-11 mb-16 shadow-[0px_4px_4px_0px_#00000008] dark:shadow-none cursor-pointer hover:bg-white/95 dark:hover:bg-[#1E2025] transition-colors">
+            <div className="bg-white/90 dark:bg-[#181A1F] rounded-2xl px-16.5 py-11 h-full shadow-[0px_4px_4px_0px_#00000008] dark:shadow-none cursor-pointer hover:bg-white/95 dark:hover:bg-[#1E2025] transition-colors">
               <div className="flex items-start justify-between gap-16">
                 <div className="shrink-0">
                   <h2 className="text-2xl font-bold mb-5 dark:text-white">Consistency is Key</h2>
@@ -324,6 +467,10 @@ const HomePage = () => {
               </div>
             </div>
           </Link>
+          </div>
+
+          {/* Today's Bulletin (desktop, second column) */}
+          <TodayBulletinCard bulletin={bulletin} loading={bulletinLoading} />
         </div>
 
         {/* ── Content Grid ── */}
