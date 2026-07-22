@@ -2,6 +2,23 @@ import api from './api';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
+export interface UserPreferences {
+  id: string;
+  userId: string;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  inAppNotifications: boolean;
+  weeklyDigest: boolean;
+  mentorshipEmails: boolean;
+  communityEmails: boolean;
+  marketingEmails: boolean;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  timezone: string;
+  prayerReminderTime: string | null;
+  textSize: 'small' | 'medium' | 'large';
+}
+
 export interface User {
   id: string;
   email: string;
@@ -22,6 +39,7 @@ export interface User {
   avatarUrl?: string;
   createdAt: string;
   lastLoginAt?: string;
+  preferences?: UserPreferences | null;
 }
 
 export type ActivityType =
@@ -167,8 +185,20 @@ export const userService = {
     },
   ) => api.patch('/users/me', data),
 
-  updatePreferences: (data: Record<string, boolean | string>) =>
-    api.patch('/users/me/preferences', data),
+  updatePreferences: (data: Partial<{
+    theme: string;
+    prayerReminderTime: string | null;
+    textSize: string;
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+    inAppNotifications: boolean;
+    weeklyDigest: boolean;
+    mentorshipEmails: boolean;
+    communityEmails: boolean;
+    marketingEmails: boolean;
+    language: string;
+    timezone: string;
+  }>) => api.patch('/users/me/preferences', data),
 
   getStats: () =>
     api.get<{

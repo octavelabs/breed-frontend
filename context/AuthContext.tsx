@@ -89,6 +89,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     bootstrap();
   }, []);
 
+  // ── Apply theme whenever user preferences change ─────────────────────────────
+  useEffect(() => {
+    const theme = user?.preferences?.theme ?? 'system';
+    const html = document.documentElement;
+    if (theme === 'system') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    } else {
+      html.setAttribute('data-theme', theme);
+    }
+  }, [user?.preferences?.theme]);
+
+  // ── Apply text size whenever user preferences change ─────────────────────────
+  useEffect(() => {
+    const textSize = user?.preferences?.textSize ?? 'medium';
+    const scale = textSize === 'small' ? '0.875' : textSize === 'large' ? '1.125' : '1';
+    document.documentElement.style.setProperty('--breed-text-scale', scale);
+  }, [user?.preferences?.textSize]);
+
   // ── Derived state ────────────────────────────────────────────────────────────
 
   const isAuthenticated = user !== null;
