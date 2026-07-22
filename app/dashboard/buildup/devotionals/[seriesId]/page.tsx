@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { devotionalService } from "@/lib/api-services";
 import { ArrowLeft, Book1, People, TickCircle, Notification, Clock } from "iconsax-react";
@@ -108,6 +109,7 @@ const DevotionalSeriesPage = () => {
 
   const [series,      setSeries]      = useState<SeriesDetail | null>(null);
   const [loading,     setLoading]     = useState(true);
+  usePageTitle(series?.title);
   const [subscribing, setSubscribing] = useState(false);
   const [activeTab,   setActiveTab]   = useState<"articles" | "about">("articles");
 

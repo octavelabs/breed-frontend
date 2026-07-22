@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { meetingsService } from "@/lib/api-services";
 import {
@@ -239,6 +240,7 @@ export default function MeetingDetailPage() {
 
   const [meeting, setMeeting] = useState<MeetingDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  usePageTitle(meeting?.title);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [copied, setCopied] = useState(false);

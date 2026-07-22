@@ -4,6 +4,7 @@ import DashboardLayout from "@/app/layout/DashboardLayout";
 import { ArrowLeft, Zap, Calendar, CheckSquare, Users, Clock, CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import { mentorshipService } from "@/lib/api-services";
 import { BookingModal } from "./components/BookingModal";
 import Link from "next/link";
@@ -74,6 +75,7 @@ const MentorProfilePage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [mentor, setMentor] = useState<Mentor | null>(null);
   const [mentorship, setMentorship] = useState<Mentorship | null>(null);
+  usePageTitle(mentor ? `${mentor.firstName} ${mentor.lastName}` : null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tasks, setTasks] = useState<MentorshipTask[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(false);

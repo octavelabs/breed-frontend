@@ -2,6 +2,7 @@
 
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import QuizQuestion from '@/app/components/quiz';
 import StepProgress from '@/app/components/StepProgress';
 import DashboardLayout from '@/app/layout/DashboardLayout';
@@ -111,6 +112,7 @@ function QuizInner() {
 
   const [quiz,          setQuiz]        = useState<QuizData | null>(null);
   const [lessonLabel,   setLessonLabel] = useState('');
+  usePageTitle(lessonLabel || quiz?.title);
   const [isLoading,     setIsLoading]   = useState(true);
   const [screenLoading, setScreenLoading] = useState(true); // LoadingScreen animation
   const [answers,       setAnswers]     = useState<Map<string, string>>(new Map());

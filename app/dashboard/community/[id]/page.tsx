@@ -4,6 +4,7 @@ import DashboardLayout from "@/app/layout/DashboardLayout";
 import { ArrowLeft, Globe, Lock, Users } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import { JoinCommunityModal } from "../list/components/JoinCommunityModal";
 import Button from "@/app/components/Button";
 import { communityService } from "@/lib/api-services";
@@ -39,6 +40,7 @@ const SingleCommunityPage = () => {
 
   const [community, setCommunity] = useState<Community | null>(null);
   const [isMember, setIsMember] = useState(false);
+  usePageTitle(community?.name);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);

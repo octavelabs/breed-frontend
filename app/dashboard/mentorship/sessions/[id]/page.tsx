@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { mentorshipService } from "@/lib/api-services";
 import {
@@ -118,6 +119,7 @@ export default function SessionDetailPage() {
 
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  usePageTitle(session?.title);
   const [cancelling, setCancelling] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [copied, setCopied] = useState(false);

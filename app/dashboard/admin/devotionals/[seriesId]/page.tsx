@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import {
   Heart, SearchNormal1, CloseCircle, Trash, Eye, EyeSlash, ArrowLeft2, ArrowRight2, Book1,
 } from 'iconsax-react';
@@ -56,6 +57,7 @@ const SeriesArticlesPage = () => {
 
   const [series,       setSeries]       = useState<SeriesInfo | null>(null);
   const [articles,     setArticles]     = useState<AdminArticle[]>([]);
+  usePageTitle(series?.title);
   const [meta,         setMeta]         = useState<Meta>({ total: 0, page: 1, limit: 20, totalPages: 1 });
   const [loading,      setLoading]      = useState(true);
   const [search,       setSearch]       = useState('');

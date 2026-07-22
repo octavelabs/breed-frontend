@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { ArrowLeft, Clock, Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
 import { devotionalService } from "@/lib/api-services";
@@ -35,6 +36,7 @@ const ArticlePage = () => {
 
   const [article,    setArticle]    = useState<Article | null>(null);
   const [loading,    setLoading]    = useState(true);
+  usePageTitle(article?.title);
   const [bookmarked, setBookmarked] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
 

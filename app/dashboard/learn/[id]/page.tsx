@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { courseService } from '@/lib/api-services';
 import { useEffect, useState } from 'react';
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 
 interface Lesson {
   id: string;
@@ -53,6 +54,7 @@ const CourseDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  usePageTitle(course?.title);
 
   useEffect(() => {
     if (!id) return;

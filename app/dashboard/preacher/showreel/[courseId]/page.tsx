@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import Button from '@/app/components/Button';
 import { Archive, ArrowLeft, Trash2 } from 'lucide-react';
@@ -33,6 +34,7 @@ const UpdateCourse = () => {
 
   const [course, setCourse] = useState<ApiCourse | null>(null);
   const [loading, setLoading] = useState(true);
+  usePageTitle(course?.title);
   const [actionLoading, setActionLoading] = useState<'publish' | 'archive' | 'delete' | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
