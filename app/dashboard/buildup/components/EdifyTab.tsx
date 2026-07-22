@@ -69,6 +69,9 @@ function formatElapsed(secs: number): string {
 
 type TimerState = 'idle' | 'running' | 'details';
 
+const TIMER_START_KEY = 'edify_timer_start';
+const TIMER_BULLETIN_KEY = 'edify_timer_bulletin';
+
 const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
   const { onTimerStateChange, autoStart } = props;
   const isDark = useDarkMode();
@@ -80,29 +83,72 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
   const [bulletinCtx, setBulletinCtx] = useState<BulletinCtx | null>(null);
   const [checkedPoints, setCheckedPoints] = useState<Set<number>>(new Set());
 
+  // Use real wall-clock time, not tick-counting, so the timer stays accurate
+  // when the browser throttles or suspends JS in the background.
   useEffect(() => {
     if (timerState !== 'running') return;
-    const id = setInterval(() => setElapsed((e) => e + 1), 1000);
+    const tick = () => {
+      if (!startTimeRef.current) return;
+      setElapsed(Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000));
+    };
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [timerState]);
+
+  // Snap the elapsed time the moment the tab/app becomes visible again — no
+  // waiting for the next interval tick after returning from background.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && timerState === 'running' && startTimeRef.current) {
+        setElapsed(Math.floor((Date.now() - startTimeRef.current.getTime()) / 1000));
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [timerState]);
+
+  // Restore a running session from sessionStorage on mount. This handles the
+  // case where iOS kills the tab (page reloads) or the user navigates away and
+  // back within the app — the timer continues from the true start time.
+  useEffect(() => {
+    if (autoStart) return; // autoStart manages its own fresh session
+    const savedStart = sessionStorage.getItem(TIMER_START_KEY);
+    if (!savedStart) return;
+    const startMs = parseInt(savedStart, 10);
+    if (isNaN(startMs)) return;
+    try {
+      const savedBulletin = sessionStorage.getItem(TIMER_BULLETIN_KEY);
+      if (savedBulletin) setBulletinCtx(JSON.parse(savedBulletin));
+    } catch {}
+    startTimeRef.current = new Date(startMs);
+    setElapsed(Math.floor((Date.now() - startMs) / 1000));
+    setTimerState('running');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-cap at 90 minutes
   useEffect(() => {
     if (timerState === 'running' && elapsed >= 5400) {
       stoppedAtRef.current = new Date();
+      sessionStorage.removeItem(TIMER_START_KEY);
+      sessionStorage.removeItem(TIMER_BULLETIN_KEY);
       setTimerState('details');
     }
   }, [elapsed, timerState]);
 
   function startTimer() {
     if (timerState !== 'idle') return;
-    startTimeRef.current = new Date();
+    const now = new Date();
+    startTimeRef.current = now;
+    sessionStorage.setItem(TIMER_START_KEY, String(now.getTime()));
     setElapsed(0);
     setTimerState('running');
   }
 
   function stopTimer() {
     stoppedAtRef.current = new Date();
+    sessionStorage.removeItem(TIMER_START_KEY);
+    sessionStorage.removeItem(TIMER_BULLETIN_KEY);
     if (bulletinCtx && !reflection) {
       setReflection(`Prayed through: ${bulletinCtx.title}`);
     }
@@ -122,6 +168,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
         const ctx = JSON.parse(raw) as BulletinCtx;
         setBulletinCtx(ctx);
         sessionStorage.removeItem('edify_bulletin_ctx');
+        sessionStorage.setItem(TIMER_BULLETIN_KEY, JSON.stringify(ctx));
         const valid = FOCUS_OPTIONS.find((f) => f.id === ctx.category);
         if (valid) setCategory(valid.id);
       } else if (autoStart.category) {
@@ -164,6 +211,8 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
         verseRef: skip ? undefined : (verseRef || undefined),
         loggedAt: (stoppedAtRef.current ?? new Date()).toISOString(),
       });
+      sessionStorage.removeItem(TIMER_START_KEY);
+      sessionStorage.removeItem(TIMER_BULLETIN_KEY);
       setTimerState('idle');
       setElapsed(0);
       setCategory('');

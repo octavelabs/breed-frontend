@@ -71,19 +71,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      let fetchedUser: User | null = null;
       try {
-        const fetchedUser = await authService.me<User>();
-        setUser(fetchedUser);
-        setSessionCookies(fetchedUser.role);
+        fetchedUser = await authService.me<User>();
       } catch {
-        // Token is invalid / expired and refresh already failed inside the
-        // interceptor, so just clear everything here.
-        clearTokens();
-        clearLoggedInCookie();
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+        // First attempt failed — wait 2 s and retry once. This absorbs the
+        // window where iOS wakes up the app but the network isn't ready yet.
+        try {
+          await new Promise<void>((r) => setTimeout(r, 2000));
+          fetchedUser = await authService.me<User>();
+        } catch {
+          // Both attempts failed — token is genuinely invalid or server error.
+          clearTokens();
+          clearLoggedInCookie();
+          setUser(null);
+          setIsLoading(false);
+          return;
+        }
       }
+
+      setUser(fetchedUser);
+      setSessionCookies(fetchedUser!.role);
+      setIsLoading(false);
     };
 
     bootstrap();
