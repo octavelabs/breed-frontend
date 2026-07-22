@@ -1,7 +1,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LogOut } from 'lucide-react';
+
+function useDarkMode() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
 import {
   Home2, Book1, Clipboard, People, Profile2User,
   Grid3, Video, VideoPlay,
@@ -55,7 +67,7 @@ const SideBar = () => {
         className={`h-screen max-h-screen w-64 border-r hidden md:flex md:flex-col ${
           isPreacher
             ? "bg-[#1A0B2E] border-[#2D1B4E]"
-            : "bg-white border-gray-200"
+            : "bg-white dark:bg-[#181A1F] border-gray-200 dark:border-[#2D313A]"
         }`}
       >
         {/* Logo */}
@@ -154,7 +166,7 @@ const SideBar = () => {
   );
 };
 
-const glassStyle: React.CSSProperties = {
+const lightGlass: React.CSSProperties = {
   background: 'rgba(245, 235, 255, 0.45)',
   backdropFilter: 'blur(32px) saturate(2)',
   WebkitBackdropFilter: 'blur(32px) saturate(2)',
@@ -162,25 +174,50 @@ const glassStyle: React.CSSProperties = {
   boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.95)',
 };
 
-const NavItem = ({ item, active }: { item: { path: string; label: string; icon: React.ElementType }; active: boolean }) => (
-  <Link href={item.path} className="relative flex flex-col items-center gap-[3px] px-2 py-1 z-10">
-    {active && (
-      <span
-        className="absolute inset-x-0 -inset-y-0.5 rounded-2xl"
-        style={{ background: 'rgba(255,255,255,0.97)', boxShadow: '0 1px 4px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1)', zIndex: -1 }}
-      />
-    )}
-    <item.icon color={active ? '#870BD6' : '#6B7280'} size={22} variant={active ? 'Bold' : 'Linear'} />
-    <span className="text-[10px] font-semibold relative" style={{ color: active ? '#870BD6' : '#6B7280' }}>
-      {item.label}
-    </span>
-  </Link>
-);
+const darkGlass: React.CSSProperties = {
+  background: 'rgba(24, 26, 31, 0.95)',
+  backdropFilter: 'blur(24px) saturate(1.8)',
+  WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
+  border: '1px solid rgba(45, 49, 58, 0.8)',
+  boxShadow: '0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
+};
+
+const NavItem = ({
+  item,
+  active,
+  isDark,
+}: {
+  item: { path: string; label: string; icon: React.ElementType };
+  active: boolean;
+  isDark: boolean;
+}) => {
+  const activeColor = isDark ? '#A855F7' : '#870BD6';
+  const inactiveColor = isDark ? '#717784' : '#6B7280';
+  return (
+    <Link href={item.path} className="relative flex flex-col items-center gap-[3px] px-2 py-1 z-10">
+      {active && (
+        <span
+          className="absolute inset-x-0 -inset-y-0.5 rounded-2xl"
+          style={{
+            background: isDark ? '#1A2342' : 'rgba(255,255,255,0.97)',
+            boxShadow: isDark ? 'none' : '0 1px 4px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1)',
+            zIndex: -1,
+          }}
+        />
+      )}
+      <item.icon color={active ? activeColor : inactiveColor} size={22} variant={active ? 'Bold' : 'Linear'} />
+      <span className="text-[10px] font-semibold relative" style={{ color: active ? activeColor : inactiveColor }}>
+        {item.label}
+      </span>
+    </Link>
+  );
+};
 
 export const MobileNav = () => {
   const pathname = usePathname();
   const { userType } = useUser();
   const [moreOpen, setMoreOpen] = useState(false);
+  const isDark = useDarkMode();
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
@@ -194,13 +231,19 @@ export const MobileNav = () => {
   const overflowItems = isAdminRoute ? currentNavItems.slice(4) : [];
   const hasOverflow = overflowItems.length > 0;
 
+  const glassStyle = isDark ? darkGlass : lightGlass;
+  const activeColor = isDark ? '#A855F7' : '#870BD6';
+  const inactiveColor = isDark ? '#717784' : '#6B7280';
+  const sheenColor = isDark
+    ? 'linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(255,255,255,0))'
+    : 'linear-gradient(to bottom, rgba(255,255,255,0.38), rgba(255,255,255,0))';
+
   return (
     <section className="fixed bottom-4 left-4 right-4 z-[99] md:hidden">
 
       {/* Overflow sheet */}
       {hasOverflow && moreOpen && (
         <>
-          {/* Backdrop dismiss */}
           <div className="fixed inset-0 z-[98]" onClick={() => setMoreOpen(false)} />
           <div
             className="absolute bottom-[76px] right-0 w-48 rounded-[20px] overflow-hidden z-[100] py-1"
@@ -208,7 +251,7 @@ export const MobileNav = () => {
           >
             <span
               className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[20px]"
-              style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.38), rgba(255,255,255,0))' }}
+              style={{ background: sheenColor }}
             />
             {overflowItems.map((item) => {
               const active = isActive(item.path);
@@ -223,11 +266,11 @@ export const MobileNav = () => {
                   {active && (
                     <span
                       className="absolute inset-x-2 inset-y-1 rounded-xl"
-                      style={{ background: 'rgba(255,255,255,0.97)', zIndex: -1 }}
+                      style={{ background: isDark ? '#1A2342' : 'rgba(255,255,255,0.97)', zIndex: -1 }}
                     />
                   )}
-                  <Icon color={active ? '#870BD6' : '#6B7280'} size={20} variant={active ? 'Bold' : 'Linear'} />
-                  <span className="text-sm font-semibold" style={{ color: active ? '#870BD6' : '#6B7280' }}>
+                  <Icon color={active ? activeColor : inactiveColor} size={20} variant={active ? 'Bold' : 'Linear'} />
+                  <span className="text-sm font-semibold" style={{ color: active ? activeColor : inactiveColor }}>
                     {item.label}
                   </span>
                 </Link>
@@ -242,14 +285,13 @@ export const MobileNav = () => {
         className="relative flex justify-between items-center h-[64px] px-5 rounded-[30px] overflow-hidden"
         style={glassStyle}
       >
-        {/* Sheen */}
         <span
           className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[30px]"
-          style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.38), rgba(255,255,255,0))' }}
+          style={{ background: sheenColor }}
         />
 
         {visibleItems.map((item) => (
-          <NavItem key={item.path} item={item} active={isActive(item.path)} />
+          <NavItem key={item.path} item={item} active={isActive(item.path)} isDark={isDark} />
         ))}
 
         {hasOverflow && (
@@ -260,7 +302,11 @@ export const MobileNav = () => {
             {moreOpen && (
               <span
                 className="absolute inset-x-0 -inset-y-0.5 rounded-2xl"
-                style={{ background: 'rgba(255,255,255,0.97)', boxShadow: '0 1px 4px rgba(0,0,0,0.10)', zIndex: -1 }}
+                style={{
+                  background: isDark ? '#1A2342' : 'rgba(255,255,255,0.97)',
+                  boxShadow: isDark ? 'none' : '0 1px 4px rgba(0,0,0,0.10)',
+                  zIndex: -1,
+                }}
               />
             )}
             <div className="flex gap-[3px] items-center h-[22px]">
@@ -268,11 +314,11 @@ export const MobileNav = () => {
                 <span
                   key={i}
                   className="w-[4px] h-[4px] rounded-full"
-                  style={{ background: moreOpen ? '#870BD6' : '#6B7280' }}
+                  style={{ background: moreOpen ? activeColor : inactiveColor }}
                 />
               ))}
             </div>
-            <span className="text-[10px] font-semibold" style={{ color: moreOpen ? '#870BD6' : '#6B7280' }}>
+            <span className="text-[10px] font-semibold" style={{ color: moreOpen ? activeColor : inactiveColor }}>
               More
             </span>
           </button>

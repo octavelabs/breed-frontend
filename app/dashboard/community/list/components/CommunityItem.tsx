@@ -27,9 +27,9 @@ const CommunityItem: React.FC<CommunityItemProps> = ({ community, isSelected, on
       onMouseLeave={() => setHovered(false)}
       className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
         isSelected
-          ? "bg-[#F5EBFF] border-r-2 border-[#870BD6]"
+          ? "bg-[#F5EBFF] dark:bg-[#2D1B4E] border-r-2 border-[#870BD6]"
           : hovered
-          ? "bg-[#FAFAFA]"
+          ? "bg-[#FAFAFA] dark:bg-[#252830]"
           : "bg-transparent"
       }`}
     >
@@ -49,11 +49,11 @@ const CommunityItem: React.FC<CommunityItemProps> = ({ community, isSelected, on
 
       {/* Name + member count */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold leading-tight truncate ${isSelected ? "text-[#870BD6]" : "text-[#180426]"}`}>
+        <p className={`text-sm font-semibold leading-tight truncate ${isSelected ? "text-[#870BD6]" : "text-[#180426] dark:text-white"}`}>
           {community.name}
         </p>
         {memberCount > 0 && (
-          <p className="text-[11px] text-[#60666B] mt-0.5 flex items-center gap-1">
+          <p className="text-[11px] text-[#60666B] dark:text-[#9CA3AF] mt-0.5 flex items-center gap-1">
             <Users size={10} /> {memberCount.toLocaleString()} member{memberCount !== 1 ? "s" : ""}
           </p>
         )}

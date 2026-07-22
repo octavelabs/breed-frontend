@@ -171,11 +171,11 @@ export default function DevotionalsTab() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <p className="text-sm text-gray-500">Articles and teachings from devotionals you follow</p>
+        <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">Articles and teachings from devotionals you follow</p>
       </div>
 
       {/* Mode toggle */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit text-sm">
+      <div className="flex gap-1 bg-gray-100 dark:bg-[#252830] rounded-xl p-1 mb-6 w-fit text-sm">
         {([
           { id: 'feed' as FeedMode, label: 'My Feed' },
           { id: 'browse' as FeedMode, label: 'Browse All' },
@@ -184,7 +184,7 @@ export default function DevotionalsTab() {
           <button
             key={m.id}
             onClick={() => setMode(m.id)}
-            className={`px-4 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${mode === m.id ? 'bg-white text-[#870BD6] shadow-sm' : 'text-gray-500'}`}
+            className={`px-4 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${mode === m.id ? 'bg-white dark:bg-[#181A1F] text-[#870BD6] dark:text-[#A855F7] shadow-sm' : 'text-gray-500 dark:text-[#717784]'}`}
           >
             {m.label}
           </button>
@@ -202,8 +202,8 @@ export default function DevotionalsTab() {
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
               <Book1 size={32} color="#870BD6" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Your feed is empty</h3>
-            <p className="text-sm text-gray-500 max-w-xs mx-auto">Subscribe to devotionals in Browse All to see new articles here.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Your feed is empty</h3>
+            <p className="text-sm text-gray-500 dark:text-[#9CA3AF] max-w-xs mx-auto">Subscribe to devotionals in Browse All to see new articles here.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -225,8 +225,8 @@ export default function DevotionalsTab() {
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
               <Book1 size={32} color="#870BD6" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">No devotionals yet</h3>
-            <p className="text-sm text-gray-500">Check back later for new content.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">No devotionals yet</h3>
+            <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">Check back later for new content.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -254,8 +254,8 @@ export default function DevotionalsTab() {
             <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
               <Bookmark size={32} color="#870BD6" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">No saved articles</h3>
-            <p className="text-sm text-gray-500">Bookmark articles to find them here easily.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">No saved articles</h3>
+            <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">Bookmark articles to find them here easily.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -290,7 +290,7 @@ function SeriesCard({
 
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer group"
+      className="bg-white dark:bg-[#181A1F] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-[#2D313A] cursor-pointer group"
       onClick={onSelect}
     >
       {s.coverImageUrl ? (
@@ -302,16 +302,16 @@ function SeriesCard({
         </div>
       )}
       <div className="p-4">
-        <h3 className="font-bold text-gray-900 leading-tight mb-1 group-hover:text-[#870BD6] transition-colors">{s.title}</h3>
-        {s.description && <p className="text-xs text-gray-500 line-clamp-2 mb-3">{s.description}</p>}
+        <h3 className="font-bold text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-[#870BD6] dark:group-hover:text-[#A855F7] transition-colors">{s.title}</h3>
+        {s.description && <p className="text-xs text-gray-500 dark:text-[#9CA3AF] line-clamp-2 mb-3">{s.description}</p>}
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-[9px] font-bold text-[#870BD6]">
+          <div className="w-5 h-5 rounded-full bg-purple-100 dark:bg-[#2D1B4E] flex items-center justify-center text-[9px] font-bold text-[#870BD6]">
             {s.author.firstName[0]}
           </div>
-          <span className="text-xs text-gray-500">{s.author.firstName} {s.author.lastName}</span>
+          <span className="text-xs text-gray-500 dark:text-[#9CA3AF]">{s.author.firstName} {s.author.lastName}</span>
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-[11px] text-gray-400">
+          <div className="flex items-center gap-3 text-[11px] text-gray-400 dark:text-[#717784]">
             <span className="flex items-center gap-1"><Book1 size={12} color="#9ca3af" />{s.articleCount} articles</span>
             <span className="flex items-center gap-1"><People size={12} color="#9ca3af" />{s.subscriberCount}</span>
           </div>
@@ -321,7 +321,7 @@ function SeriesCard({
               disabled={toggling}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 s.isSubscribed
-                  ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-gray-100 dark:bg-[#252830] text-gray-600 dark:text-[#9CA3AF] hover:bg-gray-200 dark:hover:bg-[#2D313A]'
                   : 'bg-linear-to-b from-[#A967F1] to-[#5B26B1] text-white'
               }`}
             >
@@ -343,7 +343,7 @@ function SeriesCard({
 
 function ArticleCard({ article: a, onClick, onBookmark }: { article: DevotionalArticle; onClick: () => void; onBookmark: () => void }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer" onClick={onClick}>
+    <div className="bg-white dark:bg-[#181A1F] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-[#2D313A] cursor-pointer" onClick={onClick}>
       {a.coverImageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={a.coverImageUrl} alt={a.title} className="w-full h-40 object-cover" />
@@ -354,22 +354,22 @@ function ArticleCard({ article: a, onClick, onBookmark }: { article: DevotionalA
       )}
       <div className="p-4">
         {a.series && (
-          <span className="text-[10px] font-bold uppercase tracking-wide text-[#870BD6] mb-1 block">{a.series.title}</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-[#870BD6] dark:text-[#A855F7] mb-1 block">{a.series.title}</span>
         )}
         {!a.series && a.category && (
-          <span className="text-[10px] font-bold uppercase tracking-wide text-[#870BD6] mb-1 block">{a.category.name}</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-[#870BD6] dark:text-[#A855F7] mb-1 block">{a.category.name}</span>
         )}
-        <h3 className="font-bold text-gray-900 leading-tight mb-2 line-clamp-2 select-none">{a.title}</h3>
-        {a.excerpt && <p className="text-xs text-gray-500 line-clamp-2 mb-3">{a.excerpt}</p>}
+        <h3 className="font-bold text-gray-900 dark:text-white leading-tight mb-2 line-clamp-2 select-none">{a.title}</h3>
+        {a.excerpt && <p className="text-xs text-gray-500 dark:text-[#9CA3AF] line-clamp-2 mb-3">{a.excerpt}</p>}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-[#870BD6]">
+            <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-[#2D1B4E] flex items-center justify-center text-[10px] font-bold text-[#870BD6]">
               {a.author.firstName[0]}
             </div>
-            <span className="text-xs text-gray-500">{a.author.firstName} {a.author.lastName}</span>
+            <span className="text-xs text-gray-500 dark:text-[#9CA3AF]">{a.author.firstName} {a.author.lastName}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+            <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-[#717784]">
               <Clock size={12} color="#9ca3af" />{a.estimatedMinutes}m
             </span>
             <button
@@ -486,7 +486,7 @@ function ArticleReader({
   return (
     <div>
       {/* Back button — same pattern as PartnershipDetail */}
-      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
+      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 dark:text-[#9CA3AF] hover:text-gray-700 dark:hover:text-white cursor-pointer">
         <ArrowRight2 size={20} color="#6b7280" className="rotate-180" />
         <span className="text-sm font-medium">Back</span>
       </button>
@@ -501,7 +501,7 @@ function ArticleReader({
         )}
 
         {/* Title */}
-        <h1 className="text-2xl lg:text-3xl font-bold text-[#180426] mb-4 leading-tight">
+        <h1 className="text-2xl lg:text-3xl font-bold text-[#180426] dark:text-white mb-4 leading-tight">
           {article.title}
         </h1>
 
@@ -509,26 +509,26 @@ function ArticleReader({
         <div className="flex items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-2 flex-wrap">
             {categoryLabel && (
-              <span className="bg-[#F7EDFF] text-[#870BD6] font-medium text-xs px-3 py-1.5 rounded-full">
+              <span className="bg-[#F7EDFF] dark:bg-[#2D1B4E] text-[#870BD6] dark:text-[#A855F7] font-medium text-xs px-3 py-1.5 rounded-full">
                 {categoryLabel}
               </span>
             )}
             {article.tags?.map((t) => (
-              <span key={t} className="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">
+              <span key={t} className="flex items-center gap-1 px-2.5 py-1 bg-gray-100 dark:bg-[#252830] text-gray-500 dark:text-[#9CA3AF] text-xs font-medium rounded-full">
                 <Tag size={10} color="#6b7280" />{t}
               </span>
             ))}
           </div>
           <div className="flex items-center gap-3 shrink-0">
             {article.estimatedMinutes != null && (
-              <span className="flex items-center gap-1.5 text-sm text-gray-500">
+              <span className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-[#9CA3AF]">
                 <Clock size={14} color="#9ca3af" />{article.estimatedMinutes}m
               </span>
             )}
             <button
               onClick={handleBookmark}
               disabled={bookmarking}
-              className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-[#252830] rounded-xl transition-colors cursor-pointer"
             >
               {bookmarked
                 ? <Bookmark variant="Bold" size={20} color="#870BD6" />
@@ -538,7 +538,7 @@ function ArticleReader({
         </div>
 
         {/* Author row */}
-        <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-4 mb-6">
+        <div className="flex items-center gap-3 bg-gray-50 dark:bg-[#252830] rounded-2xl p-4 mb-6">
           <div className="w-9 h-9 rounded-full bg-[#E7C8FF] flex items-center justify-center font-bold text-[#870BD6] text-sm shrink-0 overflow-hidden">
             {article.author.avatarUrl
               // eslint-disable-next-line @next/next/no-img-element
@@ -546,9 +546,9 @@ function ArticleReader({
               : `${article.author.firstName[0]}${article.author.lastName[0]}`}
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-sm">{article.author.firstName} {article.author.lastName}</p>
+            <p className="font-semibold text-gray-900 dark:text-white text-sm">{article.author.firstName} {article.author.lastName}</p>
             {article.publishedAt && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-[#717784]">
                 {new Date(article.publishedAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
               </p>
             )}
@@ -557,7 +557,7 @@ function ArticleReader({
 
         {/* Excerpt */}
         {article.excerpt && (
-          <p className="text-base text-gray-600 font-medium mb-6 leading-relaxed">{article.excerpt}</p>
+          <p className="text-base text-gray-600 dark:text-[#9CA3AF] font-medium mb-6 leading-relaxed">{article.excerpt}</p>
         )}
 
         {/* Full content */}
@@ -567,19 +567,19 @@ function ArticleReader({
           </div>
         ) : article.content ? (
           <div
-            className="prose prose-base max-w-none text-gray-700 leading-relaxed
-              prose-headings:text-[#180426] prose-a:text-[#870BD6]
-              prose-blockquote:border-l-[#870BD6] prose-blockquote:text-gray-600
+            className="prose prose-base max-w-none text-gray-700 dark:text-[#E2E4E9] leading-relaxed
+              prose-headings:text-[#180426] dark:prose-headings:text-white prose-a:text-[#870BD6] dark:prose-a:text-[#A855F7]
+              prose-blockquote:border-l-[#870BD6] prose-blockquote:text-gray-600 dark:prose-blockquote:text-[#9CA3AF]
               prose-img:rounded-xl prose-pre:bg-[#1e1e1e] prose-pre:text-[#d4d4d4]"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
         ) : (
-          <p className="text-gray-400 italic text-sm">No content available.</p>
+          <p className="text-gray-400 dark:text-[#717784] italic text-sm">No content available.</p>
         )}
 
         {/* ── Reactions ──────────────────────────────────────────────────────── */}
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Reactions</p>
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-[#2D313A]">
+          <p className="text-xs font-semibold text-gray-400 dark:text-[#717784] uppercase tracking-wide mb-3">Reactions</p>
           <div className="flex gap-2 flex-wrap">
             {REACTION_TYPES.map((r) => {
               const current = reactions.find((rx) => rx.type === r.type);
@@ -589,8 +589,8 @@ function ArticleReader({
                   onClick={() => handleReact(r.type)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer ${
                     current?.hasReacted
-                      ? 'bg-[#F5EBFF] border-[#D49CFD] text-[#870BD6]'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-[#D49CFD] hover:bg-[#F5EBFF]'
+                      ? 'bg-[#F5EBFF] dark:bg-[#2D1B4E] border-[#D49CFD] text-[#870BD6] dark:text-[#A855F7]'
+                      : 'bg-white dark:bg-[#252830] border-gray-200 dark:border-[#2D313A] text-gray-600 dark:text-[#9CA3AF] hover:border-[#D49CFD] hover:bg-[#F5EBFF] dark:hover:bg-[#2D1B4E]'
                   }`}
                 >
                   <span>{r.emoji}</span>
@@ -605,8 +605,8 @@ function ArticleReader({
         </div>
 
         {/* ── Comments ───────────────────────────────────────────────────────── */}
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-[#2D313A]">
+          <p className="text-xs font-semibold text-gray-400 dark:text-[#717784] uppercase tracking-wide mb-4">
             Comments {comments.length > 0 && `(${comments.length})`}
           </p>
 
@@ -618,7 +618,7 @@ function ArticleReader({
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAddComment(); } }}
               placeholder="Share a reflection…"
               rows={2}
-              className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] resize-none"
+              className="flex-1 border border-gray-200 dark:border-[#2D313A] bg-white dark:bg-[#252830] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-[#717784] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] resize-none"
             />
             <button
               onClick={handleAddComment}
@@ -637,7 +637,7 @@ function ArticleReader({
               <div className="w-6 h-6 rounded-full border-2 border-t-[#870BD6] border-[#E9D5FF] animate-spin" />
             </div>
           ) : comments.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Be the first to share a reflection.</p>
+            <p className="text-sm text-gray-400 dark:text-[#717784] text-center py-6">Be the first to share a reflection.</p>
           ) : (
             <div className="space-y-4">
               {comments.map((c) => (
@@ -648,16 +648,16 @@ function ArticleReader({
                       ? <img src={c.user.avatarUrl} alt="" className="w-full h-full object-cover" />
                       : `${c.user?.firstName?.[0] ?? '?'}${c.user?.lastName?.[0] ?? ''}`}
                   </div>
-                  <div className="flex-1 bg-gray-50 rounded-2xl px-4 py-3">
+                  <div className="flex-1 bg-gray-50 dark:bg-[#252830] rounded-2xl px-4 py-3">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-semibold text-[#180426]">
+                      <p className="text-sm font-semibold text-[#180426] dark:text-white">
                         {c.user?.firstName} {c.user?.lastName}
                       </p>
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-[10px] text-gray-400 dark:text-[#717784]">
                         {new Date(c.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                       </p>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">{c.content}</p>
+                    <p className="text-sm text-gray-600 dark:text-[#9CA3AF] leading-relaxed">{c.content}</p>
                   </div>
                 </div>
               ))}

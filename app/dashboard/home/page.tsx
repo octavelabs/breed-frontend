@@ -87,7 +87,7 @@ const TRACKED: ActivityType[] = [
 // ── Skeleton ───────────────────────────────────────────────────────────────
 
 const TextSkeleton = ({ w = "w-3/4" }: { w?: string }) => (
-  <div className={`animate-pulse bg-gray-200 rounded h-4 ${w}`} />
+  <div className={`animate-pulse bg-gray-200 dark:bg-[#252830] rounded h-4 ${w}`} />
 );
 
 // ── Streak Day Column ──────────────────────────────────────────────────────
@@ -112,8 +112,8 @@ function DayColumn({
       {/* Activity dots */}
       <div
         className={`w-9 h-9 rounded-full flex items-center justify-center relative ${
-          isToday ? "ring-2 ring-[#870BD6] ring-offset-2" : ""
-        } ${noActivity ? "bg-gray-100" : "bg-[#FFF6E5]"}`}
+          isToday ? "ring-2 ring-[#870BD6] dark:ring-[#A855F7] ring-offset-2 dark:ring-offset-[#1E2025]" : ""
+        } ${noActivity ? "bg-gray-100 dark:bg-[#252830]" : "bg-[#FFF6E5] dark:bg-[#3D2060]"}`}
       >
         {hasFire ? (
           <FlameIcon size={20} />
@@ -142,7 +142,7 @@ function DayColumn({
         )}
       </div>
       <span
-        className={`text-xs font-medium ${noActivity ? "text-gray-400" : "text-gray-600"} ${isToday ? "font-bold text-[#180426]" : ""}`}
+        className={`text-xs font-medium ${noActivity ? "text-gray-400 dark:text-[#717784]" : "text-gray-600 dark:text-[#E2E4E9]"} ${isToday ? "font-bold text-[#180426] dark:!text-white" : ""}`}
       >
         {label}
       </span>
@@ -205,17 +205,17 @@ const HomePage = () => {
       <div className="mx-auto">
         {/* ── Greeting ── */}
         <div className="flex justify-between lg:justify-start items-center mb-8 lg:mb-0">
-          <h1 className="text-[24px] lg:text-[32px] font-bold lg:mb-8">
+          <h1 className="text-[24px] lg:text-[32px] font-bold lg:mb-8 dark:text-white">
             {getGreeting()}, {user?.firstName ?? "Friend"}
           </h1>
           {/* Mobile streak badge */}
           <Link href="/dashboard/streaks">
-            <div className="flex lg:hidden items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#D2D9DF] bg-white cursor-pointer hover:border-[#870BD6] transition-colors">
+            <div className="flex lg:hidden items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#D2D9DF] dark:border-[#2D313A] bg-white dark:bg-[#252830] cursor-pointer hover:border-[#870BD6] dark:hover:border-[#A855F7] transition-colors">
               <FlameIcon size={20} />
               {streakLoading ? (
-                <div className="animate-pulse bg-gray-200 rounded h-5 w-6" />
+                <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-5 w-6" />
               ) : (
-                <span className="text-[20px] font-bold">{currentStreak}</span>
+                <span className="text-[20px] font-bold dark:text-white">{currentStreak}</span>
               )}
             </div>
           </Link>
@@ -268,17 +268,17 @@ const HomePage = () => {
           className="hidden lg:block rounded-2xl"
         >
           <Link href="/dashboard/streaks">
-            <div className="bg-white/90 rounded-2xl px-16.5 py-11 mb-16 shadow-[0px_4px_4px_0px_#00000008] cursor-pointer hover:bg-white/95 transition-colors">
+            <div className="bg-white/90 dark:bg-[#181A1F] rounded-2xl px-16.5 py-11 mb-16 shadow-[0px_4px_4px_0px_#00000008] dark:shadow-none cursor-pointer hover:bg-white/95 dark:hover:bg-[#1E2025] transition-colors">
               <div className="flex items-start justify-between gap-16">
                 <div className="shrink-0">
-                  <h2 className="text-2xl font-bold mb-5">Consistency is Key</h2>
+                  <h2 className="text-2xl font-bold mb-5 dark:text-white">Consistency is Key</h2>
 
                   {streakLoading ? (
                     <div className="flex gap-4">
                       {[...Array(7)].map((_, i) => (
                         <div key={i} className="flex flex-col items-center gap-2">
-                          <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
-                          <div className="w-4 h-3 rounded bg-gray-100 animate-pulse" />
+                          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                          <div className="w-4 h-3 rounded bg-gray-100 dark:bg-[#252830] animate-pulse" />
                         </div>
                       ))}
                     </div>
@@ -326,12 +326,12 @@ const HomePage = () => {
                 </div>
 
                 {/* Streak badge */}
-                <div className="flex flex-col items-center gap-1 px-6 py-4 rounded-2xl border border-[#D2D9DF] bg-white shrink-0">
+                <div className="flex flex-col items-center gap-1 px-6 py-4 rounded-2xl border border-[#D2D9DF] dark:border-[#2D313A] bg-white dark:bg-[#252830] shrink-0">
                   <FlameIcon size={38} />
                   {streakLoading ? (
-                    <div className="animate-pulse bg-gray-200 rounded h-7 w-8" />
+                    <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-7 w-8" />
                   ) : (
-                    <span className="text-2xl font-bold leading-none">
+                    <span className="text-2xl font-bold leading-none dark:text-white">
                       {currentStreak}
                     </span>
                   )}
@@ -345,7 +345,7 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-6 mb-8">
           {/* Suggested Course */}
           <div>
-            <h3 className="text-base lg:text-xl font-bold text-gray-900 mb-2 lg:mb-4">
+            <h3 className="text-base lg:text-xl font-bold text-gray-900 dark:text-white mb-2 lg:mb-4">
               {course ? "Suggested Course" : "Browse Courses"}
             </h3>
             <Link
@@ -355,7 +355,7 @@ const HomePage = () => {
                   : "/dashboard/learn"
               }
             >
-              <div className="bg-white rounded-2xl px-[28px] py-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-[#181A1F] dark:border dark:border-[#2D313A] rounded-2xl px-[28px] py-4 shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-none transition-shadow cursor-pointer">
                 <div className="flex gap-6 items-center">
                   <div className="flex-1">
                     {courseLoading ? (
@@ -366,14 +366,14 @@ const HomePage = () => {
                       </div>
                     ) : (
                       <>
-                        <p className="text-[10px] lg:text-sm text-gray-500 mb-2">
+                        <p className="text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF] mb-2">
                           {course?.category?.name ?? "Featured Course"}
                         </p>
-                        <p className="text-xs lg:text-base font-bold text-gray-900 leading-tight mb-2 lg:mb-4">
+                        <p className="text-xs lg:text-base font-bold text-gray-900 dark:text-white leading-tight mb-2 lg:mb-4">
                           {course?.title ??
                             "Explore courses to grow in your faith."}
                         </p>
-                        <div className="flex items-center gap-2 text-[10px] lg:text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF]">
                           <Clock className="w-4 h-4" />
                           <span>
                             {course?.durationMinutes
@@ -397,7 +397,7 @@ const HomePage = () => {
 
           {/* Today's Devotional */}
           <div>
-            <h3 className="text-base lg:text-xl font-bold text-gray-900 mb-2 lg:mb-4">
+            <h3 className="text-base lg:text-xl font-bold text-gray-900 dark:text-white mb-2 lg:mb-4">
               Today&apos;s Devotional
             </h3>
             <Link
@@ -407,7 +407,7 @@ const HomePage = () => {
                   : "/dashboard/buildup?tab=devotionals"
               }
             >
-              <div className="bg-white rounded-2xl px-[28px] py-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-[#181A1F] dark:border dark:border-[#2D313A] rounded-2xl px-[28px] py-4 shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-none transition-shadow cursor-pointer">
                 <div className="flex gap-6 items-center">
                   <div className="flex-1">
                     {devotionalLoading ? (
@@ -418,15 +418,15 @@ const HomePage = () => {
                       </div>
                     ) : (
                       <>
-                        <p className="text-[10px] lg:text-sm text-gray-500 mb-2">
+                        <p className="text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF] mb-2">
                           {devotional?.category?.name ?? "Daily Devotional"}
                         </p>
-                        <p className="text-xs lg:text-base font-bold text-gray-900 leading-tight mb-2 lg:mb-4">
+                        <p className="text-xs lg:text-base font-bold text-gray-900 dark:text-white leading-tight mb-2 lg:mb-4">
                           {devotional?.title ??
                             devotional?.excerpt ??
                             "No devotional scheduled for today."}
                         </p>
-                        <div className="flex items-center gap-2 text-[10px] lg:text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF]">
                           <Clock className="w-4 h-4" />
                           <span>
                             {devotional?.estimatedMinutes

@@ -48,7 +48,7 @@ const ExploreCard = ({
 
   return (
     <Link href={`/dashboard/community/${community.id}`}>
-      <div className="bg-white border border-[#E2E3E5] rounded-2xl overflow-hidden hover:shadow-md transition-shadow flex flex-col cursor-pointer group">
+      <div className="bg-white dark:bg-[#181A1F] border border-[#E2E3E5] dark:border-[#2D313A] rounded-2xl overflow-hidden hover:shadow-md transition-shadow flex flex-col cursor-pointer group">
         {/* Cover */}
         <div className="relative bg-[#180426] h-[140px] flex items-center justify-center overflow-hidden">
           {community.coverImage ? (
@@ -86,16 +86,16 @@ const ExploreCard = ({
 
         {/* Content */}
         <div className="px-4 py-3 flex-1 flex flex-col gap-2">
-          <h3 className="font-bold text-[#180426] text-sm leading-snug line-clamp-1 group-hover:text-[#870BD6] transition-colors">
+          <h3 className="font-bold text-[#180426] dark:text-white text-sm leading-snug line-clamp-1 group-hover:text-[#870BD6] transition-colors">
             {community.name}
           </h3>
           {community.description && (
-            <p className="text-xs text-[#60666B] leading-relaxed line-clamp-2">
+            <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] leading-relaxed line-clamp-2">
               {community.description}
             </p>
           )}
           <div className="flex items-center justify-between mt-auto pt-1">
-            <span className="flex items-center gap-1.5 text-xs text-[#60666B]">
+            <span className="flex items-center gap-1.5 text-xs text-[#60666B] dark:text-[#9CA3AF]">
               <Users size={13} />
               {memberCount.toLocaleString()} member
               {memberCount !== 1 ? "s" : ""}
@@ -144,20 +144,20 @@ const ExploreTab = ({
   );
 
   return (
-    <div className="px-4 lg:px-12 py-6 border-t border-[#D2D9DF]">
+    <div className="px-4 lg:px-12 py-6 border-t border-[#D2D9DF] dark:border-[#2D313A]">
       {/* Loading */}
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="bg-white border border-[#E2E3E5] rounded-2xl overflow-hidden animate-pulse"
+              className="bg-white dark:bg-[#181A1F] border border-[#E2E3E5] dark:border-[#2D313A] rounded-2xl overflow-hidden animate-pulse"
             >
-              <div className="h-[140px] bg-gray-200" />
+              <div className="h-[140px] bg-gray-200 dark:bg-[#2D313A]" />
               <div className="px-4 py-3 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-2/3" />
-                <div className="h-3 bg-gray-200 rounded" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-4 bg-gray-200 dark:bg-[#252830] rounded w-2/3" />
+                <div className="h-3 bg-gray-200 dark:bg-[#252830] rounded" />
+                <div className="h-3 bg-gray-200 dark:bg-[#252830] rounded w-1/2" />
               </div>
             </div>
           ))}
@@ -167,13 +167,13 @@ const ExploreTab = ({
       {/* Empty: no communities at all */}
       {!loading && communities.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
             <BookOpen size={28} className="text-[#870BD6]" />
           </div>
-          <p className="text-base font-semibold text-[#180426]">
+          <p className="text-base font-semibold text-[#180426] dark:text-white">
             No communities yet
           </p>
-          <p className="text-sm text-[#60666B] max-w-xs">
+          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] max-w-xs">
             No communities have been created yet. Check back soon — new
             communities are added regularly.
           </p>
@@ -183,10 +183,10 @@ const ExploreTab = ({
       {/* Empty: search no results */}
       {!loading && communities.length > 0 && filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
             <SearchIcon size={24} className="text-[#870BD6]" />
           </div>
-          <p className="text-base font-semibold text-[#180426]">
+          <p className="text-base font-semibold text-[#180426] dark:text-white">
             No results for &quot;{search}&quot;
           </p>
           <button
@@ -258,14 +258,14 @@ const MyCommunitiesTab = ({
 
   if (loading) {
     return (
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF]">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] dark:border-[#2D313A]">
         <div className="flex flex-col gap-2 w-full lg:w-72 px-4 pt-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
-              <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />
+              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#252830] shrink-0" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-3 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-3 bg-gray-200 dark:bg-[#252830] rounded w-3/4" />
+                <div className="h-3 bg-gray-200 dark:bg-[#252830] rounded w-1/2" />
               </div>
             </div>
           ))}
@@ -276,8 +276,8 @@ const MyCommunitiesTab = ({
 
   if (communities.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 gap-5 text-center border-t border-[#D2D9DF]">
-        <div className="w-20 h-20 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center py-20 px-4 gap-5 text-center border-t border-[#D2D9DF] dark:border-[#2D313A]">
+        <div className="w-20 h-20 rounded-full bg-[#F5EBFF] dark:bg-[#181A1F] flex items-center justify-center">
           <img
             src="/emptyCommunity.svg"
             className="w-12 h-12"
@@ -289,8 +289,8 @@ const MyCommunitiesTab = ({
           <Users size={32} className="text-[#870BD6] hidden" />
         </div>
         <div className="space-y-2 max-w-sm">
-          <p className="text-lg font-bold text-[#180426]">No communities yet</p>
-          <p className="text-sm text-[#60666B]">
+          <p className="text-lg font-bold text-[#180426] dark:text-white">No communities yet</p>
+          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF]">
             You haven&apos;t joined any communities yet. Discover communities
             and grow together with other believers.
           </p>
@@ -311,7 +311,7 @@ const MyCommunitiesTab = ({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF]">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] dark:border-[#2D313A]">
       <CommunitySidebar
         communities={communities}
         selectedCommunity={selectedCommunity}
@@ -342,13 +342,13 @@ const MyCommunitiesTab = ({
         />
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-8">
-          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
             <Users size={26} className="text-[#870BD6]" />
           </div>
-          <p className="text-base font-semibold text-[#180426]">
+          <p className="text-base font-semibold text-[#180426] dark:text-white">
             Select a community
           </p>
-          <p className="text-sm text-[#60666B] max-w-xs">
+          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] max-w-xs">
             Choose a community from the list to start chatting.
           </p>
         </div>
@@ -440,8 +440,8 @@ const CommunityPage = () => {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center px-4 lg:px-12 mt-6 lg:mt-16 pb-[27px] lg:pb-8 border-b border-[#D2D9DF]">
-        <h1 className="text-2xl lg:text-[32px] leading-none font-bold">
+      <div className="flex justify-between items-center px-4 lg:px-12 mt-6 lg:mt-16 pb-[27px] lg:pb-8 border-b border-[#D2D9DF] dark:border-[#2D313A]">
+        <h1 className="text-2xl lg:text-[32px] leading-none font-bold dark:text-white">
           Community
         </h1>
         <div className="flex items-center gap-3">
@@ -466,7 +466,7 @@ const CommunityPage = () => {
       </div>
 
       {/* Tab content */}
-      <div className="bg-white min-h-screen">
+      <div className="bg-white dark:bg-[#121316] min-h-screen">
         {/* Tab pills + search row */}
         <div className="px-4 lg:px-12 py-5 flex items-center justify-between gap-4">
           <div className="flex gap-3 overflow-x-auto">
@@ -476,8 +476,8 @@ const CommunityPage = () => {
                 onClick={() => switchTab(tab.value)}
                 className={`border px-4.5 py-3 rounded-xl font-medium text-sm transition-all whitespace-nowrap cursor-pointer ${
                   activeTab === tab.value
-                    ? "bg-white border-black font-semibold text-[#180426]"
-                    : "text-[#4E5255] border-[#D2D9DF] hover:border-gray-400"
+                    ? "bg-white dark:bg-[#252830] border-black dark:border-transparent font-semibold text-[#180426] dark:text-white"
+                    : "text-[#4E5255] dark:text-[#9CA3AF] border-[#D2D9DF] dark:border-[#2D313A] hover:border-gray-400 dark:hover:border-[#717784]"
                 }`}
               >
                 {tab.label}
@@ -487,7 +487,7 @@ const CommunityPage = () => {
 
           {/* Search */}
           <div className="relative hidden sm:block w-56 lg:w-72 shrink-0">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#717784] pointer-events-none" />
             <input
               type="text"
               placeholder={
@@ -497,7 +497,7 @@ const CommunityPage = () => {
               }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white transition-colors"
+              className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] dark:border-[#2D313A] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white dark:bg-[#252830] dark:text-white dark:placeholder:text-[#717784] transition-colors"
             />
           </div>
         </div>

@@ -132,33 +132,33 @@ export function OnboardingChecklist() {
   if (!mounted || dismissed) return null;
 
   return (
-    <div className="bg-white border border-[#E3E8EF] rounded-2xl overflow-hidden mb-8">
+    <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl overflow-hidden mb-8">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#E3E8EF]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#E3E8EF] dark:border-[#2D313A]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#F5EBFF] flex items-center justify-center shrink-0">
-            <Sparkles size={15} className="text-[#870BD6]" />
+          <div className="w-8 h-8 rounded-lg bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center shrink-0">
+            <Sparkles size={15} className="text-[#870BD6] dark:text-[#A855F7]" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-[#180426]">Getting started</h2>
-            <p className="text-xs text-[#60666B]">{doneCount} of {steps.length} completed</p>
+            <h2 className="text-sm font-semibold text-[#180426] dark:text-white">Getting started</h2>
+            <p className="text-xs text-[#60666B] dark:text-[#9CA3AF]">{doneCount} of {steps.length} completed</p>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2">
-            <div className="w-32 h-1.5 bg-[#F0F2F4] rounded-full overflow-hidden">
+            <div className="w-32 h-1.5 bg-[#F0F2F4] dark:bg-[#252830] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#870BD6] rounded-full transition-all duration-500"
+                className="h-full bg-[#870BD6] dark:bg-[#A855F7] rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-xs font-medium text-[#60666B]">{progress}%</span>
+            <span className="text-xs font-medium text-[#60666B] dark:text-[#9CA3AF]">{progress}%</span>
           </div>
           <button
             onClick={dismiss}
             title="Dismiss"
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors text-[#60666B] hover:text-gray-900"
+            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[#252830] transition-colors text-[#60666B] dark:text-[#9CA3AF] hover:text-gray-900 dark:hover:text-white"
           >
             <X size={14} />
           </button>
@@ -168,28 +168,28 @@ export function OnboardingChecklist() {
       {/* All done */}
       {allDone ? (
         <div className="px-6 py-10 text-center">
-          <div className="w-12 h-12 rounded-full bg-[#ECFDF3] flex items-center justify-center mx-auto mb-3">
-            <CheckCircle2 size={24} className="text-[#067647]" />
+          <div className="w-12 h-12 rounded-full bg-[#ECFDF3] dark:bg-[#0D2B1D] flex items-center justify-center mx-auto mb-3">
+            <CheckCircle2 size={24} className="text-[#067647] dark:text-[#34D399]" />
           </div>
-          <p className="text-sm font-semibold text-gray-900">You're all set!</p>
-          <p className="text-xs text-[#60666B] mt-1 max-w-xs mx-auto">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">You're all set!</p>
+          <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-1 max-w-xs mx-auto">
             You've completed your Breed setup. Welcome to the community.
           </p>
           <button
             onClick={dismiss}
-            className="mt-4 text-xs text-[#870BD6] font-medium hover:underline"
+            className="mt-4 text-xs text-[#870BD6] dark:text-[#A855F7] font-medium hover:underline"
           >
             Dismiss
           </button>
         </div>
       ) : (
-        <div className="divide-y divide-[#F0F2F4]">
+        <div className="divide-y divide-[#F0F2F4] dark:divide-[#2D313A]">
           {steps.map((step) => {
             const done = !!completed[step.id];
             return (
               <div
                 key={step.id}
-                className={`flex items-center gap-4 px-6 py-4 transition-colors ${done ? "bg-[#FAFAFA]" : "hover:bg-[#FAFAFA]"}`}
+                className={`flex items-center gap-4 px-6 py-4 transition-colors ${done ? "bg-[#FAFAFA] dark:bg-[#252830]/40" : "hover:bg-[#FAFAFA] dark:hover:bg-[#252830]/40"}`}
               >
                 <button
                   onClick={() => toggle(step.id)}
@@ -197,24 +197,24 @@ export function OnboardingChecklist() {
                   title={done ? "Mark as incomplete" : "Mark as done"}
                 >
                   {done
-                    ? <CheckCircle2 size={20} className="text-[#067647]" />
-                    : <Circle size={20} className="text-[#D0D5DD] hover:text-[#870BD6]" />
+                    ? <CheckCircle2 size={20} className="text-[#067647] dark:text-[#34D399]" />
+                    : <Circle size={20} className="text-[#D0D5DD] dark:text-[#717784] hover:text-[#870BD6] dark:hover:text-[#A855F7]" />
                   }
                 </button>
 
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium leading-snug ${done ? "line-through text-[#60666B]" : "text-[#180426]"}`}>
+                  <p className={`text-sm font-medium leading-snug ${done ? "line-through text-[#60666B] dark:text-[#717784]" : "text-[#180426] dark:text-[#E2E4E9]"}`}>
                     {step.label}
                   </p>
                   {!done && (
-                    <p className="text-xs text-[#60666B] mt-0.5 truncate">{step.description}</p>
+                    <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5 truncate">{step.description}</p>
                   )}
                 </div>
 
                 {!done && (
                   <Link
                     href={step.href}
-                    className="shrink-0 flex items-center gap-0.5 text-xs font-semibold text-[#870BD6] hover:underline"
+                    className="shrink-0 flex items-center gap-0.5 text-xs font-semibold text-[#870BD6] dark:text-[#A855F7] hover:underline"
                   >
                     Go <ChevronRight size={13} />
                   </Link>

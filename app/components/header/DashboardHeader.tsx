@@ -39,9 +39,10 @@ const DashboardHeader: React.FC = () => {
     : '?';
 
   return (
-    <header className="h-18 bg-white border-b border-gray-200 px-6 flex items-center justify-between gap-4">
+    <header className="h-18 bg-white dark:bg-[#181A1F] border-b border-gray-200 dark:border-[#2D313A] px-6 flex items-center justify-between gap-4">
       {/* Logo — hidden on desktop where the sidebar already shows it */}
-      <img src="/logo3.png" alt="Breed" className="h-8 w-auto lg:hidden" />
+      <img src="/logo3.png" alt="Breed" className="h-8 w-auto lg:hidden dark:hidden" />
+      <img src="/logo3.svg" alt="Breed" className="h-8 w-auto lg:hidden hidden dark:block" />
 
       {/* Right side controls */}
       <div className="flex items-center gap-3 ml-auto">
@@ -52,7 +53,7 @@ const DashboardHeader: React.FC = () => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen((o) => !o)}
-            className="flex items-center gap-2 hover:bg-gray-100 px-2 py-1 rounded-lg transition-colors"
+            className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#1E2025] px-2 py-1 rounded-lg transition-colors"
           >
             {user?.avatarUrl ? (
               <img
@@ -61,8 +62,8 @@ const DashboardHeader: React.FC = () => {
                 className="w-9 h-9 rounded-full object-cover"
               />
             ) : (
-              <div className="w-9 h-9 bg-[#E7C8FF] rounded-full flex items-center justify-center">
-                <span className="text-[#870BD6] font-semibold text-sm">{initials}</span>
+              <div className="w-9 h-9 bg-[#E7C8FF] dark:bg-[#2D1B4E] rounded-full flex items-center justify-center">
+                <span className="text-[#870BD6] dark:text-[#A855F7] font-semibold text-sm">{initials}</span>
               </div>
             )}
             <ChevronDown
@@ -71,30 +72,30 @@ const DashboardHeader: React.FC = () => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0px_8px_32px_rgba(0,0,0,0.12)] border border-[#E3E8EF] z-50 overflow-hidden py-1">
+            <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#1E2025] rounded-2xl shadow-[0px_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0px_8px_32px_rgba(0,0,0,0.5)] border border-[#E3E8EF] dark:border-[#2D313A] z-50 overflow-hidden py-1">
               {/* User info */}
-              <div className="px-4 py-3 border-b border-[#F0F2F4]">
-                <p className="text-sm font-bold text-[#180426] truncate">
+              <div className="px-4 py-3 border-b border-[#F0F2F4] dark:border-[#2D313A]">
+                <p className="text-sm font-bold text-[#180426] dark:text-white truncate">
                   {user ? `${user.firstName} ${user.lastName}` : ''}
                 </p>
-                <p className="text-xs text-[#60666B] truncate">{user?.email}</p>
+                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] truncate">{user?.email}</p>
               </div>
 
               <Link
                 href="/dashboard/more"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 text-sm text-[#180426] hover:bg-[#FAFBFC] transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-sm text-[#180426] dark:text-[#E2E4E9] hover:bg-[#FAFBFC] dark:hover:bg-[#252830] transition-colors"
               >
-                <UserRound size={16} className="text-[#60666B]" />
+                <UserRound size={16} className="text-[#60666B] dark:text-[#9CA3AF]" />
                 Profile
               </Link>
 
               <a
                 href="mailto:support@joinbreed.com"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 text-sm text-[#180426] hover:bg-[#FAFBFC] transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-sm text-[#180426] dark:text-[#E2E4E9] hover:bg-[#FAFBFC] dark:hover:bg-[#252830] transition-colors"
               >
-                <HelpCircle size={16} className="text-[#60666B]" />
+                <HelpCircle size={16} className="text-[#60666B] dark:text-[#9CA3AF]" />
                 Need Help?
               </a>
 
@@ -102,7 +103,7 @@ const DashboardHeader: React.FC = () => {
               {isAdminUser ? (
                 <>
                   <div className="px-4 pt-2 pb-1">
-                    <p className="text-[10px] font-semibold text-[#60666B] uppercase tracking-wider">Switch View</p>
+                    <p className="text-[10px] font-semibold text-[#60666B] dark:text-[#717784] uppercase tracking-wider">Switch View</p>
                   </div>
                   {[
                     { view: 'believer', label: 'Believer',    href: '/dashboard/home',                 Icon: UserRound },
@@ -112,10 +113,10 @@ const DashboardHeader: React.FC = () => {
                     <button
                       key={view}
                       onClick={() => { setDropdownOpen(false); router.push(href); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-[#FAFBFC]"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-[#FAFBFC] dark:hover:bg-[#252830]"
                     >
-                      <Icon size={16} className={currentView === view ? 'text-[#870BD6]' : 'text-[#60666B]'} />
-                      <span className={currentView === view ? 'font-semibold text-[#870BD6]' : 'text-[#180426]'}>
+                      <Icon size={16} className={currentView === view ? 'text-[#870BD6] dark:text-[#A855F7]' : 'text-[#60666B] dark:text-[#9CA3AF]'} />
+                      <span className={currentView === view ? 'font-semibold text-[#870BD6] dark:text-[#A855F7]' : 'text-[#180426] dark:text-[#E2E4E9]'}>
                         {label}
                       </span>
                       {currentView === view && <Check size={13} className="text-[#870BD6] ml-auto" />}
@@ -125,14 +126,14 @@ const DashboardHeader: React.FC = () => {
               ) : isPreacherAccount ? (
                 <button
                   onClick={() => { setDropdownOpen(false); toggleUserType(); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#180426] hover:bg-[#FAFBFC] transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#180426] dark:text-[#E2E4E9] hover:bg-[#FAFBFC] dark:hover:bg-[#252830] transition-colors"
                 >
-                  <ArrowLeftRight size={16} className="text-[#60666B]" />
+                  <ArrowLeftRight size={16} className="text-[#60666B] dark:text-[#9CA3AF]" />
                   {userType === 'preacher' ? 'Switch to Believer' : 'Switch to Preacher'}
                 </button>
               ) : null}
 
-              <div className="border-t border-[#F0F2F4] mt-1">
+              <div className="border-t border-[#F0F2F4] dark:border-[#2D313A] mt-1">
                 <button
                   onClick={async () => { setDropdownOpen(false); await logout(); }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors"

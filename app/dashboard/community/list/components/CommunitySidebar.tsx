@@ -45,23 +45,23 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
   const isHidden = isMobile && !!selectedCommunity;
 
   return (
-    <div className={`${isHidden ? "hidden" : "flex"} lg:flex flex-col w-full lg:w-72 shrink-0 border-r border-[#E3E8EF] h-full overflow-hidden`}>
+    <div className={`${isHidden ? "hidden" : "flex"} lg:flex flex-col w-full lg:w-72 shrink-0 border-r border-[#E3E8EF] dark:border-[#2D313A] h-full overflow-hidden`}>
       {/* Header */}
       <div className="px-4 pt-4 pb-3 shrink-0">
-        <p className="text-xs font-semibold text-[#60666B] uppercase tracking-widest mb-3">
+        <p className="text-xs font-semibold text-[#60666B] dark:text-[#9CA3AF] uppercase tracking-widest mb-3">
           Communities ({communities.length})
         </p>
 
         {/* Internal search — only shown when no external search is controlling filtering */}
         {externalSearch === undefined && (
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#717784]" />
             <input
               type="text"
               placeholder="Search communities"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-[#F8FAFC] border border-[#E3E8EF] rounded-lg outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]/20 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[#F8FAFC] dark:bg-[#252830] border border-[#E3E8EF] dark:border-[#2D313A] rounded-lg outline-none focus:border-[#870BD6] focus:ring-1 focus:ring-[#870BD6]/20 transition-colors dark:text-white dark:placeholder:text-[#717784]"
             />
           </div>
         )}
@@ -70,7 +70,7 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
       {/* List */}
       <div className="flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-[#60666B] text-center">
+          <p className="px-4 py-6 text-sm text-[#60666B] dark:text-[#9CA3AF] text-center">
             {activeSearch ? `No results for "${activeSearch}"` : "No communities yet."}
           </p>
         ) : (

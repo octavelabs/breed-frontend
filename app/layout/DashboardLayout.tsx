@@ -18,7 +18,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom, cus
 
   return (
     <UserProvider>
-      <div className="block lg:flex min-h-screen bg-[#F8F9FC]">
+      <div className="block lg:flex min-h-screen bg-[#F8F9FC] dark:bg-[#121316]">
         <SideBar />
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <DashboardHeader />

@@ -55,9 +55,9 @@ type PopoverState = { visible: boolean; rowData: null | any };
 const DateDivider = ({ date }: { date: string }) => (
   <div className="text-center my-4 relative">
     <div className="absolute inset-0 flex items-center">
-      <div className="w-full border-t border-[#F0F2F4]" />
+      <div className="w-full border-t border-[#F0F2F4] dark:border-[#2D313A]" />
     </div>
-    <span className="relative inline-block bg-white px-3 text-xs text-[#60666B] font-medium">
+    <span className="relative inline-block bg-white dark:bg-[#121316] px-3 text-xs text-[#60666B] dark:text-[#9CA3AF] font-medium">
       {date}
     </span>
   </div>
@@ -226,7 +226,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
       ref={parentRef}
     >
       {/* Header */}
-      <div className="h-14 px-5 py-3 border-b border-[#D2D9DF] flex items-center justify-between shrink-0 bg-white">
+      <div className="h-14 px-5 py-3 border-b border-[#D2D9DF] dark:border-[#2D313A] flex items-center justify-between shrink-0 bg-white dark:bg-[#181A1F]">
         <div className="flex items-center gap-2.5">
           <button
             className="block lg:hidden"
@@ -251,11 +251,11 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
               )}
             </div>
             <div className="text-left">
-              <p className="font-semibold text-sm text-[#180426] leading-none">
+              <p className="font-semibold text-sm text-[#180426] dark:text-white leading-none">
                 {community.name}
               </p>
               {memberCount > 0 && (
-                <p className="text-[11px] text-[#60666B] mt-0.5 flex items-center gap-1">
+                <p className="text-[11px] text-[#60666B] dark:text-[#9CA3AF] mt-0.5 flex items-center gap-1">
                   <Users size={10} /> {memberCount.toLocaleString()} members
                 </p>
               )}
@@ -263,7 +263,7 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-1.5 rounded-lg hover:bg-gray-100 text-[#60666B]">
+          <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#252830] text-[#60666B] dark:text-[#9CA3AF]">
             <Search size={18} />
           </button>
           <Button
@@ -287,13 +287,13 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
       <div className="flex-1 overflow-y-auto px-6 py-4 hide-scrollbar">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
               <ChartAreaIcon size={26} className="text-[#870BD6]" />
             </div>
-            <p className="text-base font-semibold text-[#180426]">
+            <p className="text-base font-semibold text-[#180426] dark:text-white">
               No conversations yet
             </p>
-            <p className="text-sm text-[#60666B] max-w-xs">
+            <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] max-w-xs">
               Be the first to encourage the community. Send a message below!
             </p>
           </div>
@@ -322,15 +322,15 @@ export const CommunityChatView: React.FC<CommunityChatViewProps> = ({
       </div>
 
       {/* Input */}
-      <div className="px-5 py-3 pb-5 bg-white border-t border-[#E3E8EF] shrink-0">
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-[#F8FAFC] rounded-2xl border border-[#E3E8EF] focus-within:border-[#870BD6] transition-colors">
+      <div className="px-5 py-3 pb-5 bg-white dark:bg-[#181A1F] border-t border-[#E3E8EF] dark:border-[#2D313A] shrink-0">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#252830] rounded-2xl border border-[#E3E8EF] dark:border-[#2D313A] focus-within:border-[#870BD6] transition-colors">
           <input
             type="text"
             placeholder="Write a message…"
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 border-none bg-transparent outline-none text-sm text-[#180426] placeholder:text-gray-400"
+            className="flex-1 border-none bg-transparent outline-none text-sm text-[#180426] dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#717784]"
           />
           <button
             onClick={handleSend}

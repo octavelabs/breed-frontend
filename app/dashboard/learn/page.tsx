@@ -55,9 +55,9 @@ const CourseCard = ({
 
   return (
     <Link href={`/dashboard/learn/${course.id}/chapters/${course.id}`}>
-      <div className="border border-[#E2E3E5] shadow-[0px_1px_2px_0px_#1018280D] rounded-[16px] bg-white hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
+      <div className="border border-[#E2E3E5] dark:border-[#2D313A] shadow-[0px_1px_2px_0px_#1018280D] rounded-[16px] bg-white dark:bg-[#181A1F] hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
         {/* Cover */}
-        <div className="bg-gray-100 rounded-t-[16px] p-[14px]">
+        <div className="bg-gray-100 dark:bg-[#252830] rounded-t-[16px] p-[14px]">
           <div className="relative bg-[#180426] rounded-[12px] h-[160px] overflow-hidden flex items-center justify-center">
             {course.coverImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -79,13 +79,13 @@ const CourseCard = ({
         {/* Content */}
         <div className="px-4 pt-3 pb-4 flex flex-col flex-1">
           {course.category?.name && (
-            <p className="text-[11px] text-[#870BD6] font-medium mb-1">{course.category.name}</p>
+            <p className="text-[11px] text-gray-500 dark:text-[#9CA3AF] font-medium mb-1">{course.category.name}</p>
           )}
-          <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 line-clamp-2 flex-1">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-snug mb-2 line-clamp-2 flex-1">
             {course.title}
           </h3>
 
-          <div className="flex items-center gap-3 text-[13px] text-[#60666B] mb-3 flex-wrap">
+          <div className="flex items-center gap-3 text-[13px] text-[#60666B] dark:text-[#9CA3AF] mb-3 flex-wrap">
             <span className="flex items-center gap-1">
               <BookOpen size={13} />
               {course.lessonCount ?? 0} lessons
@@ -104,11 +104,11 @@ const CourseCard = ({
 
           {showProgress && (
             <div className="mt-auto">
-              <div className="flex justify-between text-[11px] text-[#60666B] mb-1">
+              <div className="flex justify-between text-[11px] text-[#60666B] dark:text-[#9CA3AF] mb-1">
                 <span>Progress</span>
                 <span>{progress}%</span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className="w-full bg-gray-100 dark:bg-[#252830] rounded-full h-1.5">
                 <div
                   className="bg-[#870BD6] h-1.5 rounded-full transition-all"
                   style={{ width: `${progress}%` }}
@@ -134,11 +134,11 @@ const EmptyState = ({
   sub?: string;
 }) => (
   <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-    <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+    <div className="w-14 h-14 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
       <Icon size={24} color="#870BD6" />
     </div>
-    <p className="text-sm font-semibold text-gray-700">{message}</p>
-    {sub && <p className="text-[13px] text-[#60666B] max-w-xs">{sub}</p>}
+    <p className="text-sm font-semibold text-gray-700 dark:text-[#E2E4E9]">{message}</p>
+    {sub && <p className="text-[13px] text-[#60666B] dark:text-[#9CA3AF] max-w-xs">{sub}</p>}
   </div>
 );
 
@@ -147,14 +147,14 @@ const EmptyState = ({
 const CoursesSkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 pt-6 pb-10">
     {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className="border border-[#E2E3E5] rounded-[16px] animate-pulse">
-        <div className="bg-gray-100 rounded-t-[16px] p-[14px]">
-          <div className="bg-gray-200 rounded-[12px] h-[160px]" />
+      <div key={i} className="border border-[#E2E3E5] dark:border-[#2D313A] rounded-[16px] animate-pulse">
+        <div className="bg-gray-100 dark:bg-[#252830] rounded-t-[16px] p-[14px]">
+          <div className="bg-gray-200 dark:bg-[#2D313A] rounded-[12px] h-[160px]" />
         </div>
         <div className="px-4 py-4 space-y-2">
-          <div className="h-3 bg-gray-200 rounded w-1/3" />
-          <div className="h-4 bg-gray-200 rounded w-3/4" />
-          <div className="h-3 bg-gray-200 rounded w-1/2" />
+          <div className="h-3 bg-gray-200 dark:bg-[#2D313A] rounded w-1/3" />
+          <div className="h-4 bg-gray-200 dark:bg-[#2D313A] rounded w-3/4" />
+          <div className="h-3 bg-gray-200 dark:bg-[#2D313A] rounded w-1/2" />
         </div>
       </div>
     ))}
@@ -191,7 +191,7 @@ const DiscoverCourses = ({ search }: { search: string }) => {
   if (loading) return <CoursesSkeleton />;
 
   return (
-    <div className="border-t border-[#D2D9DF]">
+    <div className="border-t border-[#D2D9DF] dark:border-[#2D313A]">
       {filtered.length === 0 ? (
         <EmptyState
           icon={BookOpen}
@@ -231,7 +231,7 @@ const InProgressCourses = () => {
 
   if (courses.length === 0)
     return (
-      <div className="border-t border-[#D2D9DF]">
+      <div className="border-t border-[#D2D9DF] dark:border-[#2D313A]">
         <EmptyState
           icon={Clock}
           message="No courses in progress"
@@ -241,7 +241,7 @@ const InProgressCourses = () => {
     );
 
   return (
-    <div className="border-t border-[#D2D9DF]">
+    <div className="border-t border-[#D2D9DF] dark:border-[#2D313A]">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 py-6 pb-10">
         {courses.map((course) => (
           <CourseCard key={course.id} course={course} showProgress />
@@ -273,7 +273,7 @@ const CompletedCourses = () => {
 
   if (courses.length === 0)
     return (
-      <div className="border-t border-[#D2D9DF]">
+      <div className="border-t border-[#D2D9DF] dark:border-[#2D313A]">
         <EmptyState
           icon={CheckCircle}
           message="No completed courses yet"
@@ -283,7 +283,7 @@ const CompletedCourses = () => {
     );
 
   return (
-    <div className="border-t border-[#D2D9DF]">
+    <div className="border-t border-[#D2D9DF] dark:border-[#2D313A]">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-4 lg:px-12 py-6 pb-10">
         {courses.map((course) => (
           <div key={course.id} className="relative">
@@ -311,10 +311,10 @@ const Learn: React.FC = () => {
 
   return (
     <DashboardLayout custom={true}>
-      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
-        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Learn</h1>
+      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF] dark:border-[#2D313A]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold dark:text-white">Learn</h1>
       </div>
-      <div className="bg-white pt-5">
+      <div className="bg-white dark:bg-[#121316] pt-5">
         <Tabs
           tabs={tabs}
           defaultTab="discover"
@@ -322,13 +322,13 @@ const Learn: React.FC = () => {
           customButton={(activeTab) =>
             activeTab === 'discover' ? (
               <div className="relative w-full lg:w-auto lg:ml-3 lg:shrink-0">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#717784]" />
                 <input
                   type="text"
                   placeholder="Search courses…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full lg:w-60 pl-9 pr-4 h-10.5 border border-[#B9C2CA] rounded-full text-sm outline-none focus:border-purple-400 bg-white"
+                  className="w-full lg:w-60 pl-9 pr-4 h-10.5 border border-[#B9C2CA] dark:border-[#2D313A] rounded-full text-sm outline-none focus:border-purple-400 bg-white dark:bg-[#252830] dark:text-white dark:placeholder:text-[#717784]"
                 />
               </div>
             ) : null

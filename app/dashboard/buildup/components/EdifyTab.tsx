@@ -2,6 +2,18 @@
 
 import { ArrowLeft2, ArrowRight2, Timer1, TickCircle } from 'iconsax-react';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+
+function useDarkMode() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
 import { EdifyMonthResponse, edifyService } from '@/lib/api-services';
 
 export interface EdifyTabHandle {
@@ -59,6 +71,7 @@ type TimerState = 'idle' | 'running' | 'details';
 
 const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
   const { onTimerStateChange, autoStart } = props;
+  const isDark = useDarkMode();
   // ── Timer ─────────────────────────────────────────────────────────────────
   const [timerState, setTimerState] = useState<TimerState>('idle');
   const [elapsed, setElapsed] = useState(0);
@@ -262,12 +275,12 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
   const DayDetail = () => {
     if (!selectedDay || !selectedDaySessions) {
       return (
-        <div className="rounded-2xl border border-[#F0F2F4] bg-white p-6 flex flex-col items-center justify-center text-center min-h-[200px] gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+        <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] p-6 flex flex-col items-center justify-center text-center min-h-[200px] gap-3">
+          <div className="w-12 h-12 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
             <Timer1 size={24} color="#5B26B1" variant="Bold" />
           </div>
-          <p className="text-sm font-semibold text-[#180426]">Prayer History</p>
-          <p className="text-xs text-[#60666B] max-w-[180px]">
+          <p className="text-sm font-semibold text-[#180426] dark:text-white">Prayer History</p>
+          <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] max-w-[180px]">
             Tap a day on the calendar to see your sessions
           </p>
         </div>
@@ -275,8 +288,8 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
     }
 
     return (
-      <div className="rounded-2xl border border-[#F0F2F4] bg-white p-5">
-        <p className="text-sm font-bold text-[#180426] mb-1">
+      <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] p-5">
+        <p className="text-sm font-bold text-[#180426] dark:text-white mb-1">
           {new Date(selectedDay + 'T12:00:00').toLocaleDateString('en-US', {
             weekday: 'long',
             month: 'long',
@@ -284,38 +297,38 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
           })}
         </p>
         {selectedDaySessions.length > 0 && (
-          <p className="text-xs text-[#60666B] mb-4">
+          <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-4">
             {monthData?.byDate[selectedDay]?.totalMin ?? 0} min total
           </p>
         )}
         {selectedDaySessions.length === 0 ? (
-          <p className="text-sm text-[#60666B] py-4">No sessions logged this day.</p>
+          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] py-4">No sessions logged this day.</p>
         ) : (
           <div>
             {selectedDaySessions.map((s, idx) => (
               <div
                 key={s.id}
-                className={`flex items-start gap-3 py-3 ${idx > 0 ? 'border-t border-[#F0F2F4]' : ''}`}
+                className={`flex items-start gap-3 py-3 ${idx > 0 ? 'border-t border-[#F0F2F4] dark:border-[#2D313A]' : ''}`}
               >
-                <div className="w-9 h-9 rounded-xl bg-[#F5EBFF] flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center shrink-0">
                   <Timer1 size={18} color="#5B26B1" variant="Bold" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-[#180426]">{s.durationMin} min</span>
+                    <span className="text-sm font-semibold text-[#180426] dark:text-white">{s.durationMin} min</span>
                     {s.category && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#F5EBFF] text-[#5B26B1] font-medium">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] text-[#5B26B1] dark:text-[#A855F7] font-medium">
                         {FOCUS_OPTIONS.find((f) => f.id === s.category)?.label ?? s.category}
                       </span>
                     )}
                   </div>
                   {s.reflection && (
-                    <p className="text-xs text-[#60666B] mt-1 line-clamp-3">{s.reflection}</p>
+                    <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-1 line-clamp-3">{s.reflection}</p>
                   )}
                   {s.verseRef && (
-                    <p className="text-xs text-[#870BD6] mt-1 font-medium">{s.verseRef}</p>
+                    <p className="text-xs text-[#870BD6] dark:text-[#A855F7] mt-1 font-medium">{s.verseRef}</p>
                   )}
-                  <p className="text-[10px] text-[#B9C2CA] mt-1">
+                  <p className="text-[10px] text-[#B9C2CA] dark:text-[#717784] mt-1">
                     {new Date(s.loggedAt).toLocaleTimeString('en-US', {
                       hour: 'numeric',
                       minute: '2-digit',
@@ -512,17 +525,17 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
         <div>
           <button
             onClick={() => setShowPast((s) => !s)}
-            className="text-sm text-[#870BD6] font-semibold underline underline-offset-2 cursor-pointer"
+            className="text-sm text-[#870BD6] dark:text-[#A855F7] font-semibold underline underline-offset-2 cursor-pointer"
           >
             {showPast ? 'Cancel' : '+ Log a past session'}
           </button>
 
           {showPast && (
-            <div className="mt-4 rounded-2xl border border-[#E7C8FF] bg-[#F5EBFF] p-5 space-y-4">
-              <p className="text-sm font-bold text-[#180426]">Log a Past Session</p>
+            <div className="mt-4 rounded-2xl border border-[#E7C8FF] dark:border-[#2D313A] bg-[#F5EBFF] dark:bg-[#252830] p-5 space-y-4">
+              <p className="text-sm font-bold text-[#180426] dark:text-white">Log a Past Session</p>
 
               <div>
-                <p className="text-xs text-[#60666B] mb-2">Duration</p>
+                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-2">Duration</p>
                 <div className="flex flex-wrap gap-2">
                   {DURATION_PRESETS.map((min) => (
                     <button
@@ -531,7 +544,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                       className={`text-xs px-3 py-1.5 rounded-full border cursor-pointer transition-colors font-medium ${
                         pastDuration === min
                           ? 'bg-[#870BD6] border-[#870BD6] text-white'
-                          : 'border-[#E7C8FF] text-[#60666B] bg-white hover:border-[#870BD6]'
+                          : 'border-[#E7C8FF] dark:border-[#2D313A] text-[#60666B] dark:text-[#9CA3AF] bg-white dark:bg-[#181A1F] hover:border-[#870BD6]'
                       }`}
                     >
                       {min} min
@@ -541,18 +554,18 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
               </div>
 
               <div>
-                <p className="text-xs text-[#60666B] mb-2">When did you pray?</p>
+                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-2">When did you pray?</p>
                 <input
                   type="datetime-local"
                   value={pastDatetime}
                   max={now.toISOString().slice(0, 16)}
                   onChange={(e) => setPastDatetime(e.target.value)}
-                  className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] outline-none focus:border-[#870BD6] transition-colors"
+                  className="w-full border border-[#E7C8FF] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] rounded-xl px-3 py-2 text-sm text-[#180426] dark:text-white outline-none focus:border-[#870BD6] transition-colors"
                 />
               </div>
 
               <div>
-                <p className="text-xs text-[#60666B] mb-2">Focus (optional)</p>
+                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-2">Focus (optional)</p>
                 <div className="flex flex-wrap gap-2">
                   {FOCUS_OPTIONS.map((opt) => (
                     <button
@@ -561,7 +574,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                       className={`text-xs px-3 py-1.5 rounded-full border cursor-pointer transition-colors ${
                         pastCategory === opt.id
                           ? 'bg-[#870BD6] border-[#870BD6] text-white'
-                          : 'border-[#E7C8FF] text-[#60666B] bg-white hover:border-[#870BD6]'
+                          : 'border-[#E7C8FF] dark:border-[#2D313A] text-[#60666B] dark:text-[#9CA3AF] bg-white dark:bg-[#181A1F] hover:border-[#870BD6]'
                       }`}
                     >
                       {opt.label}
@@ -575,7 +588,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                     value={pastCustomCategory}
                     onChange={(e) => setPastCustomCategory(e.target.value)}
                     placeholder="Describe your focus…"
-                    className="mt-2 w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] outline-none focus:border-[#870BD6] transition-colors"
+                    className="mt-2 w-full border border-[#E7C8FF] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] rounded-xl px-3 py-2 text-sm text-[#180426] dark:text-white placeholder-[#B9C2CA] dark:placeholder-[#717784] outline-none focus:border-[#870BD6] transition-colors"
                   />
                 )}
               </div>
@@ -586,14 +599,14 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                   onChange={(e) => setPastReflection(e.target.value)}
                   placeholder="Reflection note (optional)"
                   rows={3}
-                  className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] resize-none outline-none focus:border-[#870BD6] transition-colors"
+                  className="w-full border border-[#E7C8FF] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] rounded-xl px-3 py-2 text-sm text-[#180426] dark:text-white placeholder-[#B9C2CA] dark:placeholder-[#717784] resize-none outline-none focus:border-[#870BD6] transition-colors"
                 />
                 <textarea
                   value={pastPrayerPoints}
                   onChange={(e) => setPastPrayerPoints(e.target.value)}
                   placeholder={"Prayer points (optional)\nPoint 1\nPoint 2"}
                   rows={3}
-                  className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] resize-none outline-none focus:border-[#870BD6] transition-colors"
+                  className="w-full border border-[#E7C8FF] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] rounded-xl px-3 py-2 text-sm text-[#180426] dark:text-white placeholder-[#B9C2CA] dark:placeholder-[#717784] resize-none outline-none focus:border-[#870BD6] transition-colors"
                 />
               </div>
 
@@ -602,7 +615,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                 value={pastVerse}
                 onChange={(e) => setPastVerse(e.target.value)}
                 placeholder="Bible verse (optional)"
-                className="w-full border border-[#E7C8FF] bg-white rounded-xl px-3 py-2 text-sm text-[#180426] placeholder-[#B9C2CA] outline-none focus:border-[#870BD6] transition-colors"
+                className="w-full border border-[#E7C8FF] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] rounded-xl px-3 py-2 text-sm text-[#180426] dark:text-white placeholder-[#B9C2CA] dark:placeholder-[#717784] outline-none focus:border-[#870BD6] transition-colors"
               />
 
               <button
@@ -617,21 +630,21 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
         </div>
 
         {/* Heatmap */}
-        <div className="rounded-2xl border border-[#F0F2F4] bg-white p-5">
+        <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] p-5">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={prevMonth}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F2F4] transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F2F4] dark:hover:bg-[#252830] transition-colors cursor-pointer"
             >
               <ArrowLeft2 size={16} color="#60666B" />
             </button>
-            <p className="text-sm font-bold text-[#180426]">
+            <p className="text-sm font-bold text-[#180426] dark:text-white">
               {MONTH_NAMES[viewMonth - 1]} {viewYear}
             </p>
             <button
               onClick={nextMonth}
               disabled={isCurrentMonth}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F2F4] transition-colors cursor-pointer disabled:opacity-30"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F2F4] dark:hover:bg-[#252830] transition-colors cursor-pointer disabled:opacity-30"
             >
               <ArrowRight2 size={16} color="#60666B" />
             </button>
@@ -646,7 +659,7 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
           {heatLoading ? (
             <div className="grid grid-cols-7 gap-1">
               {[...Array(35)].map((_, i) => (
-                <div key={i} className="aspect-square rounded-md bg-[#F0F2F4] animate-pulse" />
+                <div key={i} className="aspect-square rounded-md bg-[#F0F2F4] dark:bg-[#252830] animate-pulse" />
               ))}
             </div>
           ) : (
@@ -668,23 +681,23 @@ const EdifyTab = forwardRef<EdifyTabHandle, EdifyTabProps>((props, ref) => {
                         ? 'ring-2 ring-[#C084FC] ring-offset-1'
                         : ''
                     }`}
-                    style={{ backgroundColor: edifyHeat(totalMin) }}
+                    style={{ backgroundColor: totalMin === 0 ? (isDark ? '#252830' : '#F0F2F4') : edifyHeat(totalMin) }}
                   >
-                    <span className={totalMin > 0 ? 'text-white' : 'text-[#B9C2CA]'}>{cell.day}</span>
+                    <span className={totalMin > 0 ? 'text-white' : 'text-[#B9C2CA] dark:text-[#717784]'}>{cell.day}</span>
                   </button>
                 );
               })}
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F0F2F4]">
-            <span className="text-xs text-[#60666B]">Minutes prayed</span>
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F0F2F4] dark:border-[#2D313A]">
+            <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">Minutes prayed</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-[#60666B]">Less</span>
+              <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">Less</span>
               {[0, 5, 20, 35, 60].map((n) => (
                 <div key={n} className="w-4 h-4 rounded-sm" style={{ backgroundColor: edifyHeat(n) }} />
               ))}
-              <span className="text-xs text-[#60666B]">More</span>
+              <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">More</span>
             </div>
           </div>
         </div>

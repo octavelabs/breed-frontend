@@ -161,7 +161,7 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
   return (
     <div>
       <div className="mb-6">
-        <p className="text-sm text-gray-500">Live prayer sessions with up to 5 people</p>
+        <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">Live prayer sessions with up to 5 people</p>
       </div>
 
       {loading ? (
@@ -170,11 +170,11 @@ export default function AccountabilityTab({ externalShowCreate, onExternalShowCr
         </div>
       ) : partnerships.length === 0 ? (
         <div className="flex flex-col items-center py-20">
-          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center mb-4">
             <People size={32} color="#870BD6" />
           </div>
-          <h3 className="font-bold text-gray-900 mb-2">No prayer groups yet</h3>
-          <p className="text-sm text-gray-500 mb-6 text-center max-w-xs">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2">No prayer groups yet</h3>
+          <p className="text-sm text-gray-500 dark:text-[#9CA3AF] mb-6 text-center max-w-xs">
             Invite up to 4 people to pray with you at a set time each week.
           </p>
           <Button onClick={() => setShowCreate(true)} customClass="!w-fit px-6 !h-[44px] !text-white">
@@ -211,7 +211,7 @@ function MemberAvatars({ members }: { members: Member[] }) {
       {shown.map((m) => (
         <div
           key={m.id}
-          className="w-8 h-8 rounded-full border-2 border-white bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0 overflow-hidden"
+          className="w-8 h-8 rounded-full border-2 border-white dark:border-[#181A1F] bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0 overflow-hidden"
           title={`${m.firstName} ${m.lastName}`}
         >
           {m.avatarUrl
@@ -221,7 +221,7 @@ function MemberAvatars({ members }: { members: Member[] }) {
         </div>
       ))}
       {extra > 0 && (
-        <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-xs">
+        <div className="w-8 h-8 rounded-full border-2 border-white dark:border-[#181A1F] bg-gray-200 dark:bg-[#252830] flex items-center justify-center text-gray-600 dark:text-[#9CA3AF] font-bold text-xs">
           +{extra}
         </div>
       )}
@@ -239,7 +239,7 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-[#E3E8EF] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2">
         <MemberAvatars members={p.members} />
@@ -251,12 +251,12 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
       </div>
 
       <div>
-        <p className="font-bold text-[#180426] leading-tight truncate">{groupName}</p>
-        <p className="text-xs text-[#60666B] mt-0.5">
+        <p className="font-bold text-[#180426] dark:text-white leading-tight truncate">{groupName}</p>
+        <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5">
           {p.activeMemberCount} {p.activeMemberCount === 1 ? 'member' : 'members'}
           {p.canAddMore && ` · up to ${MAX_MEMBERS - p.activeMemberCount} more`}
         </p>
-        <div className="flex items-center gap-1 mt-1 text-xs text-[#60666B]">
+        <div className="flex items-center gap-1 mt-1 text-xs text-[#60666B] dark:text-[#9CA3AF]">
           <Clock size={11} /> {p.prayerTime}
         </div>
       </div>
@@ -264,7 +264,7 @@ function PartnershipCard({ partnership: p, onClick }: { partnership: Partnership
       {p.prayerDays.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {p.prayerDays.map((d) => (
-            <span key={d} className="text-[11px] bg-[#F5EBFF] text-[#870BD6] px-2.5 py-0.5 rounded-full font-medium">
+            <span key={d} className="text-[11px] bg-[#F5EBFF] dark:bg-[#2D1B4E] text-[#870BD6] dark:text-[#A855F7] px-2.5 py-0.5 rounded-full font-medium">
               {DAY_LABELS[d] ?? d}
             </span>
           ))}
@@ -443,11 +443,11 @@ function PartnershipDetail({
       {/* Alert modal — replaces browser alert() */}
       {alertMsg && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setAlertMsg('')}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white dark:bg-[#181A1F] rounded-2xl p-6 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
               <CloseCircle size={20} color="#ef4444" />
             </div>
-            <p className="text-sm text-gray-700 text-center mb-5 leading-relaxed">{alertMsg}</p>
+            <p className="text-sm text-gray-700 dark:text-[#E2E4E9] text-center mb-5 leading-relaxed">{alertMsg}</p>
             <button
               onClick={() => setAlertMsg('')}
               className="w-full py-2.5 bg-[#870BD6] text-white rounded-full text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer"
@@ -460,10 +460,10 @@ function PartnershipDetail({
 
       {/* Page header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 dark:hover:bg-[#252830] rounded-full transition-colors cursor-pointer">
           <ArrowRight2 size={20} color="#6b7280" className="rotate-180" />
         </button>
-        <h1 className="text-xl font-bold text-[#180426] truncate">{groupTitle}</h1>
+        <h1 className="text-xl font-bold text-[#180426] dark:text-white truncate">{groupTitle}</h1>
         <span className={`text-xs font-bold px-3 py-1 rounded-full border shrink-0 ${
           isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
         }`}>
@@ -475,9 +475,9 @@ function PartnershipDetail({
         {/* Left column */}
         <div className="lg:col-span-2 space-y-4">
           {/* Members card */}
-          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
+          <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-[#180426]">
+              <h3 className="font-bold text-[#180426] dark:text-white">
                 Members ({activeMembers.length}{pendingMembers.length > 0 ? ` + ${pendingMembers.length} pending` : ''})
               </h3>
               {p.canAddMore && (
@@ -500,14 +500,14 @@ function PartnershipDetail({
                       : `${m.firstName[0]}${m.lastName[0]}`}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#180426] leading-none">
+                    <p className="text-sm font-semibold text-[#180426] dark:text-white leading-none">
                       {m.isMe ? 'You' : `${m.firstName} ${m.lastName}`}
                     </p>
-                    {m.username && <p className="text-xs text-[#60666B] mt-0.5">@{m.username}</p>}
+                    {m.username && <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5">@{m.username}</p>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {m.memberRole === 'OWNER' && (
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded-full">Owner</span>
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-purple-100 dark:bg-[#2D1B4E] text-purple-600 dark:text-[#A855F7] rounded-full">Owner</span>
                     )}
                     <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                       m.memberStatus === 'ACTIVE' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
@@ -522,7 +522,7 @@ function PartnershipDetail({
             {p.canAddMore && (
               <button
                 onClick={() => setShowAddPartner(true)}
-                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 transition-colors cursor-pointer"
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 dark:hover:bg-[#2D1B4E] transition-colors cursor-pointer"
               >
                 <UserAdd size={15} color="#870BD6" /> Add more partners ({MAX_MEMBERS - p.members.length} spots left)
               </button>
@@ -530,13 +530,13 @@ function PartnershipDetail({
           </div>
 
           {/* Schedule card */}
-          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
+          <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                   isPending ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-green-50 text-green-600 border-green-200'
                 }`}>{isPending ? 'Pending' : 'Active'}</span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[#60666B] border border-gray-200">Prayer Group</span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-[#252830] text-[#60666B] dark:text-[#9CA3AF] border border-gray-200 dark:border-[#2D313A]">Prayer Group</span>
               </div>
               {isOwner && !iAmPending && (
                 <button
@@ -568,10 +568,10 @@ function PartnershipDetail({
           {/* Streaks */}
           {streaks.length > 0 && (
             <div>
-              <h3 className="font-bold text-[#180426] mb-3">Prayer Streaks</h3>
+              <h3 className="font-bold text-[#180426] dark:text-white mb-3">Prayer Streaks</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {streaks.map((s, i) => (
-                  <div key={s.user?.id ?? i} className="bg-white rounded-2xl p-4 border border-[#E3E8EF]">
+                  <div key={s.user?.id ?? i} className="bg-white dark:bg-[#181A1F] rounded-2xl p-4 border border-[#E3E8EF] dark:border-[#2D313A]">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-7 h-7 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-xs overflow-hidden">
                         {s.user?.avatarUrl
@@ -579,16 +579,16 @@ function PartnershipDetail({
                           ? <img src={s.user.avatarUrl} alt="" className="w-full h-full object-cover" />
                           : `${s.user?.firstName?.[0] ?? '?'}${s.user?.lastName?.[0] ?? ''}`}
                       </div>
-                      <p className="text-sm font-semibold text-[#180426] truncate">
+                      <p className="text-sm font-semibold text-[#180426] dark:text-white truncate">
                         {s.isMe ? 'You' : (s.user?.firstName ?? 'Member')}
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5 text-orange-500 mb-1">
                       <FlameIcon className="w-4 h-4" />
                       <span className="font-bold text-lg">{s.currentStreak}</span>
-                      <span className="text-xs text-gray-400">day streak</span>
+                      <span className="text-xs text-gray-400 dark:text-[#717784]">day streak</span>
                     </div>
-                    <p className="text-xs text-gray-400">Best: {s.longestStreak} days</p>
+                    <p className="text-xs text-gray-400 dark:text-[#717784]">Best: {s.longestStreak} days</p>
                   </div>
                 ))}
               </div>
@@ -613,8 +613,8 @@ function PartnershipDetail({
 
         {/* Right column — actions */}
         <div className="space-y-4">
-          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5">
-            <h3 className="font-semibold text-[#180426] mb-4">Actions</h3>
+          <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-5">
+            <h3 className="font-semibold text-[#180426] dark:text-white mb-4">Actions</h3>
 
             {/* Recipient pending: accept / decline */}
             {iAmPending && !p.isCreator && (
@@ -653,7 +653,7 @@ function PartnershipDetail({
               <button
                 onClick={handleCopyLink}
                 disabled={copyingLink}
-                className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 transition-colors mb-3 disabled:opacity-60 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 border border-[#870BD6] text-[#870BD6] rounded-full text-sm font-semibold hover:bg-purple-50 dark:hover:bg-[#2D1B4E] transition-colors mb-3 disabled:opacity-60 cursor-pointer"
               >
                 {copyingLink
                   ? <span className="inline-block w-4 h-4 rounded-full border-2 border-t-[#870BD6] border-purple-200 animate-spin" />
@@ -685,7 +685,7 @@ function PartnershipDetail({
                   </button>
                   <button
                     onClick={() => setShowEndConfirm(false)}
-                    className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-semibold cursor-pointer"
+                    className="flex-1 py-2 bg-white dark:bg-[#252830] border border-gray-200 dark:border-[#2D313A] text-gray-700 dark:text-[#E2E4E9] rounded-full text-sm font-semibold cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -720,7 +720,7 @@ function PartnershipDetail({
                   </button>
                   <button
                     onClick={() => setShowLeaveConfirm(false)}
-                    className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm font-semibold cursor-pointer"
+                    className="flex-1 py-2 bg-white dark:bg-[#252830] border border-gray-200 dark:border-[#2D313A] text-gray-700 dark:text-[#E2E4E9] rounded-full text-sm font-semibold cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -738,19 +738,19 @@ function PartnershipDetail({
             </div>
           )}
 
-          <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 text-sm">
+          <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-5 text-sm">
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-[#60666B]">Members</span>
-                <span className="font-medium text-[#180426]">{activeMembers.length} / {MAX_MEMBERS}</span>
+                <span className="text-[#60666B] dark:text-[#9CA3AF]">Members</span>
+                <span className="font-medium text-[#180426] dark:text-white">{activeMembers.length} / {MAX_MEMBERS}</span>
               </div>
-              <div className="flex justify-between border-t border-gray-100 pt-3">
-                <span className="text-[#60666B]">Days / week</span>
-                <span className="font-medium text-[#180426]">{p.prayerDays.length}</span>
+              <div className="flex justify-between border-t border-gray-100 dark:border-[#2D313A] pt-3">
+                <span className="text-[#60666B] dark:text-[#9CA3AF]">Days / week</span>
+                <span className="font-medium text-[#180426] dark:text-white">{p.prayerDays.length}</span>
               </div>
               {p.myStreak && (
-                <div className="flex justify-between border-t border-gray-100 pt-3">
-                  <span className="text-[#60666B]">My Streak</span>
+                <div className="flex justify-between border-t border-gray-100 dark:border-[#2D313A] pt-3">
+                  <span className="text-[#60666B] dark:text-[#9CA3AF]">My Streak</span>
                   <span className="flex items-center gap-1 font-medium text-orange-500">
                     <FlameIcon className="w-3.5 h-3.5" />{p.myStreak.currentStreak} days
                   </span>
@@ -791,8 +791,8 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
     <div className="flex items-start gap-3">
       <div className="mt-0.5 shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-[#60666B] mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-[#180426]">{value}</p>
+        <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-0.5">{label}</p>
+        <p className="text-sm font-medium text-[#180426] dark:text-white">{value}</p>
       </div>
     </div>
   );
@@ -846,7 +846,7 @@ function PartnerSearchInput({
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
           placeholder={placeholder}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] pr-8"
+          className="w-full border border-gray-200 dark:border-[#2D313A] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] pr-8 bg-white dark:bg-[#252830] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-[#717784]"
         />
         {(loading) && <span className="absolute right-3 top-2.5 inline-block w-4 h-4 rounded-full border-2 border-t-gray-400 border-gray-200 animate-spin" />}
         {!loading && value && onClear && (
@@ -856,7 +856,7 @@ function PartnerSearchInput({
         )}
       </div>
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#181A1F] border border-gray-200 dark:border-[#2D313A] rounded-xl shadow-lg z-20 overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s.id}
@@ -867,7 +867,7 @@ function PartnerSearchInput({
                 onChange(`@${s.username}`);
                 setShowSuggestions(false);
               }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-[#252830] transition-colors cursor-pointer text-left"
             >
               <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[#870BD6] font-bold text-xs shrink-0 overflow-hidden">
                 {s.avatarUrl
@@ -876,8 +876,8 @@ function PartnerSearchInput({
                   : `${s.firstName[0]}${s.lastName[0]}`}
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">{s.firstName} {s.lastName}</p>
-                <p className="text-xs text-gray-400">@{s.username}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{s.firstName} {s.lastName}</p>
+                <p className="text-xs text-gray-400 dark:text-[#717784]">@{s.username}</p>
               </div>
             </button>
           ))}
@@ -950,9 +950,9 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0 sm:max-h-[90vh] sm:flex sm:flex-col">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
-          <h3 className="font-bold text-gray-900">
+      <div className="bg-white dark:bg-[#181A1F] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0 sm:max-h-[90vh] sm:flex sm:flex-col">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2D313A] shrink-0">
+          <h3 className="font-bold text-gray-900 dark:text-white">
             {step === 'partners' ? 'Add Prayer Partners' : 'Set Schedule'}
           </h3>
           <button onClick={onClose} className="cursor-pointer"><CloseCircle size={20} color="#9ca3af" /></button>
@@ -961,7 +961,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
         <div className="p-5 space-y-4 sm:overflow-y-auto sm:flex-1">
           {step === 'partners' ? (
             <>
-              <p className="text-xs text-gray-400">Invite 1–{MAX_MEMBERS - 1} people to your prayer group.</p>
+              <p className="text-xs text-gray-400 dark:text-[#717784]">Invite 1–{MAX_MEMBERS - 1} people to your prayer group.</p>
 
               <div className="space-y-2">
                 {invitees.map((val, i) => (
@@ -1008,7 +1008,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
           ) : (
             <>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-2">Prayer days</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-[#9CA3AF] mb-2">Prayer days</label>
                 <div className="flex flex-wrap gap-2">
                   {DAYS.map((d) => (
                     <button
@@ -1018,7 +1018,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
                       className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                         prayerDays.includes(d)
                           ? 'bg-[#870BD6] text-white'
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                          : 'bg-gray-100 dark:bg-[#252830] text-gray-500 dark:text-[#9CA3AF] hover:bg-gray-200 dark:hover:bg-[#2D313A]'
                       }`}
                     >
                       {DAY_LABELS[d]}
@@ -1028,14 +1028,14 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Prayer time</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-[#9CA3AF] mb-1.5">Prayer time</label>
                 <input
                   type="time"
                   value={prayerTime}
                   onChange={(e) => setPrayerTime(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
+                  className="w-full border border-gray-200 dark:border-[#2D313A] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] bg-white dark:bg-[#252830] text-gray-900 dark:text-white"
                 />
-                <p className="text-xs text-gray-400 mt-1.5">Everyone will be notified 30 minutes before.</p>
+                <p className="text-xs text-gray-400 dark:text-[#717784] mt-1.5">Everyone will be notified 30 minutes before.</p>
               </div>
 
               {error && <p className="text-xs text-red-500">{error}</p>}
@@ -1043,7 +1043,7 @@ function CreatePartnershipModal({ onClose, onCreated }: { onClose: () => void; o
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => setStep('partners')}
-                  className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 bg-gray-100 dark:bg-[#252830] text-gray-700 dark:text-[#E2E4E9] rounded-xl font-semibold text-sm hover:bg-gray-200 dark:hover:bg-[#2D313A] transition-colors cursor-pointer"
                 >
                   Back
                 </button>
@@ -1100,20 +1100,20 @@ function AddPartnerModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900">Add Partner</h3>
+      <div className="bg-white dark:bg-[#181A1F] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2D313A]">
+          <h3 className="font-bold text-gray-900 dark:text-white">Add Partner</h3>
           <button onClick={onClose} className="cursor-pointer"><CloseCircle size={20} color="#9ca3af" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Partner's email or username</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-[#9CA3AF] mb-1.5">Partner's email or username</label>
             <PartnerSearchInput
               value={input}
               onChange={(v) => { setInput(v); setError(''); }}
               onClear={() => setInput('')}
             />
-            <p className="text-xs text-gray-400 mt-1.5">They'll receive an invite to join the prayer group.</p>
+            <p className="text-xs text-gray-400 dark:text-[#717784] mt-1.5">They'll receive an invite to join the prayer group.</p>
           </div>
           {error && <p className="text-xs text-red-500">{error}</p>}
           <Button
@@ -1165,14 +1165,14 @@ function EditScheduleModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900">Edit Schedule</h3>
+      <div className="bg-white dark:bg-[#181A1F] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl mb-16 sm:mb-0">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-[#2D313A]">
+          <h3 className="font-bold text-gray-900 dark:text-white">Edit Schedule</h3>
           <button onClick={onClose} className="cursor-pointer"><CloseCircle size={20} color="#9ca3af" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-2">Prayer days</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-[#9CA3AF] mb-2">Prayer days</label>
             <div className="flex flex-wrap gap-2">
               {DAYS.map((d) => (
                 <button
@@ -1182,7 +1182,7 @@ function EditScheduleModal({
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                     prayerDays.includes(d)
                       ? 'bg-[#870BD6] text-white'
-                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-[#252830] text-gray-500 dark:text-[#9CA3AF] hover:bg-gray-200 dark:hover:bg-[#2D313A]'
                   }`}
                 >
                   {DAY_LABELS[d]}
@@ -1192,14 +1192,14 @@ function EditScheduleModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Prayer time</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-[#9CA3AF] mb-1.5">Prayer time</label>
             <input
               type="time"
               value={prayerTime}
               onChange={(e) => setPrayerTime(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6]"
+              className="w-full border border-gray-200 dark:border-[#2D313A] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#870BD6]/30 focus:border-[#870BD6] bg-white dark:bg-[#252830] text-gray-900 dark:text-white"
             />
-            <p className="text-xs text-gray-400 mt-1.5">Everyone will be notified 30 minutes before.</p>
+            <p className="text-xs text-gray-400 dark:text-[#717784] mt-1.5">Everyone will be notified 30 minutes before.</p>
           </div>
 
           {error && <p className="text-xs text-red-500">{error}</p>}
@@ -1207,7 +1207,7 @@ function EditScheduleModal({
           <div className="flex gap-2 pt-1">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 bg-gray-100 dark:bg-[#252830] text-gray-700 dark:text-[#E2E4E9] rounded-xl font-semibold text-sm hover:bg-gray-200 dark:hover:bg-[#2D313A] transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -1285,16 +1285,16 @@ function NotesPanel({
 
   return (
     <div>
-      <h3 className="font-bold text-[#180426] mb-3">Prayer Journal</h3>
+      <h3 className="font-bold text-[#180426] dark:text-white mb-3">Prayer Journal</h3>
 
       {/* Input */}
-      <div className="bg-white border border-[#E3E8EF] rounded-2xl p-4 mb-3">
+      <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-4 mb-3">
         <textarea
           value={input}
           onChange={(e) => { setInput(e.target.value); setError(''); }}
           placeholder="Write a prayer note or reflection…"
           rows={3}
-          className="w-full text-sm text-[#180426] placeholder-[#9ca3af] resize-none focus:outline-none"
+          className="w-full text-sm text-[#180426] dark:text-white placeholder-[#9ca3af] dark:placeholder-[#717784] resize-none focus:outline-none bg-transparent"
         />
         {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
         <div className="flex justify-end mt-2">
@@ -1317,11 +1317,11 @@ function NotesPanel({
           <span className="inline-block w-5 h-5 rounded-full border-2 border-t-[#870BD6] border-[#E7C8FF] animate-spin" />
         </div>
       ) : notes.length === 0 ? (
-        <p className="text-xs text-[#60666B] text-center py-4">No notes yet. Add your first prayer reflection above.</p>
+        <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] text-center py-4">No notes yet. Add your first prayer reflection above.</p>
       ) : (
         <div className="space-y-3">
           {notes.map((n) => (
-            <div key={n.id} className="bg-white rounded-2xl p-4 border border-[#E3E8EF]">
+            <div key={n.id} className="bg-white dark:bg-[#181A1F] rounded-2xl p-4 border border-[#E3E8EF] dark:border-[#2D313A]">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-6 h-6 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-[10px] overflow-hidden shrink-0">
                   {n.author.avatarUrl
@@ -1329,10 +1329,10 @@ function NotesPanel({
                     ? <img src={n.author.avatarUrl} alt="" className="w-full h-full object-cover" />
                     : `${n.author.firstName[0]}${n.author.lastName[0]}`}
                 </div>
-                <span className="text-xs font-semibold text-[#180426]">{n.author.firstName}</span>
-                <span className="text-xs text-[#60666B] ml-auto">{formatDate(n.createdAt)}</span>
+                <span className="text-xs font-semibold text-[#180426] dark:text-white">{n.author.firstName}</span>
+                <span className="text-xs text-[#60666B] dark:text-[#9CA3AF] ml-auto">{formatDate(n.createdAt)}</span>
               </div>
-              <p className="text-sm text-[#180426] leading-relaxed whitespace-pre-wrap">{n.content}</p>
+              <p className="text-sm text-[#180426] dark:text-white leading-relaxed whitespace-pre-wrap">{n.content}</p>
             </div>
           ))}
         </div>
@@ -1368,14 +1368,14 @@ function SessionHistoryPanel({
 
   return (
     <div>
-      <h3 className="font-bold text-[#180426] mb-3">Session History</h3>
+      <h3 className="font-bold text-[#180426] dark:text-white mb-3">Session History</h3>
       {sessions.length === 0 ? (
-        <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6 flex flex-col items-center text-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-[#F5EBFF] flex items-center justify-center mb-1">
+        <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-6 flex flex-col items-center text-center gap-2">
+          <div className="w-10 h-10 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center mb-1">
             <Video size={18} color="#870BD6" />
           </div>
-          <p className="text-sm font-semibold text-[#180426]">No sessions yet</p>
-          <p className="text-xs text-[#60666B] max-w-xs">Your prayer session history will appear here once you hold your first session together.</p>
+          <p className="text-sm font-semibold text-[#180426] dark:text-white">No sessions yet</p>
+          <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] max-w-xs">Your prayer session history will appear here once you hold your first session together.</p>
         </div>
       ) : (
       <div className="space-y-3">
@@ -1386,23 +1386,23 @@ function SessionHistoryPanel({
           const duration = formatDuration(s.startedAt, s.endedAt);
 
           return (
-            <div key={s.id} className="bg-white rounded-2xl p-4 border border-[#E3E8EF] flex items-start gap-3">
+            <div key={s.id} className="bg-white dark:bg-[#181A1F] rounded-2xl p-4 border border-[#E3E8EF] dark:border-[#2D313A] flex items-start gap-3">
               {/* Timeline dot */}
               <div className="flex flex-col items-center shrink-0 pt-0.5">
                 <div className={`w-2.5 h-2.5 rounded-full ${i === 0 ? 'bg-[#870BD6]' : 'bg-[#D2D9DF]'}`} />
-                {i < sessions.length - 1 && <div className="w-px flex-1 bg-[#E3E8EF] mt-1" style={{ minHeight: 16 }} />}
+                {i < sessions.length - 1 && <div className="w-px flex-1 bg-[#E3E8EF] dark:bg-[#2D313A] mt-1" style={{ minHeight: 16 }} />}
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-[#180426]">{formatDate(s.startedAt)}</p>
+                  <p className="text-sm font-semibold text-[#180426] dark:text-white">{formatDate(s.startedAt)}</p>
                   {duration && (
-                    <span className="text-xs text-[#60666B] bg-[#F5EBFF] px-2 py-0.5 rounded-full font-medium shrink-0">
+                    <span className="text-xs text-[#60666B] dark:text-[#A855F7] bg-[#F5EBFF] dark:bg-[#2D1B4E] px-2 py-0.5 rounded-full font-medium shrink-0">
                       {duration}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-[#60666B] mt-0.5">{formatTime(s.startedAt)}</p>
+                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5">{formatTime(s.startedAt)}</p>
                 {starter && (
                   <div className="flex items-center gap-1.5 mt-2">
                     <div className="w-5 h-5 rounded-full bg-[#E7C8FF] flex items-center justify-center text-[#870BD6] font-bold text-[9px] overflow-hidden shrink-0">
@@ -1411,8 +1411,8 @@ function SessionHistoryPanel({
                         ? <img src={(starter as Member).avatarUrl} alt="" className="w-full h-full object-cover" />
                         : `${starter.firstName[0]}${starter.lastName[0]}`}
                     </div>
-                    <p className="text-xs text-[#60666B]">
-                      Started by <span className="font-medium text-[#180426]">{starter.firstName}</span>
+                    <p className="text-xs text-[#60666B] dark:text-[#9CA3AF]">
+                      Started by <span className="font-medium text-[#180426] dark:text-white">{starter.firstName}</span>
                     </p>
                   </div>
                 )}
