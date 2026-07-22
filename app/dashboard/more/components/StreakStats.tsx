@@ -1,65 +1,89 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import FlameIcon from '@/app/assets/icons/flame';
 import { ActivityType, CalendarDay, StreakStatsResult, userService } from '@/lib/api-services';
 import { Book1, Cup, Flash, Heart, MessageText, People, Teacher, Timer1, TrendUp, Weight } from 'iconsax-react';
 import { useQuery } from '@tanstack/react-query';
 
+function useDarkMode() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
 // ── Activity metadata ──────────────────────────────────────────────────────
 
 const ACTIVITY_META: Record<
   string,
-  { label: string; icon: React.ReactNode; colour: string; bg: string; border: string }
+  { label: string; colour: string; darkColour: string; bg: string; border: string }
 > = {
   DEVOTIONAL_READ: {
     label: 'Devotionals',
-    icon: <Book1 size={18} color="#B54708" />,
     colour: '#B54708',
+    darkColour: '#FCD34D',
     bg: '#FFF6E5',
     border: '#F9DBAF',
   },
   PRAYER_PRAYED: {
     label: 'Bonds',
-    icon: <Heart size={18} color="#067647" />,
     colour: '#067647',
+    darkColour: '#34D399',
     bg: '#ECFDF3',
     border: '#ABEFC6',
   },
   LESSON_COMPLETED: {
     label: 'Learning',
-    icon: <Teacher size={18} color="#175CD3" />,
     colour: '#175CD3',
+    darkColour: '#60A5FA',
     bg: '#EFF8FF',
     border: '#B2DDFF',
   },
   COMMUNITY_ENGAGED: {
     label: 'Community',
-    icon: <MessageText size={18} color="#6941C6" />,
     colour: '#6941C6',
+    darkColour: '#A78BFA',
     bg: '#F4F3FF',
     border: '#D9D6FE',
   },
   MENTORSHIP_TASK_COMPLETED: {
     label: 'Tasks',
-    icon: <Weight size={18} color="#870BD6" />,
     colour: '#870BD6',
+    darkColour: '#C084FC',
     bg: '#F5EBFF',
     border: '#E7C8FF',
   },
   MENTORSHIP_SESSION_ATTENDED: {
     label: 'Sessions',
-    icon: <People size={18} color="#C11574" />,
     colour: '#C11574',
+    darkColour: '#F472B6',
     bg: '#FDF2FA',
     border: '#FCCEEE',
   },
   EDIFY: {
     label: 'Edify',
-    icon: <Timer1 size={18} color="#5B26B1" />,
     colour: '#5B26B1',
+    darkColour: '#C084FC',
     bg: '#F5EBFF',
     border: '#C084FC',
   },
+};
+
+// Icon components separated so color can be passed dynamically per theme
+const ACTIVITY_ICONS: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
+  DEVOTIONAL_READ: Book1,
+  PRAYER_PRAYED: Heart,
+  LESSON_COMPLETED: Teacher,
+  COMMUNITY_ENGAGED: MessageText,
+  MENTORSHIP_TASK_COMPLETED: Weight,
+  MENTORSHIP_SESSION_ATTENDED: People,
+  EDIFY: Timer1,
 };
 
 const TRACKED: ActivityType[] = [
@@ -186,8 +210,11 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
     );
   }
 
+  const isDark = useDarkMode();
+
   const { overall, breakdown, calendar, totalActiveDays, mostActiveType } = stats;
   const mostActiveMeta = mostActiveType ? ACTIVITY_META[mostActiveType] : null;
+  const MostActiveIcon = mostActiveType ? ACTIVITY_ICONS[mostActiveType] : null;
 
   const now = new Date();
   const thirtyAgo = new Date(now);
@@ -229,8 +256,8 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
         {/* Summary stat tiles */}
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] px-4 py-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center shrink-0">
-              <Flash size={18} color="#870BD6" />
+            <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] dark:bg-[#252830] flex items-center justify-center shrink-0">
+              <Flash size={18} color={isDark ? '#C084FC' : '#870BD6'} />
             </div>
             <div>
               <p className="text-2xl font-bold text-[#180426] dark:text-white leading-none">{totalActiveDays}</p>
@@ -238,13 +265,10 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
             </div>
           </div>
 
-          {mostActiveMeta ? (
+          {mostActiveMeta && MostActiveIcon ? (
             <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] px-4 py-4 flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl bg-[#F3F4F6] dark:bg-[#252830] flex items-center justify-center shrink-0"
-                style={{ color: mostActiveMeta.colour }}
-              >
-                {mostActiveMeta.icon}
+              <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] dark:bg-[#252830] flex items-center justify-center shrink-0">
+                <MostActiveIcon size={18} color={isDark ? mostActiveMeta.darkColour : mostActiveMeta.colour} />
               </div>
               <div>
                 <p className="text-xs font-semibold dark:!text-[#9CA3AF]" style={{ color: mostActiveMeta.colour }}>
@@ -271,6 +295,7 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
           {TRACKED.map((type) => {
             const stat = breakdown[type];
             const meta = ACTIVITY_META[type];
+            const Icon = ACTIVITY_ICONS[type];
             const current = stat?.current ?? 0;
             const longest = stat?.longest ?? 0;
             return (
@@ -278,11 +303,8 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
                 key={type}
                 className="rounded-2xl p-4 border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F]"
               >
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 bg-[#F3F4F6] dark:bg-[#252830]"
-                  style={{ color: meta.colour }}
-                >
-                  {meta.icon}
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 bg-[#F3F4F6] dark:bg-[#252830]">
+                  {Icon && <Icon size={18} color={isDark ? meta.darkColour : meta.colour} />}
                 </div>
                 <p className="text-xs font-semibold mb-1.5 dark:!text-white" style={{ color: meta.colour }}>
                   {meta.label}
