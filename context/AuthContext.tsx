@@ -89,16 +89,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     bootstrap();
   }, []);
 
-  // ── Apply theme whenever user preferences change ─────────────────────────────
+  // ── Apply theme and track OS-level changes when set to "system" ──────────────
   useEffect(() => {
     const theme = user?.preferences?.theme ?? 'system';
     const html = document.documentElement;
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    } else {
+
+    if (theme !== 'system') {
       html.setAttribute('data-theme', theme);
+      return;
     }
+
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const apply = () => html.setAttribute('data-theme', mq.matches ? 'dark' : 'light');
+
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
   }, [user?.preferences?.theme]);
 
   // ── Apply text size whenever user preferences change ─────────────────────────
