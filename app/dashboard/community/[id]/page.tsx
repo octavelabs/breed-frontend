@@ -4,6 +4,7 @@ import DashboardLayout from "@/app/layout/DashboardLayout";
 import { ArrowLeft, Globe, Lock, Users } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 import { JoinCommunityModal } from "../list/components/JoinCommunityModal";
 import Button from "@/app/components/Button";
@@ -38,10 +39,28 @@ const SingleCommunityPage = () => {
   const id = params.id as string;
   const { user } = useAuth();
 
-  const [community, setCommunity] = useState<Community | null>(null);
-  const [isMember, setIsMember] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: communityData, isLoading: loading } = useQuery({
+    queryKey: ['community', id],
+    queryFn: async () => {
+      const comm = await communityService.getById(id) as Community;
+      let member = false;
+      if (comm.isJoined || !!comm.myRole) {
+        member = true;
+      } else {
+        const mine = await communityService.getMine() as unknown;
+        const list: { id: string }[] = Array.isArray((mine as any)?.data)
+          ? (mine as any).data
+          : Array.isArray(mine) ? mine as { id: string }[] : [];
+        member = list.some((c) => c.id === id);
+      }
+      return { community: comm, isMember: member };
+    },
+    enabled: !!id,
+  });
+  const community = communityData?.community ?? null;
+  const isMember = communityData?.isMember ?? false;
   usePageTitle(community?.name);
-  const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -52,46 +71,27 @@ const SingleCommunityPage = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  useEffect(() => {
-    if (!id) return;
-    const load = async () => {
-      try {
-        const comm = await communityService.getById(id) as Community;
-        setCommunity(comm);
-        // isJoined/myRole may be unreliable from the public endpoint —
-        // always verify against the authenticated getMine() list
-        if (comm.isJoined || !!comm.myRole) {
-          setIsMember(true);
-        } else {
-          const mine = await communityService.getMine() as unknown;
-          const list: { id: string }[] = Array.isArray((mine as any)?.data)
-            ? (mine as any).data
-            : Array.isArray(mine) ? mine as { id: string }[] : [];
-          setIsMember(list.some((c) => c.id === id));
-        }
-      } catch {
-        setCommunity(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [id]);
-
   const handleJoin = async () => {
     if (!id) return;
     await communityService.join(id);
-    setIsMember(true);
-    setCommunity((prev) => {
-      if (!prev) return prev;
-      const current = prev.memberCount ?? prev._count?.members ?? 0;
-      return {
-        ...prev,
-        isJoined: true,
-        memberCount: current + 1,
-        ...(prev._count ? { _count: { ...prev._count, members: current + 1 } } : {}),
-      };
-    });
+    queryClient.setQueryData<{ community: Community; isMember: boolean }>(
+      ['community', id],
+      (prev) => {
+        if (!prev) return prev;
+        const current = prev.community.memberCount ?? prev.community._count?.members ?? 0;
+        return {
+          isMember: true,
+          community: {
+            ...prev.community,
+            isJoined: true,
+            memberCount: current + 1,
+            ...(prev.community._count
+              ? { _count: { ...prev.community._count, members: current + 1 } }
+              : {}),
+          },
+        };
+      },
+    );
     setOpenModal(false);
   };
   const isPrivate = community?.privacy !== 'PUBLIC';

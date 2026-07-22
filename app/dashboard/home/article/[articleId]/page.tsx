@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
@@ -34,24 +35,16 @@ const ArticlePage = () => {
   const router    = useRouter();
   const articleId = params.articleId as string;
 
-  const [article,    setArticle]    = useState<Article | null>(null);
-  const [loading,    setLoading]    = useState(true);
+  const { data: article = null, isLoading: loading } = useQuery({
+    queryKey: ['devotional', articleId],
+    queryFn: () => devotionalService.getById(articleId) as Promise<Article>,
+    enabled: !!articleId,
+  });
   usePageTitle(article?.title);
-  const [bookmarked, setBookmarked] = useState(false);
+  // Track user's explicit bookmark toggle; fall back to article.isBookmarked from query
+  const [_bookmarked, setBookmarked] = useState<boolean | undefined>(undefined);
+  const bookmarked = _bookmarked ?? article?.isBookmarked ?? false;
   const [bookmarking, setBookmarking] = useState(false);
-
-  useEffect(() => {
-    if (!articleId) return;
-    devotionalService
-      .getById(articleId)
-      .then((data) => {
-        const a = data as Article;
-        setArticle(a);
-        setBookmarked(a.isBookmarked ?? false);
-      })
-      .catch(() => setArticle(null))
-      .finally(() => setLoading(false));
-  }, [articleId]);
 
   const handleBookmark = async () => {
     if (!article || bookmarking) return;

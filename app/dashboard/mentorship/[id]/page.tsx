@@ -3,6 +3,7 @@
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { ArrowLeft, Zap, Calendar, CheckSquare, Users, Clock, CheckCircle2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 import { mentorshipService } from "@/lib/api-services";
@@ -73,25 +74,18 @@ const MentorProfilePage = () => {
   const mentorId = params?.id as string;
 
   const [activeTab, setActiveTab] = useState("overview");
-  const [mentor, setMentor] = useState<Mentor | null>(null);
+  const { data: mentor = null, isLoading: loadingMentor, isError: mentorError } = useQuery({
+    queryKey: ['mentor', mentorId],
+    queryFn: () => mentorshipService.getMentorById(mentorId) as Promise<Mentor>,
+    enabled: !!mentorId,
+  });
   const [mentorship, setMentorship] = useState<Mentorship | null>(null);
   usePageTitle(mentor ? `${mentor.firstName} ${mentor.lastName}` : null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tasks, setTasks] = useState<MentorshipTask[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(false);
-  const [loadingMentor, setLoadingMentor] = useState(true);
   const [loadingMentorship, setLoadingMentorship] = useState(true);
   const [isBookingOpen, setBookingOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!mentorId) return;
-    setLoadingMentor(true);
-    mentorshipService.getMentorById(mentorId)
-      .then((data: any) => setMentor(data))
-      .catch(() => setError("Mentor not found."))
-      .finally(() => setLoadingMentor(false));
-  }, [mentorId]);
 
   const loadMentorshipStatus = useCallback(() => {
     setLoadingMentorship(true);
@@ -152,11 +146,11 @@ const MentorProfilePage = () => {
     );
   }
 
-  if (error || !mentor) {
+  if (mentorError || !mentor) {
     return (
       <DashboardLayout custom={true}>
         <div className="border-l border-[#D2D9DF] dark:border-[#2D313A] flex flex-col items-center justify-center py-20 gap-3">
-          <p className="font-semibold text-gray-700 dark:text-[#E2E4E9]">{error ?? "Mentor not found"}</p>
+          <p className="font-semibold text-gray-700 dark:text-[#E2E4E9]">Mentor not found</p>
           <button onClick={() => router.back()} className="text-sm text-[#870BD6] hover:underline">Go back</button>
         </div>
       </DashboardLayout>

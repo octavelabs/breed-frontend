@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { mentorshipService } from "@/lib/api-services";
@@ -152,26 +153,21 @@ function MentorCard({ mentor, onClick }: { mentor: Mentor; onClick: () => void }
 const MentorshipPage = () => {
   const router = useRouter();
   const [tab, setTab] = useState<"discover" | "my">("discover");
-  const [mentors, setMentors] = useState<Mentor[]>([]);
   const [myMentorships, setMyMentorships] = useState<MyMentorship[]>([]);
   const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>(
     [],
   );
-  const [loadingMentors, setLoadingMentors] = useState(true);
   const [loadingMy, setLoadingMy] = useState(true);
   const [search, setSearch] = useState("");
 
-  const loadMentors = useCallback(() => {
-    setLoadingMentors(true);
-    mentorshipService
-      .getMentors({ limit: 50 })
-      .then((res: any) => {
+  const { data: mentors = [], isLoading: loadingMentors } = useQuery({
+    queryKey: ['mentors'],
+    queryFn: () =>
+      mentorshipService.getMentors({ limit: 50 }).then((res: any) => {
         const data = res?.data ?? res;
-        setMentors(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setMentors([]))
-      .finally(() => setLoadingMentors(false));
-  }, []);
+        return Array.isArray(data) ? (data as Mentor[]) : [];
+      }),
+  });
 
   const loadMyMentorships = useCallback(() => {
     setLoadingMy(true);
@@ -208,9 +204,8 @@ const MentorshipPage = () => {
   }, []);
 
   useEffect(() => {
-    loadMentors();
     loadMyMentorships();
-  }, [loadMentors, loadMyMentorships]);
+  }, [loadMyMentorships]);
 
   const filteredMentors = mentors.filter((m) => {
     const q = search.toLowerCase();

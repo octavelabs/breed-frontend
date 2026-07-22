@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
@@ -116,28 +117,19 @@ function CancelModal({ title, cancelling, onClose, onConfirm }: {
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const [session, setSession] = useState<SessionDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session = null, isLoading: loading, error: queryError } = useQuery({
+    queryKey: ['mentorship-session', id],
+    queryFn: () => mentorshipService.getSessionById(id) as Promise<SessionDetail>,
+    enabled: !!id,
+  });
+  const error = queryError ? ((queryError as Error).message || "Failed to load session.") : null;
+
   usePageTitle(session?.title);
   const [cancelling, setCancelling] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await mentorshipService.getSessionById(id) as SessionDetail;
-      setSession(data);
-    } catch (err: any) {
-      setError(err?.message ?? "Failed to load session.");
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => { load(); }, [load]);
 
   const joinLink = session?.roomCode
     ? `https://meet.joinbreed.com/${session.roomCode}`
@@ -155,7 +147,10 @@ export default function SessionDetailPage() {
     setCancelling(true);
     try {
       await mentorshipService.cancelSession(id);
-      setSession((s) => s ? { ...s, status: "CANCELLED" } : s);
+      queryClient.setQueryData<SessionDetail | null>(
+        ['mentorship-session', id],
+        (s) => s ? { ...s, status: "CANCELLED" } : s,
+      );
       setShowCancel(false);
     } catch (err: any) {
       alert(err?.message ?? "Failed to cancel session.");

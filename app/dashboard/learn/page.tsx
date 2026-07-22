@@ -5,7 +5,8 @@ import DashboardLayout from '@/app/layout/DashboardLayout';
 import { courseService } from '@/lib/api-services';
 import { BookOpen, Users, Clock, SearchIcon, CheckCircle, UserRound } from 'lucide-react';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -164,20 +165,14 @@ const CoursesSkeleton = () => (
 // ── Discover tab ──────────────────────────────────────────────────────────────
 
 const DiscoverCourses = ({ search }: { search: string }) => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    courseService
-      .getAll({ limit: 30 })
-      .then((res: unknown) => {
+  const { data: courses = [], isLoading: loading } = useQuery({
+    queryKey: ['courses'],
+    queryFn: () =>
+      courseService.getAll({ limit: 30 }).then((res: unknown) => {
         const r = res as { data?: Course[] };
-        const list: Course[] = Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
-        setCourses(list);
-      })
-      .catch(() => setCourses([]))
-      .finally(() => setLoading(false));
-  }, []);
+        return Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
+      }),
+  });
 
   const filtered = search
     ? courses.filter(
@@ -212,20 +207,15 @@ const DiscoverCourses = ({ search }: { search: string }) => {
 // ── In Progress tab ───────────────────────────────────────────────────────────
 
 const InProgressCourses = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    courseService
-      .getEnrolled()
-      .then((res: unknown) => {
+  const { data: courses = [], isLoading: loading } = useQuery({
+    queryKey: ['courses', 'enrolled'],
+    queryFn: () =>
+      courseService.getEnrolled().then((res: unknown) => {
         const r = res as { data?: Course[] };
         const list: Course[] = Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
-        setCourses(list.filter((c) => (c.progressPercent ?? 0) < 100));
-      })
-      .catch(() => setCourses([]))
-      .finally(() => setLoading(false));
-  }, []);
+        return list.filter((c) => (c.progressPercent ?? 0) < 100);
+      }),
+  });
 
   if (loading) return <CoursesSkeleton />;
 
@@ -254,20 +244,14 @@ const InProgressCourses = () => {
 // ── Completed tab ─────────────────────────────────────────────────────────────
 
 const CompletedCourses = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    courseService
-      .getCompleted()
-      .then((res: unknown) => {
+  const { data: courses = [], isLoading: loading } = useQuery({
+    queryKey: ['courses', 'completed'],
+    queryFn: () =>
+      courseService.getCompleted().then((res: unknown) => {
         const r = res as { data?: Course[] };
-        const list: Course[] = Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
-        setCourses(list);
-      })
-      .catch(() => setCourses([]))
-      .finally(() => setLoading(false));
-  }, []);
+        return Array.isArray(res) ? (res as Course[]) : (r.data ?? []);
+      }),
+  });
 
   if (loading) return <CoursesSkeleton />;
 

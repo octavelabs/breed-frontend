@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import Button from '@/app/components/Button';
@@ -91,39 +92,31 @@ const PreacherDashboard = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [courses, setCourses] = useState<AuthoredCourse[]>([]);
-  const [totalCourses, setTotalCourses] = useState(0);
-  const [coursesLoading, setCoursesLoading] = useState(true);
-
-  const [requests, setRequests] = useState<MentorshipRequest[]>([]);
-  const [requestsLoading, setRequestsLoading] = useState(true);
-
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  useEffect(() => {
-    courseService
-      .getAuthored({ limit: 5 })
-      .then((res: unknown) => {
+  const { data: courseData, isLoading: coursesLoading } = useQuery({
+    queryKey: ['preacher-courses'],
+    queryFn: () =>
+      courseService.getAuthored({ limit: 5 }).then((res: unknown) => {
         const r = res as { data?: AuthoredCourse[]; meta?: { total?: number } };
         const list: AuthoredCourse[] = Array.isArray(res) ? (res as AuthoredCourse[]) : (r.data ?? []);
-        setCourses(list);
-        setTotalCourses(Array.isArray(res) ? list.length : (r.meta?.total ?? list.length));
-      })
-      .catch(() => { setCourses([]); setTotalCourses(0); })
-      .finally(() => setCoursesLoading(false));
-  }, []);
+        const total = Array.isArray(res) ? list.length : (r.meta?.total ?? list.length);
+        return { list, total };
+      }),
+  });
 
-  useEffect(() => {
-    mentorshipService
-      .getDisciples()
-      .then((res: unknown) => {
+  const courses = courseData?.list ?? [];
+  const totalCourses = courseData?.total ?? 0;
+
+  const { data: requests = [], isLoading: requestsLoading } = useQuery({
+    queryKey: ['preacher-disciples'],
+    queryFn: () =>
+      mentorshipService.getDisciples().then((res: unknown) => {
         const r = res as { data?: MentorshipRequest[] };
         const list: MentorshipRequest[] = Array.isArray(res) ? (res as MentorshipRequest[]) : (r.data ?? []);
-        setRequests(list.slice(0, 5));
-      })
-      .catch(() => setRequests([]))
-      .finally(() => setRequestsLoading(false));
-  }, []);
+        return list.slice(0, 5);
+      }),
+  });
 
   const liveCourses  = courses.filter(c => c.status?.toLowerCase() === 'published').length;
   const draftCourses = courses.filter(c => c.status?.toLowerCase() === 'draft').length;

@@ -3,7 +3,7 @@
 import FlameIcon from '@/app/assets/icons/flame';
 import { ActivityType, CalendarDay, StreakStatsResult, userService } from '@/lib/api-services';
 import { Book1, Cup, Flash, Heart, MessageText, People, Teacher, Timer1, TrendUp, Weight } from 'iconsax-react';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 // ── Activity metadata ──────────────────────────────────────────────────────
 
@@ -162,16 +162,11 @@ function ActivityCalendar({ calendar }: { calendar: CalendarDay[] }) {
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function StreakStats({ showDivider = true }: { showDivider?: boolean }) {
-  const [stats, setStats] = useState<StreakStatsResult | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    userService
-      .getStreakStats()
-      .then((res: any) => setStats((res?.data ?? res) as StreakStatsResult))
-      .catch(() => null)
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: stats = null, isLoading: loading } = useQuery({
+    queryKey: ['streak-stats'],
+    queryFn: () =>
+      userService.getStreakStats().then((res: any) => (res?.data ?? res) as StreakStatsResult),
+  });
 
   if (loading) return <Skeleton />;
 

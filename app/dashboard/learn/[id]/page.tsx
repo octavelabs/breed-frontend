@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { courseService } from '@/lib/api-services';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 
 interface Lesson {
@@ -52,21 +52,16 @@ const Skeleton = () => (
 const CourseDetail: React.FC = () => {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const [course, setCourse] = useState<CourseDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  usePageTitle(course?.title);
-
-  useEffect(() => {
-    if (!id) return;
-    courseService
-      .getById(id as string)
-      .then((res: unknown) => {
+  const { data: course = null, isLoading: loading } = useQuery({
+    queryKey: ['course', id],
+    queryFn: () =>
+      courseService.getById(id as string).then((res: unknown) => {
         const r = res as { data?: CourseDetail };
-        setCourse(Array.isArray(res) ? null : (r.data ?? (res as CourseDetail)));
-      })
-      .catch(() => setCourse(null))
-      .finally(() => setLoading(false));
-  }, [id]);
+        return Array.isArray(res) ? null : (r.data ?? (res as CourseDetail));
+      }),
+    enabled: !!id,
+  });
+  usePageTitle(course?.title);
 
   const chapters = course?.chapters ?? [];
   const totalLessons = chapters.reduce((sum, ch) => sum + ch.lessons.length, 0);

@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { Timer1 } from "iconsax-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { type ReactNode } from "react";
 import { OnboardingChecklist } from "./components/OnboardingChecklist";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -35,7 +36,7 @@ function getGreeting(): string {
 
 const ACTIVITY_META: Record<
   string,
-  { icon: React.ReactNode; colour: string; bg: string }
+  { icon: ReactNode; colour: string; bg: string }
 > = {
   DEVOTIONAL_READ: {
     icon: <BookOpen size={9} />,
@@ -155,42 +156,26 @@ function DayColumn({
 const HomePage = () => {
   const { user } = useAuth();
 
-  const [weekStreak, setWeekStreak] = useState<WeekStreakResult | null>(null);
-  const [streakLoading, setStreakLoading] = useState(true);
+  const { data: weekStreak = null, isLoading: streakLoading } = useQuery({
+    queryKey: ['week-streak'],
+    queryFn: () =>
+      userService.getWeekStreak().then((res: any) => (res?.data ?? res) as WeekStreakResult),
+  });
 
-  const [course, setCourse] = useState<any>(null);
-  const [courseLoading, setCourseLoading] = useState(true);
+  const { data: course = null, isLoading: courseLoading } = useQuery({
+    queryKey: ['courses', 'featured'],
+    queryFn: () =>
+      courseService.getAll({ limit: 1 }).then((res: any) => {
+        const items = res?.data ?? res;
+        return Array.isArray(items) ? (items[0] ?? null) : null;
+      }),
+  });
 
-  const [devotional, setDevotional] = useState<any>(null);
-  const [devotionalLoading, setDevotionalLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([
-      userService
-        .getWeekStreak()
-        .then((res: any) => {
-          setWeekStreak((res?.data ?? res) as WeekStreakResult);
-        })
-        .catch(() => null),
-      courseService
-        .getAll({ limit: 1 })
-        .then((res: any) => {
-          const items = res?.data ?? res;
-          setCourse(Array.isArray(items) ? (items[0] ?? null) : null);
-        })
-        .catch(() => null),
-      devotionalService
-        .getToday()
-        .then((res: any) => {
-          setDevotional(res?.data ?? res ?? null);
-        })
-        .catch(() => null),
-    ]).finally(() => {
-      setStreakLoading(false);
-      setCourseLoading(false);
-      setDevotionalLoading(false);
-    });
-  }, []);
+  const { data: devotional = null, isLoading: devotionalLoading } = useQuery({
+    queryKey: ['devotional', 'today'],
+    queryFn: () =>
+      devotionalService.getToday().then((res: any) => res?.data ?? res ?? null),
+  });
 
   const currentStreak = weekStreak?.currentStreak ?? 0;
   const breakdown = weekStreak?.breakdown ?? {};

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Plus,
   SearchIcon,
@@ -123,19 +124,14 @@ const ExploreTab = ({
   search: string;
   onClearSearch: () => void;
 }) => {
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    communityService
-      .getAll({ limit: 50 })
-      .then((res: unknown) => {
+  const { data: communities = [], isLoading: loading } = useQuery({
+    queryKey: ['communities'],
+    queryFn: () =>
+      communityService.getAll({ limit: 50 }).then((res: unknown) => {
         const data = (res as any)?.data ?? res;
-        setCommunities(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setCommunities([]))
-      .finally(() => setLoading(false));
-  }, []);
+        return Array.isArray(data) ? (data as Community[]) : [];
+      }),
+  });
 
   const filtered = communities.filter(
     (c) =>

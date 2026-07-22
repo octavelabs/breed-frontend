@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/app/layout/DashboardLayout';
 import { notificationService } from '@/lib/api-services';
@@ -124,29 +125,25 @@ type FilterTab = 'all' | 'unread';
 
 export default function NotificationsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [tab, setTab] = useState<FilterTab>('all');
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
   const [markingAll, setMarkingAll] = useState(false);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    notificationService
-      .getAll({ page: 1 })
-      .then((res: any) => {
+  const { data: notifications = [], isLoading: loading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () =>
+      notificationService.getAll({ page: 1 }).then((res: any) => {
         const list: Notification[] = res?.data ?? res?.items ?? (Array.isArray(res) ? res : []);
-        setNotifications(list);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
+        return list;
+      }),
+  });
 
   const handleClick = async (n: Notification) => {
     if (!n.isRead) {
       await notificationService.markAsRead(n.id).catch(() => {});
-      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)));
+      queryClient.setQueryData<Notification[]>(['notifications'], (prev = []) =>
+        prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x))
+      );
     }
     const href = getNotificationHref(n);
     if (href) router.push(href);
@@ -155,7 +152,9 @@ export default function NotificationsPage() {
   const handleMarkAllAsRead = async () => {
     setMarkingAll(true);
     await notificationService.markAllAsRead().catch(() => {});
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    queryClient.setQueryData<Notification[]>(['notifications'], (prev = []) =>
+      prev.map((n) => ({ ...n, isRead: true }))
+    );
     setMarkingAll(false);
   };
 

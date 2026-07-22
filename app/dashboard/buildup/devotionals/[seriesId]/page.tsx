@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 import DashboardLayout from "@/app/layout/DashboardLayout";
@@ -107,52 +108,46 @@ const DevotionalSeriesPage = () => {
   const { user } = useAuth();
   const seriesId = params.seriesId as string;
 
-  const [series,      setSeries]      = useState<SeriesDetail | null>(null);
-  const [loading,     setLoading]     = useState(true);
+  const queryClient = useQueryClient();
+  const { data: series = null, isLoading: loading } = useQuery({
+    queryKey: ['devotional-series', seriesId],
+    queryFn: () => devotionalService.getSeriesById(seriesId) as Promise<SeriesDetail>,
+    enabled: !!seriesId,
+  });
   usePageTitle(series?.title);
   const [subscribing, setSubscribing] = useState(false);
   const [activeTab,   setActiveTab]   = useState<"articles" | "about">("articles");
 
   const isOwnSeries = user?.id === series?.author?.id;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await devotionalService.getSeriesById(seriesId) as SeriesDetail;
-      setSeries(data);
-    } catch {
-      setSeries(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [seriesId]);
-
-  useEffect(() => { load(); }, [load]);
-
   const handleSubscribe = async () => {
     if (!series) return;
     const wasSubscribed = series.isSubscribed;
-    setSeries((prev) =>
-      prev
-        ? {
-            ...prev,
-            isSubscribed: !wasSubscribed,
-            subscriberCount: (prev.subscriberCount ?? 0) + (wasSubscribed ? -1 : 1),
-          }
-        : prev
+    queryClient.setQueryData<SeriesDetail | null>(
+      ['devotional-series', seriesId],
+      (prev) =>
+        prev
+          ? {
+              ...prev,
+              isSubscribed: !wasSubscribed,
+              subscriberCount: (prev.subscriberCount ?? 0) + (wasSubscribed ? -1 : 1),
+            }
+          : prev,
     );
     setSubscribing(true);
     try {
       await devotionalService.toggleSeriesSubscription(seriesId);
     } catch {
-      setSeries((prev) =>
-        prev
-          ? {
-              ...prev,
-              isSubscribed: wasSubscribed,
-              subscriberCount: (prev.subscriberCount ?? 0) + (wasSubscribed ? 1 : -1),
-            }
-          : prev
+      queryClient.setQueryData<SeriesDetail | null>(
+        ['devotional-series', seriesId],
+        (prev) =>
+          prev
+            ? {
+                ...prev,
+                isSubscribed: wasSubscribed,
+                subscriberCount: (prev.subscriberCount ?? 0) + (wasSubscribed ? 1 : -1),
+              }
+            : prev,
       );
     } finally {
       setSubscribing(false);
