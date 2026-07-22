@@ -65,6 +65,31 @@ const CATEGORIES: Category[] = [
 
 const DEFAULT_GRADIENT = 'linear-gradient(135deg, #870BD6, #5B26B1)';
 
+// ── Sticky note palette (per category) ────────────────────────────────────────
+
+const STICKY_NOTE_COLORS: Record<string, { bg: string; pinColor: string; textColor: string }> = {
+  PERSONAL_DEVOTION:            { bg: 'linear-gradient(180deg,#EDE9FE 0%,#EDE9FE 12%,#DDD6FE 75%,#C4B5FD 100%)', pinColor: '#5B26B1', textColor: '#4C1D95' },
+  INTERCESSION:                 { bg: 'linear-gradient(180deg,#DBEAFE 0%,#DBEAFE 12%,#BFDBFE 75%,#93C5FD 100%)', pinColor: '#1D4ED8', textColor: '#1E3A8A' },
+  INTERCESSION_FOR_NATION:      { bg: 'linear-gradient(180deg,#DBEAFE 0%,#DBEAFE 12%,#BFDBFE 75%,#93C5FD 100%)', pinColor: '#1E40AF', textColor: '#1E3A8A' },
+  HEALTH_AND_COMFORT:           { bg: 'linear-gradient(180deg,#D1FAE5 0%,#D1FAE5 12%,#A7F3D0 75%,#6EE7B7 100%)', pinColor: '#047857', textColor: '#064E3B' },
+  SPECIAL_REQUEST:              { bg: 'linear-gradient(180deg,#EDE9FE 0%,#EDE9FE 12%,#DDD6FE 75%,#C4B5FD 100%)', pinColor: '#6D28D9', textColor: '#4C1D95' },
+  HEALING:                      { bg: 'linear-gradient(180deg,#D1FAE5 0%,#D1FAE5 12%,#A7F3D0 75%,#6EE7B7 100%)', pinColor: '#059669', textColor: '#064E3B' },
+  NATION_AND_CHURCH:            { bg: 'linear-gradient(180deg,#F3E8FF 0%,#F3E8FF 12%,#E9D5FF 75%,#DDD6FE 100%)', pinColor: '#870BD6', textColor: '#5B21B6' },
+  THANKSGIVING_AND_TESTIMONIES: { bg: 'linear-gradient(180deg,#FEF9C3 0%,#FEF9C3 12%,#FDE68A 75%,#FCD34D 100%)', pinColor: '#D97706', textColor: '#92400E' },
+  FAMILY:                       { bg: 'linear-gradient(180deg,#FCE7F3 0%,#FCE7F3 12%,#FBCFE8 75%,#F9A8D4 100%)', pinColor: '#DB2777', textColor: '#9D174D' },
+  PURPOSE_AND_CALLING:          { bg: 'linear-gradient(180deg,#E0E7FF 0%,#E0E7FF 12%,#C7D2FE 75%,#A5B4FC 100%)', pinColor: '#4338CA', textColor: '#312E81' },
+  SPIRITUAL_WARFARE:            { bg: 'linear-gradient(180deg,#FEE2E2 0%,#FEE2E2 12%,#FECACA 75%,#FCA5A5 100%)', pinColor: '#DC2626', textColor: '#7F1D1D' },
+  MARRIAGES_AND_RELATIONSHIPS:  { bg: 'linear-gradient(180deg,#FFE4E6 0%,#FFE4E6 12%,#FECDD3 75%,#FDA4AF 100%)', pinColor: '#BE123C', textColor: '#881337' },
+  MISSIONS_AND_EVANGELISM:      { bg: 'linear-gradient(180deg,#CCFBF1 0%,#CCFBF1 12%,#99F6E4 75%,#5EEAD4 100%)', pinColor: '#0F766E', textColor: '#134E4A' },
+  PROVISION_AND_FINANCE:        { bg: 'linear-gradient(180deg,#FEF9C3 0%,#FEF9C3 12%,#FDE68A 75%,#FCD34D 100%)', pinColor: '#A16207', textColor: '#713F12' },
+  YOUTH_AND_NEXT_GENERATION:    { bg: 'linear-gradient(180deg,#CFFAFE 0%,#CFFAFE 12%,#A5F3FC 75%,#67E8F9 100%)', pinColor: '#0E7490', textColor: '#164E63' },
+  PEACE_AND_MENTAL_HEALTH:      { bg: 'linear-gradient(180deg,#DBEAFE 0%,#DBEAFE 12%,#BAD5FD 75%,#93C5FD 100%)', pinColor: '#0369A1', textColor: '#0C4A6E' },
+  SALVATION:                    { bg: 'linear-gradient(180deg,#FFEDD5 0%,#FFEDD5 12%,#FED7AA 75%,#FDC592 100%)', pinColor: '#EA580C', textColor: '#9A3412' },
+  WORK_AND_CALLING:             { bg: 'linear-gradient(180deg,#F1F5F9 0%,#F1F5F9 12%,#E2E8F0 75%,#CBD5E1 100%)', pinColor: '#475569', textColor: '#1E293B' },
+};
+
+const DEFAULT_STICKY = { bg: 'linear-gradient(180deg,#EDE9FE 0%,#EDE9FE 12%,#DDD6FE 75%,#C4B5FD 100%)', pinColor: '#870BD6', textColor: '#4C1D95' };
+
 function formatDate(iso?: string): string {
   if (!iso) return '';
   return new Date(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -285,7 +310,7 @@ export default function PrayerBullletinsTab() {
   return (
     <div>
       {/* Mode tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6 w-fit text-sm">
+      <div className="flex gap-1 bg-gray-100 dark:bg-[#252830] rounded-xl p-1 mb-6 w-fit text-sm">
         {([
           { id: 'today', label: "Today's Bulletin" },
           { id: 'categories', label: 'Categories' },
@@ -297,7 +322,7 @@ export default function PrayerBullletinsTab() {
               setMode(m.id);
               if (m.id !== 'categories') setSelectedCategory(null);
             }}
-            className={`px-4 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${mode === m.id ? 'bg-white text-[#870BD6] shadow-sm' : 'text-gray-500'}`}
+            className={`px-4 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${mode === m.id ? 'bg-white dark:bg-[#181A1F] text-[#870BD6] dark:text-[#A855F7] shadow-sm' : 'text-gray-500 dark:text-[#717784]'}`}
           >
             {m.label}
           </button>
@@ -313,19 +338,19 @@ export default function PrayerBullletinsTab() {
             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
               <Candle size={32} color="#ef4444" variant="Bold" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Couldn&apos;t load bulletin</h3>
-            <p className="text-sm text-gray-500 mb-4">Check your connection and try again.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Couldn&apos;t load bulletin</h3>
+            <p className="text-sm text-gray-500 dark:text-[#9CA3AF] mb-4">Check your connection and try again.</p>
             <button onClick={loadToday} className="text-sm font-semibold text-[#870BD6] hover:underline cursor-pointer">
               Retry
             </button>
           </div>
         ) : todayState === 'empty' || !viewing ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-purple-50 dark:bg-[#2D1B4E] flex items-center justify-center mx-auto mb-4">
               <Candle size={32} color="#870BD6" variant="Bold" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">No bulletin today</h3>
-            <p className="text-sm text-gray-500">Check back soon — prayer bulletins are published regularly.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">No bulletin today</h3>
+            <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">Check back soon — prayer bulletins are published regularly.</p>
           </div>
         ) : (
           <TodayBulletinInline
@@ -375,11 +400,11 @@ export default function PrayerBullletinsTab() {
           <Spinner />
         ) : bookmarks.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-purple-50 dark:bg-[#2D1B4E] flex items-center justify-center mx-auto mb-4">
               <Bookmark size={32} color="#870BD6" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">No saved bulletins</h3>
-            <p className="text-sm text-gray-500">Bookmark prayer bulletins to revisit them anytime.</p>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-2">No saved bulletins</h3>
+            <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">Bookmark prayer bulletins to revisit them anytime.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -423,9 +448,9 @@ function FeaturedSkeleton() {
         </div>
       </div>
       <div className="space-y-3">
-        <div className="h-4 w-1/3 bg-gray-200 rounded" />
-        <div className="h-4 w-full bg-gray-100 rounded" />
-        <div className="h-4 w-full bg-gray-100 rounded" />
+        <div className="h-4 w-1/3 bg-gray-200 dark:bg-[#2D313A] rounded" />
+        <div className="h-4 w-full bg-gray-100 dark:bg-[#252830] rounded" />
+        <div className="h-4 w-full bg-gray-100 dark:bg-[#252830] rounded" />
       </div>
     </div>
   );
@@ -504,23 +529,23 @@ function TodayBulletinInline({
           {isToday ? (
             <span className="text-xs font-bold uppercase tracking-widest text-[#870BD6]">Today</span>
           ) : (
-            <span className="text-xs font-medium text-gray-400">{ageLabel}</span>
+            <span className="text-xs font-medium text-gray-400 dark:text-[#717784]">{ageLabel}</span>
           )}
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={onNext}
             disabled={index === 0}
-            className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-[#252830] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
             aria-label="Newer bulletin"
           >
             <ArrowLeft2 size={16} color="#6b7280" />
           </button>
-          <span className="text-xs text-gray-400 px-1">{index + 1} / {total}</span>
+          <span className="text-xs text-gray-400 dark:text-[#717784] px-1">{index + 1} / {total}</span>
           <button
             onClick={onPrev}
             disabled={index >= total - 1}
-            className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-[#252830] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
             aria-label="Older bulletin"
           >
             <ArrowRight2 size={16} color="#6b7280" />
@@ -578,15 +603,15 @@ function TodayBulletinInline({
 
       {/* Bible verse */}
       {b.bibleVerse && (
-        <div className="bg-purple-50 border-l-4 border-[#870BD6] rounded-r-2xl p-4 mb-5">
-          <p className="text-sm italic text-[#870BD6] font-medium">&ldquo;{b.bibleVerse}&rdquo;</p>
+        <div className="bg-purple-50 dark:bg-[#2D1B4E] border-l-4 border-[#870BD6] rounded-r-2xl p-4 mb-5">
+          <p className="text-sm italic text-[#870BD6] dark:text-[#A855F7] font-medium">&ldquo;{b.bibleVerse}&rdquo;</p>
         </div>
       )}
 
       {/* Prayer points or prose content */}
       {prayerPoints.length > 0 ? (
         <div className="mb-6">
-          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Prayer Points</h2>
+          <h2 className="text-sm font-bold text-gray-500 dark:text-[#9CA3AF] uppercase tracking-wide mb-3">Prayer Points</h2>
           <div className="space-y-3">
             {prayerPoints.map((point, idx) => (
               <button
@@ -594,10 +619,10 @@ function TodayBulletinInline({
                 onClick={() => togglePoint(idx)}
                 className="w-full flex items-start gap-3 text-left group cursor-pointer"
               >
-                <span className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checkedPoints.has(idx) ? 'border-[#870BD6] bg-[#870BD6]' : 'border-gray-300 group-hover:border-[#870BD6]'}`}>
+                <span className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checkedPoints.has(idx) ? 'border-[#870BD6] bg-[#870BD6]' : 'border-gray-300 dark:border-[#717784] group-hover:border-[#870BD6]'}`}>
                   {checkedPoints.has(idx) && <TickCircle size={12} color="white" variant="Bold" />}
                 </span>
-                <span className={`text-sm leading-relaxed transition-colors ${checkedPoints.has(idx) ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+                <span className={`text-sm leading-relaxed transition-colors ${checkedPoints.has(idx) ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-[#E2E4E9]'}`}>
                   {point}
                 </span>
               </button>
@@ -610,7 +635,7 @@ function TodayBulletinInline({
           )}
         </div>
       ) : (
-        <div className="text-gray-700 leading-relaxed text-base whitespace-pre-wrap mb-6">{b.content}</div>
+        <div className="text-gray-700 dark:text-[#E2E4E9] leading-relaxed text-base whitespace-pre-wrap mb-6">{b.content}</div>
       )}
 
       {/* Actions */}
@@ -633,7 +658,7 @@ function TodayBulletinInline({
 
         <button
           onClick={handleStartPraying}
-          className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-[#870BD6] text-[#870BD6] hover:bg-purple-50 transition-colors cursor-pointer"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-[#870BD6] text-[#870BD6] hover:bg-purple-50 dark:hover:bg-[#2D1B4E] transition-colors cursor-pointer"
         >
           <Timer1 size={16} color="#870BD6" />
           Start Praying
@@ -641,7 +666,7 @@ function TodayBulletinInline({
 
         <button
           onClick={handleShare}
-          className="flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-gray-200 text-gray-600 hover:border-gray-300 transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-gray-200 dark:border-[#2D313A] text-gray-600 dark:text-[#9CA3AF] hover:border-gray-300 transition-colors cursor-pointer"
         >
           <Share size={16} color="#6b7280" />
           {copied ? 'Copied!' : 'Share'}
@@ -667,7 +692,7 @@ function BulletinCard({
 
   return (
     <div
-      className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100 cursor-pointer"
+      className="bg-white dark:bg-[#181A1F] rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100 dark:border-[#2D313A] cursor-pointer"
       onClick={onSelect}
     >
       <div className="flex items-start justify-between mb-3">
@@ -680,16 +705,16 @@ function BulletinCard({
         </span>
         <button
           onClick={(e) => { e.stopPropagation(); onBookmark(); }}
-          className="text-gray-400 hover:text-[#870BD6] cursor-pointer"
+          className="text-gray-400 dark:text-[#717784] hover:text-[#870BD6] cursor-pointer"
         >
           {b.isBookmarked
             ? <Bookmark variant="Bold" size={16} color="#870BD6" />
             : <Bookmark size={16} color="#9ca3af" />}
         </button>
       </div>
-      <h3 className="font-bold text-gray-900 mb-2 leading-tight">{b.title}</h3>
-      <p className="text-xs text-gray-500 line-clamp-2 mb-3">{b.content}</p>
-      <div className="flex items-center gap-3 text-xs text-gray-400">
+      <h3 className="font-bold text-gray-900 dark:text-white mb-2 leading-tight">{b.title}</h3>
+      <p className="text-xs text-gray-500 dark:text-[#9CA3AF] line-clamp-2 mb-3">{b.content}</p>
+      <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-[#717784]">
         {publishDate && <span>{publishDate}</span>}
         {b.requestCount > 0 && (
           <span className="flex items-center gap-1">
@@ -703,6 +728,104 @@ function BulletinCard({
 }
 
 // ── Category drill-down ────────────────────────────────────────────────────────
+
+// ── Sticky note pin ────────────────────────────────────────────────────────────
+
+function StickyPin({ color }: { color: string }) {
+  return (
+    <svg width="22" height="32" viewBox="0 0 22 32" fill="none" aria-hidden="true">
+      <circle cx="11" cy="11" r="10" fill={color} />
+      <circle cx="11" cy="11" r="6" fill="rgba(255,255,255,0.2)" />
+      <circle cx="8.5" cy="8.5" r="2.5" fill="rgba(255,255,255,0.35)" />
+      <line x1="11" y1="21" x2="11" y2="32" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// ── Sticky note card (category drill-down only) ────────────────────────────────
+
+function StickyBulletinCard({
+  bulletin: b,
+  onSelect,
+  onBookmark,
+}: {
+  bulletin: Bulletin;
+  onSelect: () => void;
+  onBookmark: () => void;
+}) {
+  const cat = CATEGORIES.find((c) => c.id === b.category);
+  const note = STICKY_NOTE_COLORS[b.category] ?? DEFAULT_STICKY;
+  const publishDate = formatDate(b.scheduledAt ?? b.createdAt);
+
+  return (
+    <div className="relative pt-4 cursor-pointer group" onClick={onSelect}>
+      {/* Pushpin — drop-shadow makes it look like it protrudes from the wall */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+        style={{ filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.55))' }}
+      >
+        <StickyPin color={note.pinColor} />
+      </div>
+
+      {/* Small shadow cast by the pin onto the paper surface */}
+      <div
+        className="absolute z-10 pointer-events-none rounded-full"
+        style={{ width: 12, height: 5, top: 22, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.22)', filter: 'blur(2px)' }}
+      />
+
+      {/* Note face */}
+      <div
+        className="relative w-full px-6 pt-6 pb-12"
+        style={{ clipPath: 'url(#stickyClip)', background: note.bg, minHeight: '210px' }}
+      >
+        {/* Bookmark */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onBookmark(); }}
+          className="absolute top-3 right-3 z-10 cursor-pointer p-2.5 rounded-full opacity-70 hover:opacity-100 hover:bg-black/5 transition-all"
+          aria-label={b.isBookmarked ? 'Remove bookmark' : 'Save bulletin'}
+        >
+          {b.isBookmarked
+            ? <Bookmark variant="Bold" size={15} color={note.pinColor} />
+            : <Bookmark size={15} color={note.textColor} />}
+        </button>
+
+        {/* Category eyebrow */}
+        <p
+          className="text-[9px] font-bold uppercase tracking-widest mb-2 pr-5"
+          style={{ color: note.pinColor, fontFamily: 'var(--font-inter)' }}
+        >
+          {cat?.label ?? b.category}
+        </p>
+
+        {/* Title */}
+        <h3
+          className="text-sm leading-snug mb-3 pr-1 group-hover:underline underline-offset-2 decoration-current"
+          style={{ color: note.textColor, fontFamily: 'var(--font-courgette)' }}
+        >
+          {b.title}
+        </h3>
+
+        {/* Content excerpt */}
+        <p
+          className="text-sm leading-relaxed line-clamp-4"
+          style={{ color: note.textColor, opacity: 0.72, fontFamily: 'var(--font-courgette)' }}
+        >
+          {b.content}
+        </p>
+
+        {/* Date */}
+        {publishDate && (
+          <p
+            className="mt-3 text-[9px]"
+            style={{ color: note.textColor, opacity: 0.5, fontFamily: 'var(--font-inter)' }}
+          >
+            {publishDate}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CategoryBulletins({
   category,
@@ -722,21 +845,34 @@ function CategoryBulletins({
   const { Icon } = category;
   return (
     <div>
+      {/* Shared clip-path definition for sticky notes */}
+      <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
+        <defs>
+          <clipPath id="stickyClip" clipPathUnits="objectBoundingBox">
+            <path
+              d="M 0 0 Q 0 0.69, 0.03 0.96 0.03 0.96, 1 0.96 Q 0.96 0.69, 0.96 0 0.96 0, 0 0"
+              strokeLinejoin="round"
+              strokeLinecap="square"
+            />
+          </clipPath>
+        </defs>
+      </svg>
+
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full cursor-pointer">
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 dark:hover:bg-[#252830] rounded-full cursor-pointer">
           <ArrowLeft2 size={20} color="#6b7280" />
         </button>
         <Icon size={22} color="#180426" variant="Bold" />
-        <h2 className="text-xl font-bold text-gray-900">{category.label}</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{category.label}</h2>
       </div>
       {loading ? (
         <Spinner />
       ) : bulletins.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">No bulletins in this category yet.</div>
+        <div className="text-center py-16 text-gray-400 dark:text-[#717784] text-sm">No bulletins in this category yet.</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-6 gap-y-12">
           {bulletins.map((b) => (
-            <BulletinCard key={b.id} bulletin={b} onSelect={() => onSelect(b)} onBookmark={() => onBookmark(b)} />
+            <StickyBulletinCard key={b.id} bulletin={b} onSelect={() => onSelect(b)} onBookmark={() => onBookmark(b)} />
           ))}
         </div>
       )}
@@ -801,7 +937,7 @@ function BulletinDetail({
 
   return (
     <div className="max-w-2xl">
-      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 hover:text-gray-700 cursor-pointer">
+      <button onClick={onBack} className="flex items-center gap-2 mb-6 text-gray-500 dark:text-[#9CA3AF] hover:text-gray-700 dark:hover:text-white cursor-pointer">
         <ArrowLeft2 size={20} color="#6b7280" />
         <span className="text-sm font-medium">Back</span>
       </button>
@@ -854,14 +990,14 @@ function BulletinDetail({
       </div>
 
       {b.bibleVerse && (
-        <div className="bg-purple-50 border-l-4 border-[#870BD6] rounded-r-2xl p-4 mb-5">
-          <p className="text-sm italic text-[#870BD6] font-medium">&ldquo;{b.bibleVerse}&rdquo;</p>
+        <div className="bg-purple-50 dark:bg-[#2D1B4E] border-l-4 border-[#870BD6] rounded-r-2xl p-4 mb-5">
+          <p className="text-sm italic text-[#870BD6] dark:text-[#A855F7] font-medium">&ldquo;{b.bibleVerse}&rdquo;</p>
         </div>
       )}
 
       {prayerPoints.length > 0 ? (
         <div className="mb-6">
-          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Prayer Points</h2>
+          <h2 className="text-sm font-bold text-gray-500 dark:text-[#9CA3AF] uppercase tracking-wide mb-3">Prayer Points</h2>
           <div className="space-y-3">
             {prayerPoints.map((point, idx) => (
               <button
@@ -869,10 +1005,10 @@ function BulletinDetail({
                 onClick={() => togglePoint(idx)}
                 className="w-full flex items-start gap-3 text-left group cursor-pointer"
               >
-                <span className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checkedPoints.has(idx) ? 'border-[#870BD6] bg-[#870BD6]' : 'border-gray-300 group-hover:border-[#870BD6]'}`}>
+                <span className={`mt-0.5 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checkedPoints.has(idx) ? 'border-[#870BD6] bg-[#870BD6]' : 'border-gray-300 dark:border-[#717784] group-hover:border-[#870BD6]'}`}>
                   {checkedPoints.has(idx) && <TickCircle size={12} color="white" variant="Bold" />}
                 </span>
-                <span className={`text-sm leading-relaxed transition-colors ${checkedPoints.has(idx) ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+                <span className={`text-sm leading-relaxed transition-colors ${checkedPoints.has(idx) ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-[#E2E4E9]'}`}>
                   {point}
                 </span>
               </button>
@@ -885,7 +1021,7 @@ function BulletinDetail({
           )}
         </div>
       ) : (
-        <div className="text-gray-700 leading-relaxed text-base whitespace-pre-wrap mb-6">{b.content}</div>
+        <div className="text-gray-700 dark:text-[#E2E4E9] leading-relaxed text-base whitespace-pre-wrap mb-6">{b.content}</div>
       )}
 
       <div className="flex flex-col sm:flex-row gap-3 mt-2">
@@ -907,7 +1043,7 @@ function BulletinDetail({
 
         <button
           onClick={handleStartPraying}
-          className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-[#870BD6] text-[#870BD6] hover:bg-purple-50 transition-colors cursor-pointer"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-[#870BD6] text-[#870BD6] hover:bg-purple-50 dark:hover:bg-[#2D1B4E] transition-colors cursor-pointer"
         >
           <Timer1 size={16} color="#870BD6" />
           Start Praying
@@ -915,7 +1051,7 @@ function BulletinDetail({
 
         <button
           onClick={handleShare}
-          className="flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-gray-200 text-gray-600 hover:border-gray-300 transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-gray-200 dark:border-[#2D313A] text-gray-600 dark:text-[#9CA3AF] hover:border-gray-300 transition-colors cursor-pointer"
         >
           <Share size={16} color="#6b7280" />
           {copied ? 'Copied!' : 'Share'}

@@ -63,13 +63,10 @@ const ACTIVITY_META: Record<
 };
 
 const TRACKED: ActivityType[] = [
-  'DEVOTIONAL_READ',
-  'PRAYER_PRAYED',
-  'LESSON_COMPLETED',
-  'COMMUNITY_ENGAGED',
-  'MENTORSHIP_TASK_COMPLETED',
-  'MENTORSHIP_SESSION_ATTENDED',
   'EDIFY',
+  'PRAYER_PRAYED',
+  'DEVOTIONAL_READ',
+  'LESSON_COMPLETED',
 ];
 
 // ── Calendar heat intensity ────────────────────────────────────────────────
@@ -87,19 +84,19 @@ function heatColour(count: number): string {
 const Skeleton = () => (
   <div className="animate-pulse lg:grid lg:grid-cols-[1fr_380px] lg:items-stretch gap-6">
     <div className="space-y-4">
-      <div className="h-40 bg-gray-100 rounded-2xl" />
+      <div className="h-40 bg-gray-100 dark:bg-[#252830] rounded-2xl" />
       <div className="grid grid-cols-2 gap-3">
         {[...Array(2)].map((_, i) => (
-          <div key={i} className="h-20 bg-gray-100 rounded-2xl" />
+          <div key={i} className="h-20 bg-gray-100 dark:bg-[#252830] rounded-2xl" />
         ))}
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         {[...Array(7)].map((_, i) => (
-          <div key={i} className="h-28 bg-gray-100 rounded-2xl" />
+          <div key={i} className="h-28 bg-gray-100 dark:bg-[#252830] rounded-2xl" />
         ))}
       </div>
     </div>
-    <div className="hidden lg:block min-h-[420px] bg-gray-100 rounded-2xl" />
+    <div className="hidden lg:block min-h-[420px] bg-gray-100 dark:bg-[#252830] rounded-2xl" />
   </div>
 );
 
@@ -125,7 +122,7 @@ function ActivityCalendar({ calendar }: { calendar: CalendarDay[] }) {
       <div className="flex gap-2 flex-1 min-h-0">
         {weeks.map((week, wi) => (
           <div key={wi} className="flex flex-col gap-2 flex-1 min-w-0">
-            <span className="text-[10px] font-medium text-[#B9C2CA] leading-none truncate shrink-0">
+            <span className="text-[10px] font-medium text-[#B9C2CA] dark:text-[#717784] leading-none truncate shrink-0">
               {weekLabels[wi]}
             </span>
             {week.map((day) => {
@@ -134,8 +131,8 @@ function ActivityCalendar({ calendar }: { calendar: CalendarDay[] }) {
                 <div
                   key={day.date}
                   title={`${day.date}: ${day.count} activit${day.count === 1 ? 'y' : 'ies'}`}
-                  className={`flex-1 min-h-7 rounded-lg transition-colors ${isToday ? 'ring-2 ring-[#870BD6] ring-offset-1' : ''}`}
-                  style={{ backgroundColor: heatColour(day.count) }}
+                  className={`flex-1 min-h-7 rounded-lg transition-colors ${isToday ? 'ring-2 ring-[#870BD6] ring-offset-1 dark:ring-offset-[#181A1F]' : ''} ${day.count === 0 ? 'bg-[#F0F2F4] dark:bg-[#252830]' : ''}`}
+                  style={day.count > 0 ? { backgroundColor: heatColour(day.count) } : undefined}
                 />
               );
             })}
@@ -144,18 +141,18 @@ function ActivityCalendar({ calendar }: { calendar: CalendarDay[] }) {
       </div>
 
       {/* Legend */}
-      <div className="shrink-0 flex items-center justify-between mt-4 pt-4 border-t border-[#F0F2F4]">
-        <span className="text-xs text-[#60666B]">Activity intensity</span>
+      <div className="shrink-0 flex items-center justify-between mt-4 pt-4 border-t border-[#F0F2F4] dark:border-[#2D313A]">
+        <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">Activity intensity</span>
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-[#60666B]">Less</span>
+          <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">Less</span>
           {[0, 1, 2, 3, 5].map((n) => (
             <div
               key={n}
-              className="w-4 h-4 rounded-sm"
-              style={{ backgroundColor: heatColour(n) }}
+              className={`w-4 h-4 rounded-sm ${n === 0 ? 'bg-[#F0F2F4] dark:bg-[#252830]' : ''}`}
+              style={n > 0 ? { backgroundColor: heatColour(n) } : undefined}
             />
           ))}
-          <span className="text-xs text-[#60666B]">More</span>
+          <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">More</span>
         </div>
       </div>
     </div>
@@ -180,13 +177,13 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
 
   if (!stats) {
     return (
-      <div className={showDivider ? 'mt-10 pt-8 border-t border-[#F0F2F4]' : ''}>
-        <div className="rounded-2xl border border-[#F0F2F4] bg-white p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] flex items-center justify-center mx-auto mb-4">
+      <div className={showDivider ? 'mt-10 pt-8 border-t border-[#F0F2F4] dark:border-[#2D313A]' : ''}>
+        <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] p-12 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center mx-auto mb-4">
             <FlameIcon size={32} />
           </div>
-          <p className="text-base font-semibold text-[#180426]">No activity data yet</p>
-          <p className="text-sm text-[#60666B] mt-2 max-w-xs mx-auto">
+          <p className="text-base font-semibold text-[#180426] dark:text-white">No activity data yet</p>
+          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] mt-2 max-w-xs mx-auto">
             Start reading devotionals, completing lessons, or praying for bulletins to build your streak.
           </p>
         </div>
@@ -204,7 +201,7 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
   const dateRange = `${MONTH_LABELS[thirtyAgo.getUTCMonth()]} ${thirtyAgo.getUTCDate()} – ${MONTH_LABELS[now.getUTCMonth()]} ${now.getUTCDate()}`;
 
   return (
-    <div className={`${showDivider ? 'mt-10 pt-8 border-t border-[#F0F2F4]' : ''} lg:grid lg:grid-cols-[1fr_380px] lg:items-stretch gap-6`}>
+    <div className={`${showDivider ? 'mt-10 pt-8 border-t border-[#F0F2F4] dark:border-[#2D313A]' : ''} lg:grid lg:grid-cols-[1fr_380px] lg:items-stretch gap-6`}>
 
       {/* ── Left column ── */}
       <div className="flex flex-col gap-4">
@@ -236,42 +233,39 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
 
         {/* Summary stat tiles */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-[#F0F2F4] bg-white px-4 py-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] flex items-center justify-center shrink-0">
+          <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] px-4 py-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center shrink-0">
               <Flash size={18} color="#870BD6" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#180426] leading-none">{totalActiveDays}</p>
-              <p className="text-xs text-[#60666B] mt-0.5">active days this month</p>
+              <p className="text-2xl font-bold text-[#180426] dark:text-white leading-none">{totalActiveDays}</p>
+              <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5">active days this month</p>
             </div>
           </div>
 
           {mostActiveMeta ? (
-            <div
-              className="rounded-2xl border px-4 py-4 flex items-center gap-3"
-              style={{ backgroundColor: mostActiveMeta.bg, borderColor: mostActiveMeta.border }}
-            >
+            <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] px-4 py-4 flex items-center gap-3">
               <div
-                className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0"
+                className="w-10 h-10 rounded-xl bg-[#F3F4F6] dark:bg-[#252830] flex items-center justify-center shrink-0"
                 style={{ color: mostActiveMeta.colour }}
               >
                 {mostActiveMeta.icon}
               </div>
               <div>
-                <p className="text-xs font-semibold" style={{ color: mostActiveMeta.colour }}>
+                <p className="text-xs font-semibold dark:!text-[#9CA3AF]" style={{ color: mostActiveMeta.colour }}>
                   Most Active
                 </p>
-                <p className="text-sm font-bold text-[#180426] mt-0.5">{mostActiveMeta.label}</p>
+                <p className="text-sm font-bold text-[#180426] dark:text-white mt-0.5">{mostActiveMeta.label}</p>
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-[#F0F2F4] bg-white px-4 py-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#F0F2F4] flex items-center justify-center shrink-0">
+            <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] px-4 py-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#F0F2F4] dark:bg-[#252830] flex items-center justify-center shrink-0">
                 <TrendUp size={18} color="#60666B" />
               </div>
               <div>
-                <p className="text-xs text-[#60666B]">Most Active</p>
-                <p className="text-sm font-bold text-[#180426] mt-0.5">None yet</p>
+                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF]">Most Active</p>
+                <p className="text-sm font-bold text-[#180426] dark:text-white mt-0.5">None yet</p>
               </div>
             </div>
           )}
@@ -287,23 +281,22 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
             return (
               <div
                 key={type}
-                className="rounded-2xl p-4 border"
-                style={{ backgroundColor: meta.bg, borderColor: meta.border }}
+                className="rounded-2xl p-4 border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F]"
               >
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center mb-3"
-                  style={{ backgroundColor: 'white', color: meta.colour }}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 bg-[#F3F4F6] dark:bg-[#252830]"
+                  style={{ color: meta.colour }}
                 >
                   {meta.icon}
                 </div>
-                <p className="text-xs font-semibold mb-1.5" style={{ color: meta.colour }}>
+                <p className="text-xs font-semibold mb-1.5 dark:!text-white" style={{ color: meta.colour }}>
                   {meta.label}
                 </p>
-                <p className="text-3xl font-bold text-[#180426] leading-none">
+                <p className="text-3xl font-bold text-[#180426] dark:text-white leading-none">
                   {current}
-                  <span className="text-sm font-normal text-[#60666B] ml-1">days</span>
+                  <span className="text-sm font-normal text-[#60666B] dark:text-[#9CA3AF] ml-1">days</span>
                 </p>
-                <p className="text-[11px] text-[#60666B] mt-1.5">
+                <p className="text-[11px] text-[#60666B] dark:text-[#9CA3AF] mt-1.5">
                   Best: <span className="font-bold">{longest}d</span>
                 </p>
               </div>
@@ -313,14 +306,14 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
       </div>
 
       {/* ── Right column: Calendar ── */}
-      <div className="rounded-2xl border border-[#F0F2F4] bg-white p-6 flex flex-col mt-4 lg:mt-0 min-h-[420px]">
+      <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] p-6 flex flex-col mt-4 lg:mt-0 min-h-[420px]">
         {/* Header */}
         <div className="shrink-0 flex items-start justify-between mb-5">
           <div>
-            <p className="text-base font-bold text-[#180426]">Last 30 Days</p>
-            <p className="text-xs text-[#60666B] mt-0.5">{dateRange}</p>
+            <p className="text-base font-bold text-[#180426] dark:text-white">Last 30 Days</p>
+            <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5">{dateRange}</p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#F5EBFF] text-[#870BD6]">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] text-[#870BD6]">
             {totalActiveDays} / 30 active
           </span>
         </div>

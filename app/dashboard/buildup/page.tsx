@@ -29,8 +29,8 @@ function BuildupContent() {
   return (
     <DashboardLayout custom={true}>
       {/* Header */}
-      <div className="flex justify-between items-center pb-6.75 lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-16 border-b border-[#D2D9DF]">
-        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">
+      <div className="flex justify-between items-center pb-6.75 lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-16 border-b border-[#D2D9DF] dark:border-[#2D313A]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold dark:text-white">
           Build Up
         </h1>
 
@@ -65,8 +65,8 @@ function BuildupContent() {
         )}
       </div>
 
-      {/* White content area */}
-      <div className="bg-white pt-5 min-h-screen">
+      {/* Content area */}
+      <div className="bg-white dark:bg-[#121316] pt-5 min-h-screen">
         {/* Tab pills */}
         <div className="flex gap-3 px-4 lg:px-12 overflow-x-auto">
           {TABS.map((tab) => (
@@ -75,8 +75,8 @@ function BuildupContent() {
               onClick={() => router.push(`/dashboard/buildup?tab=${tab.id}`)}
               className={`border px-[18px] py-3 whitespace-nowrap rounded-[12px] font-medium text-sm transition-all duration-200 cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-white border-black font-semibold text-[#180426]"
-                  : "text-[#4E5255] border-[#D2D9DF] hover:border-gray-400"
+                  ? "bg-white dark:bg-[#252830] border-black dark:border-transparent font-semibold text-[#180426] dark:text-white"
+                  : "text-[#4E5255] dark:text-[#9CA3AF] border-[#D2D9DF] dark:border-[#2D313A] hover:border-gray-400 dark:hover:border-[#717784]"
               }`}
             >
               {tab.label}
@@ -85,7 +85,7 @@ function BuildupContent() {
         </div>
 
         {/* Tab content */}
-        <div className="border-t border-[#D2D9DF] mt-5 px-4 lg:px-12 py-6">
+        <div className="border-t border-[#D2D9DF] dark:border-[#2D313A] mt-5 px-4 lg:px-12 py-6">
           {activeTab === "edify" && (
             <EdifyTab
               ref={edifyTabRef}
@@ -113,11 +113,11 @@ export default function BuildupPage() {
     <Suspense
       fallback={
         <DashboardLayout custom={true}>
-          <div className="pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
-            <div className="h-8 bg-gray-200 rounded w-32 animate-pulse" />
+          <div className="pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF] dark:border-[#2D313A]">
+            <div className="h-8 bg-gray-200 dark:bg-[#2D313A] rounded w-32 animate-pulse" />
           </div>
-          <div className="bg-white pt-5 px-4 lg:px-12">
-            <div className="h-10 bg-gray-100 rounded-xl w-72 animate-pulse" />
+          <div className="bg-white dark:bg-[#121316] pt-5 px-4 lg:px-12">
+            <div className="h-10 bg-gray-100 dark:bg-[#252830] rounded-xl w-72 animate-pulse" />
           </div>
         </DashboardLayout>
       }

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable dark: variants based on [data-theme=dark] ancestor */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @keyframes fade-in-down {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -9,7 +12,32 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Display preference tokens */
+  --breed-text-scale: 1;
+  --breed-surface: #ffffff;
+  --breed-surface-secondary: #F8F9FC;
+  --breed-border: #E3E8EF;
+  --breed-text-primary: #180426;
+  --breed-text-secondary: #60666B;
 }
+
+/* Dark mode token overrides */
+[data-theme="dark"] {
+  --background: #0F0A1E;
+  --foreground: #EDE9F8;
+  --breed-surface: #1A1427;
+  --breed-surface-secondary: #120D1E;
+  --breed-border: #2D1B4E;
+  --breed-text-primary: #EDE9F8;
+  --breed-text-secondary: #9D8FBB;
+}
+
+[data-theme="dark"] body {
+  background-color: #0F0A1E;
+  color: #EDE9F8;
+}
+
 
 @theme inline {
   --color-background: var(--background);

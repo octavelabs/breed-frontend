@@ -21,7 +21,7 @@ const PasswordField = ({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">{label}</label>
     <div className="relative">
       <input
         type={visible ? 'text' : 'password'}
@@ -29,12 +29,12 @@ const PasswordField = ({
         value={value}
         onChange={onChange}
         required
-        className="w-full border border-[#E2E3E5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 pr-11 bg-white"
+        className="w-full border border-[#E2E3E5] dark:border-[#2D313A] rounded-xl px-4 py-3 text-sm dark:text-white focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 pr-11 bg-white dark:bg-[#252830]"
       />
       <button
         type="button"
         onClick={onToggle}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#717784] hover:text-gray-600 dark:hover:text-[#9CA3AF] cursor-pointer"
       >
         {visible ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
@@ -90,7 +90,7 @@ const Security = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) =
     <>
       <ArrowLeft className="lg:hidden mb-4 cursor-pointer" stroke="#60666B" onClick={() => setShowSelectedTab(false)} />
       <h2 className="text-2xl font-bold mb-2">Privacy & Security</h2>
-      <p className="text-sm text-[#60666B] mb-8">Update your password to keep your account secure.</p>
+      <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] mb-8">Update your password to keep your account secure.</p>
 
       <form onSubmit={handleSubmit} className="w-full space-y-5">
         <PasswordField

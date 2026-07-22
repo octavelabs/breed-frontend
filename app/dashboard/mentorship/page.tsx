@@ -106,7 +106,7 @@ function MentorCard({ mentor, onClick }: { mentor: Mentor; onClick: () => void }
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-[#E3E8EF] rounded-2xl p-4 flex flex-col items-center gap-3 hover:shadow-md transition-shadow cursor-pointer text-center"
+      className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-4 flex flex-col items-center gap-3 hover:shadow-md transition-shadow cursor-pointer text-center"
     >
       {/* Avatar */}
       {mentor.avatarUrl ? (
@@ -119,30 +119,30 @@ function MentorCard({ mentor, onClick }: { mentor: Mentor; onClick: () => void }
 
       {/* Name · username · role */}
       <div>
-        <p className="font-bold text-[#180426] text-[15px] leading-snug">
+        <p className="font-bold text-[#180426] dark:text-white text-[15px] leading-snug">
           {mentor.firstName} {mentor.lastName}
         </p>
         {mentor.username && (
           <p className="text-xs text-[#870BD6] font-medium mt-0.5">@{mentor.username}</p>
         )}
         {roleText && (
-          <p className="text-[13px] text-[#60666B] mt-0.5 line-clamp-1">{roleText}</p>
+          <p className="text-[13px] text-[#60666B] dark:text-[#9CA3AF] mt-0.5 line-clamp-1">{roleText}</p>
         )}
       </div>
 
       {/* Stats */}
-      <div className="w-full border-t border-[#F0F1F3] pt-3 grid grid-cols-3 gap-1">
+      <div className="w-full border-t border-[#F0F1F3] dark:border-[#2D313A] pt-3 grid grid-cols-3 gap-1">
         <div>
-          <p className="font-bold text-[#180426] text-sm">{mentor.discipleCount}</p>
-          <p className="text-[11px] text-[#60666B]">disciples</p>
+          <p className="font-bold text-[#180426] dark:text-white text-sm">{mentor.discipleCount}</p>
+          <p className="text-[11px] text-[#60666B] dark:text-[#9CA3AF]">disciples</p>
         </div>
-        <div className="border-x border-[#F0F1F3]">
-          <p className="font-bold text-[#180426] text-sm">{sessions}</p>
-          <p className="text-[11px] text-[#60666B]">sessions</p>
+        <div className="border-x border-[#F0F1F3] dark:border-[#2D313A]">
+          <p className="font-bold text-[#180426] dark:text-white text-sm">{sessions}</p>
+          <p className="text-[11px] text-[#60666B] dark:text-[#9CA3AF]">sessions</p>
         </div>
         <div>
-          <p className="font-bold text-[#180426] text-sm">{reviews}</p>
-          <p className="text-[11px] text-[#60666B]">reviews</p>
+          <p className="font-bold text-[#180426] dark:text-white text-sm">{reviews}</p>
+          <p className="text-[11px] text-[#60666B] dark:text-[#9CA3AF]">reviews</p>
         </div>
       </div>
     </div>
@@ -227,11 +227,11 @@ const MentorshipPage = () => {
   return (
     <DashboardLayout custom={true}>
       {/* Header */}
-      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
-        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Mentorship</h1>
+      <div className="flex justify-start items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF] dark:border-[#2D313A]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold dark:text-white">Mentorship</h1>
       </div>
 
-      <div className="bg-white min-h-screen">
+      <div className="bg-white dark:bg-[#121316] min-h-screen">
         {/* Tab pills + search row */}
         <div className="px-4 lg:px-12 py-5 flex items-center justify-between gap-4">
           <div className="flex gap-3 overflow-x-auto">
@@ -241,8 +241,8 @@ const MentorshipPage = () => {
                 onClick={() => setTab(t)}
                 className={`border px-4.5 py-3 rounded-xl font-medium text-sm transition-all whitespace-nowrap cursor-pointer ${
                   tab === t
-                    ? "bg-white border-black font-semibold text-[#180426]"
-                    : "text-[#4E5255] border-[#D2D9DF] hover:border-gray-400"
+                    ? "bg-white dark:bg-[#252830] border-black dark:border-transparent font-semibold text-[#180426] dark:text-white"
+                    : "text-[#4E5255] dark:text-[#9CA3AF] border-[#D2D9DF] dark:border-[#2D313A] hover:border-gray-400 dark:hover:border-[#717784]"
                 }`}
               >
                 {t === "discover"
@@ -252,36 +252,36 @@ const MentorshipPage = () => {
             ))}
           </div>
           <div className="relative hidden sm:block w-56 lg:w-72 shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#717784] pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={tab === "discover" ? "Search by name or specialty…" : "Search mentorships…"}
-              className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white transition-colors"
+              className="w-full pl-9 pr-4 py-2.5 border border-[#D2D9DF] dark:border-[#2D313A] rounded-full text-sm focus:outline-none focus:border-[#870BD6] focus:ring-2 focus:ring-[#870BD6]/10 bg-white dark:bg-[#252830] dark:text-white dark:placeholder:text-[#717784] transition-colors"
             />
           </div>
         </div>
 
         {/* ── Discover ── */}
         {tab === "discover" && (
-          <div className="border-t border-[#D2D9DF] px-4 lg:px-12 py-6">
+          <div className="border-t border-[#D2D9DF] dark:border-[#2D313A] px-4 lg:px-12 py-6">
             {loadingMentors ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="h-52 bg-gray-100 rounded-2xl animate-pulse"
+                    className="h-52 bg-gray-100 dark:bg-[#252830] rounded-2xl animate-pulse"
                   />
                 ))}
               </div>
             ) : filteredMentors.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-                <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
                   <Users size={26} className="text-[#870BD6]" />
                 </div>
-                <p className="font-semibold text-gray-700">No mentors found</p>
-                <p className="text-sm text-[#60666B]">
+                <p className="font-semibold text-gray-700 dark:text-white">No mentors found</p>
+                <p className="text-sm text-[#60666B] dark:text-[#9CA3AF]">
                   There are no mentors accepting disciples right now.
                 </p>
               </div>
@@ -303,17 +303,17 @@ const MentorshipPage = () => {
 
         {/* ── My Mentorships ── */}
         {tab === "my" && (
-          <div className="border-t border-[#D2D9DF] px-4 lg:px-12 py-6 space-y-3">
+          <div className="border-t border-[#D2D9DF] dark:border-[#2D313A] px-4 lg:px-12 py-6 space-y-3">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-sm text-[#60666B]">
+              <p className="text-sm text-[#60666B] dark:text-[#9CA3AF]">
                 Your active and past mentorship relationships.
               </p>
               <button
                 onClick={loadMyMentorships}
                 title="Refresh"
-                className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+                className="p-2 border border-gray-200 dark:border-[#2D313A] rounded-lg hover:bg-gray-50 dark:hover:bg-[#252830]"
               >
-                <RefreshCw size={14} className="text-gray-500" />
+                <RefreshCw size={14} className="text-gray-500 dark:text-[#717784]" />
               </button>
             </div>
 
@@ -322,19 +322,19 @@ const MentorshipPage = () => {
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="h-20 bg-gray-100 rounded-2xl animate-pulse"
+                    className="h-20 bg-gray-100 dark:bg-[#252830] rounded-2xl animate-pulse"
                   />
                 ))}
               </div>
             ) : myMentorships.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-                <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
                   <Inbox size={26} className="text-[#870BD6]" />
                 </div>
-                <p className="font-semibold text-gray-700">
+                <p className="font-semibold text-gray-700 dark:text-white">
                   No mentorships yet
                 </p>
-                <p className="text-sm text-[#60666B] max-w-xs">
+                <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] max-w-xs">
                   Request a mentor from the Discover tab to begin your
                   discipleship journey.
                 </p>
@@ -350,7 +350,7 @@ const MentorshipPage = () => {
                 {/* Upcoming sessions */}
                 {upcomingSessions.length > 0 && (
                   <div className="mb-2">
-                    <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wide mb-2">
+                    <p className="text-xs font-semibold text-[#60666B] dark:text-[#9CA3AF] uppercase tracking-wide mb-2">
                       Upcoming Sessions
                     </p>
                     <div className="space-y-2">
@@ -364,24 +364,24 @@ const MentorshipPage = () => {
                                 `/dashboard/mentorship/sessions/${s.id}`,
                               )
                             }
-                            className="w-full bg-white border border-[#E3E8EF] rounded-2xl p-4 cursor-pointer hover:border-[#870BD6] hover:bg-[#FBF6FF] transition-all text-left group"
+                            className="w-full bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-4 cursor-pointer hover:border-[#870BD6] hover:bg-[#FBF6FF] dark:hover:bg-[#2D1B4E] transition-all text-left group"
                           >
                             <div className="flex items-start gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] flex items-center justify-center shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center shrink-0">
                                 <Calendar
                                   size={18}
                                   className="text-[#870BD6]"
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm text-[#180426]">
+                                <p className="font-semibold text-sm text-[#180426] dark:text-white">
                                   {s.title}
                                 </p>
-                                <p className="text-xs text-[#60666B] mt-0.5">
+                                <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mt-0.5">
                                   with {s.mentor.firstName} {s.mentor.lastName}
                                 </p>
                                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                                  <span className="flex items-center gap-1 text-xs text-[#60666B]">
+                                  <span className="flex items-center gap-1 text-xs text-[#60666B] dark:text-[#9CA3AF]">
                                     <Calendar size={11} />
                                     {scheduledAt.toLocaleDateString("en-GB", {
                                       day: "numeric",
@@ -389,14 +389,14 @@ const MentorshipPage = () => {
                                       year: "numeric",
                                     })}
                                   </span>
-                                  <span className="flex items-center gap-1 text-xs text-[#60666B]">
+                                  <span className="flex items-center gap-1 text-xs text-[#60666B] dark:text-[#9CA3AF]">
                                     <Clock size={11} />
                                     {scheduledAt.toLocaleTimeString("en-US", {
                                       hour: "numeric",
                                       minute: "2-digit",
                                     })}
                                   </span>
-                                  <span className="text-xs text-[#60666B]">
+                                  <span className="text-xs text-[#60666B] dark:text-[#9CA3AF]">
                                     {s.duration} min
                                   </span>
                                 </div>
@@ -410,12 +410,12 @@ const MentorshipPage = () => {
                         );
                       })}
                     </div>
-                    <hr className="my-4 border-[#E3E8EF]" />
+                    <hr className="my-4 border-[#E3E8EF] dark:border-[#2D313A]" />
                   </div>
                 )}
 
                 {/* Mentorship relationships */}
-                <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wide mb-2">
+                <p className="text-xs font-semibold text-[#60666B] dark:text-[#9CA3AF] uppercase tracking-wide mb-2">
                   Mentors
                 </p>
                 {myMentorships.map((m) => (
@@ -424,12 +424,12 @@ const MentorshipPage = () => {
                     onClick={() =>
                       router.push(`/dashboard/mentorship/${m.mentor.id}`)
                     }
-                    className="w-full bg-white border border-[#E3E8EF] rounded-2xl p-4 flex items-center gap-4 hover:shadow-sm transition-shadow text-left"
+                    className="w-full bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-4 flex items-center gap-4 hover:shadow-sm transition-shadow text-left"
                   >
                     <Avatar user={m.mentor} size="lg" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-[#180426]">
+                        <p className="font-semibold text-[#180426] dark:text-white">
                           {m.mentor.firstName} {m.mentor.lastName}
                         </p>
                         <span
@@ -439,7 +439,7 @@ const MentorshipPage = () => {
                         </span>
                       </div>
                       {m.mentor.username && (
-                        <p className="text-xs text-[#60666B]">
+                        <p className="text-xs text-[#60666B] dark:text-[#9CA3AF]">
                           @{m.mentor.username}
                         </p>
                       )}
@@ -450,7 +450,7 @@ const MentorshipPage = () => {
                             .map((s) => (
                               <span
                                 key={s}
-                                className="text-[10px] bg-[#F5EBFF] text-[#870BD6] px-2 py-0.5 rounded-full"
+                                className="text-[10px] bg-[#F5EBFF] dark:bg-[#2D1B4E] text-[#870BD6] dark:text-[#A855F7] px-2 py-0.5 rounded-full"
                               >
                                 {s}
                               </span>
@@ -458,9 +458,9 @@ const MentorshipPage = () => {
                         </div>
                       ) : null}
                     </div>
-                    <div className="text-xs text-[#60666B] text-right shrink-0">
+                    <div className="text-xs text-[#60666B] dark:text-[#9CA3AF] text-right shrink-0">
                       <p>Since</p>
-                      <p className="font-medium text-[#180426]">
+                      <p className="font-medium text-[#180426] dark:text-white">
                         {new Date(
                           m.startedAt ?? m.createdAt,
                         ).toLocaleDateString("en-GB", {

@@ -53,7 +53,7 @@ const InviteFriend = ({
         onClick={() => setShowSelectedTab(false)}
       />
       <h2 className="text-2xl font-bold mb-2">Invite a Friend</h2>
-      <p className="text-sm text-[#60666B] mb-8">
+      <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] mb-8">
         Share Breed with someone you care about and grow in faith together.
       </p>
 
@@ -71,16 +71,16 @@ const InviteFriend = ({
 
         {/* Referral link */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1.5">
             Your invite link
           </label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 border border-[#E2E3E5] rounded-xl px-4 py-3 text-sm text-[#60666B] bg-gray-50 truncate select-all">
+            <div className="flex-1 border border-[#E2E3E5] dark:border-[#2D313A] rounded-xl px-4 py-3 text-sm text-[#60666B] dark:text-[#9CA3AF] bg-gray-50 dark:bg-[#252830] truncate select-all">
               {inviteLink}
             </div>
             <button
               onClick={handleCopy}
-              className="shrink-0 flex items-center gap-2 px-4 py-3 rounded-xl border border-[#D49CFD] bg-[#F5EBFF] text-[#870BD6] text-sm font-semibold hover:bg-[#EDD9FF] transition-colors cursor-pointer"
+              className="shrink-0 flex items-center gap-2 px-4 py-3 rounded-xl border border-[#D49CFD] dark:border-[#4B2A6E] bg-[#F5EBFF] dark:bg-[#2D1B4E] text-[#870BD6] dark:text-[#A855F7] text-sm font-semibold hover:bg-[#EDD9FF] dark:hover:bg-[#3B2360] transition-colors cursor-pointer"
             >
               {copied ? <Check size={15} /> : <Copy size={15} />}
               {copied ? "Copied!" : "Copy"}

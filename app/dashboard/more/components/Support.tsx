@@ -18,7 +18,7 @@ const Support = () => {
         onChange={(e) => setValue(e.target.value)}
         placeholder="Tell us how we can improve"
         rows={4}
-        className="w-full px-4 py-3 border border-[#60666B] rounded-lg text-base resize-none"
+        className="w-full px-4 py-3 border border-[#60666B] dark:border-[#2D313A] rounded-lg text-base resize-none dark:bg-[#252830] dark:text-white dark:placeholder:text-[#717784]"
       />
       <Button
         onClick={() => console.log("done")}

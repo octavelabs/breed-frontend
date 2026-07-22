@@ -61,14 +61,14 @@ function getNotificationHref(n: Notification): string | null {
 // Icon color per notification type
 function typeAccent(type: string): string {
   if (type.startsWith('MENTORSHIP') || type.startsWith('SESSION') || type.startsWith('TASK') || type.startsWith('ASSESSMENT'))
-    return 'bg-[#F5EBFF] text-[#870BD6]';
+    return 'bg-[#F5EBFF] dark:bg-[#2D1B4E] text-[#870BD6]';
   if (type.startsWith('COMMUNITY'))
-    return 'bg-[#EFF8FF] text-[#175CD3]';
+    return 'bg-[#EFF8FF] dark:bg-[#1E2D45] text-[#175CD3] dark:text-[#60A5FA]';
   if (type.startsWith('DEVOTIONAL') || type.startsWith('NEW_FOLLOWER'))
-    return 'bg-[#FFF6E5] text-[#B54708]';
+    return 'bg-[#FFF6E5] dark:bg-[#3D2800] text-[#B54708] dark:text-[#F59E0B]';
   if (type.startsWith('PRAYER'))
-    return 'bg-[#ECFDF3] text-[#067647]';
-  return 'bg-[#F0F2F4] text-[#60666B]';
+    return 'bg-[#ECFDF3] dark:bg-[#0A2E1C] text-[#067647] dark:text-[#34D399]';
+  return 'bg-[#F0F2F4] dark:bg-[#252830] text-[#60666B] dark:text-[#9CA3AF]';
 }
 
 function timeAgo(dateStr: string): string {
@@ -104,14 +104,14 @@ function groupByDate(items: Notification[]): { label: string; items: Notificatio
 // ── Skeleton ───────────────────────────────────────────────────────────────
 
 const Skeleton = () => (
-  <div className="divide-y divide-[#F5F6F7]">
+  <div className="divide-y divide-[#F5F6F7] dark:divide-[#2D313A]">
     {[1, 2, 3, 4, 5].map((i) => (
       <div key={i} className="flex gap-4 px-4 lg:px-12 py-4 animate-pulse">
-        <div className="w-10 h-10 rounded-full bg-gray-100 shrink-0" />
+        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#252830] shrink-0" />
         <div className="flex-1 space-y-2 pt-1">
-          <div className="h-3.5 bg-gray-100 rounded w-1/3" />
-          <div className="h-3 bg-gray-100 rounded w-full" />
-          <div className="h-2.5 bg-gray-100 rounded w-1/5" />
+          <div className="h-3.5 bg-gray-100 dark:bg-[#252830] rounded w-1/3" />
+          <div className="h-3 bg-gray-100 dark:bg-[#252830] rounded w-full" />
+          <div className="h-2.5 bg-gray-100 dark:bg-[#252830] rounded w-1/5" />
         </div>
       </div>
     ))}
@@ -166,8 +166,8 @@ export default function NotificationsPage() {
   return (
     <DashboardLayout custom={true}>
       {/* Header */}
-      <div className="flex justify-between items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF]">
-        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold">Notifications</h1>
+      <div className="flex justify-between items-center pb-[27px] lg:pb-8 px-4 lg:px-12 mt-6 lg:mt-[64px] border-b border-[#D2D9DF] dark:border-[#2D313A]">
+        <h1 className="text-[24px] lg:text-[32px] leading-none font-bold dark:text-white">Notifications</h1>
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllAsRead}
@@ -180,7 +180,7 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      <div className="bg-white min-h-screen">
+      <div className="bg-white dark:bg-[#121316] min-h-screen">
         {/* Tab row */}
         <div className="px-4 lg:px-12 py-5 flex items-center gap-3">
           {(['all', 'unread'] as FilterTab[]).map((t) => (
@@ -189,8 +189,8 @@ export default function NotificationsPage() {
               onClick={() => setTab(t)}
               className={`border px-4.5 py-3 rounded-xl font-medium text-sm transition-all whitespace-nowrap cursor-pointer ${
                 tab === t
-                  ? 'bg-white border-black font-semibold text-[#180426]'
-                  : 'text-[#4E5255] border-[#D2D9DF] hover:border-gray-400'
+                  ? 'bg-white dark:bg-[#252830] border-black dark:border-transparent font-semibold text-[#180426] dark:text-white'
+                  : 'text-[#4E5255] dark:text-[#9CA3AF] border-[#D2D9DF] dark:border-[#2D313A] hover:border-gray-400 dark:hover:border-[#717784]'
               }`}
             >
               {t === 'all' ? 'All' : `Unread${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
@@ -198,22 +198,22 @@ export default function NotificationsPage() {
           ))}
         </div>
 
-        <div className="border-t border-[#D2D9DF]">
+        <div className="border-t border-[#D2D9DF] dark:border-[#2D313A]">
           {loading ? (
             <Skeleton />
           ) : displayed.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 gap-3 text-center px-4">
-              <div className="w-14 h-14 rounded-full bg-[#F5EBFF] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
                 {tab === 'unread' ? (
                   <CheckCheck size={24} className="text-[#870BD6]" />
                 ) : (
                   <Inbox size={24} className="text-[#870BD6]" />
                 )}
               </div>
-              <p className="font-semibold text-gray-700">
+              <p className="font-semibold text-gray-700 dark:text-white">
                 {tab === 'unread' ? "You're all caught up" : 'No notifications yet'}
               </p>
-              <p className="text-sm text-[#60666B] max-w-xs">
+              <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] max-w-xs">
                 {tab === 'unread'
                   ? 'No unread notifications. Check back later.'
                   : "Activity from your mentorships, communities, and devotionals will appear here."}
@@ -224,11 +224,11 @@ export default function NotificationsPage() {
               {groups.map(({ label, items }) => (
                 <div key={label}>
                   {/* Date group header */}
-                  <p className="text-xs font-semibold text-[#60666B] uppercase tracking-wide px-4 lg:px-12 py-3 bg-[#F8F9FC] border-b border-[#F0F2F4]">
+                  <p className="text-xs font-semibold text-[#60666B] dark:text-[#9CA3AF] uppercase tracking-wide px-4 lg:px-12 py-3 bg-[#F8F9FC] dark:bg-[#181A1F] border-b border-[#F0F2F4] dark:border-[#2D313A]">
                     {label}
                   </p>
 
-                  <div className="divide-y divide-[#F5F6F7]">
+                  <div className="divide-y divide-[#F5F6F7] dark:divide-[#2D313A]">
                     {items.map((n) => {
                       const accent = typeAccent(n.type);
                       const initial = n.title.charAt(0).toUpperCase();
@@ -239,8 +239,8 @@ export default function NotificationsPage() {
                           key={n.id}
                           onClick={() => handleClick(n)}
                           className={`flex gap-4 px-4 lg:px-12 py-4 transition-colors ${
-                            !n.isRead ? 'bg-[#FBF6FF]' : 'bg-white'
-                          } ${isClickable ? 'cursor-pointer hover:bg-[#F8F9FC]' : ''}`}
+                            !n.isRead ? 'bg-[#FBF6FF] dark:bg-[#252830]' : 'bg-white dark:bg-[#121316]'
+                          } ${isClickable ? 'cursor-pointer hover:bg-[#F8F9FC] dark:hover:bg-[#181A1F]' : ''}`}
                         >
                           {/* Type icon bubble */}
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm ${accent}`}>
@@ -249,14 +249,14 @@ export default function NotificationsPage() {
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
-                              <p className={`text-sm leading-snug ${!n.isRead ? 'font-semibold text-[#180426]' : 'text-[#3C3E40]'}`}>
+                              <p className={`text-sm leading-snug ${!n.isRead ? 'font-semibold text-[#180426] dark:text-white' : 'text-[#3C3E40] dark:text-[#E2E4E9]'}`}>
                                 {n.title}
                               </p>
-                              <span className="text-[11px] text-[#B9C2CA] shrink-0 mt-0.5">
+                              <span className="text-[11px] text-[#B9C2CA] dark:text-[#717784] shrink-0 mt-0.5">
                                 {timeAgo(n.createdAt)}
                               </span>
                             </div>
-                            <p className="text-xs text-[#60666B] leading-relaxed mt-0.5 line-clamp-2">
+                            <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] leading-relaxed mt-0.5 line-clamp-2">
                               {n.body}
                             </p>
                           </div>

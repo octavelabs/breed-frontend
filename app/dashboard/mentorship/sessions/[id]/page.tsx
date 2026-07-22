@@ -50,13 +50,13 @@ const STATUS_CONFIG: Record<string, { label: string; classes: string }> = {
 
 function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 py-3 border-b border-[#F0F2F4] last:border-0">
-      <div className="w-8 h-8 rounded-lg bg-[#FBF6FF] flex items-center justify-center shrink-0 mt-0.5">
+    <div className="flex items-start gap-3 py-3 border-b border-[#F0F2F4] dark:border-[#2D313A] last:border-0">
+      <div className="w-8 h-8 rounded-lg bg-[#FBF6FF] dark:bg-[#2D1B4E] flex items-center justify-center shrink-0 mt-0.5">
         <Icon size={15} className="text-[#870BD6]" />
       </div>
       <div>
-        <p className="text-xs text-[#60666B] mb-0.5">{label}</p>
-        <div className="text-sm font-medium text-[#180426]">{value}</div>
+        <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-0.5">{label}</p>
+        <div className="text-sm font-medium text-[#180426] dark:text-white">{value}</div>
       </div>
     </div>
   );
@@ -80,24 +80,24 @@ function CancelModal({ title, cancelling, onClose, onConfirm }: {
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="relative w-full max-w-sm bg-white rounded-[20px] shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="px-6 py-5 border-b border-gray-200 flex items-start justify-between">
+      <div className="relative w-full max-w-sm bg-white dark:bg-[#181A1F] rounded-[20px] shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="px-6 py-5 border-b border-gray-200 dark:border-[#2D313A] flex items-start justify-between">
           <div>
             <div className="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center mb-3">
               <XCircle size={22} className="text-red-600" />
             </div>
-            <h2 className="text-[20px] font-bold leading-none">Cancel Session</h2>
-            <p className="text-sm text-[#60666B] mt-1">This cannot be undone.</p>
+            <h2 className="text-[20px] font-bold leading-none dark:text-white">Cancel Session</h2>
+            <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] mt-1">This cannot be undone.</p>
           </div>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 text-gray-400"><X size={18} /></button>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-[#252830] text-gray-400 dark:text-[#717784]"><X size={18} /></button>
         </div>
         <div className="p-6">
-          <p className="text-sm text-[#292A2B] pb-4 border-b border-dashed border-[#B9C2CA]">
+          <p className="text-sm text-[#292A2B] dark:text-[#E2E4E9] pb-4 border-b border-dashed border-[#B9C2CA] dark:border-[#2D313A]">
             <span className="font-semibold">&ldquo;{title}&rdquo;</span> will be cancelled. Both you and your mentee will be notified.
           </p>
-          <p className="text-sm text-[#60666B] mt-4 mb-5">Are you sure you want to continue?</p>
+          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] mt-4 mb-5">Are you sure you want to continue?</p>
           <div className="flex gap-3">
-            <Button buttonType="bordered" customClass="!w-1/2 !h-[44px] !border-[#60666B] !text-[#60666B]" onClick={onClose} disabled={cancelling}>
+            <Button buttonType="bordered" customClass="!w-1/2 !h-[44px] !border-[#60666B] dark:!border-[#2D313A] !text-[#60666B] dark:!text-[#9CA3AF]" onClick={onClose} disabled={cancelling}>
               Keep It
             </Button>
             <Button buttonType="custom" customClass="!w-1/2 !h-[44px] text-white !bg-[#E44E4E]" loading={cancelling} onClick={onConfirm}>
@@ -166,13 +166,13 @@ export default function SessionDetailPage() {
   if (loading) {
     return (
       <DashboardLayout custom={true}>
-        <div className="bg-white pt-6 pb-8 px-4 lg:px-10 animate-pulse">
-          <div className="h-7 bg-gray-200 rounded w-1/3 mb-6" />
+        <div className="bg-white dark:bg-[#121316] pt-6 pb-8 px-4 lg:px-10 animate-pulse">
+          <div className="h-7 bg-gray-200 dark:bg-[#252830] rounded w-1/3 mb-6" />
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5 lg:w-[75%]">
             <div className="space-y-5">
-              <div className="h-56 bg-gray-200 rounded-2xl" />
+              <div className="h-56 bg-gray-200 dark:bg-[#252830] rounded-2xl" />
             </div>
-            <div className="h-64 bg-gray-200 rounded-2xl" />
+            <div className="h-64 bg-gray-200 dark:bg-[#252830] rounded-2xl" />
           </div>
         </div>
       </DashboardLayout>
@@ -182,8 +182,8 @@ export default function SessionDetailPage() {
   if (error || !session) {
     return (
       <DashboardLayout custom={true}>
-        <div className="bg-white flex flex-col items-center justify-center h-64 gap-4">
-          <p className="text-gray-500">{error ?? "Session not found."}</p>
+        <div className="bg-white dark:bg-[#121316] flex flex-col items-center justify-center h-64 gap-4">
+          <p className="text-gray-500 dark:text-[#9CA3AF]">{error ?? "Session not found."}</p>
           <button onClick={() => router.back()} className="text-[#870BD6] text-sm underline">Go back</button>
         </div>
       </DashboardLayout>
@@ -202,21 +202,21 @@ export default function SessionDetailPage() {
 
   return (
     <DashboardLayout custom={true}>
-      <div className="bg-white">
+      <div className="bg-white dark:bg-[#121316]">
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 lg:px-10 pt-6 pb-5 border-b border-[#F0F2F4]">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <ArrowLeft size={18} className="text-[#60666B]" />
+        <div className="flex items-center gap-3 px-4 lg:px-10 pt-6 pb-5 border-b border-[#F0F2F4] dark:border-[#2D313A]">
+          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-[#252830] rounded-full transition-colors">
+            <ArrowLeft size={18} className="text-[#60666B] dark:text-[#9CA3AF]" />
           </button>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-[22px] lg:text-[26px] leading-tight font-bold text-[#180426]">{session.title}</h1>
+              <h1 className="text-[22px] lg:text-[26px] leading-tight font-bold text-[#180426] dark:text-white">{session.title}</h1>
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusCfg.classes}`}>{statusCfg.label}</span>
             </div>
-            <p className="text-sm text-[#60666B] mt-0.5">
+            <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] mt-0.5">
               <span className="hover:text-[#870BD6] cursor-pointer" onClick={() => router.back()}>Mentorship</span>
               <span className="mx-2">/</span>
-              <span className="text-[#180426] font-medium">{session.title}</span>
+              <span className="text-[#180426] dark:text-white font-medium">{session.title}</span>
             </p>
           </div>
         </div>
@@ -227,14 +227,14 @@ export default function SessionDetailPage() {
 
               {/* Left column */}
               <div className="space-y-5">
-                <div className="bg-white border border-[#E3E8EF] rounded-2xl p-6">
+                <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-6">
                   <div className="flex items-center gap-2 mb-4 flex-wrap">
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusCfg.classes}`}>{statusCfg.label}</span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FBF6FF] text-[#870BD6]">Mentorship Session</span>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FBF6FF] dark:bg-[#2D1B4E] text-[#870BD6]">Mentorship Session</span>
                   </div>
-                  <h2 className="text-2xl font-bold text-[#180426] mb-1">{session.title}</h2>
+                  <h2 className="text-2xl font-bold text-[#180426] dark:text-white mb-1">{session.title}</h2>
                   {session.description && (
-                    <p className="text-[#4E5255] text-sm leading-relaxed mb-5 pb-5 border-b border-[#F0F2F4]">{session.description}</p>
+                    <p className="text-[#4E5255] dark:text-[#9CA3AF] text-sm leading-relaxed mb-5 pb-5 border-b border-[#F0F2F4] dark:border-[#2D313A]">{session.description}</p>
                   )}
 
                   <InfoRow icon={Calendar} label="Date" value={scheduledDate.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} />
@@ -244,8 +244,8 @@ export default function SessionDetailPage() {
                     <div className="flex items-center gap-2">
                       <Avatar user={session.mentor} />
                       <div>
-                        <p className="font-semibold text-[#180426] text-sm">{session.mentor.firstName} {session.mentor.lastName}</p>
-                        {session.mentor.username && <p className="text-xs text-[#60666B]">@{session.mentor.username}</p>}
+                        <p className="font-semibold text-[#180426] dark:text-white text-sm">{session.mentor.firstName} {session.mentor.lastName}</p>
+                        {session.mentor.username && <p className="text-xs text-[#60666B] dark:text-[#9CA3AF]">@{session.mentor.username}</p>}
                       </div>
                     </div>
                   } />
@@ -253,15 +253,15 @@ export default function SessionDetailPage() {
                     <div className="flex items-center gap-2">
                       <Avatar user={session.disciple} />
                       <div>
-                        <p className="font-semibold text-[#180426] text-sm">{session.disciple.firstName} {session.disciple.lastName}</p>
-                        {session.disciple.username && <p className="text-xs text-[#60666B]">@{session.disciple.username}</p>}
+                        <p className="font-semibold text-[#180426] dark:text-white text-sm">{session.disciple.firstName} {session.disciple.lastName}</p>
+                        {session.disciple.username && <p className="text-xs text-[#60666B] dark:text-[#9CA3AF]">@{session.disciple.username}</p>}
                       </div>
                     </div>
                   } />
                   {session.notes && (
-                    <div className="mt-4 pt-4 border-t border-[#F0F2F4]">
-                      <p className="text-xs text-[#60666B] mb-1 font-medium">Notes</p>
-                      <p className="text-sm text-[#292A2B] leading-relaxed">{session.notes}</p>
+                    <div className="mt-4 pt-4 border-t border-[#F0F2F4] dark:border-[#2D313A]">
+                      <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] mb-1 font-medium">Notes</p>
+                      <p className="text-sm text-[#292A2B] dark:text-[#E2E4E9] leading-relaxed">{session.notes}</p>
                     </div>
                   )}
                 </div>
@@ -270,8 +270,8 @@ export default function SessionDetailPage() {
               {/* Right column */}
               <div className="space-y-5">
                 {/* Actions */}
-                <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 space-y-3">
-                  <h3 className="font-semibold text-[#180426] text-sm mb-1">Actions</h3>
+                <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-5 space-y-3">
+                  <h3 className="font-semibold text-[#180426] dark:text-white text-sm mb-1">Actions</h3>
 
                   {(session.status === "SCHEDULED" || session.status === "IN_PROGRESS") && (
                     canJoin ? (
@@ -282,7 +282,7 @@ export default function SessionDetailPage() {
                         <Video size={16} /> Join Session
                       </Link>
                     ) : (
-                      <div className="w-full text-center py-3 rounded-full text-sm font-medium bg-[#F8F9FC] text-[#60666B] border border-[#E3E8EF]">
+                      <div className="w-full text-center py-3 rounded-full text-sm font-medium bg-[#F8F9FC] dark:bg-[#252830] text-[#60666B] dark:text-[#9CA3AF] border border-[#E3E8EF] dark:border-[#2D313A]">
                         {now < sessionStart
                           ? `Opens at ${scheduledDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`
                           : "Session has ended"}
@@ -295,7 +295,7 @@ export default function SessionDetailPage() {
                     className={`w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold border transition-all ${
                       copied
                         ? "bg-[#ECFDF3] border-[#ABEFC6] text-[#067647]"
-                        : "border-[#D2D9DF] text-[#4E5255] hover:border-[#870BD6] hover:text-[#870BD6]"
+                        : "border-[#D2D9DF] dark:border-[#2D313A] text-[#4E5255] dark:text-[#9CA3AF] hover:border-[#870BD6] hover:text-[#870BD6]"
                     }`}
                   >
                     {copied ? <><Check size={15} /> Link Copied!</> : <><Copy size={15} /> Copy Join Link</>}
@@ -313,10 +313,10 @@ export default function SessionDetailPage() {
                 </div>
 
                 {/* Join link card */}
-                <div className="bg-[#FBF6FF] border border-[#E7C8FF] rounded-2xl p-5">
-                  <h3 className="font-semibold text-[#180426] text-sm mb-3">Session Link</h3>
-                  <div className="bg-white border border-[#E7C8FF] rounded-xl px-3 py-2.5 mb-3">
-                    <p className="text-xs text-[#60666B] font-mono break-all leading-relaxed">{joinLink}</p>
+                <div className="bg-[#FBF6FF] dark:bg-[#2D1B4E] border border-[#E7C8FF] dark:border-[#4B2A6E] rounded-2xl p-5">
+                  <h3 className="font-semibold text-[#180426] dark:text-white text-sm mb-3">Session Link</h3>
+                  <div className="bg-white dark:bg-[#181A1F] border border-[#E7C8FF] dark:border-[#2D313A] rounded-xl px-3 py-2.5 mb-3">
+                    <p className="text-xs text-[#60666B] dark:text-[#9CA3AF] font-mono break-all leading-relaxed">{joinLink}</p>
                   </div>
                   <button onClick={handleCopy} className="w-full text-xs font-semibold text-[#870BD6] hover:underline flex items-center justify-center gap-1">
                     {copied ? <><Check size={11} /> Copied!</> : <><Copy size={11} /> Copy link</>}
@@ -324,17 +324,17 @@ export default function SessionDetailPage() {
                 </div>
 
                 {/* Session info */}
-                <div className="bg-white border border-[#E3E8EF] rounded-2xl p-5 space-y-3 text-sm">
+                <div className="bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl p-5 space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#60666B]">Platform</span>
-                    <span className="font-medium text-[#180426]">Breed Live</span>
+                    <span className="text-[#60666B] dark:text-[#9CA3AF]">Platform</span>
+                    <span className="font-medium text-[#180426] dark:text-white">Breed Live</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#60666B]">Duration</span>
-                    <span className="font-medium text-[#180426]">{session.duration} min</span>
+                    <span className="text-[#60666B] dark:text-[#9CA3AF]">Duration</span>
+                    <span className="font-medium text-[#180426] dark:text-white">{session.duration} min</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#60666B]">Status</span>
+                    <span className="text-[#60666B] dark:text-[#9CA3AF]">Status</span>
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusCfg.classes}`}>{statusCfg.label}</span>
                   </div>
                 </div>

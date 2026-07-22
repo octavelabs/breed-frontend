@@ -104,8 +104,8 @@ function CountryCodeSelector({
         onClick={() => !disabled && setOpen(o => !o)}
         className={`w-full h-[48px] flex items-center gap-1.5 px-3 rounded-[10px] text-sm font-medium transition-colors ${
           disabled
-            ? 'bg-[#d9d9d93d] text-[#60666B] cursor-default'
-            : 'border border-[#B9C2CA] bg-white text-[#180426] hover:border-[#870BD6] cursor-pointer'
+            ? 'bg-[#d9d9d93d] text-[#60666B] dark:text-[#9CA3AF] cursor-default'
+            : 'border border-[#B9C2CA] dark:border-[#2D313A] bg-white dark:bg-[#252830] text-[#180426] dark:text-white hover:border-[#870BD6] cursor-pointer'
         }`}
       >
         <span className="text-lg leading-none">{flag(selected.code)}</span>
@@ -114,37 +114,37 @@ function CountryCodeSelector({
       </button>
 
       {open && (
-        <div className="absolute z-50 top-[52px] left-0 w-64 bg-white border border-[#E3E8EF] rounded-2xl shadow-xl overflow-hidden">
+        <div className="absolute z-50 top-[52px] left-0 w-64 bg-white dark:bg-[#181A1F] border border-[#E3E8EF] dark:border-[#2D313A] rounded-2xl shadow-xl overflow-hidden">
           {/* Search */}
-          <div className="p-2 border-b border-[#E3E8EF]">
-            <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50 rounded-xl">
-              <Search size={13} className="text-gray-400 shrink-0" />
+          <div className="p-2 border-b border-[#E3E8EF] dark:border-[#2D313A]">
+            <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-50 dark:bg-[#252830] rounded-xl">
+              <Search size={13} className="text-gray-400 dark:text-[#717784] shrink-0" />
               <input
                 autoFocus
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Search country…"
-                className="flex-1 text-xs bg-transparent outline-none text-[#180426] placeholder:text-gray-400"
+                className="flex-1 text-xs bg-transparent outline-none text-[#180426] dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#717784]"
               />
             </div>
           </div>
           {/* List */}
           <ul className="max-h-52 overflow-y-auto py-1">
             {filtered.length === 0 && (
-              <li className="px-4 py-3 text-xs text-gray-400 text-center">No results</li>
+              <li className="px-4 py-3 text-xs text-gray-400 dark:text-[#717784] text-center">No results</li>
             )}
             {filtered.map(c => (
               <li key={`${c.code}-${c.dial}`}>
                 <button
                   type="button"
                   onClick={() => { onChange(c.dial); setOpen(false); setQuery(''); }}
-                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-purple-50 transition-colors text-left cursor-pointer ${
-                    c.dial === value ? 'bg-purple-50 font-semibold text-[#870BD6]' : 'text-[#180426]'
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-purple-50 dark:hover:bg-[#2D1B4E] transition-colors text-left cursor-pointer ${
+                    c.dial === value ? 'bg-purple-50 dark:bg-[#2D1B4E] font-semibold text-[#870BD6]' : 'text-[#180426] dark:text-white'
                   }`}
                 >
                   <span className="text-base leading-none">{flag(c.code)}</span>
                   <span className="flex-1 truncate">{c.name}</span>
-                  <span className="text-xs text-gray-400 shrink-0">{c.dial}</span>
+                  <span className="text-xs text-gray-400 dark:text-[#717784] shrink-0">{c.dial}</span>
                 </button>
               </li>
             ))}
@@ -250,11 +250,15 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
   };
 
   const inputVariant = (isEditing ? "outlined" : "primary") as "outlined" | "primary";
-  const selectClass = `w-full h-[48px] px-4 text-sm text-[#60666B] rounded-[10px] outline-none ${
-    isEditing ? "border border-[#B9C2CA] bg-white" : "bg-[#d9d9d93d]"
+  const selectClass = `w-full h-[48px] px-4 text-sm rounded-[10px] outline-none ${
+    isEditing
+      ? "border border-[#B9C2CA] dark:border-[#2D313A] bg-white dark:bg-[#252830] text-[#60666B] dark:text-white"
+      : "bg-[#d9d9d93d] text-[#60666B] dark:text-[#9CA3AF]"
   }`;
-  const textareaClass = `w-full px-4 py-3 text-sm text-[#60666B] rounded-[10px] outline-none resize-none ${
-    isEditing ? "border border-[#B9C2CA]" : "bg-[#d9d9d93d]"
+  const textareaClass = `w-full px-4 py-3 text-sm rounded-[10px] outline-none resize-none ${
+    isEditing
+      ? "border border-[#B9C2CA] dark:border-[#2D313A] dark:bg-[#252830] text-[#60666B] dark:text-white"
+      : "bg-[#d9d9d93d] text-[#60666B] dark:text-[#9CA3AF]"
   }`;
 
   return (
@@ -270,7 +274,7 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
             className="relative w-24 h-24 rounded-full mb-2 cursor-pointer group"
             onClick={() => avatarInputRef.current?.click()}
           >
-            <div className="w-full h-full rounded-full border border-gray-300 overflow-hidden flex items-center justify-center bg-[#F5EBFF]">
+            <div className="w-full h-full rounded-full border border-gray-300 dark:border-[#2D313A] overflow-hidden flex items-center justify-center bg-[#F5EBFF] dark:bg-[#2D1B4E]">
               {avatarPreview || user?.avatarUrl ? (
                 <img
                   src={avatarPreview ?? user!.avatarUrl!}
@@ -311,11 +315,11 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
           {isEditing && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">First name</label>
                 <Input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First name" variant="outlined" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Last name</label>
                 <Input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last name" variant="outlined" />
               </div>
             </div>
@@ -323,7 +327,7 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
 
           {/* Email — always read-only */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Email address</label>
             <Input type="email" id="email" name="email" value={formData.email} onChange={() => {}} placeholder="Email" isDisabled={true} variant="primary" />
           </div>
 
@@ -359,7 +363,7 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
 
           {/* Bio */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Bio</label>
             <textarea
               name="bio"
               value={formData.bio}
@@ -374,11 +378,11 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
           {/* Date of Birth + Gender */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date of birth</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Date of birth</label>
               <Input type="date" id="dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} placeholder="" isDisabled={!isEditing} variant={inputVariant} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Gender</label>
               <select
                 name="gender"
                 value={formData.gender}
@@ -396,18 +400,18 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
           {/* Country + City */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Country</label>
               <Input type="text" id="country" name="country" value={formData.country} onChange={handleChange} placeholder="Country" isDisabled={!isEditing} variant={inputVariant} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">City</label>
               <Input type="text" id="city" name="city" value={formData.city} onChange={handleChange} placeholder="City" isDisabled={!isEditing} variant={inputVariant} />
             </div>
           </div>
 
           {/* Church */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Church</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-[#E2E4E9] mb-1">Church</label>
             <Input type="text" id="churchName" name="churchName" value={formData.churchName} onChange={handleChange} placeholder="Your church name" isDisabled={!isEditing} variant={inputVariant} />
           </div>
 
@@ -421,7 +425,7 @@ const MyProfile = ({ setShowSelectedTab }: { setShowSelectedTab: (val: boolean) 
                 <button
                   onClick={() => setIsEditing(false)}
                   disabled={saving}
-                  className="flex-1 h-[58px] border border-[#D2D9DF] rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  className="flex-1 h-[58px] border border-[#D2D9DF] dark:border-[#2D313A] rounded-full text-sm font-semibold text-gray-700 dark:text-[#E2E4E9] hover:bg-gray-50 dark:hover:bg-[#252830] disabled:opacity-50 transition-colors"
                 >
                   Cancel
                 </button>
