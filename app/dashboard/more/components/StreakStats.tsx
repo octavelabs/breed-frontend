@@ -27,49 +27,49 @@ const ACTIVITY_META: Record<
   DEVOTIONAL_READ: {
     label: 'Devotionals',
     colour: '#B54708',
-    darkColour: '#FCD34D',
+    darkColour: '#9CA3AF',
     bg: '#FFF6E5',
     border: '#F9DBAF',
   },
   PRAYER_PRAYED: {
     label: 'Bonds',
     colour: '#067647',
-    darkColour: '#34D399',
+    darkColour: '#9CA3AF',
     bg: '#ECFDF3',
     border: '#ABEFC6',
   },
   LESSON_COMPLETED: {
     label: 'Learning',
     colour: '#175CD3',
-    darkColour: '#60A5FA',
+    darkColour: '#9CA3AF',
     bg: '#EFF8FF',
     border: '#B2DDFF',
   },
   COMMUNITY_ENGAGED: {
     label: 'Community',
     colour: '#6941C6',
-    darkColour: '#A78BFA',
+    darkColour: '#9CA3AF',
     bg: '#F4F3FF',
     border: '#D9D6FE',
   },
   MENTORSHIP_TASK_COMPLETED: {
     label: 'Tasks',
     colour: '#870BD6',
-    darkColour: '#C084FC',
+    darkColour: '#9CA3AF',
     bg: '#F5EBFF',
     border: '#E7C8FF',
   },
   MENTORSHIP_SESSION_ATTENDED: {
     label: 'Sessions',
     colour: '#C11574',
-    darkColour: '#F472B6',
+    darkColour: '#9CA3AF',
     bg: '#FDF2FA',
     border: '#FCCEEE',
   },
   EDIFY: {
     label: 'Edify',
     colour: '#5B26B1',
-    darkColour: '#C084FC',
+    darkColour: '#9CA3AF',
     bg: '#F5EBFF',
     border: '#C084FC',
   },
@@ -257,7 +257,7 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-2xl border border-[#F0F2F4] dark:border-[#2D313A] bg-white dark:bg-[#181A1F] px-4 py-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] dark:bg-[#252830] flex items-center justify-center shrink-0">
-              <Flash size={18} color={isDark ? '#C084FC' : '#870BD6'} />
+              <Flash size={18} color={isDark ? '#9CA3AF' : '#870BD6'} />
             </div>
             <div>
               <p className="text-2xl font-bold text-[#180426] dark:text-white leading-none">{totalActiveDays}</p>
