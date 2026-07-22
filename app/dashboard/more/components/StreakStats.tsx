@@ -186,6 +186,8 @@ function ActivityCalendar({ calendar }: { calendar: CalendarDay[] }) {
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function StreakStats({ showDivider = true }: { showDivider?: boolean }) {
+  const isDark = useDarkMode();
+
   const { data: stats = null, isLoading: loading } = useQuery({
     queryKey: ['streak-stats'],
     queryFn: () =>
@@ -209,8 +211,6 @@ export default function StreakStats({ showDivider = true }: { showDivider?: bool
       </div>
     );
   }
-
-  const isDark = useDarkMode();
 
   const { overall, breakdown, calendar, totalActiveDays, mostActiveType } = stats;
   const mostActiveMeta = mostActiveType ? ACTIVITY_META[mostActiveType] : null;
