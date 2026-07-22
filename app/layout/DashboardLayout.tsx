@@ -22,7 +22,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, custom, cus
         <SideBar />
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <DashboardHeader />
-          <main className={`flex-1 pb-[68px] lg:pb-0 overflow-auto ${custom ? "" : "p-4 pt-6 lg:p-[35px] xl:p-[70px] lg:pt-[40px] xl:pt-[79px] relative"} ${customClass}`}>
+          <main className={`flex-1 pb-[96px] lg:pb-0 overflow-auto ${custom ? "" : "p-4 pt-6 lg:p-[35px] xl:p-[70px] lg:pt-[40px] xl:pt-[79px] relative"} ${customClass}`}>
             {children}
           </main>
         </div>
