@@ -296,7 +296,6 @@ const DisplayPreference = ({
           <Button
             onClick={handleSave}
             loading={saving}
-            disabled={saving}
             customClass="w-full h-[58px] text-white"
           >
             Save Changes
