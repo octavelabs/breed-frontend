@@ -457,6 +457,9 @@ function FeaturedSkeleton() {
   );
 }
 
+// ── Breed logo as base64 data URI so html2canvas captures it without network requests ──
+const BREED_LOGO_SRC = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI0IiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTI0IDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNOS4yNTE1NiAxNy44NTIzQzEwLjk2NTYgMTYuMDE4IDEzLjE5MDkgMTUuMTAwOCAxNS45MjczIDE1LjEwMDhDMTkuMTQ0OSAxNS4xMDA4IDIxLjYyNTggMTYuMTUzMyAyMy4zNjk5IDE4LjI1ODJDMjUuMTE0IDIwLjMzMzEgMjUuOTg2IDIzLjQxNTQgMjUuOTg2IDI3LjUwNUMyNS45ODYgMzEuNjI0OCAyNS4xMTQgMzQuNzM3MSAyMy4zNjk5IDM2Ljg0MjFDMjEuNjI1OCAzOC45NDcgMTkuMTQ0OSAzOS45OTk1IDE1LjkyNzMgMzkuOTk5NUMxMi42MTk1IDM5Ljk5OTUgMTAuMDkzNiAzOC42OTE0IDguMzQ5NDQgMzYuMDc1M0w3LjU4MjYzIDM5LjQ1ODJIMC4yNzUzOTFWNi43NTYxSDkuMjUxNTZWMTcuODUyM1pNMTMuMTMwNyAyMS43MzE0QzExLjgwNzYgMjEuNzMxNCAxMC44MTUzIDIyLjIxMjYgMTAuMTUzNyAyMy4xNzQ4QzkuNDkyMTMgMjQuMTA3IDkuMTYxMzUgMjUuMzI0OSA5LjE2MTM1IDI2LjgyODVWMjguMzE3QzkuMTYxMzUgMjkuODIwNSA5LjQ5MjEzIDMxLjAzODQgMTAuMTUzNyAzMS45NzA2QzEwLjgxNTMgMzIuOTAyOCAxMS44MDc2IDMzLjM2ODkgMTMuMTMwNyAzMy4zNjg5QzE1LjcxNjggMzMuMzY4OSAxNy4wMDk5IDMxLjgzNTMgMTcuMDA5OSAyOC43NjhWMjYuMzc3NEMxNy4wMDk5IDIzLjI4MDEgMTUuNzE2OCAyMS43MzE0IDEzLjEzMDcgMjEuNzMxNFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik00MC40NjU1IDE1LjU5NjlDNDEuMTU3MSAxNS41OTY5IDQxLjc3MzYgMTUuNjg3MSA0Mi4zMTQ4IDE1Ljg2NzZDNDIuODU2MSAxNi4wMTc5IDQzLjEyNjggMTYuMTA4MSA0My4xMjY4IDE2LjEzODJWMjMuNjcxSDQwLjIzOTlDMzguMzc1NiAyMy42NzEgMzcuMDIyNCAyNC4xNTIxIDM2LjE4MDQgMjUuMTE0NEMzNS4zNjg1IDI2LjA3NjYgMzQuOTYyNSAyNy41MDUgMzQuOTYyNSAyOS4zOTk1VjM5Ljk5OTVIMjUuOTg2M1YxNi4xODMzSDMzLjMzODdMMzMuOTI1MSAxOS43OTE4QzM0LjQ2NjMgMTguNDA4NiAzNS4zMjM0IDE3LjM3MTEgMzYuNDk2MSAxNi42Nzk1QzM3LjY2ODkgMTUuOTU3OCAzOC45OTIgMTUuNTk2OSA0MC40NjU1IDE1LjU5NjlaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNTYuNTIyNiAxNS4xMDExQzYwLjg4MjkgMTUuMTAxMSA2NC4yMDU3IDE2LjEyMzUgNjYuNDkxMSAxOC4xNjgzQzY4LjgwNjUgMjAuMjEzMSA2OS45NjQzIDIzLjM0MDUgNjkuOTY0MyAyNy41NTA0VjI5LjA4NDFINTIuMTAyMUM1Mi4xMDIxIDMwLjc5ODEgNTIuNDc4IDMyLjA5MTEgNTMuMjI5OCAzMi45NjMyQzU0LjAxMTcgMzMuODM1MyA1NS4yMjk1IDM0LjI3MTMgNTYuODgzNCAzNC4yNzEzQzU4LjM4NyAzNC4yNzEzIDU5LjQ4NDYgMzMuOTU1NSA2MC4xNzYyIDMzLjMyNDFDNjAuODk3OSAzMi42OTI2IDYxLjI1ODcgMzEuODUwNiA2MS4yNTg3IDMwLjc5ODFINjkuOTY0M0M2OS45NjQzIDMzLjY4NDkgNjguODY2NyAzNS45NDAyIDY2LjY3MTUgMzcuNTY0MUM2NC40NzYzIDM5LjE4NzkgNjEuMjczOCAzOS45OTk4IDU3LjA2MzkgMzkuOTk5OEM1Mi42NDM0IDM5Ljk5OTggNDkuMjE1MyAzOC45Nzc0IDQ2Ljc3OTYgMzYuOTMyNkM0NC4zNDM4IDM0Ljg1NzcgNDMuMTI2IDMxLjczMDMgNDMuMTI2IDI3LjU1MDRDNDMuMTI2IDIzLjQ2MDggNDQuMzEzOCAyMC4zNjM1IDQ2LjY4OTQgMTguMjU4NUM0OS4wNjUgMTYuMTUzNiA1Mi4zNDI3IDE1LjEwMTEgNTYuNTIyNiAxNS4xMDExWk01Ni44ODM0IDIwLjgyOTZDNTQuMDU2OCAyMC44Mjk2IDUyLjQ3OCAyMi4xNjc3IDUyLjE0NzMgMjQuODQ0MUg2MC44OTc5QzYwLjg5NzkgMjMuNjExMSA2MC41MzcgMjIuNjMzOCA1OS44MTUzIDIxLjkxMjFDNTkuMTIzNyAyMS4xOTA0IDU4LjE0NjQgMjAuODI5NiA1Ni44ODM0IDIwLjgyOTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNODMuMzYxNCAxNS4xMDA4Qzg3LjcyMTcgMTUuMTAwOCA5MS4wNDQ2IDE2LjEyMzIgOTMuMzMgMTguMTY4MUM5NS42NDU0IDIwLjIxMjkgOTYuODAzMSAyMy4zNDAzIDk2LjgwMzEgMjcuNTUwMlYyOS4wODM4SDc4Ljk0MUM3OC45NDEgMzAuNzk3OSA3OS4zMTY5IDMyLjA5MDkgODAuMDY4NyAzMi45NjNDODAuODUwNSAzMy44MzUgODIuMDY4NCAzNC4yNzEgODMuNzIyMyAzNC4yNzFDODUuMjI1OCAzNC4yNzEgODYuMzIzNCAzMy45NTUzIDg3LjAxNTEgMzMuMzIzOEM4Ny43MzY4IDMyLjY5MjMgODguMDk3NiAzMS44NTAzIDg4LjA5NzYgMzAuNzk3OUg5Ni44MDMxQzk2LjgwMzEgMzMuNjg0NyA5NS43MDU2IDM1Ljk0IDkzLjUxMDQgMzcuNTYzOEM5MS4zMTUyIDM5LjE4NzYgODguMTEyNiAzOS45OTk2IDgzLjkwMjcgMzkuOTk5NkM3OS40ODIzIDM5Ljk5OTYgNzYuMDU0MiAzOC45NzcxIDczLjYxODUgMzYuOTMyM0M3MS4xODI3IDM0Ljg1NzQgNjkuOTY0OCAzMS43MzAxIDY5Ljk2NDggMjcuNTUwMkM2OS45NjQ4IDIzLjQ2MDUgNzEuMTUyNiAyMC4zNjMyIDczLjUyODIgMTguMjU4M0M3NS45MDM5IDE2LjE1MzMgNzkuMTgxNiAxNS4xMDA4IDgzLjM2MTQgMTUuMTAwOFpNODMuNzIyMyAyMC44MjkzQzgwLjg5NTYgMjAuODI5MyA3OS4zMTY5IDIyLjE2NzUgNzguOTg2MSAyNC44NDM4SDg3LjczNjhDODcuNzM2OCAyMy42MTA5IDg3LjM3NTkgMjIuNjMzNiA4Ni42NTQyIDIxLjkxMTlDODUuOTYyNiAyMS4xOTAyIDg0Ljk4NTMgMjAuODI5MyA4My43MjIzIDIwLjgyOTNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTE1LjIwNiAzOS40NTg1TDExNC40MzkgMzYuMDc1NUMxMTIuNjk1IDM4LjY5MTcgMTEwLjE2OSAzOS45OTk4IDEwNi44NjEgMzkuOTk5OEMxMDMuNjQ0IDM5Ljk5OTggMTAxLjE2MyAzOC45NDczIDk5LjQxODkgMzYuODQyM0M5Ny42NzQ4IDM0LjczNzQgOTYuODAyNyAzMS42MjUgOTYuODAyNyAyNy41MDUzQzk2LjgwMjcgMjMuNDE1NiA5Ny42NzQ4IDIwLjMzMzQgOTkuNDE4OSAxOC4yNTg1QzEwMS4xNjMgMTYuMTUzNSAxMDMuNjQ0IDE1LjEwMSAxMDYuODYxIDE1LjEwMUMxMDkuNTk4IDE1LjEwMSAxMTEuODIzIDE2LjAxODIgMTEzLjUzNyAxNy44NTI1VjYuNzU2MzVIMTIyLjUxM1YzOS40NTg1SDExNS4yMDZaTTEwOS42NTggMjEuNzMxN0MxMDcuMDcyIDIxLjczMTcgMTA1Ljc3OSAyMy4yODAzIDEwNS43NzkgMjYuMzc3NlYyOC43NjgzQzEwNS43NzkgMzEuODM1NSAxMDcuMDcyIDMzLjM2OTEgMTA5LjY1OCAzMy4zNjkxQzExMC45ODEgMzMuMzY5MSAxMTEuOTc0IDMyLjkwMyAxMTIuNjM1IDMxLjk3MDhDMTEzLjI5NyAzMS4wMzg2IDExMy42MjcgMjkuODIwOCAxMTMuNjI3IDI4LjMxNzJWMjYuODI4N0MxMTMuNjI3IDI1LjMyNTEgMTEzLjI5NyAyNC4xMDczIDExMi42MzUgMjMuMTc1MUMxMTEuOTc0IDIyLjIxMjggMTEwLjk4MSAyMS43MzE3IDEwOS42NTggMjEuNzMxN1oiIGZpbGw9IndoaXRlIi8+CjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8xMjg3XzE1NDc0KSI+CjxwYXRoIGQ9Ik0xMy4wMzE1IDEzLjIwMTlMMTEuNTMyNiAxMC4xMDIzQzEwLjQwNTkgNy43NzI2MyAxMS4wNjU5IDUuMDQxNTcgMTIuOTcyNCAzLjQ2MDY3QzE0LjE1OTIgMi40NzY1NiAxNS4yOTE1IDEuNDI4NTEgMTYuMzMwNiAwLjI4OTUzOUwxNi41OTQ4IDBMMTcuMjA5IDAuODExNTI4QzE3Ljk2NjkgMS44MTI4NiAxOC41NDUyIDIuODc3NjIgMTguODg2OSAzLjk1NjUxTDEzLjAzMTUgMTMuMjAxOVoiIGZpbGw9IiMwMEFBOTUiLz4KPHBhdGggZD0iTTIyLjE4NjQgMy44NjU5TDIxLjk4NjggMi44Njc5MkMyMSA1LjE5MzkgMTguNDY5IDYuNDI5ODIgMTcuMDE4MyA4LjAzNDc4QzE0LjQ4MTMgMTAuODQxNSAxMy4wMzEyIDEzLjIwMTYgMTMuMDMxMiAxMy4yMDE2SDE0LjUzMzRDMjEuMjA5OCAxMy4yMDE2IDIzLjE1MjYgOC42OTU0OSAyMi4xODY0IDMuODY1OVoiIGZpbGw9IiMwMENDNzYiLz4KPHBhdGggZD0iTTIxLjk4NjggMi44Njc5MkwyMS42MjI5IDMuMDEzNThDMjAuNzI2MyAzLjM3MjQ4IDE5LjgxMjMgMy42ODMzNCAxOC44ODY3IDMuOTU2MjdWMy45NTYzQzE4LjMzNDYgNC4xMTkxMSAxNy43NzgzIDQuMjY4NCAxNy4yMTkxIDQuNDA2MzVDMTQuODE0NCA0Ljk5OTUzIDEzLjAzMTIgNy4xNzA4NSAxMy4wMzEyIDkuNzU4NjVWMTMuMjAxNkMxMy4wMzEzIDEzLjIwMTYgMTkuMjc0MyA5LjI2MTU1IDIxLjk4NjggMi44Njc5MloiIGZpbGw9IiNBNUU4ODciLz4KPC9nPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJjbGlwMF8xMjg3XzE1NDc0Ij4KPHJlY3Qgd2lkdGg9IjEzLjIwMTkiIGhlaWdodD0iMTMuMjAxOSIgZmlsbD0id2hpdGUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwLjA5OTYpIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==';
+
 // ── Prayer Poster Modal ────────────────────────────────────────────────────────
 
 function PrayerPosterModal({ bulletin, cat, onClose }: {
@@ -476,7 +479,7 @@ function PrayerPosterModal({ bulletin, cat, onClose }: {
     return m && m.length >= 2 ? [m[0], m[1]] : ['#870BD6', '#5B26B1'];
   })();
 
-  const capture = async (): Promise<string> => {
+  const capture = async (): Promise<Blob> => {
     const { default: html2canvas } = await import('html2canvas');
     const canvas = await html2canvas(posterRef.current!, {
       scale: 2,
@@ -485,37 +488,29 @@ function PrayerPosterModal({ bulletin, cat, onClose }: {
       backgroundColor: null,
       logging: false,
     });
-    return canvas.toDataURL('image/png');
+    return new Promise((resolve) => canvas.toBlob((b) => resolve(b!), 'image/png'));
   };
 
-  const handleDownload = async () => {
+  // Single handler: native share sheet on mobile (shows "Save to Photos" / "Save to images"),
+  // falls back to <a download> on desktop browsers that don't support file sharing.
+  const handleShare = async () => {
     setStatus('generating');
     try {
-      const dataUrl = await capture();
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `breed-prayer-${bulletin.id}.png`;
-      a.click();
-    } finally {
-      setStatus('done');
-    }
-  };
-
-  const handleShareImage = async () => {
-    setStatus('generating');
-    try {
-      const dataUrl = await capture();
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
+      const blob = await capture();
       const file = new File([blob], 'breed-prayer-poster.png', { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: bulletin.title });
       } else {
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = dataUrl;
+        a.href = url;
         a.download = 'breed-prayer-poster.png';
         a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
       }
+    } catch (err) {
+      // user dismissed the share sheet — not an error
+      if (err instanceof Error && err.name !== 'AbortError') console.error(err);
     } finally {
       setStatus('idle');
     }
@@ -555,7 +550,7 @@ function PrayerPosterModal({ bulletin, cat, onClose }: {
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', position: 'relative' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo3.svg" alt="Breed" style={{ height: '22px', width: 'auto', opacity: 0.85 }} />
+            <img src={BREED_LOGO_SRC} alt="Breed" style={{ height: '22px', width: 'auto', opacity: 0.85 }} />
             {publishDate && <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px' }}>{publishDate}</span>}
           </div>
 
@@ -609,24 +604,19 @@ function PrayerPosterModal({ bulletin, cat, onClose }: {
         {/* Action buttons */}
         <div className="flex gap-3 flex-wrap justify-center">
           <button
-            onClick={handleDownload}
+            onClick={handleShare}
             disabled={busy}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 font-semibold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
           >
-            {busy ? <span className="w-4 h-4 rounded-full border-2 border-gray-400 border-t-transparent animate-spin" /> : <DocumentDownload size={16} color="#111" />}
-            Save Image
-          </button>
-          <button
-            onClick={handleShareImage}
-            disabled={busy}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-          >
-            {busy ? <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" /> : <Share size={16} color="white" />}
-            Share Poster
+            {busy
+              ? <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              : <DocumentDownload size={16} color="white" />
+            }
+            Save / Share
           </button>
           <button
             onClick={onClose}
-            className="flex items-center justify-center px-5 py-2.5 rounded-full border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors cursor-pointer"
+            className="flex items-center justify-center px-6 py-3 rounded-full border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors cursor-pointer"
           >
             Cancel
           </button>
