@@ -12,18 +12,17 @@ import {
   WeekStreakResult,
 } from "@/lib/api-services";
 import {
-  BookOpen,
   ChevronRight,
-  Clock,
   Dumbbell,
   GraduationCap,
   MessageCircle,
   Users,
 } from "lucide-react";
 import {
-  Timer1, Candle, Lovely, Flag2, HeartAdd, MessageQuestion, Heart,
+  Timer1, Book1, Candle, Lovely, Flag2, HeartAdd, MessageQuestion, Heart,
   Buildings, Cup, Profile2User, Flash, ShieldCross, HeartCircle,
   Global, Wallet, MedalStar, Sun1, Crown, Briefcase, Bookmark,
+  Clock as ClockIcon,
   type Icon as IcosaxIcon,
 } from "iconsax-react";
 import Link from "next/link";
@@ -45,7 +44,7 @@ const ACTIVITY_META: Record<
   { icon: ReactNode; colour: string; bg: string }
 > = {
   DEVOTIONAL_READ: {
-    icon: <BookOpen size={9} />,
+    icon: <Book1 size={9} color="#B54708" />,
     colour: "#B54708",
     bg: "#FFF6E5",
   },
@@ -75,7 +74,7 @@ const ACTIVITY_META: Record<
     bg: "#FDF2FA",
   },
   EDIFY: {
-    icon: <Timer1 size={9} color="#6D28D9" />,
+    icon: <Heart size={9} color="#6D28D9" />,
     colour: "#6D28D9",
     bg: "#EDE9FE",
   },
@@ -91,11 +90,32 @@ const TRACKED: ActivityType[] = [
   "EDIFY",
 ];
 
-// ── Skeleton ───────────────────────────────────────────────────────────────
+// ── Arrow up-right icon ────────────────────────────────────────────────────
 
-const TextSkeleton = ({ w = "w-3/4" }: { w?: string }) => (
-  <div className={`animate-pulse bg-gray-200 dark:bg-[#252830] rounded h-4 ${w}`} />
-);
+function ArrowUpRightIcon({
+  size = 16,
+  color = 'currentColor',
+  className,
+}: {
+  size?: number;
+  color?: string;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ color }}
+      className={className}
+    >
+      <path d="M7 17L17 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 7H17V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 // ── Bulletin category map ──────────────────────────────────────────────────
 
@@ -243,18 +263,18 @@ function DayColumn({
     >
       {/* Activity dots */}
       <div
-        className={`w-9 h-9 rounded-full flex items-center justify-center relative ${
+        className={`w-12 h-12 rounded-full flex items-center justify-center relative ${
           isToday ? "ring-2 ring-[#870BD6] dark:ring-[#A855F7] ring-offset-2 dark:ring-offset-[#1E2025]" : ""
-        } ${noActivity ? "bg-gray-100 dark:bg-[#252830]" : "bg-[#FFF6E5] dark:bg-[#3D2060]"}`}
+        } ${noActivity ? "bg-gray-100 dark:bg-[#252830]" : "bg-[#EDE9FE] dark:bg-[#3D2060]"}`}
       >
         {hasFire ? (
-          <FlameIcon size={20} />
+          <FlameIcon size={17} color="#870BD6" />
         ) : (
-          <span className="opacity-20">
-            <FlameIcon size={20} />
+          <span className="opacity-40">
+            <FlameIcon size={17} color="#870BD6" />
           </span>
         )}
-        {/* Activity type dots in bottom-right corner */}
+        {/* Activity type badges in bottom-right corner */}
         {activities.length > 0 && (
           <div className="absolute -bottom-1 -right-1 flex gap-px">
             {activities.slice(0, 3).map((type) => {
@@ -263,7 +283,7 @@ function DayColumn({
               return (
                 <div
                   key={type}
-                  className="w-2.5 h-2.5 rounded-full flex items-center justify-center"
+                  className="w-3.5 h-3.5 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: meta.bg, color: meta.colour }}
                 >
                   {meta.icon}
@@ -348,123 +368,92 @@ const HomePage = () => {
           <TodayBulletinCard bulletin={bulletin} loading={bulletinLoading} />
         </div>
 
-        {/* ── Mobile hero card ── */}
-        <div
-          className="block lg:hidden relative rounded-2xl px-[30px] py-[37.5px] shadow-lg cursor-pointer overflow-hidden h-[220px] mb-8"
-          style={{
-            backgroundImage: `url('/dashboard-gratitude.png')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="text-white">
-            <h2 className="text-[20px] font-bold mb-1 leading-none">
-              Daily Reading
-            </h2>
-            <p className="text-sm mb-4 line-clamp-3">
-              {devotional?.excerpt ??
-                devotional?.title ??
-                "Start your day with the Word."}
-            </p>
-            {devotional?.id ? (
-              <Link href={`/dashboard/home/article/${devotional.id}`}>
-                <button className="flex items-center gap-2 font-semibold hover:gap-3 transition-all">
-                  <span className="text-sm leading-none">Continue Reading</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </Link>
-            ) : (
-              <Link href="/dashboard/buildup?tab=devotionals">
-                <button className="flex items-center gap-2 font-semibold hover:gap-3 transition-all">
-                  <span className="text-sm leading-none">
-                    Browse Devotionals
-                  </span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </Link>
-            )}
-          </div>
-        </div>
-
         {/* ── Onboarding checklist (hides once dismissed or all done) ── */}
         <OnboardingChecklist />
 
         {/* ── Desktop Consistency Tracker + Today's Bulletin ── */}
         <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6 mb-16">
-          <div
-            style={{ backgroundImage: `url('/dashboard-header.png')` }}
-            className="rounded-2xl"
-          >
+          <div className="rounded-2xl">
           <Link href="/dashboard/streaks">
-            <div className="bg-white/90 dark:bg-[#181A1F] rounded-2xl px-16.5 py-11 h-full shadow-[0px_4px_4px_0px_#00000008] dark:shadow-none cursor-pointer hover:bg-white/95 dark:hover:bg-[#1E2025] transition-colors">
-              <div className="flex items-start justify-between gap-16">
-                <div className="shrink-0">
-                  <h2 className="text-2xl font-bold mb-5 dark:text-white">Consistency is Key</h2>
+            <div className="bg-white/90 dark:bg-[#181A1F] rounded-2xl p-6 h-full shadow-[0px_4px_4px_0px_#00000008] dark:shadow-none cursor-pointer hover:bg-white/95 dark:hover:bg-[#1E2025] transition-colors relative overflow-hidden">
+              {/* Flame watermark */}
+              <div
+                className="absolute -bottom-8 -right-6 pointer-events-none select-none opacity-[0.06]"
+                style={{ transform: 'rotate(-8deg)' }}
+                aria-hidden="true"
+              >
+                <FlameIcon size={210} color="#870BD6" />
+              </div>
 
-                  {streakLoading ? (
-                    <div className="flex gap-4">
-                      {[...Array(7)].map((_, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2">
-                          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#252830] animate-pulse" />
-                          <div className="w-4 h-3 rounded bg-gray-100 dark:bg-[#252830] animate-pulse" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <>
-                      {/* 7-day tracker */}
-                      <div className="flex gap-2 mb-4">
-                        {(weekStreak?.days ?? []).map((day) => (
-                          <DayColumn
-                            key={day.date}
-                            label={day.label}
-                            activities={day.activities}
-                            isToday={day.isToday}
-                            noActivity={day.activities.length === 0}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Activity type legend */}
-                      {breakdownEntries.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {TRACKED.map((type) => {
-                            const stat = breakdown[type];
-                            if (!stat || stat.current === 0) return null;
-                            const meta = ACTIVITY_META[type];
-                            return (
-                              <div
-                                key={type}
-                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: meta.bg,
-                                  color: meta.colour,
-                                }}
-                              >
-                                {meta.icon}
-                                <span>{stat.label}</span>
-                                <span className="font-bold">{stat.current}d</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </>
-                  )}
+              {/* Header row: title + streak badge side by side */}
+              <div className="flex items-start justify-between gap-3 mb-5">
+                <div className="min-w-0">
+                  <h2 className="text-2xl font-bold dark:text-white">Consistency is Key</h2>
+                  <p className="text-sm text-gray-400 dark:text-[#717784] mt-1">Keep showing up, one day at a time</p>
                 </div>
-
-                {/* Streak badge */}
-                <div className="flex flex-col items-center gap-1 px-6 py-4 rounded-2xl border border-[#D2D9DF] dark:border-[#2D313A] bg-white dark:bg-[#252830] shrink-0">
-                  <FlameIcon size={38} />
+                <div className="flex flex-col items-center gap-1 px-4 py-3 rounded-2xl border border-[#D2D9DF] dark:border-[#2D313A] bg-white dark:bg-[#252830] shrink-0">
+                  <FlameIcon size={30} />
                   {streakLoading ? (
-                    <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-7 w-8" />
+                    <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-6 w-8" />
                   ) : (
-                    <span className="text-2xl font-bold leading-none dark:text-white">
+                    <span className="text-[22px] font-bold leading-none dark:text-white">
                       {currentStreak}
                     </span>
                   )}
                 </div>
               </div>
+
+              {/* Day grid — full width, no badge competing for space */}
+              {streakLoading ? (
+                <div className="flex gap-2">
+                  {[...Array(7)].map((_, i) => (
+                    <div key={i} className="flex flex-col items-center gap-2 flex-1">
+                      <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                      <div className="w-4 h-3 rounded bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* 7-day tracker */}
+                  <div className="flex gap-2 mb-4">
+                    {(weekStreak?.days ?? []).map((day) => (
+                      <DayColumn
+                        key={day.date}
+                        label={day.label}
+                        activities={day.activities}
+                        isToday={day.isToday}
+                        noActivity={day.activities.length === 0}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Activity type legend */}
+                  {breakdownEntries.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {TRACKED.map((type) => {
+                        const stat = breakdown[type];
+                        if (!stat || stat.current === 0) return null;
+                        const meta = ACTIVITY_META[type];
+                        return (
+                          <div
+                            key={type}
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: meta.bg,
+                              color: meta.colour,
+                            }}
+                          >
+                            {meta.icon}
+                            <span>{stat.label}</span>
+                            <span className="font-bold">{stat.current}d</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </Link>
           </div>
@@ -483,45 +472,68 @@ const HomePage = () => {
             <Link
               href={
                 course?.id
-                  ? `/dashboard/learn/courses/${course.id}`
+                  ? `/dashboard/learn/${course.id}`
                   : "/dashboard/learn"
               }
             >
-              <div className="bg-white dark:bg-[#181A1F] dark:border dark:border-[#2D313A] rounded-2xl px-[28px] py-4 shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-none transition-shadow cursor-pointer">
-                <div className="flex gap-6 items-center">
-                  <div className="flex-1">
-                    {courseLoading ? (
-                      <div className="space-y-2">
-                        <TextSkeleton w="w-1/3" />
-                        <TextSkeleton />
-                        <TextSkeleton w="w-1/2" />
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF] mb-2">
-                          {course?.category?.name ?? "Featured Course"}
+              <div className="bg-white dark:bg-[#181A1F] border border-[#E5E7EB] dark:border-[#2D313A] rounded-2xl overflow-hidden cursor-pointer flex hover:shadow-sm dark:hover:border-[#3A3E48] transition-all">
+                {/* Content */}
+                <div className="w-full md:flex-[3] min-w-0 px-6 py-6 flex flex-col">
+                  {courseLoading ? (
+                    <div className="space-y-3 flex-1">
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-3 w-1/4" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-5 w-3/4" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-3 w-2/3" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-3 w-1/2" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded-full h-8 w-28 mt-1" />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-gray-400 dark:text-[#9CA3AF] font-medium uppercase tracking-wide mb-2">
+                        {course?.category?.name ?? 'Featured Course'}
+                      </p>
+                      <h4 className="text-[19px] font-bold text-gray-900 dark:text-white leading-snug mb-2 line-clamp-2">
+                        {course?.title ?? 'Explore courses to grow in your faith.'}
+                      </h4>
+                      {course?.description && (
+                        <p className="text-sm text-gray-500 dark:text-[#9CA3AF] leading-relaxed mb-3 line-clamp-2">
+                          {course.description}
                         </p>
-                        <p className="text-xs lg:text-base font-bold text-gray-900 dark:text-white leading-tight mb-2 lg:mb-4">
-                          {course?.title ??
-                            "Explore courses to grow in your faith."}
-                        </p>
-                        <div className="flex items-center gap-2 text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF]">
-                          <Clock className="w-4 h-4" />
-                          <span>
-                            {course?.durationMinutes
-                              ? `${course.durationMinutes} min`
-                              : "Self-paced"}
+                      )}
+                      {/* Meta row */}
+                      <div className="flex items-center gap-4 mb-4 text-xs text-gray-400 dark:text-[#717784]">
+                        <span className="flex items-center gap-1.5">
+                          <ClockIcon size={13} color="#9CA3AF" />
+                          {course?.durationMinutes ? `${course.durationMinutes} min` : 'Self-paced'}
+                        </span>
+                        {(course?.lessonCount ?? 0) > 0 && (
+                          <span className="flex items-center gap-1.5">
+                            <Book1 size={13} color="#9CA3AF" />
+                            {course!.lessonCount} lessons
                           </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={course?.coverImage ?? "/home-dashboard.jpg"}
-                    alt="Course"
-                    className="w-[120px] h-[120px] lg:w-[160px] lg:h-[160px] object-cover rounded-[20px] shrink-0"
-                  />
+                        )}
+                      </div>
+                      {/* CTA pill */}
+                      <div className="inline-flex self-start items-center gap-1.5 px-8 py-3 rounded-full bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-semibold">
+                        {(course as any)?.isEnrolled ? 'Continue Learning' : 'Enroll'}
+                        <ArrowUpRightIcon size={14} />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Desktop: image flush right — hidden on mobile */}
+                <div className="hidden md:block flex-[2] relative self-stretch">
+                  {courseLoading ? (
+                    <div className="absolute inset-0 bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={(course as any)?.coverImageUrl ?? (course as any)?.coverImage ?? '/home-dashboard.jpg'}
+                      alt={course?.title ?? 'Course'}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               </div>
             </Link>
@@ -539,78 +551,63 @@ const HomePage = () => {
                   : "/dashboard/buildup?tab=devotionals"
               }
             >
-              <div className="bg-white dark:bg-[#181A1F] dark:border dark:border-[#2D313A] rounded-2xl px-[28px] py-4 shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-none transition-shadow cursor-pointer">
-                <div className="flex gap-6 items-center">
-                  <div className="flex-1">
-                    {devotionalLoading ? (
-                      <div className="space-y-2">
-                        <TextSkeleton w="w-1/3" />
-                        <TextSkeleton />
-                        <TextSkeleton w="w-1/2" />
+              <div className="bg-white dark:bg-[#181A1F] border border-[#E5E7EB] dark:border-[#2D313A] rounded-2xl overflow-hidden cursor-pointer flex hover:shadow-sm dark:hover:border-[#3A3E48] transition-all">
+                {/* Content */}
+                <div className="w-full md:flex-[3] min-w-0 px-6 py-6 flex flex-col">
+                  {devotionalLoading ? (
+                    <div className="space-y-3 flex-1">
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-3 w-1/4" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-5 w-3/4" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-3 w-2/3" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded h-3 w-1/2" />
+                      <div className="animate-pulse bg-gray-100 dark:bg-[#252830] rounded-full h-8 w-28 mt-1" />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-gray-400 dark:text-[#9CA3AF] font-medium uppercase tracking-wide mb-2">
+                        {devotional?.category?.name ?? 'Daily Devotional'}
+                      </p>
+                      <h4 className="text-[19px] font-bold text-gray-900 dark:text-white leading-snug mb-2 line-clamp-2">
+                        {devotional?.title ?? 'No devotional scheduled for today.'}
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-[#9CA3AF] leading-relaxed mb-3 line-clamp-2">
+                        {devotional?.content
+                          ? devotional.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                          : 'Grow deeper in your faith with today\'s devotional reading.'}
+                      </p>
+                      {/* Meta row */}
+                      <div className="flex items-center gap-4 mb-4 text-xs text-gray-400 dark:text-[#717784]">
+                        <span className="flex items-center gap-1.5">
+                          <ClockIcon size={13} color="#9CA3AF" />
+                          {devotional?.estimatedMinutes ? `${devotional.estimatedMinutes} min read` : '5 min read'}
+                        </span>
                       </div>
-                    ) : (
-                      <>
-                        <p className="text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF] mb-2">
-                          {devotional?.category?.name ?? "Daily Devotional"}
-                        </p>
-                        <p className="text-xs lg:text-base font-bold text-gray-900 dark:text-white leading-tight mb-2 lg:mb-4">
-                          {devotional?.title ??
-                            devotional?.excerpt ??
-                            "No devotional scheduled for today."}
-                        </p>
-                        <div className="flex items-center gap-2 text-[10px] lg:text-sm text-gray-500 dark:text-[#9CA3AF]">
-                          <Clock className="w-4 h-4" />
-                          <span>
-                            {devotional?.estimatedMinutes
-                              ? `${devotional.estimatedMinutes} min read`
-                              : "5 min read"}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={devotional?.coverImageUrl ?? "/DailyEdification2.png"}
-                    alt="Devotional"
-                    className="w-[120px] h-[120px] lg:w-[160px] lg:h-[160px] object-cover rounded-[20px] shrink-0"
-                  />
+                      {/* CTA pill */}
+                      <div className="inline-flex self-start items-center gap-1.5 px-8 py-3 rounded-full bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-semibold">
+                        Read Now
+                        <ArrowUpRightIcon size={14} />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Desktop: image flush right — hidden on mobile */}
+                <div className="hidden md:block flex-[2] relative self-stretch">
+                  {devotionalLoading ? (
+                    <div className="absolute inset-0 bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={devotional?.coverImageUrl ?? '/DailyEdification2.png'}
+                      alt={devotional?.title ?? 'Devotional'}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               </div>
             </Link>
           </div>
-        </div>
-
-        {/* ── Desktop featured article banner ── */}
-        {devotional && (
-          <div
-            className="hidden lg:block relative rounded-2xl px-[30px] py-[75px] shadow-lg cursor-pointer overflow-hidden h-64"
-            style={{
-              backgroundImage: `url('/dashboard-gratitude.png')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="text-white">
-              <h2 className="text-[20px] lg:text-[24px] font-bold mb-1 leading-none">
-                {devotional.title}
-              </h2>
-              {devotional.excerpt && (
-                <p className="text-sm lg:text-base mb-4 line-clamp-2 max-w-2xl">
-                  {devotional.excerpt}
-                </p>
-              )}
-              <Link href={`/dashboard/home/article/${devotional.id}`}>
-                <button className="flex items-center gap-2 font-semibold hover:gap-3 transition-all">
-                  <span className="text-[20px] leading-none">
-                    Continue Reading
-                  </span>
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </Link>
-            </div>
-          </div>
-        )}
+        </div>        
       </div>
     </DashboardLayout>
   );

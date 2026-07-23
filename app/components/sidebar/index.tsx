@@ -197,7 +197,7 @@ const NavItem = ({
     <Link href={item.path} className="relative flex flex-col items-center gap-[3px] px-2 py-1 z-10">
       {active && (
         <span
-          className="absolute inset-x-0 -inset-y-0.5 rounded-2xl"
+          className="absolute -inset-x-3 -inset-y-0.5 rounded-full"
           style={{
             background: isDark ? '#1A2342' : 'rgba(255,255,255,0.97)',
             boxShadow: isDark ? 'none' : '0 1px 4px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1)',

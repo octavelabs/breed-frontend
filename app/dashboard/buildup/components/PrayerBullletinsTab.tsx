@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Bookmark, ArrowRight2, ArrowLeft2, Share, Heart,
   Candle, Lovely, Buildings, Cup, Profile2User, Flash,
   ShieldCross, HeartCircle, Global, Wallet, MedalStar, Sun1, Crown, Briefcase,
   Timer1, People, TickCircle, HeartAdd, MessageQuestion, Flag2,
+  DocumentDownload,
 } from 'iconsax-react';
 import type { Icon } from 'iconsax-react';
 import { prayerService } from '@/lib/api-services';
@@ -456,6 +457,185 @@ function FeaturedSkeleton() {
   );
 }
 
+// ── Prayer Poster Modal ────────────────────────────────────────────────────────
+
+function PrayerPosterModal({ bulletin, cat, onClose }: {
+  bulletin: Bulletin;
+  cat: Category | undefined;
+  onClose: () => void;
+}) {
+  const posterRef = useRef<HTMLDivElement>(null);
+  const [status, setStatus] = useState<'idle' | 'generating' | 'done'>('idle');
+
+  const prayerPoints = parsePrayerPoints(bulletin.points, bulletin.content);
+  const publishDate = formatDate(bulletin.scheduledAt ?? bulletin.createdAt);
+  const gradient = cat?.gradient ?? DEFAULT_GRADIENT;
+
+  const [c1, c2] = (() => {
+    const m = gradient.match(/#[0-9A-Fa-f]{6}/g);
+    return m && m.length >= 2 ? [m[0], m[1]] : ['#870BD6', '#5B26B1'];
+  })();
+
+  const capture = async (): Promise<string> => {
+    const { default: html2canvas } = await import('html2canvas');
+    const canvas = await html2canvas(posterRef.current!, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+    });
+    return canvas.toDataURL('image/png');
+  };
+
+  const handleDownload = async () => {
+    setStatus('generating');
+    try {
+      const dataUrl = await capture();
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `breed-prayer-${bulletin.id}.png`;
+      a.click();
+    } finally {
+      setStatus('done');
+    }
+  };
+
+  const handleShareImage = async () => {
+    setStatus('generating');
+    try {
+      const dataUrl = await capture();
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], 'breed-prayer-poster.png', { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: bulletin.title });
+      } else {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'breed-prayer-poster.png';
+        a.click();
+      }
+    } finally {
+      setStatus('idle');
+    }
+  };
+
+  const displayPoints = prayerPoints.slice(0, 5);
+  const busy = status === 'generating';
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
+      onClick={onClose}
+    >
+      <div
+        className="flex flex-col items-center gap-5 max-h-[90vh] overflow-y-auto py-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Poster */}
+        <div
+          ref={posterRef}
+          style={{
+            width: '360px',
+            flexShrink: 0,
+            background: `linear-gradient(145deg, ${c1}, ${c2})`,
+            borderRadius: '20px',
+            padding: '32px 28px 28px',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Decorative orbs */}
+          <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+          <div style={{ position: 'absolute', bottom: '-80px', left: '-60px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+          <div style={{ position: 'absolute', top: '40%', right: '-30px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', position: 'relative' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo3.svg" alt="Breed" style={{ height: '22px', width: 'auto', opacity: 0.85 }} />
+            {publishDate && <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px' }}>{publishDate}</span>}
+          </div>
+
+          {/* Category */}
+          {cat && (
+            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '9px', fontWeight: 800, letterSpacing: '2.5px', textTransform: 'uppercase', display: 'block', marginBottom: '10px', position: 'relative' }}>
+              {cat.label}
+            </span>
+          )}
+
+          {/* Title */}
+          <h2 style={{ color: 'white', fontSize: '24px', fontWeight: 800, lineHeight: 1.25, margin: '0 0 22px', position: 'relative' }}>
+            {bulletin.title}
+          </h2>
+
+          {/* Bible verse */}
+          {bulletin.bibleVerse && (
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 16px', marginBottom: '22px', borderLeft: '3px solid rgba(255,255,255,0.35)', position: 'relative' }}>
+              <p style={{ color: 'rgba(255,255,255,0.88)', fontSize: '12px', fontStyle: 'italic', lineHeight: 1.65, margin: 0 }}>
+                &ldquo;{bulletin.bibleVerse}&rdquo;
+              </p>
+            </div>
+          )}
+
+          {/* Prayer points */}
+          {displayPoints.length > 0 && (
+            <div style={{ position: 'relative' }}>
+              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '9px', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '12px' }}>
+                Prayer Points
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {displayPoints.map((pt, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '16px', lineHeight: 1, flexShrink: 0, marginTop: '1px' }}>•</span>
+                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px', lineHeight: 1.55, margin: 0, flex: 1 }}>
+                      {pt.length > 90 ? pt.slice(0, 87) + '…' : pt}
+                    </p>
+                  </div>
+                ))}
+                {prayerPoints.length > 5 && (
+                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px', marginTop: '2px' }}>
+                    +{prayerPoints.length - 5} more on Breed
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-3 flex-wrap justify-center">
+          <button
+            onClick={handleDownload}
+            disabled={busy}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 font-semibold text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            {busy ? <span className="w-4 h-4 rounded-full border-2 border-gray-400 border-t-transparent animate-spin" /> : <DocumentDownload size={16} color="#111" />}
+            Save Image
+          </button>
+          <button
+            onClick={handleShareImage}
+            disabled={busy}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+          >
+            {busy ? <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" /> : <Share size={16} color="white" />}
+            Share Poster
+          </button>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center px-5 py-2.5 rounded-full border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Today inline view (no click-through needed) ────────────────────────────────
 
 function TodayBulletinInline({
@@ -479,7 +659,7 @@ function TodayBulletinInline({
   const cat = CATEGORIES.find((c) => c.id === b.category);
   const prayerPoints = parsePrayerPoints(b.points, b.content);
   const [checkedPoints, setCheckedPoints] = useState<Set<number>>(new Set());
-  const [copied, setCopied] = useState(false);
+  const [showPoster, setShowPoster] = useState(false);
   const publishDate = formatDate(b.scheduledAt ?? b.createdAt);
   const { label: ageLabel, isToday } = getBulletinAgeLabel(b);
 
@@ -492,20 +672,6 @@ function TodayBulletinInline({
       next.has(idx) ? next.delete(idx) : next.add(idx);
       return next;
     });
-  };
-
-  const handleShare = async () => {
-    const url = window.location.href;
-    const text = `"${b.title}" — Prayer Bulletin`;
-    if (navigator.share) {
-      try { await navigator.share({ title: b.title, text, url }); } catch {}
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {}
-    }
   };
 
   const handleStartPraying = () => {
@@ -665,13 +831,17 @@ function TodayBulletinInline({
         </button>
 
         <button
-          onClick={handleShare}
+          onClick={() => setShowPoster(true)}
           className="flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-gray-200 dark:border-[#2D313A] text-gray-600 dark:text-[#9CA3AF] hover:border-gray-300 transition-colors cursor-pointer"
         >
           <Share size={16} color="#6b7280" />
-          {copied ? 'Copied!' : 'Share'}
+          Share
         </button>
       </div>
+
+      {showPoster && (
+        <PrayerPosterModal bulletin={b} cat={cat} onClose={() => setShowPoster(false)} />
+      )}
     </div>
   );
 }
@@ -897,7 +1067,7 @@ function BulletinDetail({
   const cat = CATEGORIES.find((c) => c.id === b.category);
   const prayerPoints = parsePrayerPoints(b.points, b.content);
   const [checkedPoints, setCheckedPoints] = useState<Set<number>>(new Set());
-  const [copied, setCopied] = useState(false);
+  const [showPoster, setShowPoster] = useState(false);
   const publishDate = formatDate(b.scheduledAt ?? b.createdAt);
 
   const togglePoint = (idx: number) => {
@@ -906,20 +1076,6 @@ function BulletinDetail({
       next.has(idx) ? next.delete(idx) : next.add(idx);
       return next;
     });
-  };
-
-  const handleShare = async () => {
-    const url = window.location.href;
-    const text = `"${b.title}" — Prayer Bulletin`;
-    if (navigator.share) {
-      try { await navigator.share({ title: b.title, text, url }); } catch {}
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {}
-    }
   };
 
   const handleStartPraying = () => {
@@ -1050,13 +1206,17 @@ function BulletinDetail({
         </button>
 
         <button
-          onClick={handleShare}
+          onClick={() => setShowPoster(true)}
           className="flex items-center justify-center gap-2 py-3 px-5 rounded-full font-semibold text-sm border border-gray-200 dark:border-[#2D313A] text-gray-600 dark:text-[#9CA3AF] hover:border-gray-300 transition-colors cursor-pointer"
         >
           <Share size={16} color="#6b7280" />
-          {copied ? 'Copied!' : 'Share'}
+          Share
         </button>
       </div>
+
+      {showPoster && (
+        <PrayerPosterModal bulletin={b} cat={cat} onClose={() => setShowPoster(false)} />
+      )}
     </div>
   );
 }

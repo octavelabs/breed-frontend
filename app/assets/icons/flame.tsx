@@ -1,9 +1,14 @@
+import { useId } from 'react';
+
 type FlameIconProps = {
   color?: string
   size?: number
 }
 
 const FlameIcon = ({ color = '#870BD6', size = 26 }: FlameIconProps) => {
+  const uid = useId();
+  const clipId = `flame-clip-${uid.replace(/:/g, '')}`;
+
   return (
     <svg
       width={size}
@@ -12,7 +17,7 @@ const FlameIcon = ({ color = '#870BD6', size = 26 }: FlameIconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       style={{ color }}
     >
-      <g clipPath="url(#clip0_2309_8415)">
+      <g clipPath={`url(#${clipId})`}>
         <path
           d="M25.04 30.1089C25.04 28.0331 23.7327 26.8261 21.2266 24.6986C20.6603 24.2132 20.0488 23.6987 19.4178 23.126C18.6978 23.7877 18.0134 24.3702 17.3857 24.9057C14.8844 27.0187 13.7891 28.0525 13.7891 30.1089C13.7891 31.6009 14.3817 33.0317 15.4367 34.0867C16.4917 35.1417 17.9226 35.7344 19.4145 35.7344C20.9065 35.7344 22.3374 35.1417 23.3924 34.0867C24.4473 33.0317 25.04 31.6009 25.04 30.1089Z"
           fill="currentColor"
@@ -24,13 +29,12 @@ const FlameIcon = ({ color = '#870BD6', size = 26 }: FlameIconProps) => {
       </g>
 
       <defs>
-        <clipPath id="clip0_2309_8415">
+        <clipPath id={clipId}>
           <rect width="38.8299" height="38.8299" />
         </clipPath>
       </defs>
     </svg>
   )
 }
-
 
 export default FlameIcon

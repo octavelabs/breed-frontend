@@ -48,8 +48,8 @@ const Tabs: React.FC<TabsProps> = ({
                 border px-[18px] py-3 whitespace-nowrap rounded-[12px] font-medium text-sm transition-all duration-200
                 ${
                   activeTab === tab.value
-                    ? 'bg-white dark:bg-[#252830] border-transparent font-semibold dark:text-white'
-                    : 'text-[#4E5255] dark:text-[#9CA3AF] border-[#D2D9DF] dark:border-[#2D313A]'
+                    ? 'bg-white dark:bg-[#252830] border-black dark:border-transparent font-semibold text-[#180426] dark:text-white'
+                    : 'text-[#4E5255] dark:text-[#9CA3AF] border-[#D2D9DF] dark:border-[#2D313A] hover:border-gray-400 dark:hover:border-[#717784]'
                 } ${customClass}
               `}
             >
