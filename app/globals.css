@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Enable dark: variants based on [data-theme=dark] ancestor */
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* Enable dark: variants based on [data-theme=dark] ancestor, but not inside [data-theme=light] */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *):not([data-theme=light], [data-theme=light] *));
 
 @keyframes fade-in-down {
   from { opacity: 0; transform: translateY(-10px); }
@@ -36,6 +36,17 @@
 [data-theme="dark"] body {
   background-color: #0F0A1E;
   color: #EDE9F8;
+}
+
+/* Force light mode inside auth screens (login, signup, forgot-password, etc.) */
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #171717;
+  --breed-surface: #ffffff;
+  --breed-surface-secondary: #F8F9FC;
+  --breed-border: #E3E8EF;
+  --breed-text-primary: #180426;
+  --breed-text-secondary: #60666B;
 }
 
 

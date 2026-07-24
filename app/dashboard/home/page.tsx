@@ -27,7 +27,9 @@ import {
 } from "iconsax-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { type ReactNode } from "react";
+import { type ReactNode, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { OnboardingChecklist } from "./components/OnboardingChecklist";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -302,6 +304,153 @@ function DayColumn({
   );
 }
 
+// ── Streak Drawer ──────────────────────────────────────────────────────────
+
+function StreakDrawer({
+  open,
+  onClose,
+  weekStreak,
+  streakLoading,
+  currentStreak,
+  breakdown,
+  breakdownEntries,
+}: {
+  open: boolean;
+  onClose: () => void;
+  weekStreak: WeekStreakResult | null;
+  streakLoading: boolean;
+  currentStreak: number;
+  breakdown: Record<string, any>;
+  breakdownEntries: any[];
+}) {
+  const router = useRouter();
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (drawerRef.current && !drawerRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/40 z-[150] md:hidden"
+        onClick={onClose}
+      />
+
+      {/* Bottom sheet */}
+      <div
+        ref={drawerRef}
+        className="fixed bottom-0 left-0 right-0 z-[200] md:hidden bg-white dark:bg-[#181A1F] rounded-t-3xl shadow-[0px_-4px_32px_rgba(0,0,0,0.12)] dark:shadow-[0px_-4px_32px_rgba(0,0,0,0.5)] overflow-hidden"
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-gray-200 dark:bg-[#2D313A]" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3">
+          <h3 className="font-bold text-[17px] text-[#180426] dark:text-white">Your Streaks</h3>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-[#252830] transition-colors"
+          >
+            <X size={16} className="text-gray-400 dark:text-[#717784]" />
+          </button>
+        </div>
+
+        <div className="px-5 pb-6">
+          {/* Current streak count */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-2 px-4 py-4 rounded-2xl border border-[#D2D9DF] dark:border-[#2D313A] bg-[#FAFBFF] dark:bg-[#252830]">
+              <FlameIcon size={22} />
+              {streakLoading ? (
+                <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-6 w-8" />
+              ) : (
+                <span className="text-[26px] font-bold leading-none dark:text-white">{currentStreak}</span>
+              )}
+            </div>
+            <div>
+              <p className="font-semibold text-[15px] text-[#180426] dark:text-white leading-tight">
+                {currentStreak === 0
+                  ? "No streak yet"
+                  : currentStreak === 1
+                  ? "1 day streak"
+                  : `${currentStreak} day streak`}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-[#717784] mt-0.5">Keep showing up!</p>
+            </div>
+          </div>
+
+          {/* 7-day grid */}
+          {streakLoading ? (
+            <div className="flex gap-2 mb-5">
+              {[...Array(7)].map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-2 flex-1">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                  <div className="w-4 h-3 rounded bg-gray-100 dark:bg-[#252830] animate-pulse" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex gap-2 mb-5">
+              {(weekStreak?.days ?? []).map((day) => (
+                <DayColumn
+                  key={day.date}
+                  label={day.label}
+                  activities={day.activities}
+                  isToday={day.isToday}
+                  noActivity={day.activities.length === 0}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Activity breakdown */}
+          {breakdownEntries.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-5">
+              {TRACKED.map((type) => {
+                const stat = breakdown[type];
+                if (!stat || stat.current === 0) return null;
+                const meta = ACTIVITY_META[type];
+                return (
+                  <div
+                    key={type}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+                    style={{ backgroundColor: meta.bg, color: meta.colour }}
+                  >
+                    {meta.icon}
+                    <span>{stat.label}</span>
+                    <span className="font-bold">{stat.current}d</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* CTA */}
+          <button
+            onClick={() => { onClose(); router.push("/dashboard/streaks"); }}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-gradient-to-b from-[#A967F1] to-[#5B26B1] text-white text-sm font-semibold"
+          >
+            View Full Streak History
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────
 
 const HomePage = () => {
@@ -334,6 +483,8 @@ const HomePage = () => {
       prayerService.getTodaysBulletin().then((res: any) => res?.data ?? res ?? null),
   });
 
+  const [showStreakDrawer, setShowStreakDrawer] = useState(false);
+
   const currentStreak = weekStreak?.currentStreak ?? 0;
   const breakdown = weekStreak?.breakdown ?? {};
 
@@ -351,16 +502,17 @@ const HomePage = () => {
             {getGreeting()}, {user?.firstName ?? "Friend"}
           </h1>
           {/* Mobile streak badge */}
-          <Link href="/dashboard/streaks">
-            <div className="flex lg:hidden items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#D2D9DF] dark:border-[#2D313A] bg-white dark:bg-[#252830] cursor-pointer hover:border-[#870BD6] dark:hover:border-[#A855F7] transition-colors">
-              <FlameIcon size={20} />
-              {streakLoading ? (
-                <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-5 w-6" />
-              ) : (
-                <span className="text-[20px] font-bold dark:text-white">{currentStreak}</span>
-              )}
-            </div>
-          </Link>
+          <button
+            className="flex lg:hidden items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#D2D9DF] dark:border-[#2D313A] bg-white dark:bg-[#252830] hover:border-[#870BD6] dark:hover:border-[#A855F7] transition-colors"
+            onClick={() => setShowStreakDrawer(true)}
+          >
+            <FlameIcon size={20} />
+            {streakLoading ? (
+              <div className="animate-pulse bg-gray-200 dark:bg-[#181A1F] rounded h-5 w-6" />
+            ) : (
+              <span className="text-[20px] font-bold dark:text-white">{currentStreak}</span>
+            )}
+          </button>
         </div>
 
         {/* ── Today's Bulletin (mobile) ── */}
@@ -609,6 +761,15 @@ const HomePage = () => {
           </div>
         </div>        
       </div>
+      <StreakDrawer
+        open={showStreakDrawer}
+        onClose={() => setShowStreakDrawer(false)}
+        weekStreak={weekStreak}
+        streakLoading={streakLoading}
+        currentStreak={currentStreak}
+        breakdown={breakdown}
+        breakdownEntries={breakdownEntries}
+      />
     </DashboardLayout>
   );
 };

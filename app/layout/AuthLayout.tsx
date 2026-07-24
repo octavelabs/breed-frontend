@@ -7,7 +7,7 @@ interface AuthLayoutProps {
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, custom = false }) => {
   return (
-    <div className="flex h-screen">
+    <div data-theme="light" className="flex h-screen">
       <div className="hidden lg:flex lg:w-[40%] relative overflow-hidden h-screen max-h-screen">
         <div className="relative w-full h-full flex flex-col items-center justify-center px-15 bg-cover bg-no-repeat bg-center"
         style={{backgroundImage: `url('/authLayout.webp')` }}>
