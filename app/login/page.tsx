@@ -93,7 +93,7 @@ const LoginForm: React.FC = () => {
             className="w-[36px] h-[36px]"
           />
         </div>
-        <h2 className="text-[24px] lg:text-[32px] font-bold leading-none text-center mb-2">
+        <h2 className="text-[24px] lg:text-[32px] font-bold leading-none text-center mb-2 text-[#180426]">
           Welcome Back
         </h2>
         <p className="text-center text-sm text-gray-600 mb-8">
@@ -134,7 +134,7 @@ const LoginForm: React.FC = () => {
           <div>
             <label
               htmlFor="emailOrUsername"
-              className="block text-sm font-medium  mb-2"
+              className="block text-sm font-medium mb-2 text-[#180426]"
             >
               Email address
             </label>
@@ -153,7 +153,7 @@ const LoginForm: React.FC = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium mb-2"
+              className="block text-sm font-medium mb-2 text-[#180426]"
             >
               Password
             </label>

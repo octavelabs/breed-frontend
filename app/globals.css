@@ -47,6 +47,8 @@
   --breed-border: #E3E8EF;
   --breed-text-primary: #180426;
   --breed-text-secondary: #60666B;
+  /* Reset inherited body color from dark mode so text is always visible */
+  color: var(--foreground);
 }
 
 
