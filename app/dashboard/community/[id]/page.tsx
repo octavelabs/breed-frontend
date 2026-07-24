@@ -3,13 +3,14 @@
 import DashboardLayout from "@/app/layout/DashboardLayout";
 import { ArrowLeft, Globe, Lock, Users } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePageTitle } from '@/app/hooks/usePageTitle';
 import { JoinCommunityModal } from "../list/components/JoinCommunityModal";
 import Button from "@/app/components/Button";
 import { communityService } from "@/lib/api-services";
 import { useAuth } from "@/context/AuthContext";
+import { useIsMobile } from "../lib/useIsMobile";
 
 const GUIDELINES = [
   'Be respectful and kind to all members',
@@ -62,14 +63,7 @@ const SingleCommunityPage = () => {
   const isMember = communityData?.isMember ?? false;
   usePageTitle(community?.name);
   const [openModal, setOpenModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const isMobile = useIsMobile();
 
   const handleJoin = async () => {
     if (!id) return;

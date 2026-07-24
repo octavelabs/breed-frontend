@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
+import { getUnreadCommunityCount, subscribe as subscribeUnread } from "@/app/dashboard/community/lib/unreadTracker";
 import { LogOut } from 'lucide-react';
 
 function useDarkMode() {
@@ -186,10 +187,12 @@ const NavItem = ({
   item,
   active,
   isDark,
+  badge,
 }: {
   item: { path: string; label: string; icon: React.ElementType };
   active: boolean;
   isDark: boolean;
+  badge?: number;
 }) => {
   const activeColor = isDark ? '#A855F7' : '#870BD6';
   const inactiveColor = isDark ? '#717784' : '#6B7280';
@@ -205,7 +208,14 @@ const NavItem = ({
           }}
         />
       )}
-      <item.icon color={active ? activeColor : inactiveColor} size={22} variant={active ? 'Bold' : 'Linear'} />
+      <div className="relative">
+        <item.icon color={active ? activeColor : inactiveColor} size={22} variant={active ? 'Bold' : 'Linear'} />
+        {badge != null && badge > 0 && (
+          <span className="absolute -top-1 -right-4 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-600 text-white text-[9px] font-bold flex items-center justify-center leading-none">
+            {badge > 99 ? '99+' : badge}
+          </span>
+        )}
+      </div>
       <span className="text-[10px] font-semibold relative" style={{ color: active ? activeColor : inactiveColor }}>
         {item.label}
       </span>
@@ -218,6 +228,9 @@ export const MobileNav = () => {
   const { userType } = useUser();
   const [moreOpen, setMoreOpen] = useState(false);
   const isDark = useDarkMode();
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  useEffect(() => subscribeUnread(forceUpdate), []);
+  const communityUnreadCount = getUnreadCommunityCount();
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
@@ -291,7 +304,13 @@ export const MobileNav = () => {
         />
 
         {visibleItems.map((item) => (
-          <NavItem key={item.path} item={item} active={isActive(item.path)} isDark={isDark} />
+          <NavItem
+            key={item.path}
+            item={item}
+            active={isActive(item.path)}
+            isDark={isDark}
+            badge={item.path === '/dashboard/community' ? communityUnreadCount : undefined}
+          />
         ))}
 
         {hasOverflow && (

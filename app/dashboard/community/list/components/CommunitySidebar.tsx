@@ -1,8 +1,15 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import CommunityItem from "./CommunityItem";
+import { communityService } from "@/lib/api-services";
+import {
+  getUnreadCount,
+  subscribe as subscribeUnread,
+  updateMessages,
+} from "../../lib/unreadTracker";
+import { useIsMobile } from "../../lib/useIsMobile";
 
 type CommunityEntry = {
   id: string;
@@ -27,16 +34,48 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
   externalSearch,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isMobile, setIsMobile]       = useState(false);
+  const isMobile = useIsMobile();
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const prevSelectedIdRef = useRef<string | null>(null);
 
+  // Restore focus to the previously selected community item when the chat closes.
   useEffect(() => {
-    const check = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+    if (!selectedCommunity && prevSelectedIdRef.current) {
+      itemRefs.current.get(prevSelectedIdRef.current)?.focus();
+      prevSelectedIdRef.current = null;
+    } else if (selectedCommunity) {
+      prevSelectedIdRef.current = selectedCommunity.id;
+    }
+  }, [selectedCommunity]);
 
-  const activeSearch = externalSearch !== undefined ? externalSearch : searchQuery;
+  // Re-render whenever unread counts change.
+  useEffect(() => subscribeUnread(forceUpdate), []);
+
+  // While no chat is open, poll all communities every 30s so badges stay current.
+  useEffect(() => {
+    if (selectedCommunity || communities.length === 0) return;
+
+    const poll = () => {
+      communities.forEach((c) => {
+        communityService
+          .getMessages(c.id, { limit: 20 })
+          .then((res: unknown) => {
+            const data = (res as any)?.data ?? res;
+            const items = Array.isArray(data) ? data : [];
+            updateMessages(c.id, [...items].reverse());
+          })
+          .catch(() => {});
+      });
+    };
+
+    poll();
+    const id = setInterval(poll, 30_000);
+    return () => clearInterval(id);
+  }, [communities, selectedCommunity]);
+
+  // On mobile the header search bar is hidden, so always use the internal field there.
+  const activeSearch = (externalSearch !== undefined && !isMobile) ? externalSearch : searchQuery;
 
   const filtered = communities.filter((c) =>
     c.name.toLowerCase().includes(activeSearch.toLowerCase())
@@ -52,8 +91,9 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
           Communities ({communities.length})
         </p>
 
-        {/* Internal search — only shown when no external search is controlling filtering */}
-        {externalSearch === undefined && (
+        {/* On desktop, defer to the header search bar when one is provided.
+            On mobile, the header search is hidden so always show the internal field. */}
+        {(externalSearch === undefined || isMobile) && (
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#717784]" />
             <input
@@ -77,8 +117,13 @@ export const CommunitySidebar: React.FC<CommunitySidebarProps> = ({
           filtered.map((community) => (
             <CommunityItem
               key={community.id}
+              ref={(el) => {
+                if (el) itemRefs.current.set(community.id, el);
+                else itemRefs.current.delete(community.id);
+              }}
               community={community}
               isSelected={selectedCommunity?.id === community.id}
+              unreadCount={getUnreadCount(community.id)}
               onClick={() => onSelectCommunity(community)}
             />
           ))

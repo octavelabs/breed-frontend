@@ -10,6 +10,7 @@ type Props = {
   ref?: ForwardedRef<HTMLButtonElement>;
   title?: string;
   type?: "reset" | "submit" | "button";
+  "aria-label"?: string;
 };
 
 const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
@@ -22,6 +23,7 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
     disabled,
     title,
     type,
+    "aria-label": ariaLabel,
   },
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => {
@@ -37,13 +39,14 @@ const Button: React.ForwardRefRenderFunction<HTMLButtonElement, Props> = (
   return (
     <button
       title={title}
+      aria-label={ariaLabel}
       ref={ref}
       onClick={onClick}
       disabled={disabled || loading}
       className={`${buttonStyleClass} ${
-        loading && !disabled
+        loading
           ? "!cursor-not-allowed opacity-[0.5]"
-          : !loading && disabled
+          : disabled
             ? "!cursor-not-allowed !bg-[rgba(217,217,217,0.48)]"
             : ""
       } flex gap-1 relative justify-center cursor-pointer items-center rounded-full text-base h-10 w-auto  text-sm font-semibold  ${customClasses}`}

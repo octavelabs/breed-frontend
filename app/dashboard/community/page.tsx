@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useIsMobile } from "./lib/useIsMobile";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Toast from "@/app/components/Toast";
 import {
   Plus,
   SearchIcon,
@@ -18,6 +20,7 @@ import Link from "next/link";
 import { CreateCommunityModal } from "./list/components/CreateCommunityModal";
 import { CommunitySidebar } from "./list/components/CommunitySidebar";
 import { CommunityChatView } from "./list/components/CommunityChatView";
+import { EmptyState } from "./list/components/EmptyState";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -119,28 +122,28 @@ const ExploreTab = ({
   onClearSearch,
 }: {
   joinedIds: Set<string>;
-  onJoined: (id: string) => void;
-  onSwitchToMine: () => void;
   search: string;
   onClearSearch: () => void;
 }) => {
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
   const { data: communities = [], isLoading: loading } = useQuery({
-    queryKey: ['communities'],
+    queryKey: ['communities', debouncedSearch],
     queryFn: () =>
-      communityService.getAll({ limit: 50 }).then((res: unknown) => {
+      communityService.getAll({ limit: 50, search: debouncedSearch || undefined }).then((res: unknown) => {
         const data = (res as any)?.data ?? res;
         return Array.isArray(data) ? (data as Community[]) : [];
       }),
   });
 
-  const filtered = communities.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      (c.description ?? "").toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = communities;
 
   return (
-    <div className="px-4 lg:px-12 py-6 border-t border-[#D2D9DF] dark:border-[#2D313A]">
+    <div className="flex-1 overflow-auto px-4 lg:px-12 py-6 border-t border-[#D2D9DF] dark:border-[#2D313A]">
       {/* Loading */}
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -218,43 +221,62 @@ const MyCommunitiesTab = ({
   refreshKey,
   onLeave,
   search,
+  onChatOpenChange,
 }: {
   openModal: () => void;
   isMobile: boolean;
   refreshKey: number;
   onLeave: (id: string) => void;
   search: string;
+  onChatOpenChange?: (open: boolean) => void;
 }) => {
-  const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(
-    null,
-  );
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
+  const [leaveMsg, setLeaveMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
-    communityService
-      .getMine()
-      .then((res: unknown) => {
+  const handleSetSelected = useCallback((c: Community | null) => {
+    setSelectedCommunity(c);
+    onChatOpenChange?.(c !== null);
+  }, [onChatOpenChange]);
+
+  const { data: communities = [], isLoading: loading } = useQuery({
+    queryKey: ["my-communities", refreshKey],
+    queryFn: () =>
+      communityService.getMine().then((res: unknown) => {
         const data = (res as any)?.data ?? res;
-        setCommunities(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setCommunities([]))
-      .finally(() => setLoading(false));
-  }, [refreshKey]);
+        return Array.isArray(data) ? (data as Community[]) : [];
+      }),
+  });
 
   const handleLeave = useCallback(
     (id: string) => {
-      setCommunities((prev) => prev.filter((c) => c.id !== id));
-      setSelectedCommunity(null);
+      const leaving = (
+        queryClient.getQueryData<Community[]>(["my-communities", refreshKey]) ?? []
+      ).find((c) => c.id === id);
+      // Optimistically remove from cache without waiting for a refetch.
+      queryClient.setQueryData<Community[]>(["my-communities", refreshKey], (old = []) =>
+        old.filter((c) => c.id !== id),
+      );
+      handleSetSelected(null);
       onLeave(id);
+      if (leaving?.name) setLeaveMsg(`You left "${leaving.name}"`);
     },
-    [onLeave],
+    [handleSetSelected, onLeave, queryClient, refreshKey],
+  );
+
+  const handleCoverUpdated = useCallback(
+    (id: string, url: string) => {
+      queryClient.setQueryData<Community[]>(["my-communities", refreshKey], (old = []) =>
+        old.map((c) => (c.id === id ? { ...c, coverImage: url } : c)),
+      );
+      setSelectedCommunity((prev) => (prev?.id === id ? { ...prev, coverImage: url } : prev));
+    },
+    [queryClient, refreshKey],
   );
 
   if (loading) {
     return (
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] dark:border-[#2D313A]">
+      <div className="flex-1 flex flex-col border-t border-[#D2D9DF] dark:border-[#2D313A]">
         <div className="flex flex-col gap-2 w-full lg:w-72 px-4 pt-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
@@ -272,7 +294,7 @@ const MyCommunitiesTab = ({
 
   if (communities.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 gap-5 text-center border-t border-[#D2D9DF] dark:border-[#2D313A]">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 gap-5 text-center border-t border-[#D2D9DF] dark:border-[#2D313A]">
         <div className="w-20 h-20 rounded-full bg-[#F5EBFF] dark:bg-[#181A1F] flex items-center justify-center">
           <img
             src="/emptyCommunity.svg"
@@ -307,49 +329,39 @@ const MyCommunitiesTab = ({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-150px)] border-t border-[#D2D9DF] dark:border-[#2D313A]">
-      <CommunitySidebar
-        communities={communities}
-        selectedCommunity={selectedCommunity}
-        onSelectCommunity={(c) => setSelectedCommunity(c as Community)}
-        externalSearch={search}
-      />
-      {isMobile ? (
-        selectedCommunity ? (
+    <>
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden border-t border-[#D2D9DF] dark:border-[#2D313A]">
+        <CommunitySidebar
+          communities={communities}
+          selectedCommunity={selectedCommunity}
+          onSelectCommunity={(c) => handleSetSelected(c as Community)}
+          externalSearch={search}
+        />
+        {isMobile ? (
+          selectedCommunity ? (
+            <CommunityChatView
+              community={selectedCommunity}
+              setSelectedCommunity={handleSetSelected}
+              onLeave={handleLeave}
+              onCoverUpdated={handleCoverUpdated}
+            />
+          ) : null
+        ) : selectedCommunity ? (
           <CommunityChatView
             community={selectedCommunity}
             setSelectedCommunity={setSelectedCommunity}
             onLeave={handleLeave}
-            onCoverUpdated={(id, url) => {
-              setCommunities((prev) => prev.map((c) => c.id === id ? { ...c, coverImage: url } : c));
-              setSelectedCommunity((prev) => prev?.id === id ? { ...prev, coverImage: url } : prev);
-            }}
+            onCoverUpdated={handleCoverUpdated}
           />
-        ) : null
-      ) : selectedCommunity ? (
-        <CommunityChatView
-          community={selectedCommunity}
-          setSelectedCommunity={setSelectedCommunity}
-          onLeave={handleLeave}
-          onCoverUpdated={(id, url) => {
-            setCommunities((prev) => prev.map((c) => c.id === id ? { ...c, coverImage: url } : c));
-            setSelectedCommunity((prev) => prev?.id === id ? { ...prev, coverImage: url } : prev);
-          }}
-        />
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-8">
-          <div className="w-16 h-16 rounded-full bg-[#F5EBFF] dark:bg-[#2D1B4E] flex items-center justify-center">
-            <Users size={26} className="text-[#870BD6]" />
-          </div>
-          <p className="text-base font-semibold text-[#180426] dark:text-white">
-            Select a community
-          </p>
-          <p className="text-sm text-[#60666B] dark:text-[#9CA3AF] max-w-xs">
-            Choose a community from the list to start chatting.
-          </p>
-        </div>
+        ) : (
+          <EmptyState />
+        )}
+      </div>
+
+      {leaveMsg && (
+        <Toast message={leaveMsg} type="success" onDismiss={() => setLeaveMsg(null)} />
       )}
-    </div>
+    </>
   );
 };
 
@@ -360,18 +372,11 @@ const CommunityPage = () => {
     "communities",
   );
   const [openModal, setOpenModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [refreshKey, setRefreshKey] = useState(0);
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    const check = () =>
-      setIsMobile(window.matchMedia("(max-width: 767px)").matches);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const handleCreateCommunity = async (formData: {
     name: string;
@@ -423,10 +428,11 @@ const CommunityPage = () => {
   const switchTab = (tab: "communities" | "explore") => {
     setActiveTab(tab);
     setSearch("");
+    setChatOpen(false);
   };
 
   return (
-    <DashboardLayout custom={true}>
+    <DashboardLayout custom={true} noScroll hideNav={chatOpen && activeTab === "communities"}>
       {openModal && (
         <CreateCommunityModal
           isOpen={openModal}
@@ -461,10 +467,10 @@ const CommunityPage = () => {
         </div>
       </div>
 
-      {/* Tab content */}
-      <div className="bg-white dark:bg-[#121316] min-h-screen">
+      {/* Tab content — flex-1 fills remaining height inside noScroll main */}
+      <div className="bg-white dark:bg-[#121316] flex-1 flex flex-col overflow-hidden">
         {/* Tab pills + search row */}
-        <div className="px-4 lg:px-12 py-5 flex items-center justify-between gap-4">
+        <div className="px-4 lg:px-12 py-5 flex items-center justify-between gap-4 shrink-0">
           <div className="flex gap-3 overflow-x-auto">
             {TABS.map((tab) => (
               <button
@@ -504,13 +510,12 @@ const CommunityPage = () => {
             refreshKey={refreshKey}
             onLeave={handleLeft}
             search={search}
+            onChatOpenChange={setChatOpen}
           />
         )}
         {activeTab === "explore" && (
           <ExploreTab
             joinedIds={joinedIds}
-            onJoined={handleJoined}
-            onSwitchToMine={() => setActiveTab("communities")}
             search={search}
             onClearSearch={() => setSearch("")}
           />

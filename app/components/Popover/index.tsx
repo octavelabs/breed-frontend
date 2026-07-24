@@ -39,8 +39,8 @@ const CustomPopover: React.FC<CustomPopoverProp> = ({ buttonRef, content, handle
   return (
     <div
     ref={popoverRef}
-      className="popover absolute -ml-20 flex flex-col w-auto h-auto z-20 bg-white font-bold
-      shadow-[0px_0px_3.2px_1.5px_rgba(100,132,230,0.20)] rounded-[6px] text-xs md:text-sm "
+      className="popover absolute -ml-20 flex flex-col w-auto h-auto z-20 bg-white dark:bg-[#252830] font-bold
+      shadow-[0px_0px_3.2px_1.5px_rgba(100,132,230,0.20)] dark:shadow-[0px_0px_3.2px_1.5px_rgba(0,0,0,0.40)] rounded-[6px] text-xs md:text-sm overflow-hidden"
       style={{
         top: `${rect!.bottom - parentRect!.top + topOffset}px`,
         left: `${rect!.left - parentRect!.left - leftOffset}px`
@@ -48,10 +48,13 @@ const CustomPopover: React.FC<CustomPopoverProp> = ({ buttonRef, content, handle
     >
       {content.map((el: any, idx: number) => (
         <React.Fragment key={idx}>
-          <div className="flex  px-4 py-2 gap-x-3 items-center cursor-pointer " onClick={() => {
-            el.onClick()
-            handleClose()
-            }}>
+          <div
+            className="flex px-4 py-2 gap-x-3 items-center cursor-pointer text-[#180426] dark:text-[#E2E4E9] hover:bg-[#F8FAFC] dark:hover:bg-[#2D313A] transition-colors"
+            onClick={() => {
+              el.onClick()
+              handleClose()
+            }}
+          >
             {hasIcon && el.icon}
             <p className="text-xs md:text-sm font-medium whitespace-nowrap">{el.item}</p>
           </div>
